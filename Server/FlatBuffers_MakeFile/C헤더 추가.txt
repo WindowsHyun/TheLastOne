@@ -1,0 +1,4 @@
+		/* 왜인지 모르겠지만 Get이 없어서 샘플에서 가져왔다..! */
+		inline const Game::Hyun::Client *GetClientView( const void *buf ) {
+			return flatbuffers::GetRoot<Game::Hyun::Client>( buf );
+		}

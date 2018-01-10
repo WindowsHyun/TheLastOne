@@ -1,0 +1,15 @@
+// Example IDL file for our monster's schema.
+
+namespace Game.Hyun;
+
+struct Vec3 {
+  x:float;
+  y:float;
+  z:float;
+}
+
+table Client {
+  pos:Vec3;
+  rotation:Vec3;
+  view:Vec3;
+}
