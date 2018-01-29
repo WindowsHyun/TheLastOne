@@ -10,12 +10,16 @@ public class FireCtrl : MonoBehaviour {
     // 총알 발사 좌표
     public Transform firePos;
 
+
+    private Animator animator;
+
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
         {
             Fire();
         }
+        //animator.SetBool("IsTrace", true);
     }
 
     void Fire()

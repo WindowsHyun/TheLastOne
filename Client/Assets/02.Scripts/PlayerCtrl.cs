@@ -2,24 +2,59 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
+
 public class PlayerCtrl : MonoBehaviour
 {
+    // 캐릭터의 상태 정보가 있는 Enumerable 변수 선언
+    public enum PlayerState { run, fire };
+
+    // 캐릭터의 현재 상태 정보를 저장할 Enum 변수
+    public PlayerState playerState = PlayerState.run;
+    
     private float h = 0.0f;
     private float v = 0.0f;
 
     // 접근해야 하는 컴포넌트는 반드시 변수에 할당한 후 사용
     private Transform tr;
+    private Animator animator;
 
-    // 이동 속도 변수
-    public float moveSpeed = 10.0f;
-
-    // 회전 속도 변수
+    // 캐릭터 이동 속도 변수
+    public float moveSpeed = 23.0f;
+    // 캐릭터 회전 속도 변수
     public float rotSpeed = 100.0f;
+
+    // 총알 프리팹
+    public GameObject bullet;
+    // 총알 발사 좌표
+    public Transform firePos;
+    // 총알 발사 사운드
+    public AudioClip fireSfx;
+
+    // AudioSource 컴포넌트를 저장할 변수
+    private AudioSource source = null;
+
+    // MuzzleFlash의 MeshRenderer 컴포넌트 연결 변수
+    public MeshRenderer muzzleFlash1;
+    public MeshRenderer muzzleFlash2;
 
     void Start()
     {
         // 스크립트 처음에 Transform 컴포넌트 할당
         tr = GetComponent<Transform>();
+
+        // Animator 컴포넌트 할당
+        animator = this.transform.GetChild(0).GetComponent<Animator>();
+
+        // AudioSource 컴포넌트를 추출한 후 변수에 할당
+        source = GetComponent<AudioSource>();
+
+        // 최초의 MuzzleFlash MeshRenderer를 비활성화
+        muzzleFlash1.enabled = false;
+        muzzleFlash2.enabled = false;
+
+        animator.SetBool("IsTrace", false);
+
     }
 
     void Update()
@@ -27,8 +62,8 @@ public class PlayerCtrl : MonoBehaviour
         h = Input.GetAxis("Horizontal");
         v = Input.GetAxis("Vertical");
 
-        Debug.Log("H=" + h.ToString());
-        Debug.Log("V=" + v.ToString());
+        //Debug.Log("H=" + h.ToString());
+        //Debug.Log("V=" + v.ToString());
 
         // 전후좌우 이동 방향 벡터 계산
         Vector3 moveDir = (Vector3.forward * v) + (Vector3.right * h);
@@ -38,5 +73,51 @@ public class PlayerCtrl : MonoBehaviour
 
         // Vector3.up 축을 기준으로 rotSpeed만큼의 속도로 회전
         tr.Rotate(Vector3.up * Time.deltaTime * rotSpeed * Input.GetAxis("Mouse X"));
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            Fire();
+            animator.SetBool("IsTrace", true);
+          
+        }
+    }
+
+    void Fire()
+    {
+        // 동적으로 총알을 생성하는 함수
+        CreateBullet();
+
+        // 사운드 발생 함수
+        source.PlayOneShot(fireSfx, 0.9f);
+
+        // 잠시 기다리는 루틴을 위해 코루틴 함수로 호출
+        StartCoroutine(this.ShowMuzzleFlash());
+    }
+
+    void CreateBullet()
+    {
+        // Bullet 프리팹을 동적으로 생성
+        Instantiate(bullet, firePos.position, firePos.rotation);
+    }
+
+    // MuzzleFlash 활성 / 비활성화를 짧은 시간 동안 반복
+    IEnumerator ShowMuzzleFlash()
+    {
+        // MuzzleFlash 스케일을 불규칙하게 변경
+        float scale = Random.Range(0.05f, 0.2f);
+        muzzleFlash1.transform.localScale = Vector3.one * scale;
+        muzzleFlash2.transform.localScale = Vector3.one * scale;
+
+        // 활성화해서 보이게 함
+        muzzleFlash1.enabled = true;
+        muzzleFlash2.enabled = true;
+
+        // 불규칙적인 시간 동안 Delay한 다음MeshRenderer를 비활성화
+        yield return new WaitForSeconds(Random.Range(0.05f, 0.03f));
+
+        // 비활성화해서 보이지 않게 함
+        muzzleFlash1.enabled = false;
+        muzzleFlash2.enabled = false;
+
     }
 }

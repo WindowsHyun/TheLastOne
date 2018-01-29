@@ -84,10 +84,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\02.Scripts\BlockingCtrl.cs" />
     <Compile Include="Assets\02.Scripts\BulletCtrl.cs" />
     <Compile Include="Assets\02.Scripts\FireCtrl.cs" />
     <Compile Include="Assets\02.Scripts\FollowCam.cs" />
     <Compile Include="Assets\02.Scripts\PlayerCtrl.cs" />
+    <Compile Include="Assets\02.Scripts\WeaponCtrl.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\05.Models\Skybox\README.txt" />
