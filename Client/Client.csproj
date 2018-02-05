@@ -296,7 +296,7 @@
     <Compile Include="Assets\02.Scripts\WeaponCtrl.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\05.Models\Skybox\README.txt" />
+    <None Include="Assets\04.Images\Skybox\README.txt" />
     <None Include="Assets\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
     <None Include="Assets\Standard Assets\Environment\Water (Basic)\Shaders\FXWaterBasic.shader" />
     <None Include="Assets\Standard Assets\Environment\Water\Water\Shaders\FXWaterPro.shader" />
