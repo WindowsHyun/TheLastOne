@@ -1,2 +1,2 @@
-#TargetFrameworkVersion=v4.0:PlatformToolSet=v140:EnableManagedIncrementalBuild=false:VCToolArchitecture=Native32Bit:WindowsTargetPlatformVersion=8.1
-Debug|x64|E:\★텍스트자료\OneDrive\2017년도 졸업작품 준비\IOCP Server [C++]\|
+#TargetFrameworkVersion=v4.0:PlatformToolSet=v141:EnableManagedIncrementalBuild=false:VCToolArchitecture=Native32Bit:WindowsTargetPlatformVersion=10.0.16299.0
+Debug|x64|E:\★텍스트자료\OneDrive\2018년도 졸업작품\TheLastOne\Server\IOCP Server [C++]\|
