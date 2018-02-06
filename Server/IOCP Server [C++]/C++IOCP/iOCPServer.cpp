@@ -251,9 +251,9 @@ void ProcessPacket( int ci, char *packet ) {
 
 	try {
 		auto client_View = GetClientView( get_packet );
-		g_clients[ci].client_xyz.x = client_View->pos()->x();
+		g_clients[ci].client_xyz.x = client_View->pos()->x() + 10;
 		g_clients[ci].client_xyz.y = client_View->pos()->y();
-		g_clients[ci].client_xyz.z = client_View->pos()->z();
+		g_clients[ci].client_xyz.z = client_View->pos()->z() + 10;
 		g_clients[ci].view.x = client_View->view()->x();
 		g_clients[ci].view.y = client_View->view()->y();
 		g_clients[ci].view.z = client_View->view()->z();

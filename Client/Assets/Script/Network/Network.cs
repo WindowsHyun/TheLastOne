@@ -176,6 +176,9 @@ public class Network : MonoBehaviour
         ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
         var Get_ServerData = Client.GetRootAsClient(revc_buf);
 
+        Instantiate(OtherPlayer, new Vector3(Get_ServerData.Pos.Value.X, Get_ServerData.Pos.Value.Y, Get_ServerData.Pos.Value.Z), Quaternion.identity);
+        // 만들어주는 코드
+
         OtherPlayer.transform.position = new Vector3(Get_ServerData.Pos.Value.X, Get_ServerData.Pos.Value.Y, Get_ServerData.Pos.Value.Z);
 
 
