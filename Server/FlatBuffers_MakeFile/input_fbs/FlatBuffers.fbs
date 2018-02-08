@@ -1,6 +1,6 @@
 // Example IDL file for our monster's schema.
 
-namespace Game.Hyun;
+namespace Game.TheLastOne;
 
 struct Vec3 {
   x:float;
@@ -8,8 +8,14 @@ struct Vec3 {
   z:float;
 }
 
-table Client {
-  pos:Vec3;
+table Client_info {
+  id:int;
+  hp:int;
+  name:string;
+  xyz:Vec3;
   rotation:Vec3;
-  view:Vec3;
+}
+
+table Client_id {
+  id:int;
 }

@@ -46,21 +46,19 @@ using namespace std::chrono;
 #define MAX_STR_SIZE  100
 //---------------------------------------------------------------------------------------------
 
-void err_quit( char *msg );
-void err_display( char *msg, int err_no );
+void err_quit(char *msg);
+void err_display(char *msg, int err_no);
 
 void init();
 void Worker_Thread();
 void Accept_Thread();
 void Shutdown_Server();
-void SendPutPlayerPacket( int client, int object );
-void SendPacket( int cl, void *packet );
-void DisconnectClient( int ci );
-void ProcessPacket( int ci, char *packet );
-void SendPositionPacket( int client, int object );
-void SendRemovePlayerPacket( int client, int object );
-void Send_Flat_Packet( int client, int object );
+void DisconnectClient(int ci);
+void ProcessPacket(int ci, char *packet);
+void SendPacket(int type, int cl, void *packet, int psize);
+void Send_Client_ID(int client_id);
 
+void Send_Position(int client_id, int object_id); // 임시로 클라이언트 캐릭터 위치를 보내야함.
 
 enum OPTYPE { OP_SEND, OP_RECV, OP_DO_AI, E_PLAYER_MOVE_NOTIFY, OP_Attack_Move, OP_Responder };
 enum Event_Type { E_MOVE, E_Attack_Move, E_Responder };

@@ -1,21 +1,12 @@
 #ifndef __PROTOCOL_H__
 #define __PROTOCOL_H__
 // 패킷 정보
-#define SC_POS           1
-#define SC_PUT_PLAYER    2
-#define SC_REMOVE_PLAYER 3
-#define SC_CHAT		4
-#define SC_INFO		5
+#define SC_ID           1					// 클라이언트 아이디를 보낸다.
+#define SC_PUT_PLAYER    2			// 클라이언트 추가
+#define SC_REMOVE_PLAYER 3		// 클라이언트 삭제
 
 // 패킷 정보 2
-#define CS_UP    1
-#define CS_DOWN  2
-#define CS_LEFT  3
-#define CS_RIGHT    4
-#define CS_CHAT		5
-#define CS_NPC		6	// 겹쳐도 상관없다. 어차피 충돌체크시에 확인할 부분이였다.
-#define CS_Attack		6
-#define CS_Move		7
+
 
 // BYTE를 255까지만 인식하여 int형인 BOOL로 수정
 
