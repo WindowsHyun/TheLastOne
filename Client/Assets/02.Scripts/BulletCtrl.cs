@@ -7,7 +7,7 @@ public class BulletCtrl : MonoBehaviour {
     public int damege = 20;
 
     // 총알의 발사 속도
-    public float speed = 1000.0f;
+    public float speed = 4000.0f;
 
     // 총알의 수명(초 단위)
     public float lifeTime = 2.0f;
