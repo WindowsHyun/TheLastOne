@@ -12,7 +12,7 @@ table Client_info {
   id:int;
   hp:int;
   name:string;
-  xyz:Vec3;
+  position:Vec3;
   rotation:Vec3;
 }
 

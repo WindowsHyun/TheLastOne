@@ -21,14 +21,14 @@ public struct Client_info : IFlatbufferObject
   public int Hp { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
   public string Name { get { int o = __p.__offset(8); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
   public ArraySegment<byte>? GetNameBytes() { return __p.__vector_as_arraysegment(8); }
-  public Vec3? Xyz { get { int o = __p.__offset(10); return o != 0 ? (Vec3?)(new Vec3()).__assign(o + __p.bb_pos, __p.bb) : null; } }
+  public Vec3? Position { get { int o = __p.__offset(10); return o != 0 ? (Vec3?)(new Vec3()).__assign(o + __p.bb_pos, __p.bb) : null; } }
   public Vec3? Rotation { get { int o = __p.__offset(12); return o != 0 ? (Vec3?)(new Vec3()).__assign(o + __p.bb_pos, __p.bb) : null; } }
 
   public static void StartClient_info(FlatBufferBuilder builder) { builder.StartObject(5); }
   public static void AddId(FlatBufferBuilder builder, int id) { builder.AddInt(0, id, 0); }
   public static void AddHp(FlatBufferBuilder builder, int hp) { builder.AddInt(1, hp, 0); }
   public static void AddName(FlatBufferBuilder builder, StringOffset nameOffset) { builder.AddOffset(2, nameOffset.Value, 0); }
-  public static void AddXyz(FlatBufferBuilder builder, Offset<Vec3> xyzOffset) { builder.AddStruct(3, xyzOffset.Value, 0); }
+  public static void AddPosition(FlatBufferBuilder builder, Offset<Vec3> positionOffset) { builder.AddStruct(3, positionOffset.Value, 0); }
   public static void AddRotation(FlatBufferBuilder builder, Offset<Vec3> rotationOffset) { builder.AddStruct(4, rotationOffset.Value, 0); }
   public static Offset<Client_info> EndClient_info(FlatBufferBuilder builder) {
     int o = builder.EndObject();

@@ -237,23 +237,23 @@ void ProcessPacket(int ci, char *packet) {
 
 	try {
 		auto client_View = GetClientView(get_packet);
-		g_clients[ci].client_xyz.x = client_View->xyz()->x();
-		g_clients[ci].client_xyz.y = client_View->xyz()->y();
-		g_clients[ci].client_xyz.z = client_View->xyz()->z();
+		g_clients[ci].client_xyz.x = client_View->position()->x();
+		g_clients[ci].client_xyz.y = client_View->position()->y();
+		g_clients[ci].client_xyz.z = client_View->position()->z();
 		g_clients[ci].view.x = client_View->rotation()->x();
 		g_clients[ci].view.y = client_View->rotation()->y();
 		g_clients[ci].view.z = client_View->rotation()->z();
 
-		//std::cout << g_clients[ci].client_xyz.x << ", " << g_clients[ci].client_xyz.y << ", " << g_clients[ci].client_xyz.z << std::endl;
+		//std::cout << g_clients[ci].view.x << ", " << g_clients[ci].view.y << ", " << g_clients[ci].view.z << std::endl;
 
 
-
+		
 		// 임시로 클라 0에게 1의 데이터를 보낸다.
 		for (int i = 1; i < 10; ++i) {
 			g_clients[ci + i].hp = i;
-			g_clients[ci + i].client_xyz.x = client_View->xyz()->x() + 10 + ( i  * 2);
-			g_clients[ci + i].client_xyz.y = client_View->xyz()->y();
-			g_clients[ci + i].client_xyz.z = client_View->xyz()->z() + 10 + (i * 2);
+			g_clients[ci + i].client_xyz.x = client_View->position()->x() + 10 + ( i  * 2);
+			g_clients[ci + i].client_xyz.y = client_View->position()->y();
+			g_clients[ci + i].client_xyz.z = client_View->position()->z();
 			g_clients[ci + i].view.x = client_View->rotation()->x();
 			g_clients[ci + i].view.y = client_View->rotation()->y();
 			g_clients[ci + i].view.z = client_View->rotation()->z();
@@ -262,6 +262,15 @@ void ProcessPacket(int ci, char *packet) {
 		for (int i = 1; i < 10; ++i) {
 			Send_Position(ci, i);
 		}
+		
+
+		/*
+		for (int i = 0; i < 10; ++i) {
+			if (ci == i)
+				continue;
+			Send_Position(ci, i);
+		}
+		*/
 	}
 	catch (DWORD dwError) {
 		errnum++;

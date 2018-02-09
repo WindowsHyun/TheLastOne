@@ -19,18 +19,20 @@ using Game.TheLastOne; // Client, Vec3 을 불러오기 위해
 public struct Client_Data
 {
     public int id;
-    public Vector3 Client_xyz;  // 클라이언트 위치
-    public Vector3 view;    // 클라이언트 보는 방향
+    public Vector3 position;  // 클라이언트 위치
+    public Vector3 rotation;    // 클라이언트 보는 방향
+    public bool prefab;    // 클라이언트 접속
     public bool connect;    // 클라이언트 접속
     public string name;     // 클라이언트 닉네임
     public GameObject Player;
 
-    public Client_Data(Vector3 xyz, Vector3 view, bool connect, GameObject Player)
+    public Client_Data(Vector3 position, Vector3 rotation)
     {
         this.id = -1;
-        this.Client_xyz = xyz;
-        this.view = view;
-        this.connect = connect;
+        this.position = position;
+        this.rotation = rotation;
+        this.connect = false;
+        this.prefab = false;
         this.Player = null;
         this.name = "";
     }
@@ -40,33 +42,69 @@ public class Network : MonoBehaviour
 {
     public static Socket m_Socket;
     public GameObject Player;
-    public GameObject OtherPlayer;
+    public GameObject PrefabPlayer;
     public GameObject Camera;
 
-    Vector3 Player_Pos;
-    Vector3 Camera_Pos;
+    Vector3 Player_Position;
+    Vector3 Player_Rotation;
 
     public string iPAdress = "127.0.0.1";
     public const int kPort = 9000;
 
     public bool Connect = false;
     private const int MaxClient = 50;    // 최대 동접자수
-    public Client_Data[] client_data = new Client_Data[MaxClient];      // 클라이언트 데이터 저장할 구조체
+    public static Client_Data[] client_data = new Client_Data[MaxClient];      // 클라이언트 데이터 저장할 구조체
     public int Client_imei = 0;         // 자신의 클라이언트 아이디
 
 
-    private int ReceivedataLength;                     // Receive Data Length. (byte)
+    public int LimitReceivebyte = 2000;                     // Receive Data Length. (byte)
     private byte[] Receivebyte = new byte[2000];    // Receive data by this array to save.
     private string ReceiveString;                     // Receive bytes to Change string. 
+    private static ManualResetEvent receiveDone = new ManualResetEvent(false);
 
     FlatBufferBuilder fbb = new FlatBufferBuilder(1);
 
+    IEnumerator startPrefab()
+    {
+        do
+        {
+            for ( int i=0; i<MaxClient; ++i)
+            {
+                if (Client_imei == i)
+                    continue;
+                if ( client_data[i].connect == true && client_data[i].prefab == false)
+                {
+                    client_data[i].Player = Instantiate(PrefabPlayer, client_data[i].position, Quaternion.identity);
+                    client_data[i].prefab = true;
+                }
+                else if ( client_data[i].prefab == true)
+                {
+                    client_data[i].Player.transform.position = client_data[i].position;
+
+                    var rotationX = client_data[i].rotation.x;
+                    var rotationY = client_data[i].rotation.y;
+                    var rotationZ = client_data[i].rotation.z;
+                    //Debug.Log("  :  "+ rotationX + ", " + rotationY + ", " + rotationZ);
+                    client_data[i].Player.transform.rotation = Quaternion.Euler(rotationX, rotationY, rotationZ);
+                }
+            }
+
+            yield return null;
+        } while (true);
+
+
+        yield return null;
+    }
+
+    /*
     IEnumerator startServer(Socket m_Socket)
     {
         do
         {
             Array.Clear(Receivebyte, 0, Receivebyte.Length);
-            m_Socket.Receive(Receivebyte);
+            //m_Socket.Receive(Receivebyte);
+            m_Socket.Receive(Receivebyte, 0, m_Socket.Available, SocketFlags.None);
+
 
             //Receive(m_Socket);
 
@@ -76,9 +114,9 @@ public class Network : MonoBehaviour
             //소켓에 리시브가 들어왔을 경우
             int psize = Receivebyte[0]; // 패킷 사이즈
             int ptype = Receivebyte[1]; // 패킷 타입
-            Debug.Log("총 사이즈 : " + psize + ", 패킷 타입 : " + ptype);
+            //Debug.Log("총 사이즈 : " + psize + ", 패킷 타입 : " + ptype);
             ProcessPacket(psize, ptype, Receivebyte);
-
+            receiveDone.WaitOne();
 
 
             yield return null;
@@ -87,7 +125,7 @@ public class Network : MonoBehaviour
 
         yield return null;
     }
-
+    */
 
     void ProcessPacket(int size, int type, byte[] recvPacket)
     {
@@ -105,30 +143,34 @@ public class Network : MonoBehaviour
         {
             byte[] t_buf = new byte[size + 1];
             System.Buffer.BlockCopy(recvPacket, 4, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
-
             ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
             var Get_ServerData = Client_info.GetRootAsClient_info(revc_buf);
 
-
-            client_data[Get_ServerData.Id].Client_xyz = new Vector3(Get_ServerData.Xyz.Value.X, Get_ServerData.Xyz.Value.Y, Get_ServerData.Xyz.Value.Z);
+            client_data[Get_ServerData.Id].position = new Vector3(Get_ServerData.Position.Value.X, Get_ServerData.Position.Value.Y, Get_ServerData.Position.Value.Z);
+            client_data[Get_ServerData.Id].rotation = new Vector3(Get_ServerData.Rotation.Value.X, Get_ServerData.Rotation.Value.Y, Get_ServerData.Rotation.Value.Z);
             client_data[Get_ServerData.Id].name = Get_ServerData.Name;
-            client_data[Get_ServerData.Id].Player = OtherPlayer;
 
-            //Debug.Log("오브젝트 아이디 : " + Get_ServerData.Id);
-
-            if (client_data[Get_ServerData.Id].connect != true)
+            if (client_data[Get_ServerData.Id].connect != true && Client_imei != Get_ServerData.Id)
             {
                 // 클라이언트가 처음 들어와서 프리팹이 없을경우 
-                Instantiate(client_data[Get_ServerData.Id].Player, client_data[Get_ServerData.Id].Client_xyz, Quaternion.identity);
                 client_data[Get_ServerData.Id].connect = true;
             }
             else
             {
+                Debug.Log("오브젝트 아이디 : " + Get_ServerData.Id);
                 // 이미 클라이언트가 들어와 있을경우 위치만 옮겨준다.
-                client_data[Get_ServerData.Id].Player.transform.position = client_data[Get_ServerData.Id].Client_xyz;
-            }
+                //Debug.Log("오브젝트 아이디 : " + Get_ServerData.Id);
+                //client_data[Get_ServerData.Id].Player.transform.position = client_data[Get_ServerData.Id].position;
 
+                //var rotationX = client_data[Get_ServerData.Id].rotation.x;
+                //var rotationY = client_data[Get_ServerData.Id].rotation.y;
+                //var rotationZ = client_data[Get_ServerData.Id].rotation.z;
+                ////Debug.Log("  :  "+ rotationX + ", " + rotationY + ", " + rotationZ);
+                //client_data[Get_ServerData.Id].Player.transform.rotation = Quaternion.Euler(rotationX, rotationY, rotationZ);
+            }
         }
+        //Array.Clear(Receivebyte, 0, Receivebyte.Length);
+        //receiveDone.Set();
     }
 
     void Awake()
@@ -147,6 +189,8 @@ public class Network : MonoBehaviour
             IPAddress ipAddr = System.Net.IPAddress.Parse(iPAdress);
             IPEndPoint ipEndPoint = new System.Net.IPEndPoint(ipAddr, kPort);
             m_Socket.Connect(ipEndPoint);
+            m_Socket.BeginReceive(Receivebyte, 0, LimitReceivebyte, 0, DataReceived, m_Socket);
+            StartCoroutine(startPrefab());
         }
         catch (SocketException SCE)
         {
@@ -156,7 +200,19 @@ public class Network : MonoBehaviour
 
         //=======================================================
     }
+    
+    void DataReceived(IAsyncResult ar)
+    {
+        int psize = Receivebyte[0]; // 패킷 사이즈
+        int ptype = Receivebyte[1]; // 패킷 타입
+        Debug.Log("총 사이즈 : " + psize + ", 패킷 타입 : " + ptype);
+        ProcessPacket(psize, ptype, Receivebyte);
 
+
+
+        m_Socket.BeginReceive(Receivebyte, 0, LimitReceivebyte, 0, DataReceived, m_Socket);
+    }
+    
     void Send_Packet(byte[] packet)
     {
         try
@@ -175,7 +231,7 @@ public class Network : MonoBehaviour
         fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
         Client_info.StartClient_info(fbb);
         //Client.AddName(fbb, offset); // string 사용
-        Client_info.AddXyz(fbb, Vec3.CreateVec3(fbb, Player.x, Player.y, Player.z));
+        Client_info.AddPosition(fbb, Vec3.CreateVec3(fbb, Player.x, Player.y, Player.z));
         Client_info.AddRotation(fbb, Vec3.CreateVec3(fbb, Camera.x, Camera.y, Camera.z));
         var endOffset = Client_info.EndClient_info(fbb);
         fbb.Finish(endOffset.Value);
@@ -210,18 +266,20 @@ public class Network : MonoBehaviour
     void Update()
     {
 
-        Player_Pos.x = Player.transform.position.x;
-        Player_Pos.y = Player.transform.position.y;
-        Player_Pos.z = Player.transform.position.z;
-        Camera_Pos.x = Camera.transform.position.x;
-        Camera_Pos.y = Camera.transform.position.y;
-        Camera_Pos.z = Camera.transform.position.z;
-        Send_POS(Player_Pos, Camera_Pos);
+        Player_Position.x = Player.transform.position.x;
+        Player_Position.y = Player.transform.position.y;
+        Player_Position.z = Player.transform.position.z;
+        Player_Rotation.x = Player.transform.rotation.x;
+        Player_Rotation.y = Player.transform.rotation.y * 100;
+        Player_Rotation.z = Player.transform.rotation.z;
+        //Debug.Log(Player_Position.x + ", " + Player_Position.y + ", " + Player_Position.z);
+        //Debug.Log(Player_Rotation.x + ", " + Player_Rotation.y + ", " + Player_Rotation.z);
+        Send_POS(Player_Position, Player_Rotation);
 
         if (Connect == false)
         {
             Connect = true;
-            StartCoroutine(startServer(m_Socket));
+            //StartCoroutine(startServer(m_Socket));
         }
     }
 }

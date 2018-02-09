@@ -94,11 +94,12 @@ void Send_Client_ID(int client_id) {
 void Send_Position(int client, int object) {
 	// client = 자기자신, object = 상대방
 	flatbuffers::FlatBufferBuilder builder;
+	auto id = object;
 	auto name = builder.CreateString(g_clients[object].game_id);
 	auto hp = g_clients[object].hp;
 	auto xyz = Vec3(g_clients[object].client_xyz.x, g_clients[object].client_xyz.y, g_clients[object].client_xyz.z);
-	auto rotation = Vec3(30.16f, 20.123f, 10.0f);
-	auto orc = CreateClient_info(builder, object, hp, name, &xyz, &rotation);
+	auto rotation = Vec3(g_clients[object].view.x, g_clients[object].view.y, g_clients[object].view.z);
+	auto orc = CreateClient_info(builder, id, hp, name, &xyz, &rotation);
 	builder.Finish(orc); // Serialize the root of the object.
 	SendPacket(SC_PUT_PLAYER, client, builder.GetBufferPointer(), builder.GetSize());
 }

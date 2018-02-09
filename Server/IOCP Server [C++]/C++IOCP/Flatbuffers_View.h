@@ -50,7 +50,7 @@ namespace Game {
 				VT_ID = 4,
 				VT_HP = 6,
 				VT_NAME = 8,
-				VT_XYZ = 10,
+				VT_POSITION = 10,
 				VT_ROTATION = 12
 			};
 			int32_t id() const {
@@ -62,8 +62,8 @@ namespace Game {
 			const flatbuffers::String *name() const {
 				return GetPointer<const flatbuffers::String *>(VT_NAME);
 			}
-			const Vec3 *xyz() const {
-				return GetStruct<const Vec3 *>(VT_XYZ);
+			const Vec3 *position() const {
+				return GetStruct<const Vec3 *>(VT_POSITION);
 			}
 			const Vec3 *rotation() const {
 				return GetStruct<const Vec3 *>(VT_ROTATION);
@@ -74,7 +74,7 @@ namespace Game {
 					VerifyField<int32_t>(verifier, VT_HP) &&
 					VerifyOffset(verifier, VT_NAME) &&
 					verifier.Verify(name()) &&
-					VerifyField<Vec3>(verifier, VT_XYZ) &&
+					VerifyField<Vec3>(verifier, VT_POSITION) &&
 					VerifyField<Vec3>(verifier, VT_ROTATION) &&
 					verifier.EndTable();
 			}
@@ -92,8 +92,8 @@ namespace Game {
 			void add_name(flatbuffers::Offset<flatbuffers::String> name) {
 				fbb_.AddOffset(Client_info::VT_NAME, name);
 			}
-			void add_xyz(const Vec3 *xyz) {
-				fbb_.AddStruct(Client_info::VT_XYZ, xyz);
+			void add_position(const Vec3 *position) {
+				fbb_.AddStruct(Client_info::VT_POSITION, position);
 			}
 			void add_rotation(const Vec3 *rotation) {
 				fbb_.AddStruct(Client_info::VT_ROTATION, rotation);
@@ -115,11 +115,11 @@ namespace Game {
 			int32_t id = 0,
 			int32_t hp = 0,
 			flatbuffers::Offset<flatbuffers::String> name = 0,
-			const Vec3 *xyz = 0,
+			const Vec3 *position = 0,
 			const Vec3 *rotation = 0) {
 			Client_infoBuilder builder_(_fbb);
 			builder_.add_rotation(rotation);
-			builder_.add_xyz(xyz);
+			builder_.add_position(position);
 			builder_.add_name(name);
 			builder_.add_hp(hp);
 			builder_.add_id(id);
@@ -131,14 +131,14 @@ namespace Game {
 			int32_t id = 0,
 			int32_t hp = 0,
 			const char *name = nullptr,
-			const Vec3 *xyz = 0,
+			const Vec3 *position = 0,
 			const Vec3 *rotation = 0) {
 			return Game::TheLastOne::CreateClient_info(
 				_fbb,
 				id,
 				hp,
 				name ? _fbb.CreateString(name) : 0,
-				xyz,
+				position,
 				rotation);
 		}
 
