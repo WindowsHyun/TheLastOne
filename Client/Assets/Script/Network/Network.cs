@@ -60,7 +60,6 @@ public class Network : MonoBehaviour
     public int LimitReceivebyte = 2000;                     // Receive Data Length. (byte)
     private byte[] Receivebyte = new byte[2000];    // Receive data by this array to save.
     private string ReceiveString;                     // Receive bytes to Change string. 
-    private static ManualResetEvent receiveDone = new ManualResetEvent(false);
 
     FlatBufferBuilder fbb = new FlatBufferBuilder(1);
 
@@ -141,10 +140,17 @@ public class Network : MonoBehaviour
         }
         else if (type == 2)
         {
+            // 클라이언트 하나에 대한 데이터가 들어온다.
             byte[] t_buf = new byte[size + 1];
             System.Buffer.BlockCopy(recvPacket, 4, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
             ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
+
+            var data = new Offset<Client_info>[MaxClient];
+
             var Get_ServerData = Client_info.GetRootAsClient_info(revc_buf);
+
+            //for(int i=0; i<Get_ServerData.)
+
 
             client_data[Get_ServerData.Id].position = new Vector3(Get_ServerData.Position.Value.X, Get_ServerData.Position.Value.Y, Get_ServerData.Position.Value.Z);
             client_data[Get_ServerData.Id].rotation = new Vector3(Get_ServerData.Rotation.Value.X, Get_ServerData.Rotation.Value.Y, Get_ServerData.Rotation.Value.Z);
@@ -155,22 +161,55 @@ public class Network : MonoBehaviour
                 // 클라이언트가 처음 들어와서 프리팹이 없을경우 
                 client_data[Get_ServerData.Id].connect = true;
             }
-            else
-            {
-                Debug.Log("오브젝트 아이디 : " + Get_ServerData.Id);
-                // 이미 클라이언트가 들어와 있을경우 위치만 옮겨준다.
-                //Debug.Log("오브젝트 아이디 : " + Get_ServerData.Id);
-                //client_data[Get_ServerData.Id].Player.transform.position = client_data[Get_ServerData.Id].position;
-
-                //var rotationX = client_data[Get_ServerData.Id].rotation.x;
-                //var rotationY = client_data[Get_ServerData.Id].rotation.y;
-                //var rotationZ = client_data[Get_ServerData.Id].rotation.z;
-                ////Debug.Log("  :  "+ rotationX + ", " + rotationY + ", " + rotationZ);
-                //client_data[Get_ServerData.Id].Player.transform.rotation = Quaternion.Euler(rotationX, rotationY, rotationZ);
-            }
         }
-        //Array.Clear(Receivebyte, 0, Receivebyte.Length);
-        //receiveDone.Set();
+        else if (type == 4)
+        {
+            // 클라이언트 모든 데이터가 들어온다.
+            byte[] t_buf = new byte[size + 1];
+            System.Buffer.BlockCopy(recvPacket, 4, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
+            ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
+            var Get_ServerData = All_information.GetRootAsAll_information(revc_buf);
+
+            for (int i = 0; i < Get_ServerData.DataLength; i++)
+            {
+                var client_id = Get_ServerData.Data(i).Value.Id;
+                var position_x = Get_ServerData.Data(i).Value.Position.Value.X;
+                var position_y = Get_ServerData.Data(i).Value.Position.Value.Y;
+                var position_z = Get_ServerData.Data(i).Value.Position.Value.Z;
+                client_data[client_id].position = new Vector3(position_x, position_y, position_z);
+
+                var rotation_x = Get_ServerData.Data(i).Value.Rotation.Value.X;
+                var rotation_y = Get_ServerData.Data(i).Value.Rotation.Value.Y;
+                var rotation_z = Get_ServerData.Data(i).Value.Rotation.Value.Z;
+                client_data[client_id].rotation = new Vector3(rotation_x, rotation_y, rotation_z);
+
+                client_data[client_id].name = Get_ServerData.Data(i).Value.Name;
+
+                if (client_data[client_id].connect != true && Client_imei != client_id)
+                {
+                    // 클라이언트가 처음 들어와서 프리팹이 없을경우 
+                    client_data[client_id].connect = true;
+                }
+
+            }
+
+
+
+            //Debug.Log(Get_ServerData.Id);
+
+            //client_data[Get_ServerData.Id].position = new Vector3(Get_ServerData.Position.Value.X, Get_ServerData.Position.Value.Y, Get_ServerData.Position.Value.Z);
+            //client_data[Get_ServerData.Id].rotation = new Vector3(Get_ServerData.Rotation.Value.X, Get_ServerData.Rotation.Value.Y, Get_ServerData.Rotation.Value.Z);
+            //client_data[Get_ServerData.Id].name = Get_ServerData.Name;
+
+            //if (client_data[Get_ServerData.Id].connect != true && Client_imei != Get_ServerData.Id)
+            //{
+            //    // 클라이언트가 처음 들어와서 프리팹이 없을경우 
+            //    client_data[Get_ServerData.Id].connect = true;
+            //}
+        }
+
+
+
     }
 
     void Awake()
@@ -205,7 +244,7 @@ public class Network : MonoBehaviour
     {
         int psize = Receivebyte[0]; // 패킷 사이즈
         int ptype = Receivebyte[1]; // 패킷 타입
-        Debug.Log("총 사이즈 : " + psize + ", 패킷 타입 : " + ptype);
+        //Debug.Log("총 사이즈 : " + psize + ", 패킷 타입 : " + ptype);
         ProcessPacket(psize, ptype, Receivebyte);
 
 
@@ -269,9 +308,9 @@ public class Network : MonoBehaviour
         Player_Position.x = Player.transform.position.x;
         Player_Position.y = Player.transform.position.y;
         Player_Position.z = Player.transform.position.z;
-        Player_Rotation.x = Player.transform.rotation.x;
-        Player_Rotation.y = Player.transform.rotation.y * 100;
-        Player_Rotation.z = Player.transform.rotation.z;
+        Player_Rotation.x = Player.transform.eulerAngles.x;
+        Player_Rotation.y = Player.transform.eulerAngles.y;
+        Player_Rotation.z = Player.transform.eulerAngles.z;
         //Debug.Log(Player_Position.x + ", " + Player_Position.y + ", " + Player_Position.z);
         //Debug.Log(Player_Rotation.x + ", " + Player_Rotation.y + ", " + Player_Rotation.z);
         Send_POS(Player_Position, Player_Rotation);

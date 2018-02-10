@@ -8,6 +8,10 @@ struct Vec3 {
   z:float;
 }
 
+table All_information{
+  data:[Client_info];
+}
+
 table Client_info {
   id:int;
   hp:int;

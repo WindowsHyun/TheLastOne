@@ -57,6 +57,7 @@
      <Compile Include="Assets\02.Scripts\FollowCam.cs" />
      <Compile Include="Assets\02.Scripts\PlayerCtrl.cs" />
      <Compile Include="Assets\02.Scripts\WeaponCtrl.cs" />
+     <Compile Include="Assets\Script\Network\All_information.cs" />
      <Compile Include="Assets\Script\Network\Client_id.cs" />
      <Compile Include="Assets\Script\Network\Client_info.cs" />
      <Compile Include="Assets\Script\Network\Network.cs" />

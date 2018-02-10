@@ -191,12 +191,12 @@ void Accept_Thread() {
 		g_clients[new_id].recv_over.event_type = OP_RECV;
 		g_clients[new_id].recv_over.wsabuf.buf = reinterpret_cast<CHAR *>(g_clients[new_id].recv_over.IOCP_buf);
 		g_clients[new_id].recv_over.wsabuf.len = sizeof(g_clients[new_id].recv_over.IOCP_buf);
-		g_clients[new_id].client_xyz.x = 4.88;
-		g_clients[new_id].client_xyz.y = 2.546;
-		g_clients[new_id].client_xyz.z = 2;
-		g_clients[new_id].view.x = 4.38;
-		g_clients[new_id].view.y = 2.43;
-		g_clients[new_id].view.z = -2.28;
+		g_clients[new_id].position.x = 0;
+		g_clients[new_id].position.y = 0;
+		g_clients[new_id].position.z = 0;
+		g_clients[new_id].rotation.x = 0;
+		g_clients[new_id].rotation.y = 0;
+		g_clients[new_id].rotation.z = 0;
 		g_clients[new_id].hp = 100;
 
 		Send_Client_ID(new_id);		// 클라이언트에게 자신의 아이디를 보내준다.
@@ -237,17 +237,17 @@ void ProcessPacket(int ci, char *packet) {
 
 	try {
 		auto client_View = GetClientView(get_packet);
-		g_clients[ci].client_xyz.x = client_View->position()->x();
-		g_clients[ci].client_xyz.y = client_View->position()->y();
-		g_clients[ci].client_xyz.z = client_View->position()->z();
-		g_clients[ci].view.x = client_View->rotation()->x();
-		g_clients[ci].view.y = client_View->rotation()->y();
-		g_clients[ci].view.z = client_View->rotation()->z();
+		g_clients[ci].position.x = client_View->position()->x();
+		g_clients[ci].position.y = client_View->position()->y();
+		g_clients[ci].position.z = client_View->position()->z();
+		g_clients[ci].rotation.x = client_View->rotation()->x();
+		g_clients[ci].rotation.y = client_View->rotation()->y();
+		g_clients[ci].rotation.z = client_View->rotation()->z();
 
 		//std::cout << g_clients[ci].view.x << ", " << g_clients[ci].view.y << ", " << g_clients[ci].view.z << std::endl;
 
 
-		
+		/*
 		// 임시로 클라 0에게 1의 데이터를 보낸다.
 		for (int i = 1; i < 10; ++i) {
 			g_clients[ci + i].hp = i;
@@ -262,7 +262,7 @@ void ProcessPacket(int ci, char *packet) {
 		for (int i = 1; i < 10; ++i) {
 			Send_Position(ci, i);
 		}
-		
+		*/
 
 		/*
 		for (int i = 0; i < 10; ++i) {
@@ -271,6 +271,8 @@ void ProcessPacket(int ci, char *packet) {
 			Send_Position(ci, i);
 		}
 		*/
+		Send_All_Data(ci);
+
 	}
 	catch (DWORD dwError) {
 		errnum++;

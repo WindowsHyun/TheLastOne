@@ -11,6 +11,8 @@ namespace Game {
 
 		struct Vec3;
 
+		struct All_information;
+
 		struct Client_info;
 
 		struct Client_id;
@@ -44,6 +46,56 @@ namespace Game {
 			}
 		};
 		STRUCT_END(Vec3, 12);
+
+		struct All_information FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+			enum {
+				VT_DATA = 4
+			};
+			const flatbuffers::Vector<flatbuffers::Offset<Client_info>> *data() const {
+				return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Client_info>> *>(VT_DATA);
+			}
+			bool Verify(flatbuffers::Verifier &verifier) const {
+				return VerifyTableStart(verifier) &&
+					VerifyOffset(verifier, VT_DATA) &&
+					verifier.Verify(data()) &&
+					verifier.VerifyVectorOfTables(data()) &&
+					verifier.EndTable();
+			}
+		};
+
+		struct All_informationBuilder {
+			flatbuffers::FlatBufferBuilder &fbb_;
+			flatbuffers::uoffset_t start_;
+			void add_data(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Client_info>>> data) {
+				fbb_.AddOffset(All_information::VT_DATA, data);
+			}
+			All_informationBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+				: fbb_(_fbb) {
+				start_ = fbb_.StartTable();
+			}
+			All_informationBuilder &operator=(const All_informationBuilder &);
+			flatbuffers::Offset<All_information> Finish() {
+				const auto end = fbb_.EndTable(start_, 1);
+				auto o = flatbuffers::Offset<All_information>(end);
+				return o;
+			}
+		};
+
+		inline flatbuffers::Offset<All_information> CreateAll_information(
+			flatbuffers::FlatBufferBuilder &_fbb,
+			flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Client_info>>> data = 0) {
+			All_informationBuilder builder_(_fbb);
+			builder_.add_data(data);
+			return builder_.Finish();
+		}
+
+		inline flatbuffers::Offset<All_information> CreateAll_informationDirect(
+			flatbuffers::FlatBufferBuilder &_fbb,
+			const std::vector<flatbuffers::Offset<Client_info>> *data = nullptr) {
+			return Game::TheLastOne::CreateAll_information(
+				_fbb,
+				data ? _fbb.CreateVector<flatbuffers::Offset<Client_info>>(*data) : 0);
+		}
 
 		struct Client_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 			enum {

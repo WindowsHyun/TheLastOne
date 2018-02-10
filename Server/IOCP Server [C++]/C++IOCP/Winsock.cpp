@@ -57,6 +57,9 @@ void SendPacket(int type, int cl, void *packet, int psize) {
 		ZeroMemory(&over->over, sizeof(over->over));
 		over->event_type = OP_SEND;
 		char p_size[MAX_PACKET_SIZE]{ int(psize), int(type) };
+		// 패킷 사이즈가 252를 넘어갈경우 char크기를 초과해서 에러가 난다.
+		// 해당 부분을 어떻게 수정해야 할까?
+
 
 
 		// 패킷 사이즈를 미리 합쳐서 보내줘야한다.
@@ -97,9 +100,37 @@ void Send_Position(int client, int object) {
 	auto id = object;
 	auto name = builder.CreateString(g_clients[object].game_id);
 	auto hp = g_clients[object].hp;
-	auto xyz = Vec3(g_clients[object].client_xyz.x, g_clients[object].client_xyz.y, g_clients[object].client_xyz.z);
-	auto rotation = Vec3(g_clients[object].view.x, g_clients[object].view.y, g_clients[object].view.z);
+	auto xyz = Vec3(g_clients[object].position.x, g_clients[object].position.y, g_clients[object].position.z);
+	auto rotation = Vec3(g_clients[object].rotation.x, g_clients[object].rotation.y, g_clients[object].rotation.z);
 	auto orc = CreateClient_info(builder, id, hp, name, &xyz, &rotation);
 	builder.Finish(orc); // Serialize the root of the object.
 	SendPacket(SC_PUT_PLAYER, client, builder.GetBufferPointer(), builder.GetSize());
+}
+
+void Send_All_Data(int client) {
+	flatbuffers::FlatBufferBuilder builder;
+	
+	std::vector<flatbuffers::Offset<Client_info>> Individual_client;		// 개인 데이터
+
+	for (int i = 0; i < MAX_Client; ++i) {
+		if (g_clients[i].connect != true)
+			continue;
+		auto id = i;
+		auto name = builder.CreateString(g_clients[i].game_id);
+		auto hp = g_clients[i].hp;
+		auto xyz = Vec3(g_clients[i].position.x, g_clients[i].position.y, g_clients[i].position.z);
+		auto rotation = Vec3(g_clients[i].rotation.x, g_clients[i].rotation.y, g_clients[i].rotation.z);
+		auto client_data = CreateClient_info(builder, id, hp, name, &xyz, &rotation); 
+		// client_data 라는 테이블에 클라이언트 데이터가 들어가 있다.
+
+		Individual_client.push_back(client_data);	// Vector에 넣었다.
+		// Individual_client 라는 전체 테이블에 client_data를 넣어주자.
+	}
+
+	auto Full_client_data = builder.CreateVector(Individual_client);		// 이제 Vector로 묶어서 전송할 데이터로 만들어주자.
+
+	auto orc = CreateAll_information(builder, Full_client_data);		// 실제로 보내는 테이블 명은 Client_Data
+	builder.Finish(orc); // Serialize the root of the object.
+
+	SendPacket(SC_Client_Data, client, builder.GetBufferPointer(), builder.GetSize());
 }

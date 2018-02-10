@@ -4,6 +4,7 @@
 #define SC_ID           1					// 클라이언트 아이디를 보낸다.
 #define SC_PUT_PLAYER    2			// 클라이언트 추가
 #define SC_REMOVE_PLAYER 3		// 클라이언트 삭제
+#define SC_Client_Data	4				// 클라이언트 모든 데이터
 
 // 패킷 정보 2
 
