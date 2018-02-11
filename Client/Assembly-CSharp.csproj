@@ -57,11 +57,11 @@
      <Compile Include="Assets\02.Scripts\FollowCam.cs" />
      <Compile Include="Assets\02.Scripts\PlayerCtrl.cs" />
      <Compile Include="Assets\02.Scripts\WeaponCtrl.cs" />
-     <Compile Include="Assets\Script\Network\All_information.cs" />
-     <Compile Include="Assets\Script\Network\Client_id.cs" />
-     <Compile Include="Assets\Script\Network\Client_info.cs" />
-     <Compile Include="Assets\Script\Network\Network.cs" />
-     <Compile Include="Assets\Script\Network\Vec3.cs" />
+     <Compile Include="Assets\07.Network\All_information.cs" />
+     <Compile Include="Assets\07.Network\Client_id.cs" />
+     <Compile Include="Assets\07.Network\Client_info.cs" />
+     <Compile Include="Assets\07.Network\Network.cs" />
+     <Compile Include="Assets\07.Network\Vec3.cs" />
      <None Include="Assets\04.Images\Skybox\README.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
@@ -126,9 +126,6 @@
  <Reference Include="UnityEditor.WindowsStandalone.Extensions">
  <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/windowsstandalonesupport/UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
  </Reference>
- <Reference Include="FlatBuffers">
- <HintPath>E:/★텍스트자료/OneDrive/2018년도 졸업작품/TheLastOne/Client/Assets/Script/Network/FlatBuffers.dll</HintPath>
- </Reference>
  <Reference Include="UnityEngine.Advertisements">
  <HintPath>C:/Users/kwon6/AppData/LocalLow/Unity/cache/packages/packages.unity.com/com.unity.ads@2.0.3/UnityEngine.Advertisements.dll</HintPath>
  </Reference>
@@ -149,6 +146,9 @@
  </Reference>
  <Reference Include="UnityEngine.StandardEvents">
  <HintPath>C:/Users/kwon6/AppData/LocalLow/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.10/UnityEngine.StandardEvents.dll</HintPath>
+ </Reference>
+ <Reference Include="FlatBuffers">
+ <HintPath>E:/★텍스트자료/OneDrive/2018년도 졸업작품/TheLastOne/Client/Assets/07.Network/FlatBuffers.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>

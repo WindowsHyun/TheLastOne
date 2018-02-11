@@ -72,3 +72,9 @@
     + 3D Max를 이용해 3D 캐릭터, 건축물, 차량 등 오브젝트 자체 제작
     + 3D Max를 이용해 캐릭터 및 좀비의 여러 애니메이션 자체 제작
     + 포토샵을 이용한 UI 자체 제작
+
+---------
+인게임 화면
+---------
+![Image05](https://i.imgur.com/mWf8idz.png)
+![Image06](https://i.imgur.com/qcZk6R3.png)
