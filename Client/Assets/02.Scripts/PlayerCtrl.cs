@@ -11,7 +11,7 @@ public class PlayerCtrl : MonoBehaviour
 
     // 캐릭터의 현재 상태 정보를 저장할 Enum 변수
     public PlayerState playerState = PlayerState.run;
-    
+
     private float h = 0.0f;
     private float v = 0.0f;
 
@@ -38,6 +38,9 @@ public class PlayerCtrl : MonoBehaviour
     public MeshRenderer muzzleFlash1;
     public MeshRenderer muzzleFlash2;
 
+    // 마우스 고정 관련한 변수
+    public bool LockMouse = false;
+
     void Start()
     {
         // 스크립트 처음에 Transform 컴포넌트 할당
@@ -54,6 +57,11 @@ public class PlayerCtrl : MonoBehaviour
         muzzleFlash2.enabled = false;
 
         animator.SetBool("IsTrace", false);
+
+        // 처음 시작시 마우스를 잠궈버린다.
+        LockMouse = true;
+        Cursor.lockState = CursorLockMode.Locked;//마우스 커서 고정
+        Cursor.visible = false;//마우스 커서 보이기
 
     }
 
@@ -78,9 +86,21 @@ public class PlayerCtrl : MonoBehaviour
         {
             Fire();
             animator.SetBool("IsTrace", true);
-          
+
         }
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            Debug.Log("마우스 언락");
+            Cursor.lockState = CursorLockMode.None;//마우스 커서 고정
+            Cursor.visible = true;//마우스 커서 보이기
+            LockMouse = false;
+        }
+
     }
+
+
+
 
     void Fire()
     {
@@ -118,6 +138,5 @@ public class PlayerCtrl : MonoBehaviour
         // 비활성화해서 보이지 않게 함
         muzzleFlash1.enabled = false;
         muzzleFlash2.enabled = false;
-
     }
 }

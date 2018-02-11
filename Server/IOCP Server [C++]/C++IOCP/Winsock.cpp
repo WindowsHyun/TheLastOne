@@ -56,17 +56,16 @@ void SendPacket(int type, int cl, void *packet, int psize) {
 		OverlappedEx *over = new OverlappedEx;
 		ZeroMemory(&over->over, sizeof(over->over));
 		over->event_type = OP_SEND;
-		char p_size[MAX_PACKET_SIZE]{ int(psize), int(type) };
-		// 패킷 사이즈가 252를 넘어갈경우 char크기를 초과해서 에러가 난다.
-		// 해당 부분을 어떻게 수정해야 할까?
+		char p_size[MAX_PACKET_SIZE]{ int(type) };
+		// 매직패킷의 경우 많이 필요없다. 현재 쓸수 있는 1Byte만 지정
 
 
 
 		// 패킷 사이즈를 미리 합쳐서 보내줘야한다.
 		memcpy(over->IOCP_buf, packet, psize);
 
-		for (int i = 4; i < psize + 4; ++i) {
-			p_size[i] = over->IOCP_buf[i - 4];
+		for (int i = 2; i < psize + 2; ++i) {
+			p_size[i] = over->IOCP_buf[i - 2];
 		}
 
 		//strcat( p_size, reinterpret_cast<CHAR *>(over->IOCP_buf) );

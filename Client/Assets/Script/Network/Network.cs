@@ -55,6 +55,7 @@ public class Network : MonoBehaviour
     private const int MaxClient = 50;    // 최대 동접자수
     public static Client_Data[] client_data = new Client_Data[MaxClient];      // 클라이언트 데이터 저장할 구조체
     public int Client_imei = 0;         // 자신의 클라이언트 아이디
+    internal static ManualResetEvent recvDone = new ManualResetEvent(false);    //  recv 이벤트 제어
 
 
     public int LimitReceivebyte = 2000;                     // Receive Data Length. (byte)
@@ -67,16 +68,16 @@ public class Network : MonoBehaviour
     {
         do
         {
-            for ( int i=0; i<MaxClient; ++i)
+            for (int i = 0; i < MaxClient; ++i)
             {
                 if (Client_imei == i)
                     continue;
-                if ( client_data[i].connect == true && client_data[i].prefab == false)
+                if (client_data[i].connect == true && client_data[i].prefab == false)
                 {
                     client_data[i].Player = Instantiate(PrefabPlayer, client_data[i].position, Quaternion.identity);
                     client_data[i].prefab = true;
                 }
-                else if ( client_data[i].prefab == true)
+                else if (client_data[i].prefab == true)
                 {
                     client_data[i].Player.transform.position = client_data[i].position;
 
@@ -95,36 +96,6 @@ public class Network : MonoBehaviour
         yield return null;
     }
 
-    /*
-    IEnumerator startServer(Socket m_Socket)
-    {
-        do
-        {
-            Array.Clear(Receivebyte, 0, Receivebyte.Length);
-            //m_Socket.Receive(Receivebyte);
-            m_Socket.Receive(Receivebyte, 0, m_Socket.Available, SocketFlags.None);
-
-
-            //Receive(m_Socket);
-
-            //m_Socket.BeginReceive(Receivebyte, 0, Receivebyte.Length, SocketFlags.None, new AsyncCallback(ReaderThread), m_Socket);
-
-
-            //소켓에 리시브가 들어왔을 경우
-            int psize = Receivebyte[0]; // 패킷 사이즈
-            int ptype = Receivebyte[1]; // 패킷 타입
-            //Debug.Log("총 사이즈 : " + psize + ", 패킷 타입 : " + ptype);
-            ProcessPacket(psize, ptype, Receivebyte);
-            receiveDone.WaitOne();
-
-
-            yield return null;
-        } while (true);
-
-
-        yield return null;
-    }
-    */
 
     void ProcessPacket(int size, int type, byte[] recvPacket)
     {
@@ -132,7 +103,7 @@ public class Network : MonoBehaviour
         {
             // 클라이언트 아이디를 가져온다.
             byte[] t_buf = new byte[size + 1];
-            System.Buffer.BlockCopy(recvPacket, 4, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
+            System.Buffer.BlockCopy(recvPacket, 2, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
             ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
             var Get_ServerData = Client_id.GetRootAsClient_id(revc_buf);
             Client_imei = Get_ServerData.Id;
@@ -142,14 +113,11 @@ public class Network : MonoBehaviour
         {
             // 클라이언트 하나에 대한 데이터가 들어온다.
             byte[] t_buf = new byte[size + 1];
-            System.Buffer.BlockCopy(recvPacket, 4, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
+            System.Buffer.BlockCopy(recvPacket, 2, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
             ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
 
             var data = new Offset<Client_info>[MaxClient];
-
             var Get_ServerData = Client_info.GetRootAsClient_info(revc_buf);
-
-            //for(int i=0; i<Get_ServerData.)
 
 
             client_data[Get_ServerData.Id].position = new Vector3(Get_ServerData.Position.Value.X, Get_ServerData.Position.Value.Y, Get_ServerData.Position.Value.Z);
@@ -166,7 +134,7 @@ public class Network : MonoBehaviour
         {
             // 클라이언트 모든 데이터가 들어온다.
             byte[] t_buf = new byte[size + 1];
-            System.Buffer.BlockCopy(recvPacket, 4, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
+            System.Buffer.BlockCopy(recvPacket, 2, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
             ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
             var Get_ServerData = All_information.GetRootAsAll_information(revc_buf);
 
@@ -192,20 +160,6 @@ public class Network : MonoBehaviour
                 }
 
             }
-
-
-
-            //Debug.Log(Get_ServerData.Id);
-
-            //client_data[Get_ServerData.Id].position = new Vector3(Get_ServerData.Position.Value.X, Get_ServerData.Position.Value.Y, Get_ServerData.Position.Value.Z);
-            //client_data[Get_ServerData.Id].rotation = new Vector3(Get_ServerData.Rotation.Value.X, Get_ServerData.Rotation.Value.Y, Get_ServerData.Rotation.Value.Z);
-            //client_data[Get_ServerData.Id].name = Get_ServerData.Name;
-
-            //if (client_data[Get_ServerData.Id].connect != true && Client_imei != Get_ServerData.Id)
-            //{
-            //    // 클라이언트가 처음 들어와서 프리팹이 없을경우 
-            //    client_data[Get_ServerData.Id].connect = true;
-            //}
         }
 
 
@@ -239,19 +193,18 @@ public class Network : MonoBehaviour
 
         //=======================================================
     }
-    
+
     void DataReceived(IAsyncResult ar)
     {
-        int psize = Receivebyte[0]; // 패킷 사이즈
-        int ptype = Receivebyte[1]; // 패킷 타입
-        //Debug.Log("총 사이즈 : " + psize + ", 패킷 타입 : " + ptype);
+        //int psize = Receivebyte[0]; // 패킷 사이즈
+        int psize = m_Socket.EndReceive(ar);
+        int ptype = Receivebyte[0]; // 패킷 타입
+        Debug.Log("총 사이즈 : " + psize + ", 패킷 타입 : " + ptype);
         ProcessPacket(psize, ptype, Receivebyte);
-
-
 
         m_Socket.BeginReceive(Receivebyte, 0, LimitReceivebyte, 0, DataReceived, m_Socket);
     }
-    
+
     void Send_Packet(byte[] packet)
     {
         try

@@ -23,6 +23,7 @@
 #include <random>
 #include <chrono>
 #include <windows.h>
+#include <string.h>    // strchr 함수가 선언된 헤더 파일
 
 
 using namespace std::chrono;
@@ -32,7 +33,7 @@ using namespace std::chrono;
 #define SERVERPORT 9000
 #define BUFSIZE    1024
 #define MAX_BUFF_SIZE   4000
-#define MAX_PACKET_SIZE  255
+#define MAX_PACKET_SIZE  4000
 #define MAX_Client 999
 //---------------------------------------------------------------------------------------------
 // 게임 설정
