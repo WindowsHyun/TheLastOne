@@ -39,7 +39,10 @@ public class PlayerCtrl : MonoBehaviour
     public MeshRenderer muzzleFlash2;
 
     // 마우스 고정 관련한 변수
-    public bool LockMouse = false;
+    public bool lockMouse = false;
+
+    // 카메라 뷰 전환을 체크하기 위한 변수
+    public bool sensorCheck = false;
 
     void Start()
     {
@@ -59,7 +62,7 @@ public class PlayerCtrl : MonoBehaviour
         animator.SetBool("IsTrace", false);
 
         // 처음 시작시 마우스를 잠궈버린다.
-        LockMouse = true;
+        lockMouse = true;
         Cursor.lockState = CursorLockMode.Locked;//마우스 커서 고정
         Cursor.visible = false;//마우스 커서 보이기
 
@@ -92,14 +95,12 @@ public class PlayerCtrl : MonoBehaviour
         if (Input.GetMouseButtonDown(1))
         {
             Debug.Log("마우스 언락");
-            Cursor.lockState = CursorLockMode.None;//마우스 커서 고정
+            Cursor.lockState = CursorLockMode.None;//마우스 커서 고정 해제
             Cursor.visible = true;//마우스 커서 보이기
-            LockMouse = false;
+            lockMouse = false;
         }
 
     }
-
-
 
 
     void Fire()
@@ -139,4 +140,32 @@ public class PlayerCtrl : MonoBehaviour
         muzzleFlash1.enabled = false;
         muzzleFlash2.enabled = false;
     }
+
+    void OnTriggerEnter(Collider coll)
+    {
+
+        // 충돌한 Collider가 Camchange의 CAMCHANGE(Tag값)이면 카메라 전환 
+        if (coll.gameObject.tag == "CAMCHANGE")
+        {
+
+            FollowCam followCam = GameObject.Find("Main Camera").GetComponent<FollowCam>();
+            if (sensorCheck == false)
+            {
+                followCam.change = true;
+                Debug.Log("체크 인");
+                followCam.height = 2.5f;
+                followCam.dist = 7.0f;
+                sensorCheck = true;
+            }
+            else if (sensorCheck == true)
+            {
+                followCam.change = false;
+                Debug.Log("체크 아웃");
+                followCam.height = 45.0f;
+                followCam.dist = 20.0f;
+                sensorCheck = false;
+            }
+        }
+    }
 }
+
