@@ -15,11 +15,16 @@ table All_information{
 table Client_info {
   id:int;
   hp:int;
+  Shotting:bool;
   name:string;
   position:Vec3;
   rotation:Vec3;
 }
 
 table Client_id {
+  id:int;
+}
+
+table Client_Shot_info {
   id:int;
 }

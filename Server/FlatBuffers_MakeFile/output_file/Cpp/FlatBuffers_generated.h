@@ -17,6 +17,8 @@ struct Client_info;
 
 struct Client_id;
 
+struct Client_Shot_info;
+
 MANUALLY_ALIGNED_STRUCT(4) Vec3 FLATBUFFERS_FINAL_CLASS {
  private:
   float x_;
@@ -101,15 +103,19 @@ struct Client_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_ID = 4,
     VT_HP = 6,
-    VT_NAME = 8,
-    VT_POSITION = 10,
-    VT_ROTATION = 12
+    VT_SHOTTING = 8,
+    VT_NAME = 10,
+    VT_POSITION = 12,
+    VT_ROTATION = 14
   };
   int32_t id() const {
     return GetField<int32_t>(VT_ID, 0);
   }
   int32_t hp() const {
     return GetField<int32_t>(VT_HP, 0);
+  }
+  bool Shotting() const {
+    return GetField<uint8_t>(VT_SHOTTING, 0) != 0;
   }
   const flatbuffers::String *name() const {
     return GetPointer<const flatbuffers::String *>(VT_NAME);
@@ -124,6 +130,7 @@ struct Client_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_ID) &&
            VerifyField<int32_t>(verifier, VT_HP) &&
+           VerifyField<uint8_t>(verifier, VT_SHOTTING) &&
            VerifyOffset(verifier, VT_NAME) &&
            verifier.Verify(name()) &&
            VerifyField<Vec3>(verifier, VT_POSITION) &&
@@ -141,6 +148,9 @@ struct Client_infoBuilder {
   void add_hp(int32_t hp) {
     fbb_.AddElement<int32_t>(Client_info::VT_HP, hp, 0);
   }
+  void add_Shotting(bool Shotting) {
+    fbb_.AddElement<uint8_t>(Client_info::VT_SHOTTING, static_cast<uint8_t>(Shotting), 0);
+  }
   void add_name(flatbuffers::Offset<flatbuffers::String> name) {
     fbb_.AddOffset(Client_info::VT_NAME, name);
   }
@@ -156,7 +166,7 @@ struct Client_infoBuilder {
   }
   Client_infoBuilder &operator=(const Client_infoBuilder &);
   flatbuffers::Offset<Client_info> Finish() {
-    const auto end = fbb_.EndTable(start_, 5);
+    const auto end = fbb_.EndTable(start_, 6);
     auto o = flatbuffers::Offset<Client_info>(end);
     return o;
   }
@@ -166,6 +176,7 @@ inline flatbuffers::Offset<Client_info> CreateClient_info(
     flatbuffers::FlatBufferBuilder &_fbb,
     int32_t id = 0,
     int32_t hp = 0,
+    bool Shotting = false,
     flatbuffers::Offset<flatbuffers::String> name = 0,
     const Vec3 *position = 0,
     const Vec3 *rotation = 0) {
@@ -175,6 +186,7 @@ inline flatbuffers::Offset<Client_info> CreateClient_info(
   builder_.add_name(name);
   builder_.add_hp(hp);
   builder_.add_id(id);
+  builder_.add_Shotting(Shotting);
   return builder_.Finish();
 }
 
@@ -182,6 +194,7 @@ inline flatbuffers::Offset<Client_info> CreateClient_infoDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     int32_t id = 0,
     int32_t hp = 0,
+    bool Shotting = false,
     const char *name = nullptr,
     const Vec3 *position = 0,
     const Vec3 *rotation = 0) {
@@ -189,6 +202,7 @@ inline flatbuffers::Offset<Client_info> CreateClient_infoDirect(
       _fbb,
       id,
       hp,
+      Shotting,
       name ? _fbb.CreateString(name) : 0,
       position,
       rotation);
@@ -234,10 +248,45 @@ inline flatbuffers::Offset<Client_id> CreateClient_id(
   return builder_.Finish();
 }
 
-	/* 왜인지 모르겠지만 Get이 없어서 샘플에서 가져왔다..! */
-		inline const Game::TheLastOne::Client_info *GetClientView(const void *buf) {
-			return flatbuffers::GetRoot<Game::TheLastOne::Client_info>(buf);
-		}
+struct Client_Shot_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_ID = 4
+  };
+  int32_t id() const {
+    return GetField<int32_t>(VT_ID, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_ID) &&
+           verifier.EndTable();
+  }
+};
+
+struct Client_Shot_infoBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_id(int32_t id) {
+    fbb_.AddElement<int32_t>(Client_Shot_info::VT_ID, id, 0);
+  }
+  Client_Shot_infoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  Client_Shot_infoBuilder &operator=(const Client_Shot_infoBuilder &);
+  flatbuffers::Offset<Client_Shot_info> Finish() {
+    const auto end = fbb_.EndTable(start_, 1);
+    auto o = flatbuffers::Offset<Client_Shot_info>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Client_Shot_info> CreateClient_Shot_info(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t id = 0) {
+  Client_Shot_infoBuilder builder_(_fbb);
+  builder_.add_id(id);
+  return builder_.Finish();
+}
 
 }  // namespace TheLastOne
 }  // namespace Game

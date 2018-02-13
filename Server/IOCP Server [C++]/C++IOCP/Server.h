@@ -86,6 +86,7 @@ struct CLIENT {
 	char game_id[10]; // 클라에서 받아온 게임아이디를 저장
 	int hp = -1;
 	bool connect;
+	bool shotting = false;
 
 	SOCKET client_socket;
 	OverlappedEx recv_over;

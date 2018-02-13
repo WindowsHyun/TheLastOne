@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using TheLastOne.Game.Network;
+
 [RequireComponent(typeof(AudioSource))]
 
 public class PlayerCtrl : MonoBehaviour
@@ -43,6 +45,9 @@ public class PlayerCtrl : MonoBehaviour
 
     // 카메라 뷰 전환을 체크하기 위한 변수
     public bool sensorCheck = false;
+
+    // 플레이어가 총알 발사시 Packet을 전송하기 위하여
+    NetworkCtrl networkCtrl = new NetworkCtrl();
 
     void Start()
     {
@@ -89,6 +94,7 @@ public class PlayerCtrl : MonoBehaviour
         {
             Fire();
             animator.SetBool("IsTrace", true);
+            networkCtrl.Player_Shot();
 
         }
 
@@ -103,7 +109,7 @@ public class PlayerCtrl : MonoBehaviour
     }
 
 
-    void Fire()
+    public void Fire()
     {
         // 동적으로 총알을 생성하는 함수
         CreateBullet();

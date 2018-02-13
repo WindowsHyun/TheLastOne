@@ -197,6 +197,7 @@ void Accept_Thread() {
 		g_clients[new_id].rotation.x = 0;
 		g_clients[new_id].rotation.y = 0;
 		g_clients[new_id].rotation.z = 0;
+		g_clients[new_id].shotting = false;
 		g_clients[new_id].hp = 100;
 
 		Send_Client_ID(new_id);		// 클라이언트에게 자신의 아이디를 보내준다.
@@ -234,74 +235,38 @@ void ProcessPacket(int ci, char *packet) {
 	char get_packet[MAX_PACKET_SIZE];
 	for (int i = 4; i < MAX_PACKET_SIZE; ++i)
 		get_packet[i - 4] = packet[i];
-
 	try {
-		auto client_View = GetClientView(get_packet);
-		g_clients[ci].position.x = client_View->position()->x();
-		g_clients[ci].position.y = client_View->position()->y();
-		g_clients[ci].position.z = client_View->position()->z();
-		g_clients[ci].rotation.x = client_View->rotation()->x();
-		g_clients[ci].rotation.y = client_View->rotation()->y();
-		g_clients[ci].rotation.z = client_View->rotation()->z();
-
-		//std::cout << g_clients[ci].view.x << ", " << g_clients[ci].view.y << ", " << g_clients[ci].view.z << std::endl;
-
-
-		/*
-		// 임시로 클라 0에게 1의 데이터를 보낸다.
-		for (int i = 1; i < 10; ++i) {
-			g_clients[ci + i].hp = i;
-			g_clients[ci + i].client_xyz.x = client_View->position()->x() + 10 + ( i  * 2);
-			g_clients[ci + i].client_xyz.y = client_View->position()->y();
-			g_clients[ci + i].client_xyz.z = client_View->position()->z();
-			g_clients[ci + i].view.x = client_View->rotation()->x();
-			g_clients[ci + i].view.y = client_View->rotation()->y();
-			g_clients[ci + i].view.z = client_View->rotation()->z();
+		switch (packet[1]) {
+		case CS_Info:
+		{
+			auto client_View = GetClientView(get_packet);
+			g_clients[ci].position.x = client_View->position()->x();
+			g_clients[ci].position.y = client_View->position()->y();
+			g_clients[ci].position.z = client_View->position()->z();
+			g_clients[ci].rotation.x = client_View->rotation()->x();
+			g_clients[ci].rotation.y = client_View->rotation()->y();
+			g_clients[ci].rotation.z = client_View->rotation()->z();
+			
 		}
-		//Send_Flat_Packet( ci, ci+1 );
-		for (int i = 1; i < 10; ++i) {
-			Send_Position(ci, i);
-		}
-		*/
+		break;
 
-		/*
-		for (int i = 0; i < 10; ++i) {
-			if (ci == i)
-				continue;
-			Send_Position(ci, i);
+		case CS_Shot_info:
+		{
+			auto client_Shot_View = GetClient_Shot_infoView(get_packet);
+			std::cout << client_Shot_View->id() << std::endl;
+			g_clients[ci].shotting = true;
 		}
-		*/
+		break;
+
+		
+		}
 		Send_All_Data(ci);
-
+		g_clients[ci].shotting = false;
 	}
 	catch (DWORD dwError) {
 		errnum++;
 		std::cout << "Error : " << dwError << "Count : " << errnum << std::endl;
 	}
 
-	/*
-	// 첫번째 패킷정보를 읽어서 어떤 패킷인지 분석하는것은 하지 않는다.
-	// Flatbuffers를 사용하면서 구조가 달라졌다.
-	switch ( packet[1] ) {
-	case CS_UP:
-		break;
-	case CS_DOWN:
-		break;
-	case CS_LEFT:
-		break;
-	case CS_RIGHT:
-		break;
-	case CS_Attack:
-		break;
-	case CS_Move:
-		break;
-	default:
-#if (DebugMod == TRUE )
-		//printf( "Unknown Packet Type from Client : %d -> %d\n", ci, packet[1] );
 
-#endif
-		break;
-		//exit( -1 );
-	}
-	*/
 }
