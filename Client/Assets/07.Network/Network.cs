@@ -43,7 +43,6 @@ public class Network : MonoBehaviour
     public static Socket m_Socket;
     public GameObject Player;
     public GameObject PrefabPlayer;
-    public GameObject Camera;
 
     Vector3 Player_Position;
     Vector3 Player_Rotation;
@@ -217,14 +216,14 @@ public class Network : MonoBehaviour
         }
     }
 
-    void Send_POS(Vector3 Player, Vector3 Camera)
+    void Send_POS(Vector3 Player, Vector3 PlayerRotation)
     {
         //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.
         fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
         Client_info.StartClient_info(fbb);
         //Client.AddName(fbb, offset); // string 사용
         Client_info.AddPosition(fbb, Vec3.CreateVec3(fbb, Player.x, Player.y, Player.z));
-        Client_info.AddRotation(fbb, Vec3.CreateVec3(fbb, Camera.x, Camera.y, Camera.z));
+        Client_info.AddRotation(fbb, Vec3.CreateVec3(fbb, PlayerRotation.x, PlayerRotation.y, PlayerRotation.z));
         var endOffset = Client_info.EndClient_info(fbb);
         fbb.Finish(endOffset.Value);
 

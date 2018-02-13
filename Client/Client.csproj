@@ -293,6 +293,7 @@
   <ItemGroup>
     <Compile Include="Assets\02.Scripts\BulletCtrl.cs" />
     <Compile Include="Assets\02.Scripts\FollowCam.cs" />
+    <Compile Include="Assets\02.Scripts\OtherPlayerCtrl.cs" />
     <Compile Include="Assets\02.Scripts\ParticleCtrl.cs" />
     <Compile Include="Assets\02.Scripts\PlayerCtrl.cs" />
     <Compile Include="Assets\02.Scripts\WeaponCtrl.cs" />
