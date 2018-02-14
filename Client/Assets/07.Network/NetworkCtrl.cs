@@ -22,10 +22,11 @@ public struct Client_Data
     public int id;
     public Vector3 position;  // 클라이언트 위치
     public Vector3 rotation;    // 클라이언트 보는 방향
-    public bool prefab;    // 클라이언트 접속
+    public bool prefab;    // 클라이언트 프리팹이 만들어졌는지 확인
     public bool connect;    // 클라이언트 접속
     public string name;     // 클라이언트 닉네임
-    public GameObject Player;
+    public GameObject Player;   // 프리팹을 위한 게임 오브젝트
+    public OtherPlayerCtrl script;  // 프리팹 오브젝트 안의 함수를 호출하기 위한 스크립트
 
     public Client_Data(Vector3 position, Vector3 rotation)
     {
@@ -36,6 +37,7 @@ public struct Client_Data
         this.prefab = false;
         this.Player = null;
         this.name = "";
+        this.script = null;
     }
 }
 
@@ -62,7 +64,12 @@ namespace TheLastOne.Game.Network
         private int LimitReceivebyte = 2000;                     // Receive Data Length. (byte)
         private byte[] Receivebyte = new byte[2000];    // Receive data by this array to save.
         private byte[] Sendbyte = new byte[2000];
-        
+
+        // 서버가 클라이언트에게 보내는 이벤트 타입
+        private int SC_ID = 1;                          // 클라이언트 아이디를 보낸다.
+        private int SC_PUT_PLAYER = 2;            // 클라이언트 추가
+        private int SC_REMOVE_PLAYER = 3;     // 클라이언트 삭제
+        private int SC_Client_Data = 4;		        // 클라이언트 모든 데이터
 
 
         IEnumerator startPrefab()
@@ -76,6 +83,8 @@ namespace TheLastOne.Game.Network
                     if (client_data[i].connect == true && client_data[i].prefab == false)
                     {
                         client_data[i].Player = Instantiate(PrefabPlayer, client_data[i].position, Quaternion.identity);
+                        //client_data[i].script = GameObject.Find("OtherPlayerCtrl").GetComponent<OtherPlayerCtrl>();
+                        client_data[i].script = client_data[i].Player.GetComponent<OtherPlayerCtrl>();
                         client_data[i].prefab = true;
                     }
                     else if (client_data[i].prefab == true)
@@ -99,7 +108,7 @@ namespace TheLastOne.Game.Network
 
         void ProcessPacket(int size, int type, byte[] recvPacket)
         {
-            if (type == 1)
+            if (type == SC_ID)
             {
                 // 클라이언트 아이디를 가져온다.
                 byte[] t_buf = new byte[size + 1];
@@ -109,7 +118,7 @@ namespace TheLastOne.Game.Network
                 Client_imei = Get_ServerData.Id;
                 Debug.Log("클라이언트 아이디 : " + Client_imei);
             }
-            else if (type == 2)
+            else if (type == SC_PUT_PLAYER)
             {
                 // 클라이언트 하나에 대한 데이터가 들어온다.
                 byte[] t_buf = new byte[size + 1];
@@ -119,7 +128,7 @@ namespace TheLastOne.Game.Network
                 var data = new Offset<Client_info>[MaxClient];
                 var Get_ServerData = Client_info.GetRootAsClient_info(revc_buf);
 
-
+                // 클라이언트 데이터에 서버에서 받은 데이터를 넣어준다.
                 client_data[Get_ServerData.Id].position = new Vector3(Get_ServerData.Position.Value.X, Get_ServerData.Position.Value.Y, Get_ServerData.Position.Value.Z);
                 client_data[Get_ServerData.Id].rotation = new Vector3(Get_ServerData.Rotation.Value.X, Get_ServerData.Rotation.Value.Y, Get_ServerData.Rotation.Value.Z);
                 client_data[Get_ServerData.Id].name = Get_ServerData.Name;
@@ -130,7 +139,7 @@ namespace TheLastOne.Game.Network
                     client_data[Get_ServerData.Id].connect = true;
                 }
             }
-            else if (type == 4)
+            else if (type == SC_Client_Data)
             {
                 // 클라이언트 모든 데이터가 들어온다.
                 byte[] t_buf = new byte[size + 1];
@@ -138,8 +147,10 @@ namespace TheLastOne.Game.Network
                 ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
                 var Get_ServerData = All_information.GetRootAsAll_information(revc_buf);
 
+                // 서버에서 받은 데이터 묶음을 확인하여 묶음 수 만큼 추가해준다.
                 for (int i = 0; i < Get_ServerData.DataLength; i++)
                 {
+                    // 클라이언트 데이터에 서버에서 받은 데이터를 넣어준다.
                     var client_id = Get_ServerData.Data(i).Value.Id;
                     var position_x = Get_ServerData.Data(i).Value.Position.Value.X;
                     var position_y = Get_ServerData.Data(i).Value.Position.Value.Y;
@@ -153,13 +164,11 @@ namespace TheLastOne.Game.Network
 
                     client_data[client_id].name = Get_ServerData.Data(i).Value.Name;
 
-                    Debug.Log("Client : " + client_id + ", Value : " + Get_ServerData.Data(i).Value.Shotting);
-
-                    if ( Get_ServerData.Data(i).Value.Shotting == true)
+                    if (Get_ServerData.Data(i).Value.Shotting == true && i != Client_imei)
                     {
-                        Debug.Log(client_id + "가 총을 쏘다.");
-                        //PlayerCtrl script = client_data[client_id].Player.GetComponent<PlayerCtrl>();
-                        //script.Fire();
+                        // 자신이 아닌 다른 클라이언트가 총을 쏘면 해당 클라이언트의 script에 Fire을 호출한다.
+                        //Debug.Log(client_id + "가 총을 쏘다.");
+                        client_data[client_id].script.Fire();
                     }
 
                     if (client_data[client_id].connect != true && Client_imei != client_id)

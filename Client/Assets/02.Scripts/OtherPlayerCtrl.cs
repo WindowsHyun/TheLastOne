@@ -4,7 +4,8 @@ using UnityEngine;
 
 [RequireComponent(typeof(AudioSource))]
 
-public class OtherPlayerCtrl: MonoBehaviour {
+public class OtherPlayerCtrl : MonoBehaviour
+{
     // 캐릭터의 상태 정보가 있는 Enumerable 변수 선언
     public enum PlayerState { run, fire };
 
@@ -37,6 +38,9 @@ public class OtherPlayerCtrl: MonoBehaviour {
     public MeshRenderer muzzleFlash1;
     public MeshRenderer muzzleFlash2;
 
+    // 총알 프리팹 만드는 Bool 변수 [ 외부함수에서는 프리팹 생성이 안되기 때문에 ]
+    private bool createBullet_b = false;
+
     // 마우스 고정 관련한 변수
     //public bool lockMouse = false;
 
@@ -60,6 +64,8 @@ public class OtherPlayerCtrl: MonoBehaviour {
 
         animator.SetBool("IsTrace", false);
 
+        StartCoroutine(this.createPrefab());
+
         // 처음 시작시 마우스를 잠궈버린다.
         //lockMouse = true;
         //Cursor.lockState = CursorLockMode.Locked;//마우스 커서 고정
@@ -67,22 +73,11 @@ public class OtherPlayerCtrl: MonoBehaviour {
 
     }
 
-    void Fire()
+
+    public void Fire()
     {
-        // 동적으로 총알을 생성하는 함수
-        CreateBullet();
-
-        // 사운드 발생 함수
-        source.PlayOneShot(fireSfx, 0.9f);
-
-        // 잠시 기다리는 루틴을 위해 코루틴 함수로 호출
-        StartCoroutine(this.ShowMuzzleFlash());
-    }
-
-    void CreateBullet()
-    {
-        // Bullet 프리팹을 동적으로 생성
-        Instantiate(bullet, firePos.position, firePos.rotation);
+        // 동적으로 총알을 생성할 수 있게 true로 변경
+        createBullet_b = true;
     }
 
     // MuzzleFlash 활성 / 비활성화를 짧은 시간 동안 반복
@@ -105,30 +100,30 @@ public class OtherPlayerCtrl: MonoBehaviour {
         muzzleFlash2.enabled = false;
     }
 
-    //void OnTriggerEnter(Collider coll)
-    //{
+    IEnumerator createPrefab()
+    {
+        do
+        {
+            if (createBullet_b == true)
+            {
+                // 총쏘는 애니메이션으로 변경.
+                animator.SetBool("IsTrace", true);
 
-    //    // 충돌한 Collider가 Camchange의 CAMCHANGE(Tag값)이면 카메라 전환 
-    //    if (coll.gameObject.tag == "CAMCHANGE")
-    //    {
+                Instantiate(bullet, firePos.position, firePos.rotation);
 
-    //        FollowCam followCam = GameObject.Find("Main Camera").GetComponent<FollowCam>();
-    //        if (sensorCheck == false)
-    //        {
-    //            followCam.change = true;
-    //            Debug.Log("체크 인");
-    //            followCam.height = 2.5f;
-    //            followCam.dist = 7.0f;
-    //            sensorCheck = true;
-    //        }
-    //        else if (sensorCheck == true)
-    //        {
-    //            followCam.change = false;
-    //            Debug.Log("체크 아웃");
-    //            followCam.height = 45.0f;
-    //            followCam.dist = 20.0f;
-    //            sensorCheck = false;
-    //        }
-    //    }
-    //}
+                // 사운드 발생 함수
+                source.PlayOneShot(fireSfx, 0.45f);
+
+                // 잠시 기다리는 루틴을 위해 코루틴 함수로 호출
+                StartCoroutine(this.ShowMuzzleFlash());
+                createBullet_b = false;
+            }
+            yield return null;
+        } while (true);
+
+
+        yield return null;
+    }
+
+
 }

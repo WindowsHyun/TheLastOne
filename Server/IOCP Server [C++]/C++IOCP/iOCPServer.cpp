@@ -246,22 +246,21 @@ void ProcessPacket(int ci, char *packet) {
 			g_clients[ci].rotation.x = client_View->rotation()->x();
 			g_clients[ci].rotation.y = client_View->rotation()->y();
 			g_clients[ci].rotation.z = client_View->rotation()->z();
-			
 		}
 		break;
 
 		case CS_Shot_info:
 		{
 			auto client_Shot_View = GetClient_Shot_infoView(get_packet);
-			std::cout << client_Shot_View->id() << std::endl;
-			g_clients[ci].shotting = true;
+			g_clients[client_Shot_View->id()].shotting = true;
+			Send_All_Data(client_Shot_View->id());
+			g_clients[client_Shot_View->id()].shotting = false;
 		}
 		break;
 
-		
+
 		}
 		Send_All_Data(ci);
-		g_clients[ci].shotting = false;
 	}
 	catch (DWORD dwError) {
 		errnum++;

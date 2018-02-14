@@ -108,8 +108,7 @@ public class PlayerCtrl : MonoBehaviour
 
     }
 
-
-    public void Fire()
+    void Fire()
     {
         // 동적으로 총알을 생성하는 함수
         CreateBullet();

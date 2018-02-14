@@ -132,6 +132,10 @@ void Send_All_Data(int client) {
 
 	auto orc = CreateAll_information(builder, Full_client_data);		// 실제로 보내는 테이블 명은 Client_Data
 	builder.Finish(orc); // Serialize the root of the object.
-	std::cout << builder.GetSize() << std::endl;
-	SendPacket(SC_Client_Data, client, builder.GetBufferPointer(), builder.GetSize());
+	//std::cout << builder.GetSize() << std::endl;
+	for (int i = 0; i < MAX_Client; ++i) {
+		if (g_clients[i].connect != true)
+			continue;
+		SendPacket(SC_Client_Data, i, builder.GetBufferPointer(), builder.GetSize());
+	}
 }
