@@ -76,5 +76,5 @@
 ---------
 인게임 화면
 ---------
-![Image05](https://i.imgur.com/mWf8idz.png)
-![Image06](https://i.imgur.com/qcZk6R3.png)
+![Image05](https://i.imgur.com/MtpC3hQ.png)
+![Image06](https://i.imgur.com/fsuuPMu.png)
