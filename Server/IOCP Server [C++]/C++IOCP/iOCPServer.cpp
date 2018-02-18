@@ -253,14 +253,14 @@ void ProcessPacket(int ci, char *packet) {
 		{
 			auto client_Shot_View = GetClient_Shot_infoView(get_packet);
 			g_clients[client_Shot_View->id()].shotting = true;
-			Send_All_Data(client_Shot_View->id());
+			Send_All_Data(client_Shot_View->id(), true);
 			g_clients[client_Shot_View->id()].shotting = false;
 		}
 		break;
 
 
 		}
-		Send_All_Data(ci);
+		Send_All_Data(ci, false);
 	}
 	catch (DWORD dwError) {
 		errnum++;

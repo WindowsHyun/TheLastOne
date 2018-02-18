@@ -61,9 +61,9 @@ namespace TheLastOne.Game.Network
 
         Socket_SendFunction sF = new Socket_SendFunction();
 
-        private int LimitReceivebyte = 2000;                     // Receive Data Length. (byte)
-        private byte[] Receivebyte = new byte[2000];    // Receive data by this array to save.
-        private byte[] Sendbyte = new byte[2000];
+        private int LimitReceivebyte = 4000;                     // Receive Data Length. (byte)
+        private byte[] Receivebyte = new byte[4000];    // Receive data by this array to save.
+        private byte[] Sendbyte = new byte[4000];
 
         // 서버가 클라이언트에게 보내는 이벤트 타입
         private int SC_ID = 1;                          // 클라이언트 아이디를 보낸다.
@@ -112,7 +112,7 @@ namespace TheLastOne.Game.Network
             {
                 // 클라이언트 아이디를 가져온다.
                 byte[] t_buf = new byte[size + 1];
-                System.Buffer.BlockCopy(recvPacket, 2, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
+                System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
                 ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
                 var Get_ServerData = Client_id.GetRootAsClient_id(revc_buf);
                 Client_imei = Get_ServerData.Id;
@@ -122,7 +122,7 @@ namespace TheLastOne.Game.Network
             {
                 // 클라이언트 하나에 대한 데이터가 들어온다.
                 byte[] t_buf = new byte[size + 1];
-                System.Buffer.BlockCopy(recvPacket, 2, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
+                System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
                 ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
 
                 var data = new Offset<Client_info>[MaxClient];
@@ -143,7 +143,7 @@ namespace TheLastOne.Game.Network
             {
                 // 클라이언트 모든 데이터가 들어온다.
                 byte[] t_buf = new byte[size + 1];
-                System.Buffer.BlockCopy(recvPacket, 2, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
+                System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
                 ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
                 var Get_ServerData = All_information.GetRootAsAll_information(revc_buf);
 
@@ -214,11 +214,38 @@ namespace TheLastOne.Game.Network
 
         void DataReceived(IAsyncResult ar)
         {
-            //int psize = Receivebyte[0]; // 패킷 사이즈
-            int psize = m_Socket.EndReceive(ar);
-            int ptype = Receivebyte[0]; // 패킷 타입
+            //-------------------------------------------------------------------------------------
+            /*
+             C++ itoa를 통한 char로 넣은것을 for문을 통하여 컨버팅 하여 가져온다.
+             124는 C++에서 '|'값 이다.
+             str_size로 실제 패킷 값을 계산해서 넣는다.
+             */
+            string str_size = ""; 
+            string tmp_int = "";                                              
+            byte[] temp = new byte[8];
+            int type_Pos = 0;
+
+            for (type_Pos = 0; type_Pos < 8; ++type_Pos)
+            {
+                if ( Receivebyte[type_Pos] == 124)
+                    break;
+                temp[0] = Receivebyte[type_Pos];
+                tmp_int = Encoding.Default.GetString(temp);
+                str_size += Int32.Parse(tmp_int);
+            }
+            //-------------------------------------------------------------------------------------
+
+            int psize = Int32.Parse(str_size);
+            int ptype = Receivebyte[type_Pos+1]; // 패킷 타입
             Debug.Log("총 사이즈 : " + psize + ", 패킷 타입 : " + ptype);
-            ProcessPacket(psize, ptype, Receivebyte);
+
+            if (psize == m_Socket.EndReceive(ar)) { 
+                ProcessPacket(psize, ptype, Receivebyte);
+            }
+            else
+            {
+                Debug.Log(m_Socket.EndReceive(ar) + "패킷 Error | " + psize);
+            }
 
             m_Socket.BeginReceive(Receivebyte, 0, LimitReceivebyte, 0, DataReceived, m_Socket);
         }

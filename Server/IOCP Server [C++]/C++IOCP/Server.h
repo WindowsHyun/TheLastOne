@@ -34,7 +34,7 @@ using namespace std::chrono;
 #define BUFSIZE    1024
 #define MAX_BUFF_SIZE   4000
 #define MAX_PACKET_SIZE  4000
-#define MAX_Client 999
+#define MAX_Client 50
 //---------------------------------------------------------------------------------------------
 // 게임 설정
 #define DebugMod FALSE
@@ -61,7 +61,8 @@ void Send_Client_ID(int client_id);
 
 void Send_Position(int client_id, int object_id); // 임시로 클라이언트 캐릭터 위치를 보내야함.
 
-void Send_All_Data(int client);		// 하나하나 보내주는 방식이 아닌 전체를 한번에 보내줘보자
+//void Send_All_Data(int client);		// 하나하나 보내주는 방식이 아닌 전체를 한번에 보내줘보자
+void Send_All_Data(int client, bool shot);
 
 enum OPTYPE { OP_SEND, OP_RECV, OP_DO_AI, E_PLAYER_MOVE_NOTIFY, OP_Attack_Move, OP_Responder };
 enum Event_Type { E_MOVE, E_Attack_Move, E_Responder };
