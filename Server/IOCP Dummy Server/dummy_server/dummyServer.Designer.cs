@@ -31,13 +31,15 @@
             this.connect_Server = new System.Windows.Forms.Button();
             this.DebugBox = new System.Windows.Forms.RichTextBox();
             this.connectCount = new System.Windows.Forms.TextBox();
+            this.MovePos = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // connect_Server
             // 
-            this.connect_Server.Location = new System.Drawing.Point(118, 12);
+            this.connect_Server.Location = new System.Drawing.Point(135, 15);
+            this.connect_Server.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.connect_Server.Name = "connect_Server";
-            this.connect_Server.Size = new System.Drawing.Size(155, 21);
+            this.connect_Server.Size = new System.Drawing.Size(177, 26);
             this.connect_Server.TabIndex = 0;
             this.connect_Server.Text = "연결하기";
             this.connect_Server.UseVisualStyleBackColor = true;
@@ -45,29 +47,43 @@
             // 
             // DebugBox
             // 
-            this.DebugBox.Location = new System.Drawing.Point(441, 12);
+            this.DebugBox.Location = new System.Drawing.Point(504, 15);
+            this.DebugBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.DebugBox.Name = "DebugBox";
-            this.DebugBox.Size = new System.Drawing.Size(373, 246);
+            this.DebugBox.Size = new System.Drawing.Size(426, 306);
             this.DebugBox.TabIndex = 1;
             this.DebugBox.Text = "";
             // 
             // connectCount
             // 
-            this.connectCount.Location = new System.Drawing.Point(12, 12);
+            this.connectCount.Location = new System.Drawing.Point(14, 15);
+            this.connectCount.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.connectCount.Name = "connectCount";
-            this.connectCount.Size = new System.Drawing.Size(100, 21);
+            this.connectCount.Size = new System.Drawing.Size(114, 25);
             this.connectCount.TabIndex = 2;
             this.connectCount.Text = "30";
             this.connectCount.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
+            // MovePos
+            // 
+            this.MovePos.Location = new System.Drawing.Point(14, 48);
+            this.MovePos.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.MovePos.Name = "MovePos";
+            this.MovePos.Size = new System.Drawing.Size(114, 25);
+            this.MovePos.TabIndex = 3;
+            this.MovePos.Text = "10";
+            this.MovePos.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
             // dummyServer
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(826, 329);
+            this.ClientSize = new System.Drawing.Size(944, 411);
+            this.Controls.Add(this.MovePos);
             this.Controls.Add(this.connectCount);
             this.Controls.Add(this.DebugBox);
             this.Controls.Add(this.connect_Server);
+            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "dummyServer";
             this.Text = "Dummy Server";
             this.Load += new System.EventHandler(this.dummyServer_Load);
@@ -81,6 +97,7 @@
         private System.Windows.Forms.Button connect_Server;
         private System.Windows.Forms.RichTextBox DebugBox;
         private System.Windows.Forms.TextBox connectCount;
+        private System.Windows.Forms.TextBox MovePos;
     }
 }
 

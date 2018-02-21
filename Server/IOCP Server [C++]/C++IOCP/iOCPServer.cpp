@@ -227,6 +227,10 @@ void Shutdown_Server() {
 void DisconnectClient(int ci) {
 	closesocket(g_clients[ci].client_socket);
 	g_clients[ci].connect = false;
+	g_clients[ci].position.x = 0;
+	g_clients[ci].position.y = 0;
+	g_clients[ci].position.z = 0;
+	g_clients[ci].hp = 100;
 
 	std::cout << "Disconnect Client : " << ci << std::endl;
 }
@@ -252,9 +256,11 @@ void ProcessPacket(int ci, char *packet) {
 		case CS_Shot_info:
 		{
 			auto client_Shot_View = GetClient_Shot_infoView(get_packet);
+			g_clients[client_Shot_View->id()].vl_lock.lock();
 			g_clients[client_Shot_View->id()].shotting = true;
 			Send_All_Data(client_Shot_View->id(), true);
 			g_clients[client_Shot_View->id()].shotting = false;
+			g_clients[client_Shot_View->id()].vl_lock.unlock();
 		}
 		break;
 

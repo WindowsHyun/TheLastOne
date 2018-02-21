@@ -51,6 +51,7 @@ public class OtherPlayerCtrl : MonoBehaviour
     {
         // 스크립트 처음에 Transform 컴포넌트 할당
         tr = GetComponent<Transform>();
+        tr.position = new Vector3(612, 30, 1096);
 
         // Animator 컴포넌트 할당
         animator = this.transform.GetChild(0).GetComponent<Animator>();
@@ -78,6 +79,16 @@ public class OtherPlayerCtrl : MonoBehaviour
     {
         // 동적으로 총알을 생성할 수 있게 true로 변경
         createBullet_b = true;
+    }
+
+    public void MovePos(Vector3 pos)
+    {
+
+        tr.position = Vector3.MoveTowards(tr.position, pos, Time.deltaTime * moveSpeed);
+        //StartCoroutine(moveCoroutine());
+
+        //tr.position = new Vector3(pos.x, pos.y, pos.z);
+
     }
 
     // MuzzleFlash 활성 / 비활성화를 짧은 시간 동안 반복

@@ -29,27 +29,6 @@ void err_display(char *msg, int err_no) {
 	LocalFree(lpMsgBuf);
 }
 
-//void SendPacket( int cl, void *packet ) {
-//	if ( g_clients[cl].connect == true ) {
-//		int psize = reinterpret_cast<unsigned char *>(packet)[0];
-//		int ptype = reinterpret_cast<unsigned char *>(packet)[1];
-//		OverlappedEx *over = new OverlappedEx;
-//		ZeroMemory( &over->over, sizeof( over->over ) );
-//		over->event_type = OP_SEND;
-//		memcpy( over->IOCP_buf, packet, psize );
-//		over->wsabuf.buf = reinterpret_cast<CHAR *>(over->IOCP_buf);
-//		over->wsabuf.len = psize;
-//		int res = WSASend( g_clients[cl].client_socket, &over->wsabuf, 1, NULL, 0, &over->over, NULL );
-//		if ( 0 != res ) {
-//			int error_no = WSAGetLastError();
-//			if ( WSA_IO_PENDING != error_no ) {
-//				err_display( "SendPacket:WSASend", error_no );
-//				DisconnectClient( cl );
-//			}
-//		}
-//	}
-//}
-
 void SendPacket(int type, int cl, void *packet, int psize) {
 	if (g_clients[cl].connect == true) {
 		//int ptype = reinterpret_cast<unsigned char *>(packet)[1];

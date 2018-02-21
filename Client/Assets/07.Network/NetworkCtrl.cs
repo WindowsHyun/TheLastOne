@@ -69,7 +69,7 @@ namespace TheLastOne.Game.Network
         private int SC_ID = 1;                          // 클라이언트 아이디를 보낸다.
         private int SC_PUT_PLAYER = 2;            // 클라이언트 추가
         private int SC_REMOVE_PLAYER = 3;     // 클라이언트 삭제
-        private int SC_Client_Data = 4;		        // 클라이언트 모든 데이터
+        private int SC_Client_Data = 4;             // 클라이언트 모든 데이터
 
 
         IEnumerator startPrefab()
@@ -86,10 +86,14 @@ namespace TheLastOne.Game.Network
                         //client_data[i].script = GameObject.Find("OtherPlayerCtrl").GetComponent<OtherPlayerCtrl>();
                         client_data[i].script = client_data[i].Player.GetComponent<OtherPlayerCtrl>();
                         client_data[i].prefab = true;
+
+                        // 처음 위치를 넣어 줘야 한다. 그러지 않을경우 다른 클라이언트 에서는 0,0 에서부터 천천히 올라오게 보인다.
+                        client_data[i].Player.transform.position = client_data[i].position;
                     }
                     else if (client_data[i].prefab == true)
                     {
-                        client_data[i].Player.transform.position = client_data[i].position;
+                        // 실제로 캐릭터를 움직이는 것은 코루틴 여기서 움직임을 진행 한다.
+                        client_data[i].script.MovePos(client_data[i].position);
 
                         var rotationX = client_data[i].rotation.x;
                         var rotationY = client_data[i].rotation.y;
@@ -101,8 +105,16 @@ namespace TheLastOne.Game.Network
 
                 yield return null;
             } while (true);
+            yield return null;
+        }
 
-
+        IEnumerator RecvCoroutine()
+        {
+            do
+            {
+                m_Socket.BeginReceive(Receivebyte, 0, LimitReceivebyte, 0, DataReceived, m_Socket);
+                yield return null;
+            } while (true);
             yield return null;
         }
 
@@ -156,6 +168,7 @@ namespace TheLastOne.Game.Network
                     var position_y = Get_ServerData.Data(i).Value.Position.Value.Y;
                     var position_z = Get_ServerData.Data(i).Value.Position.Value.Z;
                     client_data[client_id].position = new Vector3(position_x, position_y, position_z);
+                    // 캐릭터 이동 속도 변수
 
                     var rotation_x = Get_ServerData.Data(i).Value.Rotation.Value.X;
                     var rotation_y = Get_ServerData.Data(i).Value.Rotation.Value.Y;
@@ -202,6 +215,7 @@ namespace TheLastOne.Game.Network
                 m_Socket.Connect(ipEndPoint);
                 m_Socket.BeginReceive(Receivebyte, 0, LimitReceivebyte, 0, DataReceived, m_Socket);
                 StartCoroutine(startPrefab());
+                StartCoroutine(RecvCoroutine());
             }
             catch (SocketException SCE)
             {
@@ -220,14 +234,14 @@ namespace TheLastOne.Game.Network
              124는 C++에서 '|'값 이다.
              str_size로 실제 패킷 값을 계산해서 넣는다.
              */
-            string str_size = ""; 
-            string tmp_int = "";                                              
+            string str_size = "";
+            string tmp_int = "";
             byte[] temp = new byte[8];
             int type_Pos = 0;
 
             for (type_Pos = 0; type_Pos < 8; ++type_Pos)
             {
-                if ( Receivebyte[type_Pos] == 124)
+                if (Receivebyte[type_Pos] == 124)
                     break;
                 temp[0] = Receivebyte[type_Pos];
                 tmp_int = Encoding.Default.GetString(temp);
@@ -236,18 +250,17 @@ namespace TheLastOne.Game.Network
             //-------------------------------------------------------------------------------------
 
             int psize = Int32.Parse(str_size);
-            int ptype = Receivebyte[type_Pos+1]; // 패킷 타입
+            int ptype = Receivebyte[type_Pos + 1]; // 패킷 타입
             Debug.Log("총 사이즈 : " + psize + ", 패킷 타입 : " + ptype);
 
-            if (psize == m_Socket.EndReceive(ar)) { 
+            if (psize == m_Socket.EndReceive(ar))
+            {
                 ProcessPacket(psize, ptype, Receivebyte);
             }
             else
             {
                 Debug.Log(m_Socket.EndReceive(ar) + "패킷 Error | " + psize);
             }
-
-            m_Socket.BeginReceive(Receivebyte, 0, LimitReceivebyte, 0, DataReceived, m_Socket);
         }
 
         public void Send_Packet(byte[] packet)

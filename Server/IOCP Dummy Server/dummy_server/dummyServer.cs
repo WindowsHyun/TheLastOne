@@ -119,21 +119,26 @@ namespace dummy_server
         {
             while (true)
             {
-                switch (r.Next(0, 4))
+                switch (r.Next(0, 5))
                 {
                     case 0:
                         // 위로
-                        client_data[ci].position.x += 5;
+                        client_data[ci].position.x += Int32.Parse(MovePos.Text);
                         break;
                     case 1:
                         // 아래로
-                        client_data[ci].position.x -= 5;
+                        client_data[ci].position.x -= Int32.Parse(MovePos.Text);
                         break;
                     case 2:
-                        client_data[ci].position.z += 5;
+                        client_data[ci].position.z += Int32.Parse(MovePos.Text);
                         break;
                     case 3:
-                        client_data[ci].position.z -= 5;
+                        client_data[ci].position.z -= Int32.Parse(MovePos.Text);
+                        break;
+                    case 4:
+                        // 총알 발사!
+                        client_data[ci].stateObject.Sendbyte = makeShot_PacketInfo(ci);
+                        Send_Packet(client_data[ci].stateObject.workSocket, client_data[ci].stateObject.Sendbyte);
                         break;
                 }
 
@@ -219,6 +224,27 @@ namespace dummy_server
             return real_packet;
         }
 
+        public Byte[] makeShot_PacketInfo(int client)
+        {
+            FlatBufferBuilder fbb = new FlatBufferBuilder(1);
+            //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.
+            fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
+            Client_Shot_info.StartClient_Shot_info(fbb);
+            Client_Shot_info.AddId(fbb, client);
+            var endOffset = Client_Shot_info.EndClient_Shot_info(fbb);
+            fbb.Finish(endOffset.Value);
+
+
+            byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
+            byte[] packet_len = BitConverter.GetBytes(packet.Length);   // flatbuffers의 패킷 크기
+            byte[] packet_type = BitConverter.GetBytes(CS_Shot_info);
+            byte[] real_packet = new byte[packet_len.Length + packet.Length];
+
+            System.Buffer.BlockCopy(packet_len, 0, real_packet, 0, packet_len.Length);
+            System.Buffer.BlockCopy(packet_type, 0, real_packet, 1, packet_type.Length);
+            System.Buffer.BlockCopy(packet, 0, real_packet, 4, packet.Length);
+            return real_packet;
+        }
 
 
 
