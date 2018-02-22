@@ -163,16 +163,31 @@ namespace dummy_server
         void DataReceived(IAsyncResult ar)
         {
             StateObject state = (StateObject)ar.AsyncState;
+            //-------------------------------------------------------------------------------------
+            /*
+             C++ itoa를 통한 char로 넣은것을 for문을 통하여 컨버팅 하여 가져온다.
+             124는 C++에서 '|'값 이다.
+             str_size로 실제 패킷 값을 계산해서 넣는다.
+             */
+            string str_size = "";
+            string tmp_int = "";
+            byte[] temp = new byte[8];
+            int type_Pos = 0;
 
-            //int psize = state.Receivebyte[0]; // 패킷 사이즈
-            int psize = state.workSocket.EndReceive(ar);
+            for (type_Pos = 0; type_Pos < 8; ++type_Pos)
+            {
+                if (state.Receivebyte[type_Pos] == 124)
+                    break;
+                temp[0] = state.Receivebyte[type_Pos];
+                tmp_int = Encoding.Default.GetString(temp);
+                str_size += Int32.Parse(tmp_int);
+            }
+            //-------------------------------------------------------------------------------------
+
+            int psize = Int32.Parse(str_size);
             int ptype = state.Receivebyte[0]; // 패킷 타입
             //SetText("총 사이즈 : " + psize + ", 패킷 타입 : " + ptype);
-            if (psize >= 2000)
-            {
-                //SetText(state.client_id + "클라이언트 : Error");
-            }
-            else
+            if (psize >= state.workSocket.EndReceive(ar))
             {
                 ProcessPacket(psize, ptype, state.Receivebyte);
             }

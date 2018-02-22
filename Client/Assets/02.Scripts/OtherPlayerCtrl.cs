@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using System;
+
 [RequireComponent(typeof(AudioSource))]
 
 public class OtherPlayerCtrl : MonoBehaviour
@@ -81,16 +83,29 @@ public class OtherPlayerCtrl : MonoBehaviour
         createBullet_b = true;
     }
 
+    public float DistanceToPoint(Vector3 a, Vector3 b)
+    {
+        // 캐릭터 간의 거리 구하기.
+        return (float)Math.Sqrt(Math.Pow(a.x - b.x, 2) + Math.Pow(a.z - b.z, 2));
+    }
+
     public void MovePos(Vector3 pos)
     {
-        tr.position = Vector3.MoveTowards(tr.position, pos, Time.deltaTime * moveSpeed);
+        if (DistanceToPoint(tr.position, pos) >= 10)
+        {
+            // 10이상 거리 차이가 날경우 움직여 주는것이 아닌 바로 동기화를 시켜 버린다.
+            tr.position = pos;
+        }
+        else {
+            tr.position = Vector3.MoveTowards(tr.position, pos, Time.deltaTime * moveSpeed);
+        }
     }
 
     // MuzzleFlash 활성 / 비활성화를 짧은 시간 동안 반복
     IEnumerator ShowMuzzleFlash()
     {
         // MuzzleFlash 스케일을 불규칙하게 변경
-        float scale = Random.Range(0.05f, 0.2f);
+        float scale = UnityEngine.Random.Range(0.05f, 0.2f);
         muzzleFlash1.transform.localScale = Vector3.one * scale;
         muzzleFlash2.transform.localScale = Vector3.one * scale;
 
@@ -99,7 +114,7 @@ public class OtherPlayerCtrl : MonoBehaviour
         muzzleFlash2.enabled = true;
 
         // 불규칙적인 시간 동안 Delay한 다음MeshRenderer를 비활성화
-        yield return new WaitForSeconds(Random.Range(0.05f, 0.03f));
+        yield return new WaitForSeconds(UnityEngine.Random.Range(0.05f, 0.03f));
 
         // 비활성화해서 보이지 않게 함
         muzzleFlash1.enabled = false;

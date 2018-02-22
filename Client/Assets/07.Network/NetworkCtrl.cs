@@ -343,6 +343,11 @@ namespace TheLastOne.Game.Network
             m_Socket = null;
         }
 
+        public float DistanceToPoint(Vector3 a, Vector3 b)
+        {
+            // 캐릭터 간의 거리 구하기.
+            return (float)Math.Sqrt(Math.Pow(a.x - b.x, 2) + Math.Pow(a.z - b.z, 2));
+        }
 
 
     }
