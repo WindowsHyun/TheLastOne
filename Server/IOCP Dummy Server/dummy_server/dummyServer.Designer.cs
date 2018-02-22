@@ -32,6 +32,7 @@
             this.DebugBox = new System.Windows.Forms.RichTextBox();
             this.connectCount = new System.Windows.Forms.TextBox();
             this.MovePos = new System.Windows.Forms.TextBox();
+            this.disconnect_Server = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // connect_Server
@@ -74,11 +75,23 @@
             this.MovePos.Text = "10";
             this.MovePos.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
+            // disconnect_Server
+            // 
+            this.disconnect_Server.Location = new System.Drawing.Point(135, 49);
+            this.disconnect_Server.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.disconnect_Server.Name = "disconnect_Server";
+            this.disconnect_Server.Size = new System.Drawing.Size(177, 26);
+            this.disconnect_Server.TabIndex = 4;
+            this.disconnect_Server.Text = "연결종료";
+            this.disconnect_Server.UseVisualStyleBackColor = true;
+            this.disconnect_Server.Click += new System.EventHandler(this.disconnect_Server_Click);
+            // 
             // dummyServer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(944, 411);
+            this.Controls.Add(this.disconnect_Server);
             this.Controls.Add(this.MovePos);
             this.Controls.Add(this.connectCount);
             this.Controls.Add(this.DebugBox);
@@ -98,6 +111,7 @@
         private System.Windows.Forms.RichTextBox DebugBox;
         private System.Windows.Forms.TextBox connectCount;
         private System.Windows.Forms.TextBox MovePos;
+        private System.Windows.Forms.Button disconnect_Server;
     }
 }
 

@@ -99,7 +99,7 @@ namespace dummy_server
                     client_data[i].stateObject = state;
 
                     state.workSocket.BeginReceive(state.Receivebyte, 0, LimitReceivebyte, 0, DataReceived, state);
-                    Thread t1 = new Thread(() => Update(i-1));
+                    Thread t1 = new Thread(() => Update(i - 1));
                     t1.Start();
                     //StartCoroutine(startPrefab());
                 }
@@ -144,7 +144,7 @@ namespace dummy_server
 
                 client_data[ci].stateObject.Sendbyte = makeClient_PacketInfo(client_data[ci].position, client_data[ci].rotation);
                 Send_Packet(client_data[ci].stateObject.workSocket, client_data[ci].stateObject.Sendbyte);
-            Thread.Sleep(1000);
+                Thread.Sleep(1000);
             }
         }
 
@@ -172,8 +172,9 @@ namespace dummy_server
             {
                 //SetText(state.client_id + "클라이언트 : Error");
             }
-            else { 
-            ProcessPacket(psize, ptype, state.Receivebyte);
+            else
+            {
+                ProcessPacket(psize, ptype, state.Receivebyte);
             }
             state.workSocket.BeginReceive(state.Receivebyte, 0, LimitReceivebyte, 0, DataReceived, state);
         }
@@ -246,8 +247,14 @@ namespace dummy_server
             return real_packet;
         }
 
-
-
+        private void disconnect_Server_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < MaxClient; ++i)
+            {
+                client_data[i].stateObject.workSocket.Close();
+                client_data[i].stateObject.workSocket = null;
+            }
+        }
     }
 }
 

@@ -57,7 +57,7 @@ void Shutdown_Server();
 void DisconnectClient(int ci);
 void ProcessPacket(int ci, char *packet);
 void SendPacket(int type, int cl, void *packet, int psize);
-void Send_Client_ID(int client_id);
+void Send_Client_ID(int client_id, int value, bool allClient);
 
 void Send_Position(int client_id, int object_id); // 임시로 클라이언트 캐릭터 위치를 보내야함.
 

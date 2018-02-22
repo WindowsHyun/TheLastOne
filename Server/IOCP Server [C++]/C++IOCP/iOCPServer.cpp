@@ -200,7 +200,7 @@ void Accept_Thread() {
 		g_clients[new_id].shotting = false;
 		g_clients[new_id].hp = 100;
 
-		Send_Client_ID(new_id);		// 클라이언트에게 자신의 아이디를 보내준다.
+		Send_Client_ID(new_id, SC_ID, false);		// 클라이언트에게 자신의 아이디를 보내준다.
 		//---------------------------------------------------------------------------------------------------------------------------------------------------
 		DWORD recv_flag = 0;
 		CreateIoCompletionPort(reinterpret_cast<HANDLE>(new_client), g_hiocp, new_id, 0);
@@ -225,6 +225,7 @@ void Shutdown_Server() {
 }
 
 void DisconnectClient(int ci) {
+	Send_Client_ID(ci, SC_REMOVE_PLAYER, true);
 	closesocket(g_clients[ci].client_socket);
 	g_clients[ci].connect = false;
 	g_clients[ci].position.x = 0;
@@ -237,6 +238,7 @@ void DisconnectClient(int ci) {
 
 void ProcessPacket(int ci, char *packet) {
 	char get_packet[MAX_PACKET_SIZE];
+	bool all_Client_Packet = false;	// 모든 클라이언트에게 보낼 때는 True
 	for (int i = 4; i < MAX_PACKET_SIZE; ++i)
 		get_packet[i - 4] = packet[i];
 	try {
@@ -256,17 +258,14 @@ void ProcessPacket(int ci, char *packet) {
 		case CS_Shot_info:
 		{
 			auto client_Shot_View = GetClient_Shot_infoView(get_packet);
-			g_clients[client_Shot_View->id()].vl_lock.lock();
 			g_clients[client_Shot_View->id()].shotting = true;
-			Send_All_Data(client_Shot_View->id(), true);
-			g_clients[client_Shot_View->id()].shotting = false;
-			g_clients[client_Shot_View->id()].vl_lock.unlock();
+			all_Client_Packet = true;
+
 		}
 		break;
-
-
 		}
-		Send_All_Data(ci, false);
+
+		Send_All_Data(ci, all_Client_Packet);
 	}
 	catch (DWORD dwError) {
 		errnum++;

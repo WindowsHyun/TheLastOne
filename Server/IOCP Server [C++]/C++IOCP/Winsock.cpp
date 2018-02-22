@@ -41,8 +41,8 @@ void SendPacket(int type, int cl, void *packet, int psize) {
 		itoa(psize + 8, p_size, 10);
 		int buf_len = strlen(p_size);
 		p_size[buf_len] = '|';
-		p_size[buf_len+1] = int(type);
-		
+		p_size[buf_len + 1] = int(type);
+
 
 
 		// 패킷 사이즈를 미리 합쳐서 보내줘야한다.
@@ -68,12 +68,25 @@ void SendPacket(int type, int cl, void *packet, int psize) {
 	}
 }
 
-void Send_Client_ID(int client_id) {
+void Send_Client_ID(int client_id, int value, bool allClient) {
+	// value = 아이디를 추가 or 삭제 할때 사용.
 	flatbuffers::FlatBufferBuilder builder;
 	auto Client_id = client_id;
 	auto orc = CreateClient_id(builder, Client_id);
 	builder.Finish(orc); // Serialize the root of the object.
-	SendPacket(SC_ID, client_id, builder.GetBufferPointer(), builder.GetSize());
+
+
+	if (allClient == true) {
+		// 모든 클라이언트 에게 나갔다는 것을 보내준다..!
+		for (int i = 0; i < MAX_Client; ++i) {
+			if (g_clients[i].connect != true)
+				continue;
+			SendPacket(value, i, builder.GetBufferPointer(), builder.GetSize());
+		}
+	}
+	else {
+		SendPacket(value, client_id, builder.GetBufferPointer(), builder.GetSize());
+	}
 }
 
 
@@ -91,7 +104,7 @@ void Send_Position(int client, int object) {
 	SendPacket(SC_PUT_PLAYER, client, builder.GetBufferPointer(), builder.GetSize());
 }
 
-void Send_All_Data(int client, bool shot) {
+void Send_All_Data(int client, bool allClient) {
 	flatbuffers::FlatBufferBuilder builder;
 
 	std::vector<flatbuffers::Offset<Client_info>> Individual_client;		// 개인 데이터
@@ -117,13 +130,14 @@ void Send_All_Data(int client, bool shot) {
 	auto orc = CreateAll_information(builder, Full_client_data);		// 실제로 보내는 테이블 명은 Client_Data
 	builder.Finish(orc); // Serialize the root of the object.
 	//std::cout << builder.GetSize() << std::endl;
-	if (shot == true) {
-		// Shot 을 할때만 모든 클라이언트에다가 전송을 한다.
+	if (allClient == true) {
+		// 모든 클라이언트에다가 전송을 필요로 할때만 전송 한다.
 		for (int i = 0; i < MAX_Client; ++i) {
 			if (g_clients[i].connect != true)
 				continue;
 			SendPacket(SC_Client_Data, i, builder.GetBufferPointer(), builder.GetSize());
 		}
+		g_clients[client].shotting = false;
 	}
 	else {
 		SendPacket(SC_Client_Data, client, builder.GetBufferPointer(), builder.GetSize());

@@ -27,6 +27,7 @@ public struct Client_Data
     public string name;     // 클라이언트 닉네임
     public GameObject Player;   // 프리팹을 위한 게임 오브젝트
     public OtherPlayerCtrl script;  // 프리팹 오브젝트 안의 함수를 호출하기 위한 스크립트
+    public bool removeClient;   // 클라이언트 지울경우 true
 
     public Client_Data(Vector3 position, Vector3 rotation)
     {
@@ -38,6 +39,7 @@ public struct Client_Data
         this.Player = null;
         this.name = "";
         this.script = null;
+        this.removeClient = false;
     }
 }
 
@@ -71,7 +73,6 @@ namespace TheLastOne.Game.Network
         private int SC_REMOVE_PLAYER = 3;     // 클라이언트 삭제
         private int SC_Client_Data = 4;             // 클라이언트 모든 데이터
 
-
         IEnumerator startPrefab()
         {
             do
@@ -101,6 +102,12 @@ namespace TheLastOne.Game.Network
                         //Debug.Log("  :  "+ rotationX + ", " + rotationY + ", " + rotationZ);
                         client_data[i].Player.transform.rotation = Quaternion.Euler(rotationX, rotationY, rotationZ);
                     }
+                    if (client_data[i].removeClient == true)
+                    {
+                        // 연결은 해지 되었는데 프리팹이 살아 있는경우는 나간 경우 이므로
+                        // 코루틴을 통하여 지워주자!
+                        StartCoroutine(RemovePlayerCoroutine(i));
+                    }
                 }
 
                 yield return null;
@@ -112,11 +119,48 @@ namespace TheLastOne.Game.Network
         {
             do
             {
+
                 m_Socket.BeginReceive(Receivebyte, 0, LimitReceivebyte, 0, DataReceived, m_Socket);
                 yield return null;
             } while (true);
             yield return null;
         }
+
+        IEnumerator SendCoroutine()
+        {
+            do
+            {
+                Player_Position.x = Player.transform.position.x;
+                Player_Position.y = Player.transform.position.y;
+                Player_Position.z = Player.transform.position.z;
+                Player_Rotation.x = Player.transform.eulerAngles.x;
+                Player_Rotation.y = Player.transform.eulerAngles.y;
+                Player_Rotation.z = Player.transform.eulerAngles.z;
+                Sendbyte = sF.makeClient_PacketInfo(Player_Position, Player_Rotation);
+                Send_Packet(Sendbyte);
+                yield return new WaitForSeconds(0.05f);
+                // 초당 20번 패킷 전송으로 제한을 한다.
+            } while (true);
+            yield return null;
+        }
+
+
+        IEnumerator RemovePlayerCoroutine(int client_id)
+        {
+            // 클라이언트 데이터 및 프리팹을 삭제 하여 다른 클라이언트가 들어올 수 있게 만든다.
+            Debug.Log(client_id + "삭제 코루틴 접근");
+            client_data[client_id].connect = false;
+            client_data[client_id].removeClient = false;
+            client_data[client_id].prefab = false;
+            client_data[client_id].position = new Vector3(0, 0, 0);
+            client_data[client_id].rotation = new Vector3(0, 0, 0);
+            Destroy(client_data[client_id].Player);
+            client_data[client_id].Player = null;
+            client_data[client_id].script = null;
+            client_data[client_id].id = -1;
+            yield return null;
+        }
+        
 
         void ProcessPacket(int size, int type, byte[] recvPacket)
         {
@@ -192,6 +236,17 @@ namespace TheLastOne.Game.Network
 
                 }
             }
+            else if (type == SC_REMOVE_PLAYER)
+            {
+                // 서버에서 내보낸 클라이언트를 가져 온다.
+                byte[] t_buf = new byte[size + 1];
+                System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
+                ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
+                var Get_ServerData = Client_id.GetRootAsClient_id(revc_buf);
+
+                client_data[Get_ServerData.Id].removeClient = true;
+                //Debug.Log(Get_ServerData.Id + "번 클라이언트 삭제..!");
+            }
 
 
 
@@ -215,6 +270,7 @@ namespace TheLastOne.Game.Network
                 m_Socket.Connect(ipEndPoint);
                 m_Socket.BeginReceive(Receivebyte, 0, LimitReceivebyte, 0, DataReceived, m_Socket);
                 StartCoroutine(startPrefab());
+                StartCoroutine(SendCoroutine());
                 StartCoroutine(RecvCoroutine());
             }
             catch (SocketException SCE)
@@ -287,19 +343,6 @@ namespace TheLastOne.Game.Network
             m_Socket = null;
         }
 
-        void Update()
-        {
-            Player_Position.x = Player.transform.position.x;
-            Player_Position.y = Player.transform.position.y;
-            Player_Position.z = Player.transform.position.z;
-            Player_Rotation.x = Player.transform.eulerAngles.x;
-            Player_Rotation.y = Player.transform.eulerAngles.y;
-            Player_Rotation.z = Player.transform.eulerAngles.z;
-            //Debug.Log(Player_Position.x + ", " + Player_Position.y + ", " + Player_Position.z);
-            //Debug.Log(Player_Rotation.x + ", " + Player_Rotation.y + ", " + Player_Rotation.z);
-            Sendbyte = sF.makeClient_PacketInfo(Player_Position, Player_Rotation);
-            Send_Packet(Sendbyte);
-        }
 
 
     }
