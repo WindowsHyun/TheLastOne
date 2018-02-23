@@ -9,10 +9,12 @@ using TheLastOne.Game.Network;
 public class PlayerCtrl : MonoBehaviour
 {
     // 캐릭터의 상태 정보가 있는 Enumerable 변수 선언
-    public enum PlayerState { run, fire };
+    // enum 변수에서 fire 삭제
+    public enum PlayerState { runForword, runLeft, runRight,
+                              runForwordShot, runLeftShot, runRightShot };
 
     // 캐릭터의 현재 상태 정보를 저장할 Enum 변수
-    public PlayerState playerState = PlayerState.run;
+    public PlayerState playerState = PlayerState.runForword;
 
     private float h = 0.0f;
     private float v = 0.0f;
@@ -49,6 +51,15 @@ public class PlayerCtrl : MonoBehaviour
     // 플레이어가 총알 발사시 Packet을 전송하기 위하여
     NetworkCtrl networkCtrl = new NetworkCtrl();
 
+    // 무기 장착한 후 애니메이션 분리를 위한 변수
+    public bool equipWeapon = false;
+
+    public GameObject weapon;
+
+    public bool showItem1 = false;
+
+
+
     void Start()
     {
         // 스크립트 처음에 Transform 컴포넌트 할당
@@ -64,13 +75,17 @@ public class PlayerCtrl : MonoBehaviour
         muzzleFlash1.enabled = false;
         muzzleFlash2.enabled = false;
 
-        animator.SetBool("IsTrace", false);
+        animator.SetInteger("IsState", 0);
 
         // 처음 시작시 마우스를 잠궈버린다.
         lockMouse = true;
         Cursor.lockState = CursorLockMode.Locked;//마우스 커서 고정
         Cursor.visible = false;//마우스 커서 보이기
 
+
+        weapon.GetComponent<Renderer>().enabled = false;
+
+        //GameObject weapon = transform.Find("AK47").gameObject;
     }
 
     void Update()
@@ -90,13 +105,66 @@ public class PlayerCtrl : MonoBehaviour
         // Vector3.up 축을 기준으로 rotSpeed만큼의 속도로 회전
         tr.Rotate(Vector3.up * Time.deltaTime * rotSpeed * Input.GetAxis("Mouse X"));
 
-        if (Input.GetMouseButtonDown(0))
+
+
+        // 전진 0, 왼쪽 1, 오른쪽 2, 후진 0
+        // IsState란 애니메이터 상태 변수 추가됨
+        // 키보드 입력값을 기준으로 동작할 애니메이션 수행
+
+        if (v >= 0.1f)
         {
-            Fire();
-            animator.SetBool("IsTrace", true);
-            networkCtrl.Player_Shot();
+            // 전진 애니메이션
+            animator.SetInteger("IsState", 0);
+            playerState = PlayerState.runForword;
 
         }
+        else if (v <= -0.1f)
+        {
+            // 후진 애니메이션
+            animator.SetInteger("IsState", 0);
+            playerState = PlayerState.runForword;
+        }
+        else if (h <= -0.1f)
+        {
+            // 왼쪽 이동 애니메이션
+            animator.SetInteger("IsState", 1);
+            playerState = PlayerState.runLeft;
+        }
+        else if (h >= 0.1f)
+        {
+            // 오른쪽 이동 애니메이션
+            animator.SetInteger("IsState", 2);
+            playerState = PlayerState.runRight;
+        }
+        else
+        {
+            // 정지 시 idle애니메이션
+            animator.SetInteger("IsState", 0);
+            playerState = PlayerState.runForword;
+        }
+
+
+        // 1번 키를 누르면 총이 장착 된다.
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            weaponDisPlay();
+        }
+
+        // 총이 장착이 되었을때만 발사 가능
+        if (showItem1 == true)
+        {
+            animator.SetBool("IsEquip", true);
+            if (Input.GetMouseButtonDown(0))
+            {
+                Fire();
+                //animator.SetBool("IsTrace", true);
+                //networkCtrl.Player_Shot();
+            }
+        }
+        else {
+            animator.SetBool("IsEquip", false);
+        }
+        
 
         if (Input.GetMouseButtonDown(1))
         {
@@ -105,6 +173,7 @@ public class PlayerCtrl : MonoBehaviour
             Cursor.visible = true;//마우스 커서 보이기
             lockMouse = false;
         }
+
 
     }
 
@@ -172,5 +241,31 @@ public class PlayerCtrl : MonoBehaviour
             }
         }
     }
+
+    void weaponDisPlay()
+    {
+        if (showItem1 == true)
+        {
+            
+            weapon.GetComponent<Renderer>().enabled = false;
+            showItem1 = false;
+        }
+        else if (showItem1 == false)
+        {
+            weapon.GetComponent<Renderer>().enabled = true;
+            showItem1 = true;
+        }
+
+        //if (Input.GetKeyDown(KeyCode.Space))
+        //{
+        //    if (showItem1 == true)
+        //        showItem1 = false;
+        //    else if (showItem1 == false)
+        //        showItem1 = true;
+
+        //    Debug.Log("1번 누름");
+        //}
+    }
+
 }
 

@@ -18,27 +18,26 @@ public class WeaponCtrl : MonoBehaviour {
 
     void Start()
     {
-        showItem1 = true;  
+        showItem1 = false;  
     }
 
     void Update()
     {
-        //if(showItem1 == false)
-        //{
-        //    AK47.SetActive(false);
-        //}
         if (showItem1 == true)
-        {
-            AK47.SetActive(true);
-        }
+            AK47.GetComponent<Renderer>().enabled = true;
+        else if (showItem1 == false)
+            AK47.GetComponent<Renderer>().enabled = false;
 
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            showItem1 = false;
-            AK47.SetActive(false);
-            Debug.Log("Key 3");
-        }
 
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if(showItem1 == true)
+                showItem1 = false;
+            else if(showItem1 == false)
+                showItem1 = true;
+
+            Debug.Log("1번 누름");
+        }
     }
 
 
