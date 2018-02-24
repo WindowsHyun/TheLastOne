@@ -153,17 +153,18 @@ public class PlayerCtrl : MonoBehaviour
         // 총이 장착이 되었을때만 발사 가능
         if (showItem1 == true)
         {
-            animator.SetBool("IsEquip", true);
+            //animator.SetBool("IsEquip", true);
             if (Input.GetMouseButtonDown(0))
             {
+                animator.SetBool("IsShot", true);
                 Fire();
                 //animator.SetBool("IsTrace", true);
                 //networkCtrl.Player_Shot();
             }
         }
-        else {
-            animator.SetBool("IsEquip", false);
-        }
+        //else {
+        //    animator.SetBool("IsEquip", false);
+        //}
         
 
         if (Input.GetMouseButtonDown(1))
@@ -249,11 +250,14 @@ public class PlayerCtrl : MonoBehaviour
             
             weapon.GetComponent<Renderer>().enabled = false;
             showItem1 = false;
+            animator.SetBool("IsEquip", false);
+            
         }
         else if (showItem1 == false)
         {
             weapon.GetComponent<Renderer>().enabled = true;
             showItem1 = true;
+            animator.SetBool("IsEquip", true);
         }
 
         //if (Input.GetKeyDown(KeyCode.Space))
