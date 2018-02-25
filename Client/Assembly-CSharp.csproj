@@ -56,6 +56,7 @@
      <Compile Include="Assets\02.Scripts\OtherPlayerCtrl.cs" />
      <Compile Include="Assets\02.Scripts\ParticleCtrl.cs" />
      <Compile Include="Assets\02.Scripts\PlayerCtrl.cs" />
+     <Compile Include="Assets\02.Scripts\StartCarCtrl.cs" />
      <Compile Include="Assets\02.Scripts\WeaponCtrl.cs" />
      <Compile Include="Assets\07.Network\All_information.cs" />
      <Compile Include="Assets\07.Network\Client_id.cs" />
