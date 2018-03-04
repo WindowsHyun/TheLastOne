@@ -10,8 +10,8 @@ public class PlayerCtrl : MonoBehaviour
 {
     // 캐릭터의 상태 정보가 있는 Enumerable 변수 선언
     // enum 변수에서 fire 삭제
-    public enum PlayerState { runForword, runLeft, runRight,
-                              runForwordShot, runLeftShot, runRightShot };
+    public enum PlayerState { runForword, runBack, runLeft, runRight,
+                              runForwordShot, runBackShot, runLeftShot, runRightShot };
 
     // 캐릭터의 현재 상태 정보를 저장할 Enum 변수
     public PlayerState playerState = PlayerState.runForword;
@@ -27,6 +27,9 @@ public class PlayerCtrl : MonoBehaviour
     public float moveSpeed = 23.0f;
     // 캐릭터 회전 속도 변수
     public float rotSpeed = 100.0f;
+    // 캐릭터 체력
+    public int hp = 100;
+    
 
     // 총알 프리팹
     public GameObject bullet;
@@ -51,12 +54,14 @@ public class PlayerCtrl : MonoBehaviour
     // 플레이어가 총알 발사시 Packet을 전송하기 위하여
     NetworkCtrl networkCtrl = new NetworkCtrl();
 
-    // 무기 장착한 후 애니메이션 분리를 위한 변수
-    public bool equipWeapon = false;
-
+    // 무기 정보 저장
     public GameObject weapon;
 
+    // 무기 장착 여부
     public bool showItem1 = false;
+
+    // 혈흔 효과 프리팹
+    public GameObject bloodEffect;
 
 
 
@@ -107,33 +112,33 @@ public class PlayerCtrl : MonoBehaviour
 
 
 
-        // 전진 0, 왼쪽 1, 오른쪽 2, 후진 0
+        // 대기 0, 전진 1, 후진 2, 왼쪽 3, 오른쪽 4
         // IsState란 애니메이터 상태 변수 추가됨
         // 키보드 입력값을 기준으로 동작할 애니메이션 수행
 
         if (v >= 0.1f)
         {
             // 전진 애니메이션
-            animator.SetInteger("IsState", 0);
+            animator.SetInteger("IsState", 1);
             playerState = PlayerState.runForword;
 
         }
         else if (v <= -0.1f)
         {
             // 후진 애니메이션
-            animator.SetInteger("IsState", 0);
+            animator.SetInteger("IsState", 2);
             playerState = PlayerState.runForword;
         }
         else if (h <= -0.1f)
         {
             // 왼쪽 이동 애니메이션
-            animator.SetInteger("IsState", 1);
+            animator.SetInteger("IsState", 3);
             playerState = PlayerState.runLeft;
         }
         else if (h >= 0.1f)
         {
             // 오른쪽 이동 애니메이션
-            animator.SetInteger("IsState", 2);
+            animator.SetInteger("IsState", 4);
             playerState = PlayerState.runRight;
         }
         else
@@ -243,6 +248,19 @@ public class PlayerCtrl : MonoBehaviour
         }
     }
 
+    // 충돌을 시작할 때 발생하는 이벤트
+    void OnCollisionEnter(Collision coll)
+    {
+        // 충돌한 게임오브젝트의 태그값 비교
+        if (coll.gameObject.tag == "BULLET")
+        {
+            CreateBloodEffect(coll.transform.position);
+
+            // Bullet 삭제
+            Destroy(coll.gameObject);
+        }
+    }
+
     void weaponDisPlay()
     {
         if (showItem1 == true)
@@ -251,7 +269,8 @@ public class PlayerCtrl : MonoBehaviour
             weapon.GetComponent<Renderer>().enabled = false;
             showItem1 = false;
             animator.SetBool("IsEquip", false);
-            
+            //animator.SetBool("IsShot", false);
+
         }
         else if (showItem1 == false)
         {
@@ -261,7 +280,7 @@ public class PlayerCtrl : MonoBehaviour
         }
 
         //if (Input.GetKeyDown(KeyCode.Space))
-        //{
+        //{ 
         //    if (showItem1 == true)
         //        showItem1 = false;
         //    else if (showItem1 == false)
@@ -269,6 +288,13 @@ public class PlayerCtrl : MonoBehaviour
 
         //    Debug.Log("1번 누름");
         //}
+    }
+
+    void CreateBloodEffect(Vector3 pos)
+    {
+        // 혈흔 효과 생성
+        GameObject blood1 = (GameObject)Instantiate(bloodEffect, pos, Quaternion.identity);
+        Destroy(blood1, 1.0f);
     }
 
 }

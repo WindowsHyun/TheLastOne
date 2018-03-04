@@ -25,6 +25,8 @@ public class OtherPlayerCtrl : MonoBehaviour
     public float moveSpeed = 23.0f;
     // 캐릭터 회전 속도 변수
     public float rotSpeed = 100.0f;
+    // 캐릭터 체력
+    private int hp = 100;
 
     // 총알 프리팹
     public GameObject bullet;
@@ -43,11 +45,9 @@ public class OtherPlayerCtrl : MonoBehaviour
     // 총알 프리팹 만드는 Bool 변수 [ 외부함수에서는 프리팹 생성이 안되기 때문에 ]
     private bool createBullet_b = false;
 
-    // 마우스 고정 관련한 변수
-    //public bool lockMouse = false;
+    // 혈흔 효과 프리팹
+    public GameObject bloodEffect;
 
-    // 카메라 뷰 전환을 체크하기 위한 변수
-    //public bool sensorCheck = false;
 
     void Start()
     {
@@ -146,5 +146,24 @@ public class OtherPlayerCtrl : MonoBehaviour
         yield return null;
     }
 
+    void CreateBloodEffect(Vector3 pos)
+    {
+        // 혈흔 효과 생성
+        GameObject blood1 = (GameObject)Instantiate(bloodEffect, pos, Quaternion.identity);
+        Destroy(blood1, 1.0f);
+    }
+
+    // 충돌을 시작할 때 발생하는 이벤트
+   void OnCollisionEnter(Collision coll)
+    {
+        // 충돌한 게임오브젝트의 태그값 비교
+        if (coll.gameObject.tag == "BULLET")
+        {
+            CreateBloodEffect(coll.transform.position);
+
+            // Bullet 삭제
+            Destroy(coll.gameObject);
+        }
+    }
 
 }
