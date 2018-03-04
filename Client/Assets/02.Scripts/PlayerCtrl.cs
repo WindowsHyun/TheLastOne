@@ -256,9 +256,26 @@ public class PlayerCtrl : MonoBehaviour
         {
             CreateBloodEffect(coll.transform.position);
 
+            // 맞은 총알의 Damage를 추출해 OtherPlayer HP 차감
+            hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
+            if (hp <= 0)
+            {
+                PlayerDie();
+            }
             // Bullet 삭제
             Destroy(coll.gameObject);
         }
+    }
+
+    // 플레이어 죽을 때 실행되는 함수
+    void PlayerDie()
+    {
+        // 모든 코루틴을 종료
+        StopAllCoroutines();
+        // DIe 애니메이션 실행
+        animator.SetTrigger("IsDie");
+        // 캐릭터 캡슐 콜라이더 비활성화
+        gameObject.GetComponentInChildren<CapsuleCollider>().enabled = false;
     }
 
     void weaponDisPlay()
@@ -278,16 +295,6 @@ public class PlayerCtrl : MonoBehaviour
             showItem1 = true;
             animator.SetBool("IsEquip", true);
         }
-
-        //if (Input.GetKeyDown(KeyCode.Space))
-        //{ 
-        //    if (showItem1 == true)
-        //        showItem1 = false;
-        //    else if (showItem1 == false)
-        //        showItem1 = true;
-
-        //    Debug.Log("1번 누름");
-        //}
     }
 
     void CreateBloodEffect(Vector3 pos)
@@ -296,6 +303,8 @@ public class PlayerCtrl : MonoBehaviour
         GameObject blood1 = (GameObject)Instantiate(bloodEffect, pos, Quaternion.identity);
         Destroy(blood1, 1.0f);
     }
+
+
 
 }
 
