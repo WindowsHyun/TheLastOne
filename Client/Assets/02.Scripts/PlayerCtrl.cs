@@ -10,11 +10,13 @@ public class PlayerCtrl : MonoBehaviour
 {
     // 캐릭터의 상태 정보가 있는 Enumerable 변수 선언
     // enum 변수에서 fire 삭제
-    public enum PlayerState { runForword, runBack, runLeft, runRight,
+    public enum PlayerState { idle, idleGun, die,
+                              runForword, runBack, runLeft, runRight,
+                              runForwordGun, runBackGun, runLeftGun, runRightgun,
                               runForwordShot, runBackShot, runLeftShot, runRightShot };
 
     // 캐릭터의 현재 상태 정보를 저장할 Enum 변수
-    public PlayerState playerState = PlayerState.runForword;
+    public PlayerState playerState = PlayerState.idle;
 
     private float h = 0.0f;
     private float v = 0.0f;
@@ -62,7 +64,6 @@ public class PlayerCtrl : MonoBehaviour
 
     // 혈흔 효과 프리팹
     public GameObject bloodEffect;
-
 
 
     void Start()
@@ -121,31 +122,39 @@ public class PlayerCtrl : MonoBehaviour
             // 전진 애니메이션
             animator.SetInteger("IsState", 1);
             playerState = PlayerState.runForword;
-
+            // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.runForwordGun 이 된다.
+            // animator.SetBool("IsShot", true)  이면 playerState = PlayerState.runForwordShot 이 된다.
         }
         else if (v <= -0.1f)
         {
             // 후진 애니메이션
             animator.SetInteger("IsState", 2);
-            playerState = PlayerState.runForword;
+            playerState = PlayerState.runBack;
+            // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.runBackGun 이 된다.
+            // animator.SetBool("IsShot", true)  이면 playerState = PlayerState.runBackShot 이 된다.
         }
         else if (h <= -0.1f)
         {
             // 왼쪽 이동 애니메이션
             animator.SetInteger("IsState", 3);
             playerState = PlayerState.runLeft;
+            // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.runLeftGun 이 된다.
+            // animator.SetBool("IsShot", true)  이면 playerState = PlayerState.runLeftShot 이 된다.
         }
         else if (h >= 0.1f)
         {
             // 오른쪽 이동 애니메이션
             animator.SetInteger("IsState", 4);
             playerState = PlayerState.runRight;
+            // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.runRightGun 이 된다.
+            // animator.SetBool("IsShot", true)  이면 playerState = PlayerState.runRightShot 이 된다.
         }
         else
         {
             // 정지 시 idle애니메이션
             animator.SetInteger("IsState", 0);
-            playerState = PlayerState.runForword;
+            playerState = PlayerState.idle;
+            // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.idleGun 이 된다.
         }
 
 
@@ -161,7 +170,7 @@ public class PlayerCtrl : MonoBehaviour
             //animator.SetBool("IsEquip", true);
             if (Input.GetMouseButtonDown(0))
             {
-                animator.SetBool("IsShot", true);
+                animator.SetBool("IsShot", true);  
                 Fire();
                 //animator.SetBool("IsTrace", true);
                 //networkCtrl.Player_Shot();
@@ -221,6 +230,8 @@ public class PlayerCtrl : MonoBehaviour
         muzzleFlash2.enabled = false;
     }
 
+
+    
     void OnTriggerEnter(Collider coll)
     {
 
@@ -237,7 +248,16 @@ public class PlayerCtrl : MonoBehaviour
                 followCam.dist = 7.0f;
                 sensorCheck = true;
             }
-            else if (sensorCheck == true)
+        }
+    }
+
+    void OnTriggerExit(Collider coll)
+    {
+        // 충돌한 Collider가 Camchange의 CAMCHANGE(Tag값)이면 카메라 전환 
+        if (coll.gameObject.tag == "CAMCHANGE")
+        {
+            FollowCam followCam = GameObject.Find("Main Camera").GetComponent<FollowCam>();
+            if (sensorCheck == true)
             {
                 followCam.change = false;
                 Debug.Log("체크 아웃");
@@ -247,6 +267,7 @@ public class PlayerCtrl : MonoBehaviour
             }
         }
     }
+
 
     // 충돌을 시작할 때 발생하는 이벤트
     void OnCollisionEnter(Collision coll)
@@ -274,6 +295,7 @@ public class PlayerCtrl : MonoBehaviour
         StopAllCoroutines();
         // DIe 애니메이션 실행
         animator.SetTrigger("IsDie");
+        playerState = PlayerState.die;
         // 캐릭터 캡슐 콜라이더 비활성화
         gameObject.GetComponentInChildren<CapsuleCollider>().enabled = false;
     }

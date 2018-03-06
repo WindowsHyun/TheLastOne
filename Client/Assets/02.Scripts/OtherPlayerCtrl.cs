@@ -67,7 +67,7 @@ public class OtherPlayerCtrl : MonoBehaviour
         muzzleFlash1.enabled = false;
         muzzleFlash2.enabled = false;
 
-        animator.SetBool("IsTrace", false);
+        animator.SetInteger("IsState", 0);
 
         StartCoroutine(this.createPrefab());
 
@@ -130,7 +130,8 @@ public class OtherPlayerCtrl : MonoBehaviour
             if (createBullet_b == true)
             {
                 // 총쏘는 애니메이션으로 변경.
-                animator.SetBool("IsTrace", true);
+                animator.SetBool("IsEquip", true);
+                animator.SetBool("IsShot", true);
 
                 Instantiate(bullet, firePos.position, firePos.rotation);
 
