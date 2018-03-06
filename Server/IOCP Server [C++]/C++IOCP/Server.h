@@ -86,6 +86,7 @@ struct CLIENT {
 	xyz rotation;
 	char game_id[10]; // 클라에서 받아온 게임아이디를 저장
 	int hp = -1;
+	int animator = 0;
 	bool connect;
 	bool shotting = false;
 

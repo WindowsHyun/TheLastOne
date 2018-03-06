@@ -96,10 +96,11 @@ void Send_Position(int client, int object) {
 	auto id = object;
 	auto name = builder.CreateString(g_clients[object].game_id);
 	auto hp = g_clients[object].hp;
+	auto animator = g_clients[object].animator;
 	auto shot = g_clients[object].shotting;
 	auto xyz = Vec3(g_clients[object].position.x, g_clients[object].position.y, g_clients[object].position.z);
 	auto rotation = Vec3(g_clients[object].rotation.x, g_clients[object].rotation.y, g_clients[object].rotation.z);
-	auto orc = CreateClient_info(builder, id, hp, shot, name, &xyz, &rotation);
+	auto orc = CreateClient_info(builder, id, hp, animator, shot, name, &xyz, &rotation);
 	builder.Finish(orc); // Serialize the root of the object.
 	SendPacket(SC_PUT_PLAYER, client, builder.GetBufferPointer(), builder.GetSize());
 }
@@ -115,10 +116,11 @@ void Send_All_Data(int client, bool allClient) {
 		auto id = i;
 		auto name = builder.CreateString(g_clients[i].game_id);
 		auto hp = g_clients[i].hp;
+		auto animator = g_clients[i].animator;
 		auto shot = g_clients[i].shotting;
 		auto xyz = Vec3(g_clients[i].position.x, g_clients[i].position.y, g_clients[i].position.z);
 		auto rotation = Vec3(g_clients[i].rotation.x, g_clients[i].rotation.y, g_clients[i].rotation.z);
-		auto client_data = CreateClient_info(builder, id, hp, shot, name, &xyz, &rotation);
+		auto client_data = CreateClient_info(builder, id, hp, animator, shot, name, &xyz, &rotation);
 		// client_data 라는 테이블에 클라이언트 데이터가 들어가 있다.
 
 		Individual_client.push_back(client_data);	// Vector에 넣었다.

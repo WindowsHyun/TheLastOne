@@ -15,11 +15,13 @@ using System.Linq;
 using FlatBuffers;
 using Game.TheLastOne; // Client, Vec3 을 불러오기 위해
 using TheLastOne.SendFunction;
+using UnityEngine.UI;   // DebugText를 쓰기 위하여
 //---------------------------------------------------------------
 
 public struct Client_Data
 {
     public int id;
+    public int animator;    // 클라이언트 애니메이션
     public Vector3 position;  // 클라이언트 위치
     public Vector3 rotation;    // 클라이언트 보는 방향
     public bool prefab;    // 클라이언트 프리팹이 만들어졌는지 확인
@@ -29,9 +31,11 @@ public struct Client_Data
     public OtherPlayerCtrl script;  // 프리팹 오브젝트 안의 함수를 호출하기 위한 스크립트
     public bool removeClient;   // 클라이언트 지울경우 true
 
+
     public Client_Data(Vector3 position, Vector3 rotation)
     {
         this.id = -1;
+        this.animator = 0;
         this.position = position;
         this.rotation = rotation;
         this.connect = false;
@@ -50,6 +54,7 @@ namespace TheLastOne.Game.Network
         public static Socket m_Socket;
         public GameObject Player;
         public GameObject PrefabPlayer;
+        public Text DebugText;
 
         Vector3 Player_Position;
         Vector3 Player_Rotation;
@@ -59,13 +64,14 @@ namespace TheLastOne.Game.Network
 
         private const int MaxClient = 50;    // 최대 동접자수
         public static Client_Data[] client_data = new Client_Data[MaxClient];      // 클라이언트 데이터 저장할 구조체
-        private static int Client_imei = 0;         // 자신의 클라이언트 아이디
+        private static int Client_imei = -1;         // 자신의 클라이언트 아이디
 
         Socket_SendFunction sF = new Socket_SendFunction();
 
         private int LimitReceivebyte = 4000;                     // Receive Data Length. (byte)
         private byte[] Receivebyte = new byte[4000];    // Receive data by this array to save.
         private byte[] Sendbyte = new byte[4000];
+        private string debugString = "";        // Debug 출력을 위한 string
 
         // 서버가 클라이언트에게 보내는 이벤트 타입
         private int SC_ID = 1;                          // 클라이언트 아이디를 보낸다.
@@ -77,39 +83,41 @@ namespace TheLastOne.Game.Network
         {
             do
             {
-                for (int i = 0; i < MaxClient; ++i)
+                if (Client_imei != -1)
                 {
-                    if (Client_imei == i)
-                        continue;
-                    if (client_data[i].connect == true && client_data[i].prefab == false)
+                    for (int i = 0; i < MaxClient; ++i)
                     {
-                        client_data[i].Player = Instantiate(PrefabPlayer, client_data[i].position, Quaternion.identity);
-                        //client_data[i].script = GameObject.Find("OtherPlayerCtrl").GetComponent<OtherPlayerCtrl>();
-                        client_data[i].script = client_data[i].Player.GetComponent<OtherPlayerCtrl>();
-                        client_data[i].prefab = true;
+                        if (Client_imei == i)
+                            continue;
+                        if (client_data[i].connect == true && client_data[i].prefab == false)
+                        {
+                            client_data[i].Player = Instantiate(PrefabPlayer, client_data[i].position, Quaternion.identity);
+                            //client_data[i].script = GameObject.Find("OtherPlayerCtrl").GetComponent<OtherPlayerCtrl>();
+                            client_data[i].script = client_data[i].Player.GetComponent<OtherPlayerCtrl>();
+                            client_data[i].prefab = true;
 
-                        // 처음 위치를 넣어 줘야 한다. 그러지 않을경우 다른 클라이언트 에서는 0,0 에서부터 천천히 올라오게 보인다.
-                        client_data[i].Player.transform.position = client_data[i].position;
-                    }
-                    else if (client_data[i].prefab == true)
-                    {
-                        // 실제로 캐릭터를 움직이는 것은 코루틴 여기서 움직임을 진행 한다.
-                        client_data[i].script.MovePos(client_data[i].position);
+                            // 처음 위치를 넣어 줘야 한다. 그러지 않을경우 다른 클라이언트 에서는 0,0 에서부터 천천히 올라오게 보인다.
+                            client_data[i].Player.transform.position = client_data[i].position;
+                        }
+                        else if (client_data[i].prefab == true)
+                        {
+                            // 실제로 캐릭터를 움직이는 것은 코루틴 여기서 움직임을 진행 한다.
+                            client_data[i].script.MovePos(client_data[i].position);
 
-                        var rotationX = client_data[i].rotation.x;
-                        var rotationY = client_data[i].rotation.y;
-                        var rotationZ = client_data[i].rotation.z;
-                        //Debug.Log("  :  "+ rotationX + ", " + rotationY + ", " + rotationZ);
-                        client_data[i].Player.transform.rotation = Quaternion.Euler(rotationX, rotationY, rotationZ);
-                    }
-                    if (client_data[i].removeClient == true)
-                    {
-                        // 연결은 해지 되었는데 프리팹이 살아 있는경우는 나간 경우 이므로
-                        // 코루틴을 통하여 지워주자!
-                        StartCoroutine(RemovePlayerCoroutine(i));
+                            var rotationX = client_data[i].rotation.x;
+                            var rotationY = client_data[i].rotation.y;
+                            var rotationZ = client_data[i].rotation.z;
+                            //Debug.Log("  :  "+ rotationX + ", " + rotationY + ", " + rotationZ);
+                            client_data[i].Player.transform.rotation = Quaternion.Euler(rotationX, rotationY, rotationZ);
+                        }
+                        if (client_data[i].removeClient == true)
+                        {
+                            // 연결은 해지 되었는데 프리팹이 살아 있는경우는 나간 경우 이므로
+                            // 코루틴을 통하여 지워주자!
+                            StartCoroutine(RemovePlayerCoroutine(i));
+                        }
                     }
                 }
-
                 yield return null;
             } while (true);
             yield return null;
@@ -119,7 +127,6 @@ namespace TheLastOne.Game.Network
         {
             do
             {
-
                 m_Socket.BeginReceive(Receivebyte, 0, LimitReceivebyte, 0, DataReceived, m_Socket);
                 yield return null;
             } while (true);
@@ -130,25 +137,28 @@ namespace TheLastOne.Game.Network
         {
             do
             {
-                Player_Position.x = Player.transform.position.x;
-                Player_Position.y = Player.transform.position.y;
-                Player_Position.z = Player.transform.position.z;
-                Player_Rotation.x = Player.transform.eulerAngles.x;
-                Player_Rotation.y = Player.transform.eulerAngles.y;
-                Player_Rotation.z = Player.transform.eulerAngles.z;
-                Sendbyte = sF.makeClient_PacketInfo(Player_Position, Player_Rotation);
-                Send_Packet(Sendbyte);
-                yield return new WaitForSeconds(0.05f);
-                // 초당 20번 패킷 전송으로 제한을 한다.
+                if (Client_imei != -1)
+                {
+                    Player_Position.x = Player.transform.position.x;
+                    Player_Position.y = Player.transform.position.y;
+                    Player_Position.z = Player.transform.position.z;
+                    Player_Rotation.x = Player.transform.eulerAngles.x;
+                    Player_Rotation.y = Player.transform.eulerAngles.y;
+                    Player_Rotation.z = Player.transform.eulerAngles.z;
+                    Enum get_int_enum = Player.GetComponent<PlayerCtrl>().playerState;
+                    Sendbyte = sF.makeClient_PacketInfo(Player_Position, Convert.ToInt32(get_int_enum), Player_Rotation);
+                    Send_Packet(Sendbyte);
+                    yield return new WaitForSeconds(0.05f);
+                    // 초당 20번 패킷 전송으로 제한을 한다.
+                }
             } while (true);
             yield return null;
         }
 
-
         IEnumerator RemovePlayerCoroutine(int client_id)
         {
             // 클라이언트 데이터 및 프리팹을 삭제 하여 다른 클라이언트가 들어올 수 있게 만든다.
-            Debug.Log(client_id + "삭제 코루틴 접근");
+            //Debug.Log(client_id + "삭제 코루틴 접근");
             client_data[client_id].connect = false;
             client_data[client_id].removeClient = false;
             client_data[client_id].prefab = false;
@@ -160,10 +170,21 @@ namespace TheLastOne.Game.Network
             client_data[client_id].id = -1;
             yield return null;
         }
-        
+
+        IEnumerator DrawDebugText()
+        {
+            do
+            {
+
+                DebugText.text = debugString.ToString();
+                yield return null;
+            } while (true);
+            yield return null;
+        }
 
         void ProcessPacket(int size, int type, byte[] recvPacket)
         {
+
             if (type == SC_ID)
             {
                 // 클라이언트 아이디를 가져온다.
@@ -171,7 +192,14 @@ namespace TheLastOne.Game.Network
                 System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
                 ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
                 var Get_ServerData = Client_id.GetRootAsClient_id(revc_buf);
-                Client_imei = Get_ServerData.Id;
+                Client_imei = Int32.Parse(Get_ServerData.Id.ToString());
+                debugString = "Client ID :" + Client_imei + "/";
+                //----------------------------------------------------------------
+                // 클라이언트 아이디가 정상적으로 받은건지 확인을 한다.
+                // 버그로 인하여 일단 임시로 나둔다.
+                //Sendbyte = sF.check_ClientIMEI(Int32.Parse(Get_ServerData.Id.ToString()));
+                //Send_Packet(Sendbyte);
+                //----------------------------------------------------------------
                 Debug.Log("클라이언트 아이디 : " + Client_imei);
             }
             else if (type == SC_PUT_PLAYER)
@@ -221,10 +249,17 @@ namespace TheLastOne.Game.Network
 
                     client_data[client_id].name = Get_ServerData.Data(i).Value.Name;
 
+
+                    if (client_data[client_id].prefab == true)
+                    {
+                        // 프리팹이 만들어진 이후 부터 script를 사용할 수 있기 때문에 그 이후 애니메이션 동기화를 시작한다.
+                        client_data[client_id].script.get_Animator(Get_ServerData.Data(i).Value.Animator);
+                    }
+
                     if (Get_ServerData.Data(i).Value.Shotting == true && i != Client_imei)
                     {
                         // 자신이 아닌 다른 클라이언트가 총을 쏘면 해당 클라이언트의 script에 Fire을 호출한다.
-                        //Debug.Log(client_id + "가 총을 쏘다.");
+                        Debug.Log(client_id + "가 총을 쏘다.");
                         client_data[client_id].script.Fire();
                     }
 
@@ -260,6 +295,7 @@ namespace TheLastOne.Game.Network
             m_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendTimeout, 10000);
             m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 10000);
+            DebugText.transform.position = new Vector3(Screen.width / 2, Screen.height - 10, 0);
 
             //=======================================================
             // Socket connect.
@@ -270,8 +306,9 @@ namespace TheLastOne.Game.Network
                 m_Socket.Connect(ipEndPoint);
                 m_Socket.BeginReceive(Receivebyte, 0, LimitReceivebyte, 0, DataReceived, m_Socket);
                 StartCoroutine(startPrefab());
-                StartCoroutine(SendCoroutine());
                 StartCoroutine(RecvCoroutine());
+                StartCoroutine(SendCoroutine());
+                StartCoroutine(DrawDebugText());
             }
             catch (SocketException SCE)
             {
@@ -307,16 +344,24 @@ namespace TheLastOne.Game.Network
 
             int psize = Int32.Parse(str_size);
             int ptype = Receivebyte[type_Pos + 1]; // 패킷 타입
-            Debug.Log("총 사이즈 : " + psize + ", 패킷 타입 : " + ptype);
+            //Debug.Log("총 사이즈 : " + psize + ", 패킷 타입 : " + ptype);
 
-            if (psize == m_Socket.EndReceive(ar))
+            try
             {
-                ProcessPacket(psize, ptype, Receivebyte);
+                if (psize == m_Socket.EndReceive(ar))
+                {
+                    ProcessPacket(psize, ptype, Receivebyte);
+                }
+                else
+                {
+                    Debug.Log(m_Socket.EndReceive(ar) + "패킷 Error | " + psize);
+                }
             }
-            else
+            catch
             {
-                Debug.Log(m_Socket.EndReceive(ar) + "패킷 Error | " + psize);
+                debugString = "패킷 오류..!";
             }
+
         }
 
         public void Send_Packet(byte[] packet)

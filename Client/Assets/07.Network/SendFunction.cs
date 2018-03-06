@@ -17,13 +17,15 @@ namespace TheLastOne.SendFunction
         FlatBufferBuilder fbb = new FlatBufferBuilder(1);
         private int CS_Info = 1;              // 클라이언트가 서버에게 자신의 위치정보를 보내준다.
         private int CS_Shot_info = 2;       // 클라이언트가 서버에게 Shot 정보를 보내준다.
+        private int CS_Check_info = 3;       // 클라이언트가 서버에게 자신의 정보가 맞는지 확인해 준다.
 
-        public Byte[] makeClient_PacketInfo(Vector3 Player, Vector3 PlayerRotation)
+        public Byte[] makeClient_PacketInfo(Vector3 Player, int Player_Animator, Vector3 PlayerRotation)
         {
             //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.
             fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
             Client_info.StartClient_info(fbb);
             //Client.AddName(fbb, offset); // string 사용
+            Client_info.AddAnimator(fbb, Player_Animator);
             Client_info.AddPosition(fbb, Vec3.CreateVec3(fbb, Player.x, Player.y, Player.z));
             Client_info.AddRotation(fbb, Vec3.CreateVec3(fbb, PlayerRotation.x, PlayerRotation.y, PlayerRotation.z));
             var endOffset = Client_info.EndClient_info(fbb);
@@ -54,6 +56,27 @@ namespace TheLastOne.SendFunction
             byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
             byte[] packet_len = BitConverter.GetBytes(packet.Length);   // flatbuffers의 패킷 크기
             byte[] packet_type = BitConverter.GetBytes(CS_Shot_info);
+            byte[] real_packet = new byte[packet_len.Length + packet.Length];
+
+            System.Buffer.BlockCopy(packet_len, 0, real_packet, 0, packet_len.Length);
+            System.Buffer.BlockCopy(packet_type, 0, real_packet, 1, packet_type.Length);
+            System.Buffer.BlockCopy(packet, 0, real_packet, 4, packet.Length);
+            return real_packet;
+        }
+
+        public Byte[] check_ClientIMEI(int client)
+        {
+            //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.
+            fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
+            Client_id.StartClient_id(fbb);
+            Client_id.AddId(fbb, client);
+            var endOffset = Client_id.EndClient_id(fbb);
+            fbb.Finish(endOffset.Value);
+
+
+            byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
+            byte[] packet_len = BitConverter.GetBytes(packet.Length);   // flatbuffers의 패킷 크기
+            byte[] packet_type = BitConverter.GetBytes(CS_Check_info);
             byte[] real_packet = new byte[packet_len.Length + packet.Length];
 
             System.Buffer.BlockCopy(packet_len, 0, real_packet, 0, packet_len.Length);

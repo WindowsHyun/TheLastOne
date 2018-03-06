@@ -9,10 +9,16 @@ using System;
 public class OtherPlayerCtrl : MonoBehaviour
 {
     // 캐릭터의 상태 정보가 있는 Enumerable 변수 선언
-    public enum PlayerState { run, fire };
+    public enum PlayerState
+    {
+        idle, idleGun, die,
+        runForword, runBack, runLeft, runRight,
+        runForwordGun, runBackGun, runLeftGun, runRightgun,
+        runForwordShot, runBackShot, runLeftShot, runRightShot
+    };
 
     // 캐릭터의 현재 상태 정보를 저장할 Enum 변수
-    public PlayerState playerState = PlayerState.run;
+    public PlayerState playerState = PlayerState.idle;
 
     //private float h = 0.0f;
     //private float v = 0.0f;
@@ -47,6 +53,9 @@ public class OtherPlayerCtrl : MonoBehaviour
     // 총알 프리팹 만드는 Bool 변수 [ 외부함수에서는 프리팹 생성이 안되기 때문에 ]
     private bool createBullet_b = false;
 
+    // 애니메이션 값 저장하는 변수
+    private int animator_value = 0;
+
     // 혈흔 효과 프리팹
     public GameObject bloodEffect;
 
@@ -67,7 +76,7 @@ public class OtherPlayerCtrl : MonoBehaviour
         muzzleFlash1.enabled = false;
         muzzleFlash2.enabled = false;
 
-        animator.SetInteger("IsState", 0);
+        animator.SetInteger("IsState", animator_value);
 
         StartCoroutine(this.createPrefab());
 
@@ -78,6 +87,11 @@ public class OtherPlayerCtrl : MonoBehaviour
 
     }
 
+    public void get_Animator(int value)
+    {
+        // 동적으로 총알을 생성할 수 있게 true로 변경
+        animator_value = value;
+    }
 
     public void Fire()
     {
@@ -98,7 +112,8 @@ public class OtherPlayerCtrl : MonoBehaviour
             // 10이상 거리 차이가 날경우 움직여 주는것이 아닌 바로 동기화를 시켜 버린다.
             tr.position = pos;
         }
-        else {
+        else
+        {
             tr.position = Vector3.MoveTowards(tr.position, pos, Time.deltaTime * moveSpeed);
         }
     }
@@ -127,6 +142,31 @@ public class OtherPlayerCtrl : MonoBehaviour
     {
         do
         {
+
+            switch (animator_value)
+            {
+                case 0:
+                    animator.SetInteger("IsState", 0);
+                    //playerState = PlayerState.idle;
+                    break;
+                case 3:
+                    animator.SetInteger("IsState", 1);
+                    //playerState = PlayerState.runForword;
+                    break;
+                case 4:
+                    animator.SetInteger("IsState", 2);
+                    //playerState = PlayerState.runBack;
+                    break;
+                case 5:
+                    animator.SetInteger("IsState", 3);
+                    //playerState = PlayerState.runLeft;
+                    break;
+                case 6:
+                    animator.SetInteger("IsState", 4);
+                    //playerState = PlayerState.runRight;
+                    break;
+            }
+
             if (createBullet_b == true)
             {
                 // 총쏘는 애니메이션으로 변경.
@@ -157,7 +197,7 @@ public class OtherPlayerCtrl : MonoBehaviour
     }
 
     // 충돌을 시작할 때 발생하는 이벤트
-   void OnCollisionEnter(Collision coll)
+    void OnCollisionEnter(Collision coll)
     {
         // 충돌한 게임오브젝트의 태그값 비교
         if (coll.gameObject.tag == "BULLET")

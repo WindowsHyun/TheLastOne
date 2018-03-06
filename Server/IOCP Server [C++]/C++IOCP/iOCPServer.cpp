@@ -197,6 +197,7 @@ void Accept_Thread() {
 		g_clients[new_id].rotation.x = 0;
 		g_clients[new_id].rotation.y = 0;
 		g_clients[new_id].rotation.z = 0;
+		g_clients[new_id].animator = 0;
 		g_clients[new_id].shotting = false;
 		g_clients[new_id].hp = 100;
 
@@ -231,6 +232,7 @@ void DisconnectClient(int ci) {
 	g_clients[ci].position.x = 0;
 	g_clients[ci].position.y = 0;
 	g_clients[ci].position.z = 0;
+	g_clients[ci].animator = 0;
 	g_clients[ci].hp = 100;
 
 	std::cout << "Disconnect Client : " << ci << std::endl;
@@ -252,6 +254,7 @@ void ProcessPacket(int ci, char *packet) {
 			g_clients[ci].rotation.x = client_View->rotation()->x();
 			g_clients[ci].rotation.y = client_View->rotation()->y();
 			g_clients[ci].rotation.z = client_View->rotation()->z();
+			g_clients[ci].animator = client_View->animator();
 		}
 		break;
 
@@ -260,6 +263,22 @@ void ProcessPacket(int ci, char *packet) {
 			auto client_Shot_View = GetClient_Shot_infoView(get_packet);
 			g_clients[client_Shot_View->id()].shotting = true;
 			all_Client_Packet = true;
+
+		}
+		case CS_Check_info:
+		{
+			auto client_Check_info = GetClient_infoView(get_packet);
+			if (ci != client_Check_info->id()) {
+				/*
+				클라이언트의 고유번호와 서버의 고유번호가 다를 경우
+				값이 다르다 라는 결과를 표출하고 다시한번 클라이언트 아이디를 보내줘야 한다.
+				현재 문제오류가 없어서 일단 임시 보류.
+				*/
+				std::cout << "클라이언트 의 값 : " << client_Check_info->id() << std::endl;
+				std::cout << "실제 값 : " << ci << std::endl;
+				//Send_Client_ID(ci, SC_ID, false);
+			}
+
 
 		}
 		break;

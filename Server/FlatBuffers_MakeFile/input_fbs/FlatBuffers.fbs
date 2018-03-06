@@ -15,6 +15,7 @@ table All_information{
 table Client_info {
   id:int;
   hp:int;
+  animator:int;
   Shotting:bool;
   name:string;
   position:Vec3;

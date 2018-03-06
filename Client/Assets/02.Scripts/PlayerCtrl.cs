@@ -173,7 +173,7 @@ public class PlayerCtrl : MonoBehaviour
                 animator.SetBool("IsShot", true);  
                 Fire();
                 //animator.SetBool("IsTrace", true);
-                //networkCtrl.Player_Shot();
+                networkCtrl.Player_Shot();
             }
         }
         //else {

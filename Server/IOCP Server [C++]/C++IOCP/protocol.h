@@ -10,7 +10,7 @@
 // 클라이언트가 서버에게 보내는 패킷
 #define CS_Info           1					// 클라이언트가 서버에게 자신의 위치정보를 보내준다.
 #define CS_Shot_info    2					// 클라이언트가 서버에게 Shot 정보를 보내준다.
-
+#define CS_Check_info  3					// 클라이언트가 서버에게 자신의 정보가 맞는지 확인해 준다.
 
 // BYTE를 255까지만 인식하여 int형인 BOOL로 수정
 

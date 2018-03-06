@@ -29,9 +29,6 @@ MANUALLY_ALIGNED_STRUCT(4) Vec3 FLATBUFFERS_FINAL_CLASS {
   Vec3() {
     memset(this, 0, sizeof(Vec3));
   }
-  Vec3(const Vec3 &_o) {
-    memcpy(this, &_o, sizeof(Vec3));
-  }
   Vec3(float _x, float _y, float _z)
       : x_(flatbuffers::EndianScalar(_x)),
         y_(flatbuffers::EndianScalar(_y)),
@@ -71,13 +68,13 @@ struct All_informationBuilder {
   void add_data(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Client_info>>> data) {
     fbb_.AddOffset(All_information::VT_DATA, data);
   }
-  All_informationBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  explicit All_informationBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
   All_informationBuilder &operator=(const All_informationBuilder &);
   flatbuffers::Offset<All_information> Finish() {
-    const auto end = fbb_.EndTable(start_, 1);
+    const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<All_information>(end);
     return o;
   }
@@ -103,16 +100,20 @@ struct Client_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_ID = 4,
     VT_HP = 6,
-    VT_SHOTTING = 8,
-    VT_NAME = 10,
-    VT_POSITION = 12,
-    VT_ROTATION = 14
+    VT_ANIMATOR = 8,
+    VT_SHOTTING = 10,
+    VT_NAME = 12,
+    VT_POSITION = 14,
+    VT_ROTATION = 16
   };
   int32_t id() const {
     return GetField<int32_t>(VT_ID, 0);
   }
   int32_t hp() const {
     return GetField<int32_t>(VT_HP, 0);
+  }
+  int32_t animator() const {
+    return GetField<int32_t>(VT_ANIMATOR, 0);
   }
   bool Shotting() const {
     return GetField<uint8_t>(VT_SHOTTING, 0) != 0;
@@ -130,6 +131,7 @@ struct Client_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_ID) &&
            VerifyField<int32_t>(verifier, VT_HP) &&
+           VerifyField<int32_t>(verifier, VT_ANIMATOR) &&
            VerifyField<uint8_t>(verifier, VT_SHOTTING) &&
            VerifyOffset(verifier, VT_NAME) &&
            verifier.Verify(name()) &&
@@ -148,6 +150,9 @@ struct Client_infoBuilder {
   void add_hp(int32_t hp) {
     fbb_.AddElement<int32_t>(Client_info::VT_HP, hp, 0);
   }
+  void add_animator(int32_t animator) {
+    fbb_.AddElement<int32_t>(Client_info::VT_ANIMATOR, animator, 0);
+  }
   void add_Shotting(bool Shotting) {
     fbb_.AddElement<uint8_t>(Client_info::VT_SHOTTING, static_cast<uint8_t>(Shotting), 0);
   }
@@ -160,13 +165,13 @@ struct Client_infoBuilder {
   void add_rotation(const Vec3 *rotation) {
     fbb_.AddStruct(Client_info::VT_ROTATION, rotation);
   }
-  Client_infoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  explicit Client_infoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
   Client_infoBuilder &operator=(const Client_infoBuilder &);
   flatbuffers::Offset<Client_info> Finish() {
-    const auto end = fbb_.EndTable(start_, 6);
+    const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Client_info>(end);
     return o;
   }
@@ -176,6 +181,7 @@ inline flatbuffers::Offset<Client_info> CreateClient_info(
     flatbuffers::FlatBufferBuilder &_fbb,
     int32_t id = 0,
     int32_t hp = 0,
+    int32_t animator = 0,
     bool Shotting = false,
     flatbuffers::Offset<flatbuffers::String> name = 0,
     const Vec3 *position = 0,
@@ -184,6 +190,7 @@ inline flatbuffers::Offset<Client_info> CreateClient_info(
   builder_.add_rotation(rotation);
   builder_.add_position(position);
   builder_.add_name(name);
+  builder_.add_animator(animator);
   builder_.add_hp(hp);
   builder_.add_id(id);
   builder_.add_Shotting(Shotting);
@@ -194,6 +201,7 @@ inline flatbuffers::Offset<Client_info> CreateClient_infoDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     int32_t id = 0,
     int32_t hp = 0,
+    int32_t animator = 0,
     bool Shotting = false,
     const char *name = nullptr,
     const Vec3 *position = 0,
@@ -202,6 +210,7 @@ inline flatbuffers::Offset<Client_info> CreateClient_infoDirect(
       _fbb,
       id,
       hp,
+      animator,
       Shotting,
       name ? _fbb.CreateString(name) : 0,
       position,
@@ -228,13 +237,13 @@ struct Client_idBuilder {
   void add_id(int32_t id) {
     fbb_.AddElement<int32_t>(Client_id::VT_ID, id, 0);
   }
-  Client_idBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  explicit Client_idBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
   Client_idBuilder &operator=(const Client_idBuilder &);
   flatbuffers::Offset<Client_id> Finish() {
-    const auto end = fbb_.EndTable(start_, 1);
+    const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Client_id>(end);
     return o;
   }
@@ -268,13 +277,13 @@ struct Client_Shot_infoBuilder {
   void add_id(int32_t id) {
     fbb_.AddElement<int32_t>(Client_Shot_info::VT_ID, id, 0);
   }
-  Client_Shot_infoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  explicit Client_Shot_infoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
   Client_Shot_infoBuilder &operator=(const Client_Shot_infoBuilder &);
   flatbuffers::Offset<Client_Shot_info> Finish() {
-    const auto end = fbb_.EndTable(start_, 1);
+    const auto end = fbb_.EndTable(start_);
     auto o = flatbuffers::Offset<Client_Shot_info>(end);
     return o;
   }
