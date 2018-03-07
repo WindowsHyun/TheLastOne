@@ -10,10 +10,13 @@ public class PlayerCtrl : MonoBehaviour
 {
     // 캐릭터의 상태 정보가 있는 Enumerable 변수 선언
     // enum 변수에서 fire 삭제
-    public enum PlayerState { idle, idleGun, die,
-                              runForword, runBack, runLeft, runRight,
-                              runForwordGun, runBackGun, runLeftGun, runRightgun,
-                              runForwordShot, runBackShot, runLeftShot, runRightShot };
+    public enum PlayerState
+    {
+        idle, idleGun, die,
+        runForword, runBack, runLeft, runRight,
+        runForwordGun, runBackGun, runLeftGun, runRightgun,
+        runForwordShot, runBackShot, runLeftShot, runRightShot
+    };
 
     // 캐릭터의 현재 상태 정보를 저장할 Enum 변수
     public PlayerState playerState = PlayerState.idle;
@@ -31,7 +34,7 @@ public class PlayerCtrl : MonoBehaviour
     public float rotSpeed = 100.0f;
     // 캐릭터 체력
     public int hp = 100;
-    
+
 
     // 총알 프리팹
     public GameObject bullet;
@@ -170,7 +173,7 @@ public class PlayerCtrl : MonoBehaviour
             //animator.SetBool("IsEquip", true);
             if (Input.GetMouseButtonDown(0))
             {
-                animator.SetBool("IsShot", true);  
+                animator.SetBool("IsShot", true);
                 Fire();
                 //animator.SetBool("IsTrace", true);
                 networkCtrl.Player_Shot();
@@ -179,14 +182,24 @@ public class PlayerCtrl : MonoBehaviour
         //else {
         //    animator.SetBool("IsEquip", false);
         //}
-        
+
 
         if (Input.GetMouseButtonDown(1))
         {
-            Debug.Log("마우스 언락");
-            Cursor.lockState = CursorLockMode.None;//마우스 커서 고정 해제
-            Cursor.visible = true;//마우스 커서 보이기
-            lockMouse = false;
+            if (lockMouse == true)
+            {
+                // 마우스 잠겨 있을경우 푼다.
+                Cursor.lockState = CursorLockMode.None;//마우스 커서 고정 해제
+                Cursor.visible = true;//마우스 커서 보이기
+                lockMouse = false;
+            }
+            else
+            {
+                // 마우스가 안점겨 있을경우 다시 잠군다.
+                lockMouse = true;
+                Cursor.lockState = CursorLockMode.Locked;//마우스 커서 고정
+                Cursor.visible = false;//마우스 커서 보이기
+            }
         }
 
 
@@ -231,7 +244,7 @@ public class PlayerCtrl : MonoBehaviour
     }
 
 
-    
+
     void OnTriggerEnter(Collider coll)
     {
 
@@ -304,7 +317,7 @@ public class PlayerCtrl : MonoBehaviour
     {
         if (showItem1 == true)
         {
-            
+
             weapon.GetComponent<Renderer>().enabled = false;
             showItem1 = false;
             animator.SetBool("IsEquip", false);
