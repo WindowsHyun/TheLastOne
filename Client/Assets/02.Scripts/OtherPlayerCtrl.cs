@@ -107,7 +107,7 @@ public class OtherPlayerCtrl : MonoBehaviour
 
     public void MovePos(Vector3 pos)
     {
-        if (DistanceToPoint(tr.position, pos) >= 10)
+        if (DistanceToPoint(tr.position, pos) >= 20)
         {
             // 10이상 거리 차이가 날경우 움직여 주는것이 아닌 바로 동기화를 시켜 버린다.
             tr.position = pos;

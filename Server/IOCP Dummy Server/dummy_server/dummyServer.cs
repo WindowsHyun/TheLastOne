@@ -88,9 +88,9 @@ namespace dummy_server
                     state.client_id = i;
                     client_data[i].id = i;
 
-                    client_data[i].position.x = r.Next(400, 700);
+                    client_data[i].position.x = r.Next(500, 1200);
                     client_data[i].position.y = 30;
-                    client_data[i].position.z = r.Next(800, 1200);
+                    client_data[i].position.z = r.Next(900, 1800);
 
                     client_data[i].rotation.x = 0;
                     client_data[i].rotation.y = 0;
@@ -117,23 +117,32 @@ namespace dummy_server
 
         void Update(int ci)
         {
+            int animation = 0;
             while (true)
             {
                 switch (r.Next(0, 5))
                 {
                     case 0:
                         // 위로
+                        animation = 3;
                         client_data[ci].position.x += Int32.Parse(MovePos.Text);
+                        client_data[ci].position.z += Int32.Parse(MovePos.Text);
                         break;
                     case 1:
                         // 아래로
+                        animation = 4;
                         client_data[ci].position.x -= Int32.Parse(MovePos.Text);
+                        client_data[ci].position.z -= Int32.Parse(MovePos.Text);
                         break;
                     case 2:
-                        client_data[ci].position.z += Int32.Parse(MovePos.Text);
+                        // 왼쪽
+                        animation = 5;
+                        client_data[ci].position.x -= Int32.Parse(MovePos.Text);
                         break;
                     case 3:
-                        client_data[ci].position.z -= Int32.Parse(MovePos.Text);
+                        // 오른쪽
+                        animation = 6;
+                        client_data[ci].position.x += Int32.Parse(MovePos.Text);
                         break;
                     case 4:
                         // 총알 발사!
@@ -142,7 +151,7 @@ namespace dummy_server
                         break;
                 }
 
-                client_data[ci].stateObject.Sendbyte = makeClient_PacketInfo(client_data[ci].position, client_data[ci].rotation);
+                client_data[ci].stateObject.Sendbyte = makeClient_PacketInfo(client_data[ci].position, animation, client_data[ci].rotation);
                 Send_Packet(client_data[ci].stateObject.workSocket, client_data[ci].stateObject.Sendbyte);
                 Thread.Sleep(1000);
             }
@@ -169,27 +178,34 @@ namespace dummy_server
              124는 C++에서 '|'값 이다.
              str_size로 실제 패킷 값을 계산해서 넣는다.
              */
-            string str_size = "";
-            string tmp_int = "";
-            byte[] temp = new byte[8];
-            int type_Pos = 0;
-
-            for (type_Pos = 0; type_Pos < 8; ++type_Pos)
+            try
             {
-                if (state.Receivebyte[type_Pos] == 124)
-                    break;
-                temp[0] = state.Receivebyte[type_Pos];
-                tmp_int = Encoding.Default.GetString(temp);
-                str_size += Int32.Parse(tmp_int);
+                string str_size = "";
+                string tmp_int = "";
+                byte[] temp = new byte[8];
+                int type_Pos = 0;
+
+                for (type_Pos = 0; type_Pos < 8; ++type_Pos)
+                {
+                    if (state.Receivebyte[type_Pos] == 124)
+                        break;
+                    temp[0] = state.Receivebyte[type_Pos];
+                    tmp_int = Encoding.Default.GetString(temp);
+                    str_size += Int32.Parse(tmp_int);
+                }
+                //-------------------------------------------------------------------------------------
+
+                int psize = Int32.Parse(str_size);
+                int ptype = state.Receivebyte[type_Pos + 1]; // 패킷 타입
+                                                             //SetText("총 사이즈 : " + psize + ", 패킷 타입 : " + ptype);
+                if (psize == state.workSocket.EndReceive(ar))
+                {
+                    ProcessPacket(psize, ptype, state.Receivebyte);
+                }
             }
-            //-------------------------------------------------------------------------------------
-
-            int psize = Int32.Parse(str_size);
-            int ptype = state.Receivebyte[0]; // 패킷 타입
-            //SetText("총 사이즈 : " + psize + ", 패킷 타입 : " + ptype);
-            if (psize >= state.workSocket.EndReceive(ar))
+            catch
             {
-                ProcessPacket(psize, ptype, state.Receivebyte);
+
             }
             state.workSocket.BeginReceive(state.Receivebyte, 0, LimitReceivebyte, 0, DataReceived, state);
         }
@@ -200,10 +216,10 @@ namespace dummy_server
             {
                 // 클라이언트 아이디를 가져온다.
                 byte[] t_buf = new byte[size + 1];
-                System.Buffer.BlockCopy(recvPacket, 2, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
+                System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
                 ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
                 var Get_ServerData = Client_id.GetRootAsClient_id(revc_buf);
-                Client_imei = Get_ServerData.Id;
+                Client_imei = Int32.Parse(Get_ServerData.Id.ToString());
                 SetText("클라이언트 아이디 : " + Client_imei);
             }
 
@@ -216,13 +232,14 @@ namespace dummy_server
 
 
 
-        public Byte[] makeClient_PacketInfo(Vector3 Player, Vector3 PlayerRotation)
+        public Byte[] makeClient_PacketInfo(Vector3 Player, int Player_Animator, Vector3 PlayerRotation)
         {
             FlatBufferBuilder fbb = new FlatBufferBuilder(1);
             //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.
             fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
             Client_info.StartClient_info(fbb);
             //Client.AddName(fbb, offset); // string 사용
+            Client_info.AddAnimator(fbb, Player_Animator);
             Client_info.AddPosition(fbb, Vec3.CreateVec3(fbb, Player.x, Player.y, Player.z));
             Client_info.AddRotation(fbb, Vec3.CreateVec3(fbb, PlayerRotation.x, PlayerRotation.y, PlayerRotation.z));
             var endOffset = Client_info.EndClient_info(fbb);
