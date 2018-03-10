@@ -68,6 +68,9 @@ public class PlayerCtrl : MonoBehaviour
     // 혈흔 효과 프리팹
     public GameObject bloodEffect;
 
+    // 총 발사 가능 체크
+    public bool shotable;
+
 
     void Start()
     {
@@ -93,6 +96,8 @@ public class PlayerCtrl : MonoBehaviour
 
 
         weapon.GetComponent<Renderer>().enabled = false;
+
+        shotable = true;
 
         //GameObject weapon = transform.Find("AK47").gameObject;
     }
@@ -168,7 +173,7 @@ public class PlayerCtrl : MonoBehaviour
         }
 
         // 총이 장착이 되었을때만 발사 가능
-        if (showItem1 == true)
+        if (showItem1 == true && shotable == true)
         {
             //animator.SetBool("IsEquip", true);
             if (Input.GetMouseButtonDown(0))
@@ -262,6 +267,12 @@ public class PlayerCtrl : MonoBehaviour
                 sensorCheck = true;
             }
         }
+
+        // 캐릭터 앞 트리거가 내부 벽과 충돌을 검사하는 변수
+        if(coll.gameObject.tag == "House")
+        {
+            shotable = false;
+        }
     }
 
     void OnTriggerExit(Collider coll)
@@ -278,6 +289,12 @@ public class PlayerCtrl : MonoBehaviour
                 followCam.dist = 20.0f;
                 sensorCheck = false;
             }
+        }
+
+        // 캐릭터 앞 트리거가 내부 벽과 충돌을 검사하는 변수
+        if (coll.gameObject.tag == "House")
+        {
+            shotable = true;
         }
     }
 
