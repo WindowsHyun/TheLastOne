@@ -59,6 +59,9 @@ public class OtherPlayerCtrl : MonoBehaviour
     // 혈흔 효과 프리팹
     public GameObject bloodEffect;
 
+    // PlayerCtrl에 있는 현재 실제 클라의 위치를 가지고 있는다.
+    public Vector3 player_Pos;
+
 
     void Start()
     {
@@ -93,8 +96,10 @@ public class OtherPlayerCtrl : MonoBehaviour
         animator_value = value;
     }
 
-    public void Fire()
+    public void Fire(Vector3 player)
     {
+        // 자신의 캐릭터 위치를 넣어준다.
+        player_Pos = player;
         // 동적으로 총알을 생성할 수 있게 true로 변경
         createBullet_b = true;
     }
@@ -175,8 +180,59 @@ public class OtherPlayerCtrl : MonoBehaviour
 
                 Instantiate(bullet, firePos.position, firePos.rotation);
 
+
+                Debug.Log((DistanceToPoint(player_Pos, tr.position)/10));
+                if (DistanceToPoint(player_Pos, tr.position) >= 140)
+                {
+                    source.PlayOneShot(fireSfx, 0.0f);
+                }
+                else if(DistanceToPoint(player_Pos, tr.position) >= 130)
+                {
+                    source.PlayOneShot(fireSfx, 0.1f);
+                }
+                else if (DistanceToPoint(player_Pos, tr.position) >= 120)
+                {
+                    source.PlayOneShot(fireSfx, 0.2f);
+                }
+                else if (DistanceToPoint(player_Pos, tr.position) >= 110)
+                {
+                    source.PlayOneShot(fireSfx, 0.3f);
+                }
+                else if (DistanceToPoint(player_Pos, tr.position) >= 100)
+                {
+                    source.PlayOneShot(fireSfx, 0.4f);
+                }
+                else if (DistanceToPoint(player_Pos, tr.position) >= 90)
+                {
+                    source.PlayOneShot(fireSfx, 0.5f);
+                }
+                else if (DistanceToPoint(player_Pos, tr.position) >= 80)
+                {
+                    source.PlayOneShot(fireSfx, 0.8f);
+                }
+                else if (DistanceToPoint(player_Pos, tr.position) >= 70)
+                {
+                    source.PlayOneShot(fireSfx, 1.3f);
+                }
+                else if (DistanceToPoint(player_Pos, tr.position) >= 60)
+                {
+                    source.PlayOneShot(fireSfx, 1.7f);
+                }
+                else if (DistanceToPoint(player_Pos, tr.position) >= 50)
+                {
+                    source.PlayOneShot(fireSfx, 2.2f);
+                }
+                else if (DistanceToPoint(player_Pos, tr.position) >= 40)
+                {
+                    source.PlayOneShot(fireSfx, 2.5f);
+                }
+                else
+                {
+                    source.PlayOneShot(fireSfx, 2.9f);
+                }
+
                 // 사운드 발생 함수
-                source.PlayOneShot(fireSfx, 0.45f);
+
 
                 // 잠시 기다리는 루틴을 위해 코루틴 함수로 호출
                 StartCoroutine(this.ShowMuzzleFlash());

@@ -29,7 +29,7 @@ namespace dummy_server
         public const int kPort = 9000;
         private static int Client_imei = 0;         // 자신의 클라이언트 아이디
 
-        private const int MaxClient = 48;    // 최대 동접자수
+        private const int MaxClient = 1;    // 최대 동접자수
         public static Client_Data[] client_data = new Client_Data[MaxClient];      // 클라이언트 데이터 저장할 구조체
 
         private int LimitReceivebyte = 2000;
@@ -88,9 +88,11 @@ namespace dummy_server
                     state.client_id = i;
                     client_data[i].id = i;
 
-                    client_data[i].position.x = r.Next(500, 1200);
+                    //client_data[i].position.x = r.Next(500, 1200);
+                    client_data[i].position.x = 1000;
                     client_data[i].position.y = 30;
-                    client_data[i].position.z = r.Next(900, 1800);
+                    //client_data[i].position.z = r.Next(900, 1800);
+                    client_data[i].position.z = 138;
 
                     client_data[i].rotation.x = 0;
                     client_data[i].rotation.y = 0;
@@ -120,7 +122,7 @@ namespace dummy_server
             int animation = 0;
             while (true)
             {
-                switch (r.Next(0, 5))
+                switch (4)
                 {
                     case 0:
                         // 위로
