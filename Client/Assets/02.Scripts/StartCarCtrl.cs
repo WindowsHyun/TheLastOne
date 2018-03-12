@@ -2,19 +2,62 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StartCarCtrl : MonoBehaviour {
-    
-    // 총알의 발사 속도
+public class StartCarCtrl : MonoBehaviour
+{
+
+    // 자동차 이동 속도
     public float speed = 3000.0f;
 
+    public GameObject player;
+
+    private bool getOff = false;
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
+        // 수송 차량에 앞으로 가도록 힘을 가함
         GetComponent<Rigidbody>().AddForce(transform.forward * speed);
+        // 안에 있는 플레이어도 같이 가도록 힘을 가함
+        player.GetComponent<Rigidbody>().AddForce(transform.forward * speed);
+
+       
     }
-	
-	//// Update is called once per frame
-	//void Update () {
-		
-	//}
+
+    void Update()
+    {
+        // F키 입력 시
+        if (Input.GetKeyDown(KeyCode.F) && getOff == false)
+        {
+            // 플레이어에 가해진 힘을 0으로 만든다. - > 차량 하차
+            player.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            // 플레이어 스크립트 사용 (이동 때문)
+            player.GetComponent<PlayerCtrl>().enabled = true;
+            // 카메라 전환
+            FollowCam followCam = GameObject.Find("Main Camera").GetComponent<FollowCam>();
+            followCam.getOff = true;
+            followCam.height = 45.0f;
+            followCam.dist = 20.0f;
+
+            Debug.Log("차량 하차 -> 게임 시작");
+        }
+    }
+
+    private void OnTriggerEnter(Collider coll)
+    {
+        // 충돌한 Collider가 Camchange의 CAMCHANGE(Tag값)이면 카메라 전환 
+        if (coll.gameObject.tag == "AllGetOff" && getOff == false)
+        {
+            // 플레이어에 가해진 힘을 0으로 만든다. - > 차량 하차
+            player.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            // 플레이어 스크립트 사용 (이동 때문)
+            player.GetComponent<PlayerCtrl>().enabled = true;
+            // 카메라 전환
+            FollowCam followCam = GameObject.Find("Main Camera").GetComponent<FollowCam>();
+            followCam.getOff = true;
+            followCam.height = 45.0f;
+            followCam.dist = 20.0f;
+
+            Debug.Log("차량 하차 -> 게임 시작");
+        }
+    }
 }

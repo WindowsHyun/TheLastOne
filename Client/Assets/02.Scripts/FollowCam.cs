@@ -4,12 +4,16 @@ using UnityEngine;
 
 public class FollowCam : MonoBehaviour
 {
-    public Transform targetTr1;      // 추적할 타킷 게임오브젝트의 Transform 변수
-    public Transform targetTr2;
-    public float dist = 20.0f;      // 카메라와의 일정 거리
-    public float height = 30.0f;     // 카메라의 높이 설정
-    public float dampTrace = 20.0f; // 부드러운 추적을 위한 변수
-    public bool change = false;
+    public Transform targetTr0;      // 추적할 타깃 게임오브젝트의 Transform 변수 (스타트 차량 시점)
+    public Transform targetTr1;      // 추적할 타깃 게임오브젝트의 Transform 변수 (쿼터뷰 시점)
+    public Transform targetTr2;      // 추적할 타깃 게임오브젝트의 Transform 변수 (벡뷰 시점)
+
+    public float dist = 20.0f;       // 카메라와의 일정 거리
+    public float height = 100.0f;     // 카메라의 높이 설정
+    public float dampTrace = 20.0f;  // 부드러운 추적을 위한 변수
+
+    public bool change = false;      // 캐릭터 쿼터뷰 < - > 벡뷰 전환을 위함
+    public bool getOff = false;      // 스타트 수송차량 - > 캐릭터 시점의 전환을 위함
 
     // 카메라 자신의 Transform 변수
     private Transform tr;
@@ -25,7 +29,20 @@ public class FollowCam : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (change == false)
+        if (getOff == false)
+        {
+            // 카메라의 위치를 추적대상의 dist 변수만큼 뒤쪽으로 배치
+            // height 변수만큼 위로 올림
+            tr.position = Vector3.Lerp(tr.position,                                                          // 시작 위치
+                                        targetTr0.position - (targetTr0.forward * dist) + (Vector3.up * height)// 종료 위치
+                                        , Time.deltaTime * dampTrace);                                       // 보간 시간
+
+
+            // 카메라가 타깃 게임오브젝트를 바라보게 설정
+            tr.LookAt(targetTr0.position);
+        }
+
+        if (change == false && getOff == true)
         {
             // 카메라의 위치를 추적대상의 dist 변수만큼 뒤쪽으로 배치
             // height 변수만큼 위로 올림
@@ -37,7 +54,7 @@ public class FollowCam : MonoBehaviour
             // 카메라가 타깃 게임오브젝트를 바라보게 설정
             tr.LookAt(targetTr1.position);
         }
-        else
+        else if(change == true && getOff == true)
         {
             // 카메라의 위치를 추적대상의 dist 변수만큼 뒤쪽으로 배치
             // height 변수만큼 위로 올림

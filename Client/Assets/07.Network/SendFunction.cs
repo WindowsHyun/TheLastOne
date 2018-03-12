@@ -6,7 +6,7 @@ using System.Text;
 using UnityEngine;
 using FlatBuffers;
 using Game.TheLastOne; // Client, Vec3 을 불러오기 위해
-using TheLastOne.Game.Network;
+//using TheLastOne.Game.Network;
 
 
 

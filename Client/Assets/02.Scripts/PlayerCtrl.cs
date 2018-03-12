@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using TheLastOne.Game.Network;
+//using TheLastOne.Game.Network;
 
 [RequireComponent(typeof(AudioSource))]
 
@@ -57,7 +57,7 @@ public class PlayerCtrl : MonoBehaviour
     public bool sensorCheck = false;
 
     // 플레이어가 총알 발사시 Packet을 전송하기 위하여
-    NetworkCtrl networkCtrl = new NetworkCtrl();
+    //NetworkCtrl networkCtrl = new NetworkCtrl();
 
     // 무기 정보 저장
     public GameObject weapon;
@@ -99,6 +99,10 @@ public class PlayerCtrl : MonoBehaviour
 
         shotable = true;
 
+
+        gameObject.GetComponent<PlayerCtrl>().enabled = false;
+
+        //tr.Translate()
         //GameObject weapon = transform.Find("AK47").gameObject;
     }
 
@@ -181,7 +185,7 @@ public class PlayerCtrl : MonoBehaviour
                 animator.SetBool("IsShot", true);
                 Fire();
                 //animator.SetBool("IsTrace", true);
-                networkCtrl.Player_Shot();
+                //networkCtrl.Player_Shot();
             }
         }
         //else {
