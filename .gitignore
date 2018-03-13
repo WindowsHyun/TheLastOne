@@ -3,3 +3,12 @@
 *.opendb
 *.idb
 *.tlog
+
+# 유니티 캐시 폴더 제외
+metadata/
+PlayerDataCache/
+ShaderCache/
+
+# VS 필요 없는 폴더 제외
+.vs/
+Debug/

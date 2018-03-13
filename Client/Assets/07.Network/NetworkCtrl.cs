@@ -259,7 +259,7 @@ namespace TheLastOne.Game.Network
                     if (Get_ServerData.Data(i).Value.Shotting == true && i != Client_imei)
                     {
                         // 자신이 아닌 다른 클라이언트가 총을 쏘면 해당 클라이언트의 script에 Fire을 호출한다.
-                        //Debug.Log(client_id + "가 총을 쏘다.");
+                        Debug.Log(client_id + "가 총을 쏘다.");
                         // 자신의 클라이언트 위치를 넘겨 준다.
                         client_data[client_id].script.Fire(client_data[Client_imei].position);
                     }
@@ -313,7 +313,8 @@ namespace TheLastOne.Game.Network
             }
             catch (SocketException SCE)
             {
-                Debug.Log("Socket connect error! : " + SCE.ToString());
+                //Debug.Log();
+                debugString = "Socket connect error! : " + SCE.ToString();
                 return;
             }
 

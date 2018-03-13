@@ -114,7 +114,7 @@ public class OtherPlayerCtrl : MonoBehaviour
     {
         if (DistanceToPoint(tr.position, pos) >= 20)
         {
-            // 10이상 거리 차이가 날경우 움직여 주는것이 아닌 바로 동기화를 시켜 버린다.
+            // 20이상 거리 차이가 날경우 움직여 주는것이 아닌 바로 동기화를 시켜 버린다.
             tr.position = pos;
         }
         else
@@ -180,58 +180,8 @@ public class OtherPlayerCtrl : MonoBehaviour
 
                 Instantiate(bullet, firePos.position, firePos.rotation);
 
-
-                Debug.Log((DistanceToPoint(player_Pos, tr.position)/10));
-                if (DistanceToPoint(player_Pos, tr.position) >= 140)
-                {
-                    source.PlayOneShot(fireSfx, 0.0f);
-                }
-                else if(DistanceToPoint(player_Pos, tr.position) >= 130)
-                {
-                    source.PlayOneShot(fireSfx, 0.1f);
-                }
-                else if (DistanceToPoint(player_Pos, tr.position) >= 120)
-                {
-                    source.PlayOneShot(fireSfx, 0.2f);
-                }
-                else if (DistanceToPoint(player_Pos, tr.position) >= 110)
-                {
-                    source.PlayOneShot(fireSfx, 0.3f);
-                }
-                else if (DistanceToPoint(player_Pos, tr.position) >= 100)
-                {
-                    source.PlayOneShot(fireSfx, 0.4f);
-                }
-                else if (DistanceToPoint(player_Pos, tr.position) >= 90)
-                {
-                    source.PlayOneShot(fireSfx, 0.5f);
-                }
-                else if (DistanceToPoint(player_Pos, tr.position) >= 80)
-                {
-                    source.PlayOneShot(fireSfx, 0.8f);
-                }
-                else if (DistanceToPoint(player_Pos, tr.position) >= 70)
-                {
-                    source.PlayOneShot(fireSfx, 1.3f);
-                }
-                else if (DistanceToPoint(player_Pos, tr.position) >= 60)
-                {
-                    source.PlayOneShot(fireSfx, 1.7f);
-                }
-                else if (DistanceToPoint(player_Pos, tr.position) >= 50)
-                {
-                    source.PlayOneShot(fireSfx, 2.2f);
-                }
-                else if (DistanceToPoint(player_Pos, tr.position) >= 40)
-                {
-                    source.PlayOneShot(fireSfx, 2.5f);
-                }
-                else
-                {
-                    source.PlayOneShot(fireSfx, 2.9f);
-                }
-
-                // 사운드 발생 함수
+                // 사운드 발생 함수 ( 거리에 따른 소리를 다르게 하기 위하여 함수로 만듬)
+                source.PlayOneShot(fireSfx, SoundsByStreet(DistanceToPoint(player_Pos, tr.position)));
 
 
                 // 잠시 기다리는 루틴을 위해 코루틴 함수로 호출
@@ -244,6 +194,7 @@ public class OtherPlayerCtrl : MonoBehaviour
 
         yield return null;
     }
+
 
     void CreateBloodEffect(Vector3 pos)
     {
@@ -281,6 +232,62 @@ public class OtherPlayerCtrl : MonoBehaviour
         animator.SetTrigger("IsDie");
         // 적 플레이어의 캡슐 콜라이더 비활성화
         gameObject.GetComponentInChildren<CapsuleCollider>().enabled = false;
+    }
+
+    float SoundsByStreet(float value)
+    {
+        // 자신의 위치와 상대의 위치에 거리에 따른 총 소리의 크기를 리턴 한다.
+        // 코드를 if문이 없는 간결한 코드로 작성을 하려 하였으나,
+        // 추후 가독성을 위하여 if문으로 작성하는 것이 좋다 하여, if문으로 길게 작성함.
+        if (value >= 140)
+        {
+            return 0.0f;
+        }
+        else if (value >= 130)
+        {
+            return 0.1f;
+        }
+        else if (value >= 120)
+        {
+            return 0.2f;
+        }
+        else if (value >= 110)
+        {
+            return 0.3f;
+        }
+        else if (value >= 100)
+        {
+            return 0.4f;
+        }
+        else if (value >= 90)
+        {
+            return 0.5f;
+        }
+        else if (value >= 80)
+        {
+            return 0.8f;
+        }
+        else if (value >= 70)
+        {
+            return 1.3f;
+        }
+        else if (value >= 60)
+        {
+            return 1.7f;
+        }
+        else if (value >= 50)
+        {
+            return 2.2f;
+        }
+        else if (value >= 40)
+        {
+            return 2.5f;
+        }
+        else
+        {
+            return 2.9f;
+        }
+
     }
 
 }

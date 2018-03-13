@@ -29,7 +29,7 @@ namespace dummy_server
         public const int kPort = 9000;
         private static int Client_imei = 0;         // 자신의 클라이언트 아이디
 
-        private const int MaxClient = 1;    // 최대 동접자수
+        private const int MaxClient = 48;    // 최대 동접자수
         public static Client_Data[] client_data = new Client_Data[MaxClient];      // 클라이언트 데이터 저장할 구조체
 
         private int LimitReceivebyte = 2000;
@@ -86,13 +86,14 @@ namespace dummy_server
                     IPEndPoint ipEndPoint = new System.Net.IPEndPoint(ipAddr, kPort);
                     state.workSocket.Connect(ipEndPoint);
                     state.client_id = i;
-                    client_data[i].id = i;
+                    DebugBox.Text += i + "배열에 활당됨..!\n";
+                    //client_data[i].id = i;
 
-                    //client_data[i].position.x = r.Next(500, 1200);
-                    client_data[i].position.x = 1000;
+                    client_data[i].position.x = r.Next(500, 1200);
+                    //client_data[i].position.x = 1000;
                     client_data[i].position.y = 30;
-                    //client_data[i].position.z = r.Next(900, 1800);
-                    client_data[i].position.z = 138;
+                    client_data[i].position.z = r.Next(900, 1800);
+                    //client_data[i].position.z = 138;
 
                     client_data[i].rotation.x = 0;
                     client_data[i].rotation.y = 0;
@@ -101,8 +102,7 @@ namespace dummy_server
                     client_data[i].stateObject = state;
 
                     state.workSocket.BeginReceive(state.Receivebyte, 0, LimitReceivebyte, 0, DataReceived, state);
-                    Thread t1 = new Thread(() => Update(i - 1));
-                    t1.Start();
+                    
                     //StartCoroutine(startPrefab());
                 }
                 catch (SocketException SCE)
@@ -122,7 +122,7 @@ namespace dummy_server
             int animation = 0;
             while (true)
             {
-                switch (4)
+                switch (r.Next(0,5))
                 {
                     case 0:
                         // 위로
@@ -148,14 +148,16 @@ namespace dummy_server
                         break;
                     case 4:
                         // 총알 발사!
-                        client_data[ci].stateObject.Sendbyte = makeShot_PacketInfo(ci);
+                        // 더미 서버의 클라이언트와,  
+                        //SetText(ci + "가 총을 발사 합니다.");
+                        client_data[ci].stateObject.Sendbyte = makeShot_PacketInfo(client_data[ci].id);
                         Send_Packet(client_data[ci].stateObject.workSocket, client_data[ci].stateObject.Sendbyte);
                         break;
                 }
 
                 client_data[ci].stateObject.Sendbyte = makeClient_PacketInfo(client_data[ci].position, animation, client_data[ci].rotation);
                 Send_Packet(client_data[ci].stateObject.workSocket, client_data[ci].stateObject.Sendbyte);
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
             }
         }
 
@@ -202,7 +204,7 @@ namespace dummy_server
                                                              //SetText("총 사이즈 : " + psize + ", 패킷 타입 : " + ptype);
                 if (psize == state.workSocket.EndReceive(ar))
                 {
-                    ProcessPacket(psize, ptype, state.Receivebyte);
+                    ProcessPacket(psize, ptype, state.Receivebyte, state);
                 }
             }
             catch
@@ -212,7 +214,7 @@ namespace dummy_server
             state.workSocket.BeginReceive(state.Receivebyte, 0, LimitReceivebyte, 0, DataReceived, state);
         }
 
-        void ProcessPacket(int size, int type, byte[] recvPacket)
+        void ProcessPacket(int size, int type, byte[] recvPacket, StateObject state)
         {
             if (type == SC_ID)
             {
@@ -221,8 +223,12 @@ namespace dummy_server
                 System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
                 ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
                 var Get_ServerData = Client_id.GetRootAsClient_id(revc_buf);
-                Client_imei = Int32.Parse(Get_ServerData.Id.ToString());
-                SetText("클라이언트 아이디 : " + Client_imei);
+                client_data[state.client_id].id = Int32.Parse(Get_ServerData.Id.ToString());
+                SetText("클라이언트 아이디 : " + client_data[state.client_id].id);
+
+                // 클라이언트 아이디를 여기서 제공해준다.
+                Thread t1 = new Thread(() => Update(state.client_id));
+                t1.Start();
             }
 
         }
