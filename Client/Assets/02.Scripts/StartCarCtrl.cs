@@ -17,10 +17,19 @@ public class StartCarCtrl : MonoBehaviour
     {
         // 수송 차량에 앞으로 가도록 힘을 가함
         GetComponent<Rigidbody>().AddForce(transform.forward * speed);
+        
         // 안에 있는 플레이어도 같이 가도록 힘을 가함
         player.GetComponent<Rigidbody>().AddForce(transform.forward * speed);
 
-       
+
+        // 플레이어 스크립트 사용 (이동 때문)
+        player.GetComponent<PlayerCtrl>().enabled = true;
+        // 카메라 전환
+        FollowCam followCam = GameObject.Find("Main Camera").GetComponent<FollowCam>();
+        followCam.getOff = true;
+        followCam.height = 45.0f;
+        followCam.dist = 20.0f;
+
     }
 
     void Update()
@@ -44,7 +53,7 @@ public class StartCarCtrl : MonoBehaviour
 
     private void OnTriggerEnter(Collider coll)
     {
-        // 충돌한 Collider가 Camchange의 CAMCHANGE(Tag값)이면 카메라 전환 
+        //충돌한 Collider가 Camchange의 CAMCHANGE(Tag값)이면 카메라 전환
         if (coll.gameObject.tag == "AllGetOff" && getOff == false)
         {
             // 플레이어에 가해진 힘을 0으로 만든다. - > 차량 하차
@@ -58,6 +67,11 @@ public class StartCarCtrl : MonoBehaviour
             followCam.dist = 20.0f;
 
             Debug.Log("차량 하차 -> 게임 시작");
+        }
+
+        if (coll.gameObject.tag == "EndPoint")
+        {
+            Destroy(gameObject);
         }
     }
 }

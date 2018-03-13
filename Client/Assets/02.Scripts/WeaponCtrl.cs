@@ -2,43 +2,44 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WeaponCtrl : MonoBehaviour {
+public class WeaponCtrl : MonoBehaviour
+{
 
     //  주무기 상태 정보가 있는 Enumerable 변수 선언
-    public enum WeaponState { AK47, M4A1 };
+    public enum WeaponState { AK47 };
 
     // 캐릭터의 주무기 정보를 저장할 Enum 변수
     //public WeaponState weaponState = WeaponState.AK47;
 
-   
-    public GameObject AK47;
-
-    public bool showItem1;
-    
-
-    void Start()
+    void OnTriggerEnter(Collider coll)
     {
-        showItem1 = false;  
-    }
-
-    void Update()
-    {
-        if (showItem1 == true)
-            AK47.GetComponent<Renderer>().enabled = true;
-        else if (showItem1 == false)
-            AK47.GetComponent<Renderer>().enabled = false;
-
-
-        if (Input.GetKeyDown(KeyCode.Space))
+        if(coll.gameObject.tag == "Player")
         {
-            if(showItem1 == true)
-                showItem1 = false;
-            else if(showItem1 == false)
-                showItem1 = true;
-
-            Debug.Log("1번 누름");
+            PlayerCtrl playerCtrl = GameObject.Find("Player").GetComponent<PlayerCtrl>();
+            playerCtrl.itemEatPossible = true;
         }
     }
+
+    void OnTriggerExit(Collider coll)
+    {
+        PlayerCtrl playerCtrl = GameObject.Find("Player").GetComponent<PlayerCtrl>();
+        playerCtrl.itemEatPossible = false;
+    }
+
+    //void OnTriggerEnter(Collider coll)
+    //{
+    //    if (coll.gameObject.tag == "Player")
+    //    {
+    //        if (Input.GetKeyDown(KeyCode.G))
+    //        {
+    //            Debug.Log("오김옴?");
+    //            PlayerCtrl playerCtrl = GameObject.Find("Player").GetComponent<PlayerCtrl>();
+    //            playerCtrl.itemEat = true;
+
+    //            Destroy(gameObject);
+    //        }
+    //    }
+    //}
 
 
 
@@ -73,13 +74,4 @@ public class WeaponCtrl : MonoBehaviour {
     //           isPlayerEnter = false;
     //       }
     //   }
-
-
-    //   void Start () {
-
-    //}
-
-    //void Update () {
-
-    //}
 }

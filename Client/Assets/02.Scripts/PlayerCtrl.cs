@@ -59,6 +59,9 @@ public class PlayerCtrl : MonoBehaviour
     // 플레이어가 총알 발사시 Packet을 전송하기 위하여
     //NetworkCtrl networkCtrl = new NetworkCtrl();
 
+    // 아이템 획득 확인을 위한 변수
+    public bool itemEatPossible = false;
+    public bool itemEat = false;
     // 무기 정보 저장
     public GameObject weapon;
 
@@ -94,16 +97,12 @@ public class PlayerCtrl : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;//마우스 커서 고정
         Cursor.visible = false;//마우스 커서 보이기
 
+        // 현재 발사 가능
+        shotable = true;
 
         weapon.GetComponent<Renderer>().enabled = false;
 
-        shotable = true;
 
-
-        gameObject.GetComponent<PlayerCtrl>().enabled = false;
-
-        //tr.Translate()
-        //GameObject weapon = transform.Find("AK47").gameObject;
     }
 
     void Update()
@@ -171,9 +170,14 @@ public class PlayerCtrl : MonoBehaviour
 
 
         // 1번 키를 누르면 총이 장착 된다.
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        if (itemEatPossible == true)
         {
-            weaponDisPlay();
+            if (Input.GetKeyDown(KeyCode.G))
+            {
+                itemEat = true;
+                weaponDisPlay();
+            }
+            //weaponDisPlay();
         }
 
         // 총이 장착이 되었을때만 발사 가능
@@ -271,11 +275,32 @@ public class PlayerCtrl : MonoBehaviour
                 sensorCheck = true;
             }
         }
-
+        
         // 캐릭터 앞 트리거가 내부 벽과 충돌을 검사하는 변수
         if(coll.gameObject.tag == "House")
         {
             shotable = false;
+        }
+
+        //if (coll.gameObject.tag == "EquipPoint")
+        //{
+        //    itemEatPossible = true;
+        //}
+
+
+        // 충돌한 게임오브젝트의 태그값 비교
+        if (coll.gameObject.tag == "BULLET")
+        {
+            CreateBloodEffect(coll.transform.position);
+
+            // 맞은 총알의 Damage를 추출해 OtherPlayer HP 차감
+            hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
+            if (hp <= 0)
+            {
+                PlayerDie();
+            }
+            // Bullet 삭제
+            Destroy(coll.gameObject);
         }
     }
 
@@ -300,27 +325,40 @@ public class PlayerCtrl : MonoBehaviour
         {
             shotable = true;
         }
+
+        //if (coll.gameObject.tag == "EquipPoint")
+        //{
+        //    itemEatPossible = false;
+        //}
+
+        if (itemEat == true)
+        {
+            Destroy(coll.gameObject);
+            itemEat = false;
+        }
+
+        
     }
 
 
     // 충돌을 시작할 때 발생하는 이벤트
-    void OnCollisionEnter(Collision coll)
-    {
-        // 충돌한 게임오브젝트의 태그값 비교
-        if (coll.gameObject.tag == "BULLET")
-        {
-            CreateBloodEffect(coll.transform.position);
+    //void OnCollisionEnter(Collision coll)
+    //{
+    //    // 충돌한 게임오브젝트의 태그값 비교
+    //    if (coll.gameObject.tag == "BULLET")
+    //    {
+    //        CreateBloodEffect(coll.transform.position);
 
-            // 맞은 총알의 Damage를 추출해 OtherPlayer HP 차감
-            hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
-            if (hp <= 0)
-            {
-                PlayerDie();
-            }
-            // Bullet 삭제
-            Destroy(coll.gameObject);
-        }
-    }
+    //        // 맞은 총알의 Damage를 추출해 OtherPlayer HP 차감
+    //        hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
+    //        if (hp <= 0)
+    //        {
+    //            PlayerDie();
+    //        }
+    //        // Bullet 삭제
+    //        Destroy(coll.gameObject);
+    //    }
+    //}
 
     // 플레이어 죽을 때 실행되는 함수
     void PlayerDie()
@@ -336,16 +374,16 @@ public class PlayerCtrl : MonoBehaviour
 
     void weaponDisPlay()
     {
-        if (showItem1 == true)
-        {
+        //if (showItem1 == true)
+        //{
 
-            weapon.GetComponent<Renderer>().enabled = false;
-            showItem1 = false;
-            animator.SetBool("IsEquip", false);
-            //animator.SetBool("IsShot", false);
+        //    weapon.GetComponent<Renderer>().enabled = false;
+        //    showItem1 = false;
+        //    animator.SetBool("IsEquip", false);
+        //    //animator.SetBool("IsShot", false);
 
-        }
-        else if (showItem1 == false)
+        //}
+        if (showItem1 == false)
         {
             weapon.GetComponent<Renderer>().enabled = true;
             showItem1 = true;
