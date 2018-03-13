@@ -245,47 +245,47 @@ public class OtherPlayerCtrl : MonoBehaviour
         }
         else if (value >= 130)
         {
-            return 0.1f;
+            return 0.05f;
         }
         else if (value >= 120)
         {
-            return 0.2f;
+            return 0.1f;
         }
         else if (value >= 110)
         {
-            return 0.3f;
+            return 0.15f;
         }
         else if (value >= 100)
         {
-            return 0.4f;
+            return 0.2f;
         }
         else if (value >= 90)
         {
-            return 0.5f;
+            return 0.3f;
         }
         else if (value >= 80)
         {
-            return 0.8f;
+            return 0.4f;
         }
         else if (value >= 70)
         {
-            return 1.3f;
+            return 0.5f;
         }
         else if (value >= 60)
         {
-            return 1.7f;
+            return 0.6f;
         }
         else if (value >= 50)
         {
-            return 2.2f;
+            return 0.7f;
         }
         else if (value >= 40)
         {
-            return 2.5f;
+            return 0.8f;
         }
         else
         {
-            return 2.9f;
+            return 0.9f;
         }
 
     }
