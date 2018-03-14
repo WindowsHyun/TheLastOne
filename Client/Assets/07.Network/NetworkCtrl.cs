@@ -73,6 +73,9 @@ namespace TheLastOne.Game.Network
         private byte[] Sendbyte = new byte[4000];
         private string debugString = "";        // Debug 출력을 위한 string
 
+        // 서버 연결을 했는지 체크
+        private bool serverConnect = false;
+
         // 서버가 클라이언트에게 보내는 이벤트 타입
         private int SC_ID = 1;                          // 클라이언트 아이디를 보낸다.
         private int SC_PUT_PLAYER = 2;            // 클라이언트 추가
@@ -304,6 +307,7 @@ namespace TheLastOne.Game.Network
             {
                 IPAddress ipAddr = System.Net.IPAddress.Parse(iPAdress);
                 IPEndPoint ipEndPoint = new System.Net.IPEndPoint(ipAddr, kPort);
+                serverConnect = true;
                 m_Socket.Connect(ipEndPoint);
                 m_Socket.BeginReceive(Receivebyte, 0, LimitReceivebyte, 0, DataReceived, m_Socket);
                 StartCoroutine(startPrefab());
@@ -368,13 +372,16 @@ namespace TheLastOne.Game.Network
 
         public void Send_Packet(byte[] packet)
         {
-            try
+            if (serverConnect == true)
             {
-                m_Socket.Send(packet, packet.Length, 0);
-            }
-            catch (SocketException err)
-            {
-                Debug.Log("Socket send or receive error! : " + err.ToString());
+                try
+                {
+                    m_Socket.Send(packet, packet.Length, 0);
+                }
+                catch (SocketException err)
+                {
+                    Debug.Log("Socket send or receive error! : " + err.ToString());
+                }
             }
         }
 
