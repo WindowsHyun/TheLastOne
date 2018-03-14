@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-//using TheLastOne.Game.Network;
+using TheLastOne.Game.Network;
 
 [RequireComponent(typeof(AudioSource))]
 
@@ -57,7 +57,7 @@ public class PlayerCtrl : MonoBehaviour
     public bool sensorCheck = false;
 
     // 플레이어가 총알 발사시 Packet을 전송하기 위하여
-    //NetworkCtrl networkCtrl = new NetworkCtrl();
+    NetworkCtrl networkCtrl = new NetworkCtrl();
 
     // 아이템 획득 확인을 위한 변수
     public bool itemEatPossible = false;
@@ -189,7 +189,7 @@ public class PlayerCtrl : MonoBehaviour
                 animator.SetBool("IsShot", true);
                 Fire();
                 //animator.SetBool("IsTrace", true);
-                //networkCtrl.Player_Shot();
+                networkCtrl.Player_Shot();
             }
         }
         //else {

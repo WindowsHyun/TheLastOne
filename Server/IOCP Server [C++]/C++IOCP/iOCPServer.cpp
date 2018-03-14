@@ -226,8 +226,8 @@ void Shutdown_Server() {
 }
 
 void DisconnectClient(int ci) {
-	Send_Client_ID(ci, SC_REMOVE_PLAYER, true);
-	closesocket(g_clients[ci].client_socket);
+	
+	
 	g_clients[ci].connect = false;
 	g_clients[ci].position.x = 0;
 	g_clients[ci].position.y = 0;
@@ -235,6 +235,8 @@ void DisconnectClient(int ci) {
 	g_clients[ci].animator = 0;
 	g_clients[ci].hp = 100;
 
+	Send_Client_ID(ci, SC_REMOVE_PLAYER, true);
+	closesocket(g_clients[ci].client_socket);
 	std::cout << "Disconnect Client : " << ci << std::endl;
 }
 
