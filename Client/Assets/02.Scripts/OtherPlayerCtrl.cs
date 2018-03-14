@@ -197,7 +197,7 @@ public class OtherPlayerCtrl : MonoBehaviour
     }
 
     // 충돌을 시작할 때 발생하는 이벤트
-    void OnCollisionEnter(Collision coll)
+    void OnTriggerEnter(Collider coll)
     {
         // 충돌한 게임오브젝트의 태그값 비교
         if (coll.gameObject.tag == "BULLET")
@@ -215,16 +215,35 @@ public class OtherPlayerCtrl : MonoBehaviour
         }
     }
 
+    //// 충돌을 시작할 때 발생하는 이벤트
+    //void OnCollisionEnter(Collision coll)
+    //{
+    //    // 충돌한 게임오브젝트의 태그값 비교
+    //    if (coll.gameObject.tag == "BULLET")
+    //    {
+    //        CreateBloodEffect(coll.transform.position);
+
+    //        // 맞은 총알의 Damage를 추출해 OtherPlayer HP 차감
+    //        hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
+    //        if (hp <= 0)
+    //        {
+    //            OtherPlayerDie();
+    //        }
+    //        // Bullet 삭제
+    //        Destroy(coll.gameObject);
+    //    }
+    //}
+
     // 적 플레이어 죽을때 실행되는 함수
     void OtherPlayerDie()
     {
-        // 모든 코루팀 종료
+        // 모든 코루틴 종료
         StopAllCoroutines();
         isDie = true;
         // Die 애니메이션 실행
         animator.SetTrigger("IsDie");
         // 적 플레이어의 캡슐 콜라이더 비활성화
-        gameObject.GetComponentInChildren<CapsuleCollider>().enabled = false;
+        gameObject.GetComponent<CapsuleCollider>().enabled = false;
     }
 
 }

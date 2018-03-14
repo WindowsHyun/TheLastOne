@@ -314,7 +314,7 @@ public class PlayerCtrl : MonoBehaviour
             {
                 followCam.change = false;
                 Debug.Log("체크 아웃");
-                followCam.height = 45.0f;
+                followCam.height = 35.0f;
                 followCam.dist = 20.0f;
                 sensorCheck = false;
             }
@@ -369,7 +369,7 @@ public class PlayerCtrl : MonoBehaviour
         animator.SetTrigger("IsDie");
         playerState = PlayerState.die;
         // 캐릭터 캡슐 콜라이더 비활성화
-        gameObject.GetComponentInChildren<CapsuleCollider>().enabled = false;
+        gameObject.GetComponent<CapsuleCollider>().enabled = false;
     }
 
     void weaponDisPlay()

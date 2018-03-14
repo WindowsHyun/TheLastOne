@@ -20,16 +20,6 @@ public class StartCarCtrl : MonoBehaviour
         
         // 안에 있는 플레이어도 같이 가도록 힘을 가함
         player.GetComponent<Rigidbody>().AddForce(transform.forward * speed);
-
-
-        // 플레이어 스크립트 사용 (이동 때문)
-        player.GetComponent<PlayerCtrl>().enabled = true;
-        // 카메라 전환
-        FollowCam followCam = GameObject.Find("Main Camera").GetComponent<FollowCam>();
-        followCam.getOff = true;
-        followCam.height = 45.0f;
-        followCam.dist = 20.0f;
-
     }
 
     void Update()
@@ -44,8 +34,8 @@ public class StartCarCtrl : MonoBehaviour
             // 카메라 전환
             FollowCam followCam = GameObject.Find("Main Camera").GetComponent<FollowCam>();
             followCam.getOff = true;
-            followCam.height = 45.0f;
-            followCam.dist = 20.0f;
+            followCam.height = 35.0f;
+            followCam.dist = 25.0f;
 
             Debug.Log("차량 하차 -> 게임 시작");
         }
@@ -63,8 +53,8 @@ public class StartCarCtrl : MonoBehaviour
             // 카메라 전환
             FollowCam followCam = GameObject.Find("Main Camera").GetComponent<FollowCam>();
             followCam.getOff = true;
-            followCam.height = 45.0f;
-            followCam.dist = 20.0f;
+            followCam.height = 35.0f;
+            followCam.dist = 25.0f;
 
             Debug.Log("차량 하차 -> 게임 시작");
         }
