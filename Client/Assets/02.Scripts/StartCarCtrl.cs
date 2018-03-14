@@ -37,8 +37,12 @@ public class StartCarCtrl : MonoBehaviour
             followCam.height = 35.0f;
             followCam.dist = 25.0f;
 
+            // 차량의 포지션을 내리기 전까지 플레이어 포지션과 동일하게 이동을 시킨다.
+            player.transform.position = new Vector3(transform.position.x, 29.99451f, transform.position.z);
+
             Debug.Log("차량 하차 -> 게임 시작");
         }
+
     }
 
     private void OnTriggerEnter(Collider coll)

@@ -59,6 +59,9 @@ public class OtherPlayerCtrl : MonoBehaviour
     // 혈흔 효과 프리팹
     public GameObject bloodEffect;
 
+    // PlayerCtrl에 있는 현재 실제 클라의 위치를 가지고 있는다.
+    public Vector3 player_Pos;
+
 
     void Start()
     {
@@ -93,8 +96,10 @@ public class OtherPlayerCtrl : MonoBehaviour
         animator_value = value;
     }
 
-    public void Fire()
+    public void Fire(Vector3 player)
     {
+        // 자신의 캐릭터 위치를 넣어준다.
+        player_Pos = player;
         // 동적으로 총알을 생성할 수 있게 true로 변경
         createBullet_b = true;
     }
@@ -109,7 +114,7 @@ public class OtherPlayerCtrl : MonoBehaviour
     {
         if (DistanceToPoint(tr.position, pos) >= 20)
         {
-            // 10이상 거리 차이가 날경우 움직여 주는것이 아닌 바로 동기화를 시켜 버린다.
+            // 20이상 거리 차이가 날경우 움직여 주는것이 아닌 바로 동기화를 시켜 버린다.
             tr.position = pos;
         }
         else
@@ -175,8 +180,9 @@ public class OtherPlayerCtrl : MonoBehaviour
 
                 Instantiate(bullet, firePos.position, firePos.rotation);
 
-                // 사운드 발생 함수
-                source.PlayOneShot(fireSfx, 0.45f);
+                // 사운드 발생 함수 ( 거리에 따른 소리를 다르게 하기 위하여 함수로 만듬)
+                source.PlayOneShot(fireSfx, SoundsByStreet(DistanceToPoint(player_Pos, tr.position)));
+
 
                 // 잠시 기다리는 루틴을 위해 코루틴 함수로 호출
                 StartCoroutine(this.ShowMuzzleFlash());
@@ -188,6 +194,7 @@ public class OtherPlayerCtrl : MonoBehaviour
 
         yield return null;
     }
+
 
     void CreateBloodEffect(Vector3 pos)
     {
@@ -244,6 +251,62 @@ public class OtherPlayerCtrl : MonoBehaviour
         animator.SetTrigger("IsDie");
         // 적 플레이어의 캡슐 콜라이더 비활성화
         gameObject.GetComponent<CapsuleCollider>().enabled = false;
+    }
+
+    float SoundsByStreet(float value)
+    {
+        // 자신의 위치와 상대의 위치에 거리에 따른 총 소리의 크기를 리턴 한다.
+        // 코드를 if문이 없는 간결한 코드로 작성을 하려 하였으나,
+        // 추후 가독성을 위하여 if문으로 작성하는 것이 좋다 하여, if문으로 길게 작성함.
+        if (value >= 140)
+        {
+            return 0.0f;
+        }
+        else if (value >= 130)
+        {
+            return 0.05f;
+        }
+        else if (value >= 120)
+        {
+            return 0.1f;
+        }
+        else if (value >= 110)
+        {
+            return 0.15f;
+        }
+        else if (value >= 100)
+        {
+            return 0.2f;
+        }
+        else if (value >= 90)
+        {
+            return 0.3f;
+        }
+        else if (value >= 80)
+        {
+            return 0.4f;
+        }
+        else if (value >= 70)
+        {
+            return 0.5f;
+        }
+        else if (value >= 60)
+        {
+            return 0.6f;
+        }
+        else if (value >= 50)
+        {
+            return 0.7f;
+        }
+        else if (value >= 40)
+        {
+            return 0.8f;
+        }
+        else
+        {
+            return 0.9f;
+        }
+
     }
 
 }
