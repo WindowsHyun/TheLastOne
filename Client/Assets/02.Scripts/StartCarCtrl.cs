@@ -15,6 +15,7 @@ public class StartCarCtrl : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        player.GetComponent<PlayerCtrl>().enabled = false;
         // 수송 차량에 앞으로 가도록 힘을 가함
         GetComponent<Rigidbody>().AddForce(transform.forward * speed);
         

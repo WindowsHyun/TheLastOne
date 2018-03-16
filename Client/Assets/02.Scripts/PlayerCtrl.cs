@@ -59,6 +59,10 @@ public class PlayerCtrl : MonoBehaviour
     // 플레이어가 총알 발사시 Packet을 전송하기 위하여
     NetworkCtrl networkCtrl = new NetworkCtrl();
 
+    // 무기 획득 확인을 위한 변수
+    public bool weaponEatPossible = false;
+    public bool weaponEat = false;
+
     // 아이템 획득 확인을 위한 변수
     public bool itemEatPossible = false;
     public bool itemEat = false;
@@ -73,6 +77,8 @@ public class PlayerCtrl : MonoBehaviour
 
     // 총 발사 가능 체크
     public bool shotable;
+
+    private int bulletCount = 0;
 
 
     void Start()
@@ -170,18 +176,27 @@ public class PlayerCtrl : MonoBehaviour
 
 
         // 1번 키를 누르면 총이 장착 된다.
-        if (itemEatPossible == true)
+        if (weaponEatPossible == true)
         {
             if (Input.GetKeyDown(KeyCode.G))
             {
-                itemEat = true;
-                weaponDisPlay();
+                weaponEat = true;
+                WeaponDisPlay();
             }
             //weaponDisPlay();
         }
 
+        if(itemEatPossible == true)
+        {
+            if (Input.GetKeyDown(KeyCode.G))
+            {
+                itemEat = true;
+                
+            }
+        }
+
         // 총이 장착이 되었을때만 발사 가능
-        if (showItem1 == true && shotable == true)
+        if (showItem1 == true && shotable == true && bulletCount >0)
         {
             //animator.SetBool("IsEquip", true);
             if (Input.GetMouseButtonDown(0))
@@ -190,6 +205,7 @@ public class PlayerCtrl : MonoBehaviour
                 Fire();
                 //animator.SetBool("IsTrace", true);
                 networkCtrl.Player_Shot();
+                Debug.Log(bulletCount);
             }
         }
         //else {
@@ -222,6 +238,7 @@ public class PlayerCtrl : MonoBehaviour
     {
         // 동적으로 총알을 생성하는 함수
         CreateBullet();
+        bulletCount--;
 
         // 사운드 발생 함수
         source.PlayOneShot(fireSfx, 0.9f);
@@ -282,11 +299,7 @@ public class PlayerCtrl : MonoBehaviour
             shotable = false;
         }
 
-        //if (coll.gameObject.tag == "EquipPoint")
-        //{
-        //    itemEatPossible = true;
-        //}
-
+    
 
         // 충돌한 게임오브젝트의 태그값 비교
         if (coll.gameObject.tag == "BULLET")
@@ -315,7 +328,7 @@ public class PlayerCtrl : MonoBehaviour
                 followCam.change = false;
                 Debug.Log("체크 아웃");
                 followCam.height = 35.0f;
-                followCam.dist = 20.0f;
+                followCam.dist = 25.0f;
                 sensorCheck = false;
             }
         }
@@ -326,39 +339,24 @@ public class PlayerCtrl : MonoBehaviour
             shotable = true;
         }
 
-        //if (coll.gameObject.tag == "EquipPoint")
-        //{
-        //    itemEatPossible = false;
-        //}
-
+   
         if (itemEat == true)
         {
-            Destroy(coll.gameObject);
+            coll.gameObject.SetActive(false);
+            //Destroy(coll.gameObject);
             itemEat = false;
+            bulletCount += 30;
         }
 
-        
+        if (weaponEat == true)
+        {
+            coll.gameObject.SetActive(false);
+            //Destroy(coll.gameObject);
+            weaponEat = false;
+        }
+
+
     }
-
-
-    // 충돌을 시작할 때 발생하는 이벤트
-    //void OnCollisionEnter(Collision coll)
-    //{
-    //    // 충돌한 게임오브젝트의 태그값 비교
-    //    if (coll.gameObject.tag == "BULLET")
-    //    {
-    //        CreateBloodEffect(coll.transform.position);
-
-    //        // 맞은 총알의 Damage를 추출해 OtherPlayer HP 차감
-    //        hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
-    //        if (hp <= 0)
-    //        {
-    //            PlayerDie();
-    //        }
-    //        // Bullet 삭제
-    //        Destroy(coll.gameObject);
-    //    }
-    //}
 
     // 플레이어 죽을 때 실행되는 함수
     void PlayerDie()
@@ -372,7 +370,7 @@ public class PlayerCtrl : MonoBehaviour
         gameObject.GetComponent<CapsuleCollider>().enabled = false;
     }
 
-    void weaponDisPlay()
+    void WeaponDisPlay()
     {
         //if (showItem1 == true)
         //{

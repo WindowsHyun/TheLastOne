@@ -16,14 +16,14 @@ public class WeaponCtrl : MonoBehaviour
         if(coll.gameObject.tag == "Player")
         {
             PlayerCtrl playerCtrl = GameObject.Find("Player").GetComponent<PlayerCtrl>();
-            playerCtrl.itemEatPossible = true;
+            playerCtrl.weaponEatPossible = true;
         }
     }
 
     void OnTriggerExit(Collider coll)
     {
         PlayerCtrl playerCtrl = GameObject.Find("Player").GetComponent<PlayerCtrl>();
-        playerCtrl.itemEatPossible = false;
+        playerCtrl.weaponEatPossible = false;
     }
 
     //void OnTriggerEnter(Collider coll)
