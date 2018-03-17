@@ -74,7 +74,7 @@ namespace TheLastOne.Game.Network
         private string debugString = "";        // Debug 출력을 위한 string
 
         // 서버 연결을 했는지 체크
-        private bool serverConnect = false;
+        private static bool serverConnect = false;
 
         // 서버가 클라이언트에게 보내는 이벤트 타입
         private int SC_ID = 1;                          // 클라이언트 아이디를 보낸다.

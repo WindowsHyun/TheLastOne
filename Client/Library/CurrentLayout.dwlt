@@ -111,7 +111,7 @@ MonoBehaviour:
   m_MinSize: {x: 917, y: 442}
   m_MaxSize: {x: 22012, y: 10021}
   vertical: 0
-  controlID: 94
+  controlID: 105
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -135,7 +135,7 @@ MonoBehaviour:
   m_MinSize: {x: 202, y: 442}
   m_MaxSize: {x: 4002, y: 8042}
   vertical: 1
-  controlID: 95
+  controlID: 10
 --- !u!114 &7
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -154,8 +154,8 @@ MonoBehaviour:
     y: 0
     width: 908
     height: 486
-  m_MinSize: {x: 202, y: 221}
-  m_MaxSize: {x: 4002, y: 4021}
+  m_MinSize: {x: 200, y: 200}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 13}
   m_Panes:
   - {fileID: 13}
@@ -366,14 +366,14 @@ MonoBehaviour:
     height: 465
   m_PersistentViewDataDictionary: {fileID: 0}
   m_SceneLighting: 0
-  lastFramingTime: 1751.6593208951572
+  lastFramingTime: 8285.356688064583
   m_2DMode: 0
   m_isRotationLocked: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 1900.375, y: -439.8125, z: 1453.3125}
+    m_Target: {x: 1009, y: 33.11618, z: 273.48645}
     speed: 2
-    m_Value: {x: 1900.375, y: -439.8125, z: 1453.3125}
+    m_Value: {x: 1009, y: 33.11618, z: 273.48645}
   m_RenderMode: 0
   m_ValidateTrueMetals: 0
   m_SceneViewState:
@@ -399,11 +399,11 @@ MonoBehaviour:
   m_Rotation:
     m_Target: {x: 0.13869876, y: 0.85508186, z: -0.40454033, w: 0.29316998}
     speed: 2
-    m_Value: {x: 0.13869849, y: 0.85508025, z: -0.40453956, w: 0.2931694}
+    m_Value: {x: 0.13869876, y: 0.85508186, z: -0.4045403, w: 0.29316998}
   m_Size:
-    m_Target: 538.51013
+    m_Target: 17.063566
     speed: 2
-    m_Value: 538.51013
+    m_Value: 17.063566
   m_Ortho:
     m_Target: 1
     speed: 2
@@ -446,21 +446,21 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 9efbffff00000000
+    m_ExpandedIDs: 0a0bfdffde0bfdff4c0dfdff6619feff3a1afeffa81bfeff3284ffff000000002a4d0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
-      m_Name: Country bridge (3)
-      m_OriginalName: Country bridge (3)
+      m_Name: 
+      m_OriginalName: 
       m_EditFieldRect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 0
         height: 0
-      m_UserData: -237370
+      m_UserData: 0
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
-      m_OriginalEventType: 0
+      m_OriginalEventType: 11
       m_IsRenamingFilename: 0
       m_ClientGUIView: {fileID: 9}
     m_SearchString: 
@@ -508,19 +508,19 @@ MonoBehaviour:
     m_ShowAllHits: 0
     m_SearchArea: 0
     m_Folders:
-    - Assets/03.Prefabs/Cam
+    - Assets/03.Prefabs
   m_ViewMode: 0
   m_StartGridSize: 64
-  m_LastFolders:
-  - Assets
+  m_LastFolders: []
   m_LastFoldersGridSize: -1
-  m_LastProjectPath: C:\Users\shtke\Documents\Unity Code\Git_The_Last_One\Client
+  m_LastProjectPath: "E:\\\u2605\uD14D\uC2A4\uD2B8\uC790\uB8CC\\OneDrive\\2018\uB144\uB3C4
+    \uC878\uC5C5\uC791\uD488\\TheLastOne\\Client"
   m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 364e0000
     m_LastClickedID: 20022
-    m_ExpandedIDs: 00000000fc270000aa280000b4280000d8280000dc2800002e290000d4290000f0290000002a0000062a0000502a00009c2a0000f82a00006e2b0000ba2b0000ee2b0000002c0000022c0000082c0000402c00004c2c0000522c0000a02c0000e02c0000022d0000962d0000a82d0000d42d0000e82d00004c2e0000682e0000182f00001e2f00006c2f00008e2f0000922f0000a22f0000f02f00006e30000098310000a6310000ee3d0000f03d0000f23d0000f43d0000f63d0000f83d0000fa3d0000fc3d0000fe3d0000003e0000023e0000043e0000063e0000083e00000a3e00000c3e0000
+    m_ExpandedIDs: 000000007c360000f64700006c480000d8480000e0480000fa480000fe480000084900000a4900001c4900005449000062490000684900006a49000082490000884900009c490000ae490000d8490000ea490000004a0000084a00000a4a00000e4a00001c4a0000244a0000424a00004c4a00005a4a00008e4a0000944a00009e4a0000b24a0000be4a0000e64a0000044b00000c4b00000e4b0000164b0000164c00001a4c00004a5300004c5300004e53000050530000525300005453000056530000585300005a5300005c5300005e5300006053000062530000645300006653000068530000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -548,7 +548,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000fc27000036280000aa280000b4280000d8280000dc2800002e290000d4290000f0290000002a0000062a0000502a00005e2a00009c2a0000f82a00006e2b0000ba2b0000ee2b0000002c0000022c0000082c0000402c00004c2c0000522c0000a02c0000e02c0000022d0000962d0000a82d0000d42d00004c2e0000682e0000182f00001e2f00006c2f00008e2f0000922f0000a22f0000f02f000098310000a6310000ee3d0000f03d0000f23d0000f43d0000f63d0000f83d0000fa3d0000fc3d0000fe3d0000003e0000023e0000043e0000063e0000083e00000a3e00000c3e0000
+    m_ExpandedIDs: 00000000f64700006c480000d8480000fa480000fe480000084900000a4900001c4900005449000062490000684900006a490000824900009c490000ae490000d8490000ea490000004a0000084a00000a4a00000e4a00001c4a0000244a00003a4a0000424a00004c4a00005a4a00008e4a0000944a00009e4a0000b24a0000be4a0000e64a0000044b00000c4b00000e4b0000164b0000164c00001a4c00004a5300004c5300004e53000050530000525300005453000056530000585300005a5300005c5300005e5300006053000062530000645300006653000068530000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
