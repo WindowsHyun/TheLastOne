@@ -18,6 +18,9 @@ public class PlayerCtrl : MonoBehaviour
         runForwordShot, runBackShot, runLeftShot, runRightShot
     };
 
+    // 델리게이트 및 이벤트 선언
+    public delegate void PlayerDieHandler();
+    public static event PlayerDieHandler OnPlayerDie;
     // 캐릭터의 현재 상태 정보를 저장할 Enum 변수
     public PlayerState playerState = PlayerState.idle;
 
@@ -306,7 +309,7 @@ public class PlayerCtrl : MonoBehaviour
         {
             CreateBloodEffect(coll.transform.position);
 
-            // 맞은 총알의 Damage를 추출해 OtherPlayer HP 차감
+            // 맞은 총알의 Damage를 추출해 Player HP 차감
             hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
             if (hp <= 0)
             {
@@ -314,6 +317,20 @@ public class PlayerCtrl : MonoBehaviour
             }
             // Bullet 삭제
             Destroy(coll.gameObject);
+        }
+
+        // 충돌한 게임오브젝트의 태그값 비교
+        if (coll.gameObject.tag == "ZombieAttack")
+        {
+            CreateBloodEffect(coll.transform.position);
+
+            // 좀비 공격의 Damage만큼 HP 차감
+            hp -= 10;
+            Debug.Log("Player H{: " + hp.ToString());
+            if (hp <= 0)
+            {
+                PlayerDie();
+            }
         }
     }
 
@@ -361,6 +378,18 @@ public class PlayerCtrl : MonoBehaviour
     // 플레이어 죽을 때 실행되는 함수
     void PlayerDie()
     {
+        //// Zombie라는 Tag를 가진 모든 게임오브젝트를 찾아옴
+        //GameObject[] zombies = GameObject.FindGameObjectsWithTag("Zombie");
+
+        //// 모든 몬스터의 OnPlayerDie함수를 순차적으로 호출
+        //foreach(GameObject zombie in zombies)
+        //{
+        //    zombie.SendMessage("OnPlayerDie", SendMessageOptions.DontRequireReceiver);
+        //}
+
+        // 이벤트 발생 시킴
+        OnPlayerDie();
+
         // 모든 코루틴을 종료
         StopAllCoroutines();
         // DIe 애니메이션 실행
@@ -368,6 +397,7 @@ public class PlayerCtrl : MonoBehaviour
         playerState = PlayerState.die;
         // 캐릭터 캡슐 콜라이더 비활성화
         gameObject.GetComponent<CapsuleCollider>().enabled = false;
+        //gameObject.SetActive(false);
     }
 
     void WeaponDisPlay()

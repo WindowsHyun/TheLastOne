@@ -1,0 +1,444 @@
+fileFormatVersion: 2
+guid: 4e3c9e9c7fef8a44bbd9d38412c9f615
+timeCreated: 1521286414
+licenseType: Free
+ModelImporter:
+  serializedVersion: 22
+  fileIDToRecycleName:
+    100000: Ankle_L
+    100002: Ankle_R
+    100004: ArmL
+    100006: ArmR
+    100008: Body
+    100010: Chest_M
+    100012: Cup_L
+    100014: Cup_R
+    100016: DeformationSystem
+    100018: Elbow_L
+    100020: Elbow_R
+    100022: Eye_L
+    100024: Eye_R
+    100026: EyeEnd_L
+    100028: EyeEnd_R
+    100030: ForeArmL
+    100032: ForeArmR
+    100034: Geo
+    100036: Group
+    100038: HandL
+    100040: HandR
+    100042: Head
+    100044: Head_M
+    100046: HeadEnd_M
+    100048: Hip_L
+    100050: Hip_R
+    100052: IndexFinger1_L
+    100054: IndexFinger1_R
+    100056: IndexFinger2_L
+    100058: IndexFinger2_R
+    100060: IndexFinger3_L
+    100062: IndexFinger3_R
+    100064: IndexFinger4_L
+    100066: IndexFinger4_R
+    100068: Jaw_M
+    100070: JawEnd_M
+    100072: Knee_L
+    100074: Knee_R
+    100076: KneeL
+    100078: KneeR
+    100080: LegL
+    100082: LegR
+    100084: Main
+    100086: MiddleFinger1_L
+    100088: MiddleFinger1_R
+    100090: MiddleFinger2_L
+    100092: MiddleFinger2_R
+    100094: MiddleFinger3_L
+    100096: MiddleFinger3_R
+    100098: MiddleFinger4_L
+    100100: MiddleFinger4_R
+    100102: Neck_M
+    100104: PinkyFinger1_L
+    100106: PinkyFinger1_R
+    100108: PinkyFinger2_L
+    100110: PinkyFinger2_R
+    100112: PinkyFinger3_L
+    100114: PinkyFinger3_R
+    100116: PinkyFinger4_L
+    100118: PinkyFinger4_R
+    100120: RingFinger1_L
+    100122: RingFinger1_R
+    100124: RingFinger2_L
+    100126: RingFinger2_R
+    100128: RingFinger3_L
+    100130: RingFinger3_R
+    100132: RingFinger4_L
+    100134: RingFinger4_R
+    100136: Root_M
+    100138: Scapula_L
+    100140: Scapula_R
+    100142: Shoulder_L
+    100144: Shoulder_R
+    100146: Spine1_M
+    100148: ThumbFinger1_L
+    100150: ThumbFinger1_R
+    100152: ThumbFinger2_L
+    100154: ThumbFinger2_R
+    100156: ThumbFinger3_L
+    100158: ThumbFinger3_R
+    100160: ThumbFinger4_L
+    100162: ThumbFinger4_R
+    100164: Toes_L
+    100166: Toes_R
+    100168: ToesEnd_L
+    100170: ToesEnd_R
+    100172: Torso
+    100174: Wrist_L
+    100176: Wrist_R
+    100178: //RootNode
+    100180: ZombieAC_B_Body
+    100182: ZombieAC_B_Head
+    100184: ZombieAC_Parts1
+    400000: Ankle_L
+    400002: Ankle_R
+    400004: ArmL
+    400006: ArmR
+    400008: Body
+    400010: Chest_M
+    400012: Cup_L
+    400014: Cup_R
+    400016: DeformationSystem
+    400018: Elbow_L
+    400020: Elbow_R
+    400022: Eye_L
+    400024: Eye_R
+    400026: EyeEnd_L
+    400028: EyeEnd_R
+    400030: ForeArmL
+    400032: ForeArmR
+    400034: Geo
+    400036: Group
+    400038: HandL
+    400040: HandR
+    400042: Head
+    400044: Head_M
+    400046: HeadEnd_M
+    400048: Hip_L
+    400050: Hip_R
+    400052: IndexFinger1_L
+    400054: IndexFinger1_R
+    400056: IndexFinger2_L
+    400058: IndexFinger2_R
+    400060: IndexFinger3_L
+    400062: IndexFinger3_R
+    400064: IndexFinger4_L
+    400066: IndexFinger4_R
+    400068: Jaw_M
+    400070: JawEnd_M
+    400072: Knee_L
+    400074: Knee_R
+    400076: KneeL
+    400078: KneeR
+    400080: LegL
+    400082: LegR
+    400084: Main
+    400086: MiddleFinger1_L
+    400088: MiddleFinger1_R
+    400090: MiddleFinger2_L
+    400092: MiddleFinger2_R
+    400094: MiddleFinger3_L
+    400096: MiddleFinger3_R
+    400098: MiddleFinger4_L
+    400100: MiddleFinger4_R
+    400102: Neck_M
+    400104: PinkyFinger1_L
+    400106: PinkyFinger1_R
+    400108: PinkyFinger2_L
+    400110: PinkyFinger2_R
+    400112: PinkyFinger3_L
+    400114: PinkyFinger3_R
+    400116: PinkyFinger4_L
+    400118: PinkyFinger4_R
+    400120: RingFinger1_L
+    400122: RingFinger1_R
+    400124: RingFinger2_L
+    400126: RingFinger2_R
+    400128: RingFinger3_L
+    400130: RingFinger3_R
+    400132: RingFinger4_L
+    400134: RingFinger4_R
+    400136: Root_M
+    400138: Scapula_L
+    400140: Scapula_R
+    400142: Shoulder_L
+    400144: Shoulder_R
+    400146: Spine1_M
+    400148: ThumbFinger1_L
+    400150: ThumbFinger1_R
+    400152: ThumbFinger2_L
+    400154: ThumbFinger2_R
+    400156: ThumbFinger3_L
+    400158: ThumbFinger3_R
+    400160: ThumbFinger4_L
+    400162: ThumbFinger4_R
+    400164: Toes_L
+    400166: Toes_R
+    400168: ToesEnd_L
+    400170: ToesEnd_R
+    400172: Torso
+    400174: Wrist_L
+    400176: Wrist_R
+    400178: //RootNode
+    400180: ZombieAC_B_Body
+    400182: ZombieAC_B_Head
+    400184: ZombieAC_Parts1
+    2100000: 02 - Default
+    2100002: 01 - Default
+    2100004: ZombieAC_B_Head_MAT
+    2100006: ZombieAC_B_Body_MAT
+    4300000: ZombieAC_B_Head
+    4300002: ZombieAC_B_Body
+    4300004: HandL
+    4300006: ForeArmL
+    4300008: HandR
+    4300010: ForeArmR
+    4300012: Body
+    4300014: ArmL
+    4300016: LegL
+    4300018: ArmR
+    4300020: LegR
+    4300022: KneeR
+    4300024: KneeL
+    4300026: Head
+    4300028: Torso
+    7400000: Take 001
+    7400002: walk
+    7400004: attack
+    7400006: die
+    9500000: //RootNode
+    13700000: ArmL
+    13700002: ArmR
+    13700004: Body
+    13700006: ForeArmL
+    13700008: ForeArmR
+    13700010: HandL
+    13700012: HandR
+    13700014: Head
+    13700016: KneeL
+    13700018: KneeR
+    13700020: LegL
+    13700022: LegR
+    13700024: Torso
+    13700026: ZombieAC_B_Body
+    13700028: ZombieAC_B_Head
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 01 - Default
+    second: {fileID: 2100000, guid: a4ae0d989b9df5549b37e70bfebfdd8c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 02 - Default
+    second: {fileID: 2100000, guid: b2591f9c7fdef594794bcb6d3e6c0802, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: ZombieAC_B_Body_MAT
+    second: {fileID: 2100000, guid: a4ae0d989b9df5549b37e70bfebfdd8c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: ZombieAC_B_Head_MAT
+    second: {fileID: 2100000, guid: b2591f9c7fdef594794bcb6d3e6c0802, type: 2}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    animationCompression: 3
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Take 001
+      takeName: Take 001
+      firstFrame: 0
+      lastFrame: 250
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: walk
+      takeName: Take 001
+      firstFrame: 0
+      lastFrame: 75
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: attack
+      takeName: Take 001
+      firstFrame: 100
+      lastFrame: 160
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: die
+      takeName: Take 001
+      firstFrame: 170
+      lastFrame: 250
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 1
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
