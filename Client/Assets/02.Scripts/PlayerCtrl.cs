@@ -295,15 +295,7 @@ public class PlayerCtrl : MonoBehaviour
                 sensorCheck = true;
             }
         }
-        
-        // 캐릭터 앞 트리거가 내부 벽과 충돌을 검사하는 변수
-        if(coll.gameObject.tag == "House")
-        {
-            shotable = false;
-        }
-
-    
-
+ 
         // 충돌한 게임오브젝트의 태그값 비교
         if (coll.gameObject.tag == "BULLET")
         {
@@ -317,6 +309,12 @@ public class PlayerCtrl : MonoBehaviour
             }
             // Bullet 삭제
             Destroy(coll.gameObject);
+        }
+
+        // 캐릭터 앞 트리거가 내부 벽과 충돌을 검사하는 변수
+        if (coll.gameObject.tag == "House")
+        {
+            shotable = false;
         }
 
         // 충돌한 게임오브젝트의 태그값 비교
@@ -356,7 +354,7 @@ public class PlayerCtrl : MonoBehaviour
             shotable = true;
         }
 
-   
+
         if (itemEat == true)
         {
             coll.gameObject.SetActive(false);
@@ -372,21 +370,12 @@ public class PlayerCtrl : MonoBehaviour
             weaponEat = false;
         }
 
-
+        
     }
 
     // 플레이어 죽을 때 실행되는 함수
     void PlayerDie()
     {
-        //// Zombie라는 Tag를 가진 모든 게임오브젝트를 찾아옴
-        //GameObject[] zombies = GameObject.FindGameObjectsWithTag("Zombie");
-
-        //// 모든 몬스터의 OnPlayerDie함수를 순차적으로 호출
-        //foreach(GameObject zombie in zombies)
-        //{
-        //    zombie.SendMessage("OnPlayerDie", SendMessageOptions.DontRequireReceiver);
-        //}
-
         // 이벤트 발생 시킴
         OnPlayerDie();
 
@@ -397,6 +386,11 @@ public class PlayerCtrl : MonoBehaviour
         playerState = PlayerState.die;
         // 캐릭터 캡슐 콜라이더 비활성화
         gameObject.GetComponent<CapsuleCollider>().enabled = false;
+
+
+        firePos.GetComponent<CapsuleCollider>().enabled = false;
+        //FirePosCtrl firePos = GameObject.Find("FirePos").GetComponent<FirePosCtrl>();
+        //firePos.GetComponent<CapsuleCollider>().enabled = false;
         //gameObject.SetActive(false);
     }
 

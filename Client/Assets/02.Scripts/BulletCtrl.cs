@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BulletCtrl : MonoBehaviour {
     // 총알의 파괴력
-    public int damage = 20;
+    public int damage = 10;
 
     // 총알의 발사 속도
     public float speed = 4000.0f;

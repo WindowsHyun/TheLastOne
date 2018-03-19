@@ -214,6 +214,7 @@ ModelImporter:
     7400002: walk
     7400004: attack
     7400006: die
+    7400008: idle
     9500000: //RootNode
     13700000: ArmL
     13700002: ArmR
@@ -235,12 +236,12 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: 01 - Default
-    second: {fileID: 2100000, guid: a4ae0d989b9df5549b37e70bfebfdd8c, type: 2}
+    second: {fileID: 2100000, guid: b2591f9c7fdef594794bcb6d3e6c0802, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: 02 - Default
-    second: {fileID: 2100000, guid: b2591f9c7fdef594794bcb6d3e6c0802, type: 2}
+    second: {fileID: 2100000, guid: a4ae0d989b9df5549b37e70bfebfdd8c, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
@@ -309,7 +310,7 @@ ModelImporter:
       name: walk
       takeName: Take 001
       firstFrame: 0
-      lastFrame: 75
+      lastFrame: 40
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -336,8 +337,8 @@ ModelImporter:
     - serializedVersion: 16
       name: attack
       takeName: Take 001
-      firstFrame: 100
-      lastFrame: 160
+      firstFrame: 60
+      lastFrame: 100
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -364,8 +365,8 @@ ModelImporter:
     - serializedVersion: 16
       name: die
       takeName: Take 001
-      firstFrame: 170
-      lastFrame: 250
+      firstFrame: 120
+      lastFrame: 160
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -373,6 +374,34 @@ ModelImporter:
       loop: 0
       hasAdditiveReferencePose: 0
       loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: idle
+      takeName: Take 001
+      firstFrame: 180
+      lastFrame: 220
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0

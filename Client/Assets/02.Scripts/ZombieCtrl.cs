@@ -102,6 +102,7 @@ public class ZombieCtrl : MonoBehaviour
                 case ZombieState.idle:
                     nvAgent.isStopped = true;
                     animator.SetBool("IsTrace", false);
+                    animator.SetBool("IsAttack", false);
                     break;
 
                 // 추적 상태
@@ -110,12 +111,14 @@ public class ZombieCtrl : MonoBehaviour
                     nvAgent.destination = playerTr.position;
                     // 추적을 재시작
                     nvAgent.isStopped = false;
-                    animator.SetBool("IsTrace", false);
+                    animator.SetBool("IsTrace", true);
+                    animator.SetBool("IsAttack", false);
                     break;
 
                 case ZombieState.attack:
                     nvAgent.isStopped = true;
-                    animator.SetBool("IsTrace", true);
+                    animator.SetBool("IsTrace", false);
+                    animator.SetBool("IsAttack", true);
                     break;
             }
             yield return null;
@@ -149,7 +152,7 @@ public class ZombieCtrl : MonoBehaviour
         isDie = true;
         zombieState = ZombieState.die;
         nvAgent.isStopped = true;
-        animator.SetBool("IsDie", true);
+        animator.SetTrigger("IsDie");
 
         gameObject.GetComponent<CapsuleCollider>().enabled = false;
         gameObject.GetComponentInChildren<SphereCollider>().enabled = false;
@@ -167,6 +170,7 @@ public class ZombieCtrl : MonoBehaviour
     {
         // 좀비의 상태를 체크하는 코루틴 함수를 모두 정지시킴
         StopAllCoroutines();
-        animator.SetBool("isTrace", false);
+        animator.SetBool("IsTrace", false);
+        animator.SetBool("IsAttack", false);
     }
 }
