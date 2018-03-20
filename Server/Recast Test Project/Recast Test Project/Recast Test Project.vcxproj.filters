@@ -19,6 +19,12 @@
     <Filter Include="소스 파일\Recast">
       <UniqueIdentifier>{4829a70e-3ac3-444e-a25e-7a85a731a8bd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\Mesh">
+      <UniqueIdentifier>{4cc8b467-f60e-4fd9-9579-8280b030e84f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Mesh">
+      <UniqueIdentifier>{bcc9d1d2-52c8-41c6-81b0-3b3dbafa90eb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -69,6 +75,15 @@
     <ClCompile Include="DebugDraw.cpp">
       <Filter>소스 파일\Recast</Filter>
     </ClCompile>
+    <ClCompile Include="Sample.cpp">
+      <Filter>소스 파일\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample_SoloMesh.cpp">
+      <Filter>소스 파일\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="NavMeshTesterTool.cpp">
+      <Filter>소스 파일\Mesh</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Recast.h">
@@ -94,6 +109,15 @@
     </ClInclude>
     <ClInclude Include="RecastDebugDraw.h">
       <Filter>헤더 파일\Recast</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample.h">
+      <Filter>헤더 파일\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample_SoloMesh.h">
+      <Filter>헤더 파일\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="NavMeshTesterTool.h">
+      <Filter>헤더 파일\Mesh</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
