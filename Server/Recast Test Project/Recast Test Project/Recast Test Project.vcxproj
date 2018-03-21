@@ -123,11 +123,18 @@
   <ItemGroup>
     <ClCompile Include="ChunkyTriMesh.cpp" />
     <ClCompile Include="DebugDraw.cpp" />
+    <ClCompile Include="DetourAlloc.cpp" />
+    <ClCompile Include="DetourCommon.cpp" />
+    <ClCompile Include="DetourNavMesh.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="DetourNode.cpp" />
     <ClCompile Include="InputGeom.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MeshLoaderObj.cpp" />
     <ClCompile Include="NavMeshTesterTool.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Recast.cpp" />
     <ClCompile Include="RecastAlloc.cpp" />
@@ -142,18 +149,30 @@
     <ClCompile Include="RecastRegion.cpp" />
     <ClCompile Include="Sample.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Sample_SoloMesh.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChunkyTriMesh.h" />
     <ClInclude Include="DebugDraw.h" />
+    <ClInclude Include="DetourAlloc.h" />
+    <ClInclude Include="DetourAssert.h" />
+    <ClInclude Include="DetourCommon.h" />
+    <ClInclude Include="DetourMath.h" />
+    <ClInclude Include="DetourNavMesh.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="DetourNode.h" />
+    <ClInclude Include="DetourStatus.h" />
     <ClInclude Include="InputGeom.h" />
     <ClInclude Include="MeshLoaderObj.h" />
     <ClInclude Include="NavMeshTesterTool.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Recast.h" />
     <ClInclude Include="RecastAlloc.h" />
@@ -161,9 +180,11 @@
     <ClInclude Include="RecastDebugDraw.h" />
     <ClInclude Include="Sample.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Sample_SoloMesh.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClInclude>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

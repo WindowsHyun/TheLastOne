@@ -25,6 +25,12 @@
     <Filter Include="소스 파일\Mesh">
       <UniqueIdentifier>{bcc9d1d2-52c8-41c6-81b0-3b3dbafa90eb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\Detour">
+      <UniqueIdentifier>{7ddc8f4b-d9e7-4caf-b77e-9bb3cfc045ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Detour">
+      <UniqueIdentifier>{08952557-7237-4fa5-963f-0b1b3e7aab7d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -84,6 +90,18 @@
     <ClCompile Include="NavMeshTesterTool.cpp">
       <Filter>소스 파일\Mesh</Filter>
     </ClCompile>
+    <ClCompile Include="DetourNavMesh.cpp">
+      <Filter>소스 파일\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="DetourAlloc.cpp">
+      <Filter>소스 파일\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="DetourCommon.cpp">
+      <Filter>소스 파일\Detour</Filter>
+    </ClCompile>
+    <ClCompile Include="DetourNode.cpp">
+      <Filter>소스 파일\Detour</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Recast.h">
@@ -118,6 +136,27 @@
     </ClInclude>
     <ClInclude Include="NavMeshTesterTool.h">
       <Filter>헤더 파일\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="DetourNavMesh.h">
+      <Filter>헤더 파일\Detour</Filter>
+    </ClInclude>
+    <ClInclude Include="DetourAlloc.h">
+      <Filter>헤더 파일\Detour</Filter>
+    </ClInclude>
+    <ClInclude Include="DetourStatus.h">
+      <Filter>헤더 파일\Detour</Filter>
+    </ClInclude>
+    <ClInclude Include="DetourAssert.h">
+      <Filter>헤더 파일\Detour</Filter>
+    </ClInclude>
+    <ClInclude Include="DetourCommon.h">
+      <Filter>헤더 파일\Detour</Filter>
+    </ClInclude>
+    <ClInclude Include="DetourNode.h">
+      <Filter>헤더 파일\Detour</Filter>
+    </ClInclude>
+    <ClInclude Include="DetourMath.h">
+      <Filter>헤더 파일\Detour</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

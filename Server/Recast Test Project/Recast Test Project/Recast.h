@@ -931,7 +931,7 @@ void rcMarkBoxArea(rcContext* ctx, const float* bmin, const float* bmax, unsigne
 ///  @param[in]		hmax	The height of the top of the polygon.
 ///  @param[in]		areaId	The area id to apply. [Limit: <= #RC_WALKABLE_AREA]
 ///  @param[in,out]	chf		A populated compact heightfield.
-void rcMarkConvexPolyArea(rcContext* ctx, const float* verts, const int nverts,
+void rcMarkConvexPolyArea(const float* verts, const int nverts,
 						  const float hmin, const float hmax, unsigned char areaId,
 						  rcCompactHeightfield& chf);
 

@@ -385,13 +385,13 @@ static int pointInPoly(int nvert, const float* verts, const float* p)
 /// projected onto the xz-plane at @p hmin, then extruded to @p hmax.
 /// 
 /// @see rcCompactHeightfield, rcMedianFilterWalkableArea
-void rcMarkConvexPolyArea(rcContext* ctx, const float* verts, const int nverts,
+void rcMarkConvexPolyArea( const float* verts, const int nverts,
 						  const float hmin, const float hmax, unsigned char areaId,
 						  rcCompactHeightfield& chf)
 {
-	rcAssert(ctx);
+	//rcAssert(ctx);
 	
-	ctx->startTimer(RC_TIMER_MARK_CONVEXPOLY_AREA);
+	//ctx->startTimer(RC_TIMER_MARK_CONVEXPOLY_AREA);
 
 	float bmin[3], bmax[3];
 	rcVcopy(bmin, verts);
@@ -449,7 +449,7 @@ void rcMarkConvexPolyArea(rcContext* ctx, const float* verts, const int nverts,
 		}
 	}
 
-	ctx->stopTimer(RC_TIMER_MARK_CONVEXPOLY_AREA);
+	//ctx->stopTimer(RC_TIMER_MARK_CONVEXPOLY_AREA);
 }
 
 int rcOffsetPoly(const float* verts, const int nverts, const float offset,
