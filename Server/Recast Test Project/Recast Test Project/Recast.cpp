@@ -17,6 +17,7 @@
 //
 
 #include <float.h>
+#include <iostream>
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <string.h>
@@ -208,7 +209,7 @@ void rcCalcGridSize(const float* bmin, const float* bmax, float cs, int* w, int*
 /// See the #rcConfig documentation for more information on the configuration parameters.
 /// 
 /// @see rcAllocHeightfield, rcHeightfield 
-bool rcCreateHeightfield(rcContext* /*ctx*/, rcHeightfield& hf, int width, int height,
+bool rcCreateHeightfield( rcHeightfield& hf, int width, int height,
 						 const float* bmin, const float* bmax,
 						 float cs, float ch)
 {
@@ -245,7 +246,7 @@ static void calcTriNormal(const float* v0, const float* v1, const float* v2, flo
 /// See the #rcConfig documentation for more information on the configuration parameters.
 /// 
 /// @see rcHeightfield, rcClearUnwalkableTriangles, rcRasterizeTriangles
-void rcMarkWalkableTriangles(rcContext* /*ctx*/, const float walkableSlopeAngle,
+void rcMarkWalkableTriangles( const float walkableSlopeAngle,
 							 const float* verts, int /*nv*/,
 							 const int* tris, int nt,
 							 unsigned char* areas)
@@ -465,6 +466,33 @@ bool rcBuildCompactHeightfield(rcContext* ctx, const int walkableHeight, const i
 	
 	return true;
 }
+
+//bool rcRasterizeTriangles(const float* verts, const int /*nv*/,
+//	const int* tris, const unsigned char* areas, const int nt,
+//	rcHeightfield& solid, const int flagMergeThr)
+//{
+//	//rcAssert(ctx);
+//
+//	//rcScopedTimer timer(ctx, RC_TIMER_RASTERIZE_TRIANGLES);
+//
+//	const float ics = 1.0f / solid.cs;
+//	const float ich = 1.0f / solid.ch;
+//	// Rasterize triangles.
+//	for (int i = 0; i < nt; ++i)
+//	{
+//		const float* v0 = &verts[tris[i * 3 + 0] * 3];
+//		const float* v1 = &verts[tris[i * 3 + 1] * 3];
+//		const float* v2 = &verts[tris[i * 3 + 2] * 3];
+//		// Rasterize.
+//		if (!rasterizeTri(v0, v1, v2, areas[i], solid, solid.bmin, solid.bmax, solid.cs, ics, ich, flagMergeThr))
+//		{
+//			std::cout << RC_LOG_ERROR << "rcRasterizeTriangles: Out of memory." << std::endl;
+//			return false;
+//		}
+//	}
+//
+//	return true;
+//}
 
 /*
 static int getHeightfieldMemoryUsage(const rcHeightfield& hf)

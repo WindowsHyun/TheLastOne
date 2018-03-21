@@ -17,6 +17,7 @@
 //
 
 #include <float.h>
+#include <iostream>
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <string.h>
@@ -693,7 +694,7 @@ static void walkContour(int x, int y, int i, int dir,
 	}
 }
 
-static bool filterSmallRegions(rcContext* ctx, int minRegionArea, int mergeRegionSize,
+static bool filterSmallRegions(int minRegionArea, int mergeRegionSize,
 							   unsigned short& maxRegionId,
 							   rcCompactHeightfield& chf,
 							   unsigned short* srcReg)
@@ -705,7 +706,7 @@ static bool filterSmallRegions(rcContext* ctx, int minRegionArea, int mergeRegio
 	rcRegion* regions = (rcRegion*)rcAlloc(sizeof(rcRegion)*nreg, RC_ALLOC_TEMP);
 	if (!regions)
 	{
-		ctx->log(RC_LOG_ERROR, "filterSmallRegions: Out of memory 'regions' (%d).", nreg);
+		std::cout << RC_LOG_ERROR << "filterSmallRegions: Out of memory 'regions' (" << nreg << ")." << std::endl;
 		return false;
 	}
 
@@ -1047,12 +1048,12 @@ struct rcSweepSpan
 /// @warning The distance field must be created using #rcBuildDistanceField before attempting to build regions.
 /// 
 /// @see rcCompactHeightfield, rcCompactSpan, rcBuildDistanceField, rcBuildRegionsMonotone, rcConfig
-bool rcBuildRegionsMonotone(rcContext* ctx, rcCompactHeightfield& chf,
+bool rcBuildRegionsMonotone(rcCompactHeightfield& chf,
 							const int borderSize, const int minRegionArea, const int mergeRegionArea)
 {
-	rcAssert(ctx);
+	//rcAssert(ctx);
 	
-	ctx->startTimer(RC_TIMER_BUILD_REGIONS);
+	//ctx->startTimer(RC_TIMER_BUILD_REGIONS);
 	
 	const int w = chf.width;
 	const int h = chf.height;
@@ -1061,7 +1062,7 @@ bool rcBuildRegionsMonotone(rcContext* ctx, rcCompactHeightfield& chf,
 	rcScopedDelete<unsigned short> srcReg = (unsigned short*)rcAlloc(sizeof(unsigned short)*chf.spanCount, RC_ALLOC_TEMP);
 	if (!srcReg)
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildRegionsMonotone: Out of memory 'src' (%d).", chf.spanCount);
+		std::cout << RC_LOG_ERROR << "rcBuildRegionsMonotone: Out of memory 'src' (" << chf.spanCount << ")." << std::endl;
 		return false;
 	}
 	memset(srcReg,0,sizeof(unsigned short)*chf.spanCount);
@@ -1070,7 +1071,7 @@ bool rcBuildRegionsMonotone(rcContext* ctx, rcCompactHeightfield& chf,
 	rcScopedDelete<rcSweepSpan> sweeps = (rcSweepSpan*)rcAlloc(sizeof(rcSweepSpan)*nsweeps, RC_ALLOC_TEMP);
 	if (!sweeps)
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildRegionsMonotone: Out of memory 'sweeps' (%d).", nsweeps);
+		std::cout << RC_LOG_ERROR << "rcBuildRegionsMonotone: Out of memory 'sweeps' (" << nsweeps << ")." << std::endl;
 		return false;
 	}
 	
@@ -1181,20 +1182,20 @@ bool rcBuildRegionsMonotone(rcContext* ctx, rcCompactHeightfield& chf,
 		}
 	}
 
-	ctx->startTimer(RC_TIMER_BUILD_REGIONS_FILTER);
+	//ctx->startTimer(RC_TIMER_BUILD_REGIONS_FILTER);
 
 	// Filter out small regions.
 	chf.maxRegions = id;
-	if (!filterSmallRegions(ctx, minRegionArea, mergeRegionArea, chf.maxRegions, chf, srcReg))
+	if (!filterSmallRegions( minRegionArea, mergeRegionArea, chf.maxRegions, chf, srcReg))
 		return false;
 
-	ctx->stopTimer(RC_TIMER_BUILD_REGIONS_FILTER);
+	//ctx->stopTimer(RC_TIMER_BUILD_REGIONS_FILTER);
 	
 	// Store the result out.
 	for (int i = 0; i < chf.spanCount; ++i)
 		chf.spans[i].reg = srcReg[i];
 	
-	ctx->stopTimer(RC_TIMER_BUILD_REGIONS);
+	//ctx->stopTimer(RC_TIMER_BUILD_REGIONS);
 
 	return true;
 }
@@ -1320,7 +1321,7 @@ bool rcBuildRegions(rcContext* ctx, rcCompactHeightfield& chf,
 	
 	// Filter out small regions.
 	chf.maxRegions = regionId;
-	if (!filterSmallRegions(ctx, minRegionArea, mergeRegionArea, chf.maxRegions, chf, srcReg))
+	if (!filterSmallRegions( minRegionArea, mergeRegionArea, chf.maxRegions, chf, srcReg))
 		return false;
 	
 	ctx->stopTimer(RC_TIMER_BUILD_REGIONS_FILTER);

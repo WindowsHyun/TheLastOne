@@ -102,6 +102,9 @@
     <ClCompile Include="DetourNode.cpp">
       <Filter>소스 파일\Detour</Filter>
     </ClCompile>
+    <ClCompile Include="DetourNavMeshBuilder.cpp">
+      <Filter>소스 파일\Detour</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Recast.h">
@@ -156,6 +159,9 @@
       <Filter>헤더 파일\Detour</Filter>
     </ClInclude>
     <ClInclude Include="DetourMath.h">
+      <Filter>헤더 파일\Detour</Filter>
+    </ClInclude>
+    <ClInclude Include="DetourNavMeshBuilder.h">
       <Filter>헤더 파일\Detour</Filter>
     </ClInclude>
   </ItemGroup>

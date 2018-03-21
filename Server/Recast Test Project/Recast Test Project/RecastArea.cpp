@@ -17,6 +17,7 @@
 //
 
 #include <float.h>
+#include <iostream>
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <string.h>
@@ -34,19 +35,20 @@
 /// This method is usually called immediately after the heightfield has been built.
 ///
 /// @see rcCompactHeightfield, rcBuildCompactHeightfield, rcConfig::walkableRadius
-bool rcErodeWalkableArea(rcContext* ctx, int radius, rcCompactHeightfield& chf)
+bool rcErodeWalkableArea(int radius, rcCompactHeightfield& chf)
 {
-	rcAssert(ctx);
+	//rcAssert(ctx);
 	
 	const int w = chf.width;
 	const int h = chf.height;
 	
-	ctx->startTimer(RC_TIMER_ERODE_AREA);
+	//ctx->startTimer(RC_TIMER_ERODE_AREA);
 	
 	unsigned char* dist = (unsigned char*)rcAlloc(sizeof(unsigned char)*chf.spanCount, RC_ALLOC_TEMP);
 	if (!dist)
 	{
-		ctx->log(RC_LOG_ERROR, "erodeWalkableArea: Out of memory 'dist' (%d).", chf.spanCount);
+		std::cout << RC_LOG_ERROR << "erodeWalkableArea: Out of memory 'dist' (" << chf.spanCount << ")." << std::endl;
+		//ctx->log(RC_LOG_ERROR, "erodeWalkableArea: Out of memory 'dist' (%d).", chf.spanCount);
 		return false;
 	}
 	
@@ -215,7 +217,7 @@ bool rcErodeWalkableArea(rcContext* ctx, int radius, rcCompactHeightfield& chf)
 	
 	rcFree(dist);
 	
-	ctx->stopTimer(RC_TIMER_ERODE_AREA);
+	//ctx->stopTimer(RC_TIMER_ERODE_AREA);
 	
 	return true;
 }
