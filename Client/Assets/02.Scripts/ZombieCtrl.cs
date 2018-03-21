@@ -153,9 +153,9 @@ public class ZombieCtrl : MonoBehaviour
         zombieState = ZombieState.die;
         nvAgent.isStopped = true;
         animator.SetTrigger("IsDie");
-
-        gameObject.GetComponent<CapsuleCollider>().enabled = false;
         gameObject.GetComponentInChildren<SphereCollider>().enabled = false;
+        gameObject.GetComponent<CapsuleCollider>().enabled = false;
+        
     }
 
     void CreateBloodEffect(Vector3 pos)

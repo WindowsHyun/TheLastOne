@@ -69,11 +69,20 @@ public class PlayerCtrl : MonoBehaviour
     // 아이템 획득 확인을 위한 변수
     public bool itemEatPossible = false;
     public bool itemEat = false;
+    public bool bullet762Set = false;
+    public bool bullet556Set = false;
+    private int bullet762 = 0;
+    private int bullet556 = 0;
+
     // 무기 정보 저장
-    public GameObject weapon;
+    public GameObject ak47;
+    public GameObject m16;
+    public bool ak47Set = false;
+    public bool m16Set = false;
 
     // 무기 장착 여부
     public bool showItem1 = false;
+    public bool showItem2 = false;
 
     // 혈흔 효과 프리팹
     public GameObject bloodEffect;
@@ -81,7 +90,6 @@ public class PlayerCtrl : MonoBehaviour
     // 총 발사 가능 체크
     public bool shotable;
 
-    private int bulletCount = 0;
 
 
     void Start()
@@ -109,8 +117,8 @@ public class PlayerCtrl : MonoBehaviour
         // 현재 발사 가능
         shotable = true;
 
-        weapon.GetComponent<Renderer>().enabled = false;
-
+        ak47.GetComponent<Renderer>().enabled = false;
+        m16.GetComponent<Renderer>().enabled = false;
 
     }
 
@@ -178,42 +186,58 @@ public class PlayerCtrl : MonoBehaviour
         }
 
 
-        // 1번 키를 누르면 총이 장착 된다.
+        // 총을 획득 가능할때 g키 입력시 획득
         if (weaponEatPossible == true)
         {
             if (Input.GetKeyDown(KeyCode.G))
             {
                 weaponEat = true;
                 WeaponDisPlay();
-            }
-            //weaponDisPlay();
+            }  
         }
 
-        if(itemEatPossible == true)
+        // 아이템 획득 가능할때 g키 입력시 획득
+        if (itemEatPossible == true)
         {
             if (Input.GetKeyDown(KeyCode.G))
             {
                 itemEat = true;
-                
+                ItemSelection();
+
+
             }
         }
 
         // 총이 장착이 되었을때만 발사 가능
-        if (showItem1 == true && shotable == true && bulletCount >0)
+        if (shotable == true)
         {
-            //animator.SetBool("IsEquip", true);
-            if (Input.GetMouseButtonDown(0))
+            // 어떠한 종류의 총알이 1발 이상 있을 시
+            if (bullet556 > 0 && showItem2 == true)
             {
-                animator.SetBool("IsShot", true);
-                Fire();
-                //animator.SetBool("IsTrace", true);
-                networkCtrl.Player_Shot();
-                Debug.Log(bulletCount);
+
+                if (Input.GetMouseButtonDown(0))
+                {
+                    animator.SetBool("IsShot", true);
+                    Fire();
+                    //animator.SetBool("IsTrace", true);
+                    networkCtrl.Player_Shot();
+                    Debug.Log("m16 발사");
+                    Debug.Log(bullet556);
+                }
+            }
+            else if (bullet762 > 0 && showItem1 == true)
+            {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    animator.SetBool("IsShot", true);
+                    Fire();
+                    //animator.SetBool("IsTrace", true);
+                    networkCtrl.Player_Shot();
+                    Debug.Log("ak47 발사");
+                    Debug.Log(bullet762);
+                }
             }
         }
-        //else {
-        //    animator.SetBool("IsEquip", false);
-        //}
 
 
         if (Input.GetMouseButtonDown(1))
@@ -234,6 +258,22 @@ public class PlayerCtrl : MonoBehaviour
             }
         }
 
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            showItem1 = true;
+            showItem2 = false;
+            ak47.GetComponent<Renderer>().enabled = true;
+            m16.GetComponent<Renderer>().enabled = false;
+           
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            showItem1 = false;
+            showItem2 = true;
+            m16.GetComponent<Renderer>().enabled = true;
+            ak47.GetComponent<Renderer>().enabled = false;
+        }
+
 
     }
 
@@ -241,10 +281,17 @@ public class PlayerCtrl : MonoBehaviour
     {
         // 동적으로 총알을 생성하는 함수
         CreateBullet();
-        bulletCount--;
+        if (m16Set == true)
+        {
+            bullet556--;
+        }
+        else if(ak47Set == true)
+        {
+            bullet762--;
+        }
 
-        // 사운드 발생 함수
-        source.PlayOneShot(fireSfx, 0.9f);
+            // 사운드 발생 함수
+            source.PlayOneShot(fireSfx, 0.9f);
 
         // 잠시 기다리는 루틴을 위해 코루틴 함수로 호출
         StartCoroutine(this.ShowMuzzleFlash());
@@ -360,7 +407,7 @@ public class PlayerCtrl : MonoBehaviour
             coll.gameObject.SetActive(false);
             //Destroy(coll.gameObject);
             itemEat = false;
-            bulletCount += 30;
+            //bulletCount += 30;
         }
 
         if (weaponEat == true)
@@ -396,22 +443,38 @@ public class PlayerCtrl : MonoBehaviour
 
     void WeaponDisPlay()
     {
-        //if (showItem1 == true)
-        //{
-
-        //    weapon.GetComponent<Renderer>().enabled = false;
-        //    showItem1 = false;
-        //    animator.SetBool("IsEquip", false);
-        //    //animator.SetBool("IsShot", false);
-
-        //}
-        if (showItem1 == false)
+        // 총이 장착되지않은 상태에서 총을 획득할 경우
+        if (showItem1 == false && ak47Set == true)
         {
-            weapon.GetComponent<Renderer>().enabled = true;
+            ak47.GetComponent<Renderer>().enabled = true;
+            m16.GetComponent<Renderer>().enabled = false;
             showItem1 = true;
+            showItem2 = false;
             animator.SetBool("IsEquip", true);
         }
+        else if (showItem2 == false && m16Set == true)
+        {
+            m16.GetComponent<Renderer>().enabled = true;
+            ak47.GetComponent<Renderer>().enabled = false;
+            showItem1 = false;
+            showItem2 = true;
+            animator.SetBool("IsEquip", true);
+        } 
     }
+
+
+    void ItemSelection()
+    {
+        if(itemEat == true && bullet556Set == true)
+        {
+            bullet556 += 30;
+        }
+        else if(itemEat == true && bullet762Set == true)
+        {
+            bullet762 += 30;
+        }
+    }
+
 
     void CreateBloodEffect(Vector3 pos)
     {
@@ -419,8 +482,5 @@ public class PlayerCtrl : MonoBehaviour
         GameObject blood1 = (GameObject)Instantiate(bloodEffect, pos, Quaternion.identity);
         Destroy(blood1, 1.0f);
     }
-
-
-
 }
 

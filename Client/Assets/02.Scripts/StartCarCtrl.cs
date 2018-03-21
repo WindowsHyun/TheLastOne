@@ -31,8 +31,10 @@ public class StartCarCtrl : MonoBehaviour
         {
             // 플레이어에 가해진 힘을 0으로 만든다. - > 차량 하차
             player.GetComponent<Rigidbody>().velocity = Vector3.zero;
+
             // 플레이어 스크립트 사용 (이동 때문)
             player.GetComponent<PlayerCtrl>().enabled = true;
+
             // 카메라 전환
             FollowCam followCam = GameObject.Find("Main Camera").GetComponent<FollowCam>();
             followCam.getOff = true;
@@ -45,7 +47,7 @@ public class StartCarCtrl : MonoBehaviour
             // 차량 하차 후 true로 F키 입력 시 재하차 불가능하게 만듬
             startSet = true;
 
-            Debug.Log("차량 하차 -> 게임 시작");
+            //bug.Log("차량 하차 -> 게임 시작");
         }
 
     }
@@ -68,7 +70,7 @@ public class StartCarCtrl : MonoBehaviour
             // 차량 하차 후 true로 F키 입력 시 재하차 불가능하게 만듬
             startSet = true;
 
-            Debug.Log("차량 하차 -> 게임 시작");
+            //bug.Log("차량 하차 -> 게임 시작");
         }
 
         if (coll.gameObject.tag == "EndPoint")
