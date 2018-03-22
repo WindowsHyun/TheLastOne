@@ -299,7 +299,7 @@ namespace TheLastOne.Game.Network
             m_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendTimeout, 10000);
             m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 10000);
-            DebugText.transform.position = new Vector3(Screen.width / 2, Screen.height - 10, 0);
+            //DebugText.transform.position = new Vector3(Screen.width / 2, Screen.height - 10, 0);
 
             //=======================================================
             // Socket connect.

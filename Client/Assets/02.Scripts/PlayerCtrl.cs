@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 using TheLastOne.Game.Network;
 
@@ -37,6 +38,11 @@ public class PlayerCtrl : MonoBehaviour
     public float rotSpeed = 100.0f;
     // 캐릭터 체력
     public int hp = 100;
+
+    // 캐릭터 생명 초기값
+    private int initHp;
+    // 캐릭터의 HP바 이미지
+    public Image imgHpBar;
 
 
     // 총알 프리팹
@@ -94,6 +100,9 @@ public class PlayerCtrl : MonoBehaviour
 
     void Start()
     {
+        // 생명 초기값 설정
+        initHp = hp;
+
         // 스크립트 처음에 Transform 컴포넌트 할당
         tr = GetComponent<Transform>();
 
@@ -350,6 +359,10 @@ public class PlayerCtrl : MonoBehaviour
 
             // 맞은 총알의 Damage를 추출해 Player HP 차감
             hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
+            
+            // Image UI 항목의 fillAmount 속성을 조절해 생명 게이지 값 조절
+            imgHpBar.fillAmount = (float)hp / (float)initHp;
+
             if (hp <= 0)
             {
                 PlayerDie();
@@ -371,6 +384,10 @@ public class PlayerCtrl : MonoBehaviour
 
             // 좀비 공격의 Damage만큼 HP 차감
             hp -= 10;
+
+            // Image UI 항목의 fillAmount 속성을 조절해 생명 게이지 값 조절
+            imgHpBar.fillAmount = (float)hp / (float)initHp;
+
             Debug.Log("Player H{: " + hp.ToString());
             if (hp <= 0)
             {
