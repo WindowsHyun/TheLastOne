@@ -1147,7 +1147,7 @@ bool rcBuildContours( rcCompactHeightfield& chf,
 ///  						contour to polygon conversion process. [Limit: >= 3] 
 ///  @param[out]	mesh	The resulting polygon mesh. (Must be re-allocated.)
 ///  @returns True if the operation completed successfully.
-bool rcBuildPolyMesh(rcContext* ctx, rcContourSet& cset, const int nvp, rcPolyMesh& mesh);
+bool rcBuildPolyMesh(rcContourSet& cset, const int nvp, rcPolyMesh& mesh);
 
 /// Merges multiple polygon meshes into a single mesh.
 ///  @ingroup recast
@@ -1168,7 +1168,7 @@ bool rcMergePolyMeshes(rcContext* ctx, rcPolyMesh** meshes, const int nmeshes, r
 ///  								heightfield data. [Limit: >=0] [Units: wu]
 ///  @param[out]	dmesh			The resulting detail mesh.  (Must be pre-allocated.)
 ///  @returns True if the operation completed successfully.
-bool rcBuildPolyMeshDetail(rcContext* ctx, const rcPolyMesh& mesh, const rcCompactHeightfield& chf,
+bool rcBuildPolyMeshDetail( const rcPolyMesh& mesh, const rcCompactHeightfield& chf,
 	const float sampleDist, const float sampleMaxError,
 	rcPolyMeshDetail& dmesh);
 

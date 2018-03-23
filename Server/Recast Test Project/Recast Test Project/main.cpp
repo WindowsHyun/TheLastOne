@@ -26,7 +26,8 @@ int main() {
 	rcPolyMesh* m_pmesh;
 	rcConfig m_cfg;
 	rcPolyMeshDetail* m_dmesh;
-	class dtNavMesh* m_navMesh;
+	class dtNavMesh* m_navMesh = 0;
+	class dtNavMeshQuery* m_navQuery = 0;
 	//----------------------------------------
 	float m_cellSize = 1.0f;
 	float m_cellHeight = 0.2f;
@@ -72,7 +73,8 @@ int main() {
 
 	//--------------------------------------------------
 	// CleanUp
-
+	dtFreeNavMesh(m_navMesh);
+	m_navMesh = 0;
 	//--------------------------------------------------
 
 
@@ -174,12 +176,6 @@ int main() {
 
 	//SampleSoloMesh.cpp 601Page Step6부터 시작하면 됩니다..! 20180321
 
-
-
-
-
-
-
 	m_pmesh = rcAllocPolyMesh();
 	if (!m_pmesh)
 	{
@@ -187,12 +183,30 @@ int main() {
 		return false;
 	}
 
+	if (!rcBuildPolyMesh(*m_cset, m_cfg.maxVertsPerPoly, *m_pmesh))
+	{
+		std::cout << RC_LOG_ERROR << "buildNavigation: Could not triangulate contours." << std::endl;
+		return false;
+	}
+
+	// 스탭7
 	m_dmesh = rcAllocPolyMeshDetail();
 	if (!m_dmesh)
 	{
 		std::cout << RC_LOG_ERROR << "buildNavigation: Out of memory 'pmdtl'." << std::endl;
 		return false;
 	}
+	if (!rcBuildPolyMeshDetail( *m_pmesh, *m_chf, m_cfg.detailSampleDist, m_cfg.detailSampleMaxError, *m_dmesh))
+	{
+		std::cout << RC_LOG_ERROR << "buildNavigation: Could not build detail mesh." << std::endl;
+		return false;
+	}
+
+
+
+
+
+
 
 	if (m_cfg.maxVertsPerPoly <= 6) //DT_VERTS_PER_POLYGON
 	{
@@ -249,6 +263,24 @@ int main() {
 			std::cout << RC_LOG_ERROR << "Could not create Detour navmesh" << std::endl;
 			return false;
 		}
+
+		dtStatus status;
+
+		status = m_navMesh->init(navData, navDataSize, DT_TILE_FREE_DATA);
+		if (dtStatusFailed(status))
+		{
+			dtFree(navData);
+			std::cout << RC_LOG_ERROR << "Could not init Detour navmesh" << std::endl;
+			//m_ctx->log(RC_LOG_ERROR, "Could not init Detour navmesh");
+			return false;
+		}
+
+	/*	status = m_navQuery->init(m_navMesh, 2048);
+		if (dtStatusFailed(status))
+		{
+			m_ctx->log(RC_LOG_ERROR, "Could not init Detour navmesh query");
+			return false;
+		}*/
 
 
 	}

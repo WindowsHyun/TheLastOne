@@ -17,6 +17,7 @@
 //
 
 #include <float.h>
+#include <iostream>
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <string.h>
@@ -255,11 +256,12 @@ static int findEdge(const int* edges, int nedges, int s, int t)
 	return UNDEF;
 }
 
-static int addEdge(rcContext* ctx, int* edges, int& nedges, const int maxEdges, int s, int t, int l, int r)
+static int addEdge( int* edges, int& nedges, const int maxEdges, int s, int t, int l, int r)
 {
 	if (nedges >= maxEdges)
 	{
-		ctx->log(RC_LOG_ERROR, "addEdge: Too many edges (%d/%d).", nedges, maxEdges);
+		std::cout << RC_LOG_ERROR << "addEdge: Too many edges" << std::endl;
+		//ctx->log(RC_LOG_ERROR, "addEdge: Too many edges (%d/%d).", nedges, maxEdges);
 		return UNDEF;
 	}
 	
@@ -317,7 +319,7 @@ static bool overlapEdges(const float* pts, const int* edges, int nedges, int s1,
 	return false;
 }
 
-static void completeFacet(rcContext* ctx, const float* pts, int npts, int* edges, int& nedges, const int maxEdges, int& nfaces, int e)
+static void completeFacet(const float* pts, int npts, int* edges, int& nedges, const int maxEdges, int& nfaces, int e)
 {
 	static const float EPS = 1e-5f;
 
@@ -394,14 +396,14 @@ static void completeFacet(rcContext* ctx, const float* pts, int npts, int* edges
 		// Add new edge or update face info of old edge. 
 		e = findEdge(edges, nedges, pt, s);
 		if (e == UNDEF)
-		    addEdge(ctx, edges, nedges, maxEdges, pt, s, nfaces, UNDEF);
+		    addEdge( edges, nedges, maxEdges, pt, s, nfaces, UNDEF);
 		else
 		    updateLeftFace(&edges[e*4], pt, s, nfaces);
 		
 		// Add new edge or update face info of old edge. 
 		e = findEdge(edges, nedges, t, pt);
 		if (e == UNDEF)
-		    addEdge(ctx, edges, nedges, maxEdges, t, pt, nfaces, UNDEF);
+		    addEdge( edges, nedges, maxEdges, t, pt, nfaces, UNDEF);
 		else
 		    updateLeftFace(&edges[e*4], t, pt, nfaces);
 		
@@ -413,7 +415,7 @@ static void completeFacet(rcContext* ctx, const float* pts, int npts, int* edges
 	}
 }
 
-static void delaunayHull(rcContext* ctx, const int npts, const float* pts,
+static void delaunayHull( const int npts, const float* pts,
 						 const int nhull, const int* hull,
 						 rcIntArray& tris, rcIntArray& edges)
 {
@@ -423,15 +425,15 @@ static void delaunayHull(rcContext* ctx, const int npts, const float* pts,
 	edges.resize(maxEdges*4);
 	
 	for (int i = 0, j = nhull-1; i < nhull; j=i++)
-		addEdge(ctx, &edges[0], nedges, maxEdges, hull[j],hull[i], HULL, UNDEF);
+		addEdge( &edges[0], nedges, maxEdges, hull[j],hull[i], HULL, UNDEF);
 	
 	int currentEdge = 0;
 	while (currentEdge < nedges)
 	{
 		if (edges[currentEdge*4+2] == UNDEF)
-			completeFacet(ctx, pts, npts, &edges[0], nedges, maxEdges, nfaces, currentEdge);
+			completeFacet(pts, npts, &edges[0], nedges, maxEdges, nfaces, currentEdge);
 		if (edges[currentEdge*4+3] == UNDEF)
-			completeFacet(ctx, pts, npts, &edges[0], nedges, maxEdges, nfaces, currentEdge);
+			completeFacet(pts, npts, &edges[0], nedges, maxEdges, nfaces, currentEdge);
 		currentEdge++;
 	}
 
@@ -478,7 +480,8 @@ static void delaunayHull(rcContext* ctx, const int npts, const float* pts,
 		int* t = &tris[i*4];
 		if (t[0] == -1 || t[1] == -1 || t[2] == -1)
 		{
-			ctx->log(RC_LOG_WARNING, "delaunayHull: Removing dangling face %d [%d,%d,%d].", i, t[0],t[1],t[2]);
+			std::cout << RC_LOG_WARNING << "delaunayHull: Removing dangling face " << i << std::endl;
+			//ctx->log(RC_LOG_WARNING, "delaunayHull: Removing dangling face %d [%d,%d,%d].", i, t[0],t[1],t[2]);
 			t[0] = tris[tris.size()-4];
 			t[1] = tris[tris.size()-3];
 			t[2] = tris[tris.size()-2];
@@ -500,7 +503,7 @@ inline float getJitterY(const int i)
 	return (((i * 0xd8163841) & 0xffff) / 65535.0f * 2.0f) - 1.0f;
 }
 
-static bool buildPolyDetail(rcContext* ctx, const float* in, const int nin,
+static bool buildPolyDetail(const float* in, const int nin,
 							const float sampleDist, const float sampleMaxError,
 							const rcCompactHeightfield& chf, const rcHeightPatch& hp,
 							float* verts, int& nverts, rcIntArray& tris,
@@ -633,12 +636,13 @@ static bool buildPolyDetail(rcContext* ctx, const float* in, const int nin,
 	edges.resize(0);
 	tris.resize(0);
 
-	delaunayHull(ctx, nverts, verts, nhull, hull, tris, edges);
+	delaunayHull(nverts, verts, nhull, hull, tris, edges);
 	
 	if (tris.size() == 0)
 	{
 		// Could not triangulate the poly, make sure there is some valid data there.
-		ctx->log(RC_LOG_WARNING, "buildPolyDetail: Could not triangulate polygon, adding default data.");
+		std::cout << RC_LOG_WARNING << "buildPolyDetail: Could not triangulate polygon, adding default data." << std::endl;
+		//ctx->log(RC_LOG_WARNING, "buildPolyDetail: Could not triangulate polygon, adding default data.");
 		for (int i = 2; i < nverts; ++i)
 		{
 			tris.push(0);
@@ -727,7 +731,7 @@ static bool buildPolyDetail(rcContext* ctx, const float* in, const int nin,
 			// TODO: Incremental add instead of full rebuild.
 			edges.resize(0);
 			tris.resize(0);
-			delaunayHull(ctx, nverts, verts, nhull, hull, tris, edges);
+			delaunayHull(nverts, verts, nhull, hull, tris, edges);
 		}		
 	}
 
@@ -735,7 +739,8 @@ static bool buildPolyDetail(rcContext* ctx, const float* in, const int nin,
 	if (ntris > MAX_TRIS)
 	{
 		tris.resize(MAX_TRIS*4);
-		ctx->log(RC_LOG_ERROR, "rcBuildPolyMeshDetail: Shrinking triangle count from %d to max %d.", ntris, MAX_TRIS);
+		std::cout << RC_LOG_ERROR << "rcBuildPolyMeshDetail: Shrinking triangle count from" << ntris << std::endl;
+		//ctx->log(RC_LOG_ERROR, "rcBuildPolyMeshDetail: Shrinking triangle count from %d to max %d.", ntris, MAX_TRIS);
 	}
 
 	return true;
@@ -946,13 +951,13 @@ static unsigned char getTriFlags(const float* va, const float* vb, const float* 
 /// See the #rcConfig documentation for more information on the configuration parameters.
 ///
 /// @see rcAllocPolyMeshDetail, rcPolyMesh, rcCompactHeightfield, rcPolyMeshDetail, rcConfig
-bool rcBuildPolyMeshDetail(rcContext* ctx, const rcPolyMesh& mesh, const rcCompactHeightfield& chf,
+bool rcBuildPolyMeshDetail(const rcPolyMesh& mesh, const rcCompactHeightfield& chf,
 						   const float sampleDist, const float sampleMaxError,
 						   rcPolyMeshDetail& dmesh)
 {
-	rcAssert(ctx);
+	//rcAssert(ctx);
 	
-	ctx->startTimer(RC_TIMER_BUILD_POLYMESHDETAIL);
+	//ctx->startTimer(RC_TIMER_BUILD_POLYMESHDETAIL);
 
 	if (mesh.nverts == 0 || mesh.npolys == 0)
 		return true;
@@ -975,13 +980,15 @@ bool rcBuildPolyMeshDetail(rcContext* ctx, const rcPolyMesh& mesh, const rcCompa
 	rcScopedDelete<int> bounds = (int*)rcAlloc(sizeof(int)*mesh.npolys*4, RC_ALLOC_TEMP);
 	if (!bounds)
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildPolyMeshDetail: Out of memory 'bounds' (%d).", mesh.npolys*4);
+		std::cout << RC_LOG_ERROR << "rcBuildPolyMeshDetail: Out of memory 'bounds'" << mesh.npolys * 4 << std::endl;
+		//ctx->log(RC_LOG_ERROR, "rcBuildPolyMeshDetail: Out of memory 'bounds' (%d).", mesh.npolys*4);
 		return false;
 	}
 	rcScopedDelete<float> poly = (float*)rcAlloc(sizeof(float)*nvp*3, RC_ALLOC_TEMP);
 	if (!poly)
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildPolyMeshDetail: Out of memory 'poly' (%d).", nvp*3);
+		std::cout << RC_LOG_ERROR << "rcBuildPolyMeshDetail: Out of memory 'poly' " << nvp * 3 << std::endl;
+		//ctx->log(RC_LOG_ERROR, "rcBuildPolyMeshDetail: Out of memory 'poly' (%d).", nvp*3);
 		return false;
 	}
 	
@@ -1019,7 +1026,8 @@ bool rcBuildPolyMeshDetail(rcContext* ctx, const rcPolyMesh& mesh, const rcCompa
 	hp.data = (unsigned short*)rcAlloc(sizeof(unsigned short)*maxhw*maxhh, RC_ALLOC_TEMP);
 	if (!hp.data)
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildPolyMeshDetail: Out of memory 'hp.data' (%d).", maxhw*maxhh);
+		std::cout << RC_LOG_ERROR <<"rcBuildPolyMeshDetail: Out of memory 'hp.data'" << maxhw * maxhh << std::endl;
+		//ctx->log(RC_LOG_ERROR, "rcBuildPolyMeshDetail: Out of memory 'hp.data' (%d).", maxhw*maxhh);
 		return false;
 	}
 	
@@ -1029,7 +1037,8 @@ bool rcBuildPolyMeshDetail(rcContext* ctx, const rcPolyMesh& mesh, const rcCompa
 	dmesh.meshes = (unsigned int*)rcAlloc(sizeof(unsigned int)*dmesh.nmeshes*4, RC_ALLOC_PERM);
 	if (!dmesh.meshes)
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildPolyMeshDetail: Out of memory 'dmesh.meshes' (%d).", dmesh.nmeshes*4);
+		std::cout << RC_LOG_ERROR << "rcBuildPolyMeshDetail: Out of memory 'dmesh.meshes'" << dmesh.nmeshes * 4 << std::endl;
+		//ctx->log(RC_LOG_ERROR, "rcBuildPolyMeshDetail: Out of memory 'dmesh.meshes' (%d).", dmesh.nmeshes*4);
 		return false;
 	}
 
@@ -1040,14 +1049,16 @@ bool rcBuildPolyMeshDetail(rcContext* ctx, const rcPolyMesh& mesh, const rcCompa
 	dmesh.verts = (float*)rcAlloc(sizeof(float)*vcap*3, RC_ALLOC_PERM);
 	if (!dmesh.verts)
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildPolyMeshDetail: Out of memory 'dmesh.verts' (%d).", vcap*3);
+		std::cout << RC_LOG_ERROR << "rcBuildPolyMeshDetail: Out of memory 'dmesh.verts' " << vcap * 3 << std::endl;
+		//ctx->log(RC_LOG_ERROR, "rcBuildPolyMeshDetail: Out of memory 'dmesh.verts' (%d).", vcap*3);
 		return false;
 	}
 	dmesh.ntris = 0;
 	dmesh.tris = (unsigned char*)rcAlloc(sizeof(unsigned char*)*tcap*4, RC_ALLOC_PERM);
 	if (!dmesh.tris)
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildPolyMeshDetail: Out of memory 'dmesh.tris' (%d).", tcap*4);
+		std::cout << RC_LOG_ERROR << "rcBuildPolyMeshDetail: Out of memory 'dmesh.tris' " << tcap * 4 << std::endl;
+		//ctx->log(RC_LOG_ERROR, "rcBuildPolyMeshDetail: Out of memory 'dmesh.tris' (%d).", tcap*4);
 		return false;
 	}
 	
@@ -1076,7 +1087,7 @@ bool rcBuildPolyMeshDetail(rcContext* ctx, const rcPolyMesh& mesh, const rcCompa
 		
 		// Build detail mesh.
 		int nverts = 0;
-		if (!buildPolyDetail(ctx, poly, npoly,
+		if (!buildPolyDetail(poly, npoly,
 							 sampleDist, sampleMaxError,
 							 chf, hp, verts, nverts, tris,
 							 edges, samples))
@@ -1116,7 +1127,8 @@ bool rcBuildPolyMeshDetail(rcContext* ctx, const rcPolyMesh& mesh, const rcCompa
 			float* newv = (float*)rcAlloc(sizeof(float)*vcap*3, RC_ALLOC_PERM);
 			if (!newv)
 			{
-				ctx->log(RC_LOG_ERROR, "rcBuildPolyMeshDetail: Out of memory 'newv' (%d).", vcap*3);
+				std::cout << RC_LOG_ERROR << "rcBuildPolyMeshDetail: Out of memory 'newv' " << vcap * 3 << std::endl;
+				//ctx->log(RC_LOG_ERROR, "rcBuildPolyMeshDetail: Out of memory 'newv' (%d).", vcap*3);
 				return false;
 			}
 			if (dmesh.nverts)
@@ -1140,7 +1152,8 @@ bool rcBuildPolyMeshDetail(rcContext* ctx, const rcPolyMesh& mesh, const rcCompa
 			unsigned char* newt = (unsigned char*)rcAlloc(sizeof(unsigned char)*tcap*4, RC_ALLOC_PERM);
 			if (!newt)
 			{
-				ctx->log(RC_LOG_ERROR, "rcBuildPolyMeshDetail: Out of memory 'newt' (%d).", tcap*4);
+				std::cout << RC_LOG_ERROR << "rcBuildPolyMeshDetail: Out of memory 'newt' " << tcap * 4 << std::endl;
+				//ctx->log(RC_LOG_ERROR, "rcBuildPolyMeshDetail: Out of memory 'newt' (%d).", tcap*4);
 				return false;
 			}
 			if (dmesh.ntris)
@@ -1159,7 +1172,7 @@ bool rcBuildPolyMeshDetail(rcContext* ctx, const rcPolyMesh& mesh, const rcCompa
 		}
 	}
 		
-	ctx->stopTimer(RC_TIMER_BUILD_POLYMESHDETAIL);
+	//ctx->stopTimer(RC_TIMER_BUILD_POLYMESHDETAIL);
 
 	return true;
 }
