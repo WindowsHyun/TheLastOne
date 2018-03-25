@@ -3,21 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public struct gameItem
-{
-    public int id;
-
-
-
-    public gameItem(int value)
-    {
-        this.id = -1;
-
-    }
-}
-
-
-
 public class ItemCtrl : MonoBehaviour {
 
     public enum ItemType { Ammunition762, Ammunition556, FirstAid } // 탄약, 구급상자
@@ -25,7 +10,10 @@ public class ItemCtrl : MonoBehaviour {
     public ItemType type;           // 아이템의 타입.
     public Sprite DefaultImg;   // 기본 이미지.
     public int MaxCount;        // 겹칠수 있는 최대 숫자.
-    public int bulletCount = 30;
+    public int itemCount = 1;
+
+    public int getItemCount() { return itemCount; }
+    public void setItemCount(int value) { itemCount += value; }
 
     // 인벤토리에 접근하기 위한 변수.
     private InventoryCtrl Iv;

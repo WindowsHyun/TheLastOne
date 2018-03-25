@@ -131,6 +131,19 @@ public class PlayerCtrl : MonoBehaviour
 
     }
 
+    public void setBullet(string type, int value)
+    {
+        if (type == "Ammunition762")
+        {
+            bullet762 = value;
+        }
+
+        if (type == "Ammunition556")
+        {
+            bullet556 = value;
+        }
+    }
+
     void Update()
     {
         h = Input.GetAxis("Horizontal");
@@ -148,12 +161,9 @@ public class PlayerCtrl : MonoBehaviour
         // Vector3.up 축을 기준으로 rotSpeed만큼의 속도로 회전
         tr.Rotate(Vector3.up * Time.deltaTime * rotSpeed * Input.GetAxis("Mouse X"));
 
-
-
         // 대기 0, 전진 1, 후진 2, 왼쪽 3, 오른쪽 4
         // IsState란 애니메이터 상태 변수 추가됨
         // 키보드 입력값을 기준으로 동작할 애니메이션 수행
-
         if (v >= 0.1f)
         {
             // 전진 애니메이션
@@ -202,7 +212,7 @@ public class PlayerCtrl : MonoBehaviour
             {
                 weaponEat = true;
                 WeaponDisPlay();
-            }  
+            }
         }
 
         // 아이템 획득 가능할때 g키 입력시 획득
@@ -273,7 +283,7 @@ public class PlayerCtrl : MonoBehaviour
             showItem2 = false;
             ak47.GetComponent<Renderer>().enabled = true;
             m16.GetComponent<Renderer>().enabled = false;
-           
+
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
@@ -294,13 +304,13 @@ public class PlayerCtrl : MonoBehaviour
         {
             bullet556--;
         }
-        else if(ak47Set == true)
+        else if (ak47Set == true)
         {
             bullet762--;
         }
 
-            // 사운드 발생 함수
-            source.PlayOneShot(fireSfx, 0.9f);
+        // 사운드 발생 함수
+        source.PlayOneShot(fireSfx, 0.9f);
 
         // 잠시 기다리는 루틴을 위해 코루틴 함수로 호출
         StartCoroutine(this.ShowMuzzleFlash());
@@ -351,7 +361,7 @@ public class PlayerCtrl : MonoBehaviour
                 sensorCheck = true;
             }
         }
- 
+
         // 충돌한 게임오브젝트의 태그값 비교
         if (coll.gameObject.tag == "BULLET")
         {
@@ -359,7 +369,7 @@ public class PlayerCtrl : MonoBehaviour
 
             // 맞은 총알의 Damage를 추출해 Player HP 차감
             hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
-            
+
             // Image UI 항목의 fillAmount 속성을 조절해 생명 게이지 값 조절
             imgHpBar.fillAmount = (float)hp / (float)initHp;
 
@@ -429,13 +439,13 @@ public class PlayerCtrl : MonoBehaviour
 
         if (weaponEat == true)
         {
-            
+
             coll.gameObject.SetActive(false);
             //Destroy(coll.gameObject);
             weaponEat = false;
         }
 
-        
+
     }
 
     // 플레이어 죽을 때 실행되는 함수
@@ -477,17 +487,17 @@ public class PlayerCtrl : MonoBehaviour
             showItem1 = false;
             showItem2 = true;
             animator.SetBool("IsEquip", true);
-        } 
+        }
     }
 
 
     void ItemSelection()
     {
-        if(itemEat == true && bullet556Set == true)
+        if (itemEat == true && bullet556Set == true)
         {
             bullet556 += 30;
         }
-        else if(itemEat == true && bullet762Set == true)
+        else if (itemEat == true && bullet762Set == true)
         {
             bullet762 += 30;
         }

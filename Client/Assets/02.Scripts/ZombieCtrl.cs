@@ -48,10 +48,10 @@ public class ZombieCtrl : MonoBehaviour
         //nvAgent.destination = playerTr.position;
 
         // 일정한 간격으로 좀비의 행동 상태를 체크하는 코루틴 함수 실행
-        StartCoroutine(this.CheckZombieState());
+        //StartCoroutine(this.CheckZombieState());
 
         // 좀비의 상태에 따라 동작하는 루틴을 실행하는 코루틴 함수 실행
-        StartCoroutine(this.ZombieAction());
+        //StartCoroutine(this.ZombieAction());
     }
 
     void OnEnable()

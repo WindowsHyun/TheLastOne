@@ -87,10 +87,11 @@ public class InventoryCtrl : MonoBehaviour {
 
             // 슬롯에 존재하는 아이템의 타입과 넣을려는 아이템의 타입이 같고.
             // 슬롯에 존재하는 아이템의 겹칠수 있는 최대치가 넘지않았을 때. (true일 때)
-            if (slot.ItemReturn().type == item.type && slot.ItemMax(item))
+            if (slot.ItemReturn().type == item.type )
             {
                 // 슬롯에 아이템을 넣는다.
-                slot.AddItem(item);
+                Debug.Log("중복 아이템 추가..!");
+                slot.AddItem(item, true, slot);
                 return true;
             }
         }
@@ -104,7 +105,7 @@ public class InventoryCtrl : MonoBehaviour {
             if (slot.isSlots())
                 continue;
 
-            slot.AddItem(item);
+            slot.AddItem(item, false, null);
             return true;
         }
 
@@ -138,37 +139,37 @@ public class InventoryCtrl : MonoBehaviour {
     }
 
     // 아이템 옮기기 및 교환.
-    public void Swap(SlotCtrl slot, Vector3 Pos)
+    public void Swap(SlotCtrl value, Vector3 Pos)
     {
         SlotCtrl FirstSlot = NearDisSlot(Pos);
 
         // 현재 슬롯과 옮기려는 슬롯이 같으면 함수 종료.
-        if (slot == FirstSlot || FirstSlot == null)
+        if (value == FirstSlot || FirstSlot == null)
         {
-            slot.UpdateInfo(true, slot.slot.Peek().DefaultImg);
+            value.UpdateInfo(true, value.slot.Peek().DefaultImg);
             return;
         }
 
         // 가까운 슬롯이 비어있으면 옮기기.
         if (!FirstSlot.isSlots())
         {
-            Swap(FirstSlot, slot);
+            Swap(FirstSlot, value);
         }
         // 교환.
         else
         {
-            int Count = slot.slot.Count;
-            ItemCtrl item = slot.slot.Peek();
+            int Count = value.slot.Count;
+            ItemCtrl item = value.slot.Peek();
             Stack<ItemCtrl> temp = new Stack<ItemCtrl>();
 
             {
                 for (int i = 0; i < Count; i++)
                     temp.Push(item);
 
-                slot.slot.Clear();
+                value.slot.Clear();
             }
 
-            Swap(slot, FirstSlot);
+            Swap(value, FirstSlot);
 
             {
                 Count = temp.Count;

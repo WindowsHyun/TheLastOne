@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 public class ItemDragCtrl : MonoBehaviour {
 
     public Transform Img;   // 빈 이미지 객체.

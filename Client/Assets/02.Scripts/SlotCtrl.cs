@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 
-
 public class SlotCtrl : MonoBehaviour
 {
 
@@ -21,7 +20,9 @@ public class SlotCtrl : MonoBehaviour
 
     public bool isSlots() { return isSlot; } // 슬롯이 현재 비어있는지? 에 대한 플래그 반환
 
-    public void SetSlots(bool isSlot) { this.isSlot = isSlot; }
+    public void SetSlots(bool value) { this.isSlot = value; }
+
+    public PlayerCtrl player;
 
     void Start()
     {
@@ -43,12 +44,28 @@ public class SlotCtrl : MonoBehaviour
         // 텍스트 객체의 부모 객체의 x지름을 가져온다.
         // 폰트의 크기를 부모 객체의 x지름 / 2 만큼으로 지정해준다.
         ItemImg = transform.GetChild(0).GetComponent<Image>();
+
+        player = GameObject.Find("Player").GetComponent<PlayerCtrl>();
+
     }
 
-    public void AddItem(ItemCtrl item)
+    public void AddItem(ItemCtrl item, bool same, SlotCtrl sameSlot)
     {
+        // bool same = true 일경우 아이템 같은게 들어왔으니 찾아서 넣어라.
         // 스택에 아이템 추가.
-        slot.Push(item);
+        if (same == true)
+        {
+            //Debug.Log(sameSlot.ItemReturn().type.ToString());
+            sameSlot.ItemReturn().setItemCount(30); // 이미 존재 하면 해당 갯수를 증가한다.
+        }
+        else
+        {
+
+            if (item.type.ToString() == "Ammunition762" || item.type.ToString() == "Ammunition556")
+                item.setItemCount(29);// 총알의 경우 기본이 1개 이므로 29개를 더해서 30개로 맞춰준다.
+            slot.Push(item);
+        }
+
         UpdateInfo(true, item.DefaultImg);
     }
 
@@ -61,7 +78,7 @@ public class SlotCtrl : MonoBehaviour
 
         // 슬롯에 아이템이 1개인 경우.
         // 아이템이 1개일 때 사용하게 되면 0개가 된다.
-        if (slot.Count == 1)
+        if (slot.Peek().getItemCount() == 1)
         {
             // 혹시 모를 오류를 방지하기 위해 slot리스트를 Clear해준다
             slot.Clear();
@@ -69,13 +86,19 @@ public class SlotCtrl : MonoBehaviour
             UpdateInfo(false, DefaultImg);
             return;
         }
+        else
+        {
+            // 아이템 갯수가 여러개 일 경우
+            slot.Peek().setItemCount(-1);
+            //slot.Pop();
+        }
 
-        slot.Pop();
+
         UpdateInfo(isSlot, ItemImg.sprite);
     }
 
     // 슬롯에 대한 각종 정보 업데이트.
-    public void UpdateInfo(bool isSlot, Sprite sprite)
+    public void UpdateInfo(bool value, Sprite sprite)
     {
         //SetSlots(isSlot);                                          // 슬롯이 비어있다면 false 아니면 true 셋팅.
         //ItemImg.sprite = sprite;                                   // 슬롯안에 들어있는 아이템의 이미지를 셋팅.
@@ -83,21 +106,16 @@ public class SlotCtrl : MonoBehaviour
         ////ItemIO.SaveDate();  
         //// 인벤토리에 변동사항이 생겼으므로 저장
 
-        this.isSlot = isSlot;
+        this.isSlot = value;
         transform.GetChild(0).GetComponent<Image>().sprite = sprite;
 
-        
-        ItemCtrl item;
+        player.setBullet(slot.Peek().type.ToString(), slot.Peek().getItemCount());
 
-        item = slot.Peek();
-
-        if (slot.Count > 1)
-        {
-            //text.text = slot.Count.ToString();
-            
-            text.text = (Int32.Parse(item.bulletCount.ToString()) * Int32.Parse(slot.Count.ToString())).ToString();
-        }
+        if (slot.Count >= 1)
+            text.text = slot.Peek().getItemCount().ToString();
         else
-            text.text = item.bulletCount.ToString();
+            text.text = "";
+
     }
+
 }
