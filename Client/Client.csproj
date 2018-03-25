@@ -305,6 +305,7 @@
     <Compile Include="Assets\07.Network\Client_id.cs" />
     <Compile Include="Assets\07.Network\Client_info.cs" />
     <Compile Include="Assets\07.Network\Client_Shot_info.cs" />
+    <Compile Include="Assets\07.Network\CollisionCheckCtrl.cs" />
     <Compile Include="Assets\07.Network\NavMeshExport.cs" />
     <Compile Include="Assets\07.Network\NetworkCtrl.cs" />
     <Compile Include="Assets\07.Network\SendFunction.cs" />
