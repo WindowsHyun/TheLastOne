@@ -14,6 +14,7 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
     <CompilerResponseFile></CompilerResponseFile>
+    <UnityProjectGenerator>VSTU</UnityProjectGenerator>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
     <UnityVersion>2017.3.0f3</UnityVersion>
@@ -293,10 +294,13 @@
   <ItemGroup>
     <Compile Include="Assets\02.Scripts\BulletCtrl.cs" />
     <Compile Include="Assets\02.Scripts\FollowCam.cs" />
+    <Compile Include="Assets\02.Scripts\InventoryCtrl.cs" />
     <Compile Include="Assets\02.Scripts\ItemCtrl.cs" />
+    <Compile Include="Assets\02.Scripts\ItemDragCtrl.cs" />
     <Compile Include="Assets\02.Scripts\OtherPlayerCtrl.cs" />
     <Compile Include="Assets\02.Scripts\ParticleCtrl.cs" />
     <Compile Include="Assets\02.Scripts\PlayerCtrl.cs" />
+    <Compile Include="Assets\02.Scripts\SlotCtrl.cs" />
     <Compile Include="Assets\02.Scripts\StartCarCtrl.cs" />
     <Compile Include="Assets\02.Scripts\WeaponCtrl.cs" />
     <Compile Include="Assets\02.Scripts\ZombieCtrl.cs" />

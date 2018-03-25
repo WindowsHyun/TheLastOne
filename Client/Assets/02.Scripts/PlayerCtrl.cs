@@ -429,6 +429,7 @@ public class PlayerCtrl : MonoBehaviour
 
         if (weaponEat == true)
         {
+            
             coll.gameObject.SetActive(false);
             //Destroy(coll.gameObject);
             weaponEat = false;
