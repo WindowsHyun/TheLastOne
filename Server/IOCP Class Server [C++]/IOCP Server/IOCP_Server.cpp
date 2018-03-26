@@ -1,7 +1,9 @@
 ﻿#include "IOCP_Server.h"
 #include "Game_Client.h"
+#include "Timer.h"
 
 Game_Client *g_clients = new Game_Client[MAX_Client];
+Server_Timer Timer;
 
 IOCP_Server::IOCP_Server()
 {
@@ -71,6 +73,9 @@ void IOCP_Server::makeThread()
 	}
 
 	std::thread accept_tread{ &IOCP_Server::Accept_Thread, this };
+
+	Timer.initTimer(g_hiocp);		// 타이머 스레드를 만들어 준다.
+
 	accept_tread.join();
 	for (auto pth : worker_threads) {
 		pth->join();
@@ -145,6 +150,19 @@ void IOCP_Server::Worker_Thread()
 				exit(-1);
 			}
 			delete over;
+		}
+		else if (OP_InitTime == over->event_type) {
+			Send_All_Time(T_InitTime, ci, -1, true);
+			if (ci <= 0) {
+				// 초기 대기시간이 만료 되었을 경우
+				std::cout << "OP_InitTime이 완료 되었습니다..!" << std::endl;
+			}
+			else {
+				// ci-1 을 한 이유는 1초씩 내리기 위하여.
+				Timer_Event t = { ci - 1, high_resolution_clock::now() + 1s, E_initTime };
+				Timer.setTimerEvent(t);
+			}
+
 		}
 		else {
 #if (DebugMod == TRUE )
@@ -379,5 +397,27 @@ void IOCP_Server::Send_All_Data(int client, bool allClient)
 	}
 	else {
 		SendPacket(SC_Client_Data, client, builder.GetBufferPointer(), builder.GetSize());
+	}
+}
+
+void IOCP_Server::Send_All_Time(int kind, int time, int client_id, bool allClient)
+{
+	flatbuffers::FlatBufferBuilder builder;
+	auto f_kind = kind;
+	auto f_time = time;
+	auto orc = CreateGame_Timer(builder, f_kind, f_time);
+	builder.Finish(orc); // Serialize the root of the object.
+
+
+	if (allClient == true) {
+		// 모든 클라이언트 에게 나갔다는 것을 보내준다..!
+		for (int i = 0; i < MAX_Client; ++i) {
+			if (g_clients[i].get_Connect() != true)
+				continue;
+			SendPacket(SC_Server_Time, i, builder.GetBufferPointer(), builder.GetSize());
+		}
+	}
+	else {
+		SendPacket(SC_Server_Time, client_id, builder.GetBufferPointer(), builder.GetSize());
 	}
 }

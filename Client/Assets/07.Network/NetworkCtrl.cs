@@ -81,6 +81,7 @@ namespace TheLastOne.Game.Network
         private int SC_PUT_PLAYER = 2;            // 클라이언트 추가
         private int SC_REMOVE_PLAYER = 3;     // 클라이언트 삭제
         private int SC_Client_Data = 4;             // 클라이언트 모든 데이터
+        private int SC_Server_Time = 5;             // 서버 타이머
 
         IEnumerator startPrefab()
         {
@@ -123,7 +124,7 @@ namespace TheLastOne.Game.Network
                 }
                 yield return null;
             } while (true);
-            yield return null;
+            //yield return null;
         }
 
         IEnumerator RecvCoroutine()
@@ -133,7 +134,7 @@ namespace TheLastOne.Game.Network
                 m_Socket.BeginReceive(Receivebyte, 0, LimitReceivebyte, 0, DataReceived, m_Socket);
                 yield return null;
             } while (true);
-            yield return null;
+            //yield return null;
         }
 
         IEnumerator SendCoroutine()
@@ -155,7 +156,7 @@ namespace TheLastOne.Game.Network
                     // 초당 20번 패킷 전송으로 제한을 한다.
                 }
             } while (true);
-            yield return null;
+            //yield return null;
         }
 
         IEnumerator RemovePlayerCoroutine(int client_id)
@@ -182,7 +183,7 @@ namespace TheLastOne.Game.Network
                 DebugText.text = debugString.ToString();
                 yield return null;
             } while (true);
-            yield return null;
+            //yield return null;
         }
 
         void ProcessPacket(int size, int type, byte[] recvPacket)
@@ -285,6 +286,16 @@ namespace TheLastOne.Game.Network
 
                 client_data[Get_ServerData.Id].removeClient = true;
                 //Debug.Log(Get_ServerData.Id + "번 클라이언트 삭제..!");
+
+            }
+            else if (type == SC_Server_Time)
+            {
+                byte[] t_buf = new byte[size + 1];
+                System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
+                ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
+                var Get_ServerData = Game_Timer.GetRootAsGame_Timer(revc_buf);
+                //Debug.Log("Time : " + Get_ServerData.Time);
+                debugString = "Time : " + Get_ServerData.Time;
             }
 
 
@@ -365,7 +376,7 @@ namespace TheLastOne.Game.Network
             }
             catch
             {
-                debugString = "패킷 오류..!";
+                //debugString = "패킷 오류..!";
             }
 
         }

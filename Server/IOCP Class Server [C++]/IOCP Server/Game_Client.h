@@ -3,8 +3,7 @@
 
 #include "IOCP_Server.h"
 
-enum OPTYPE { OP_SEND, OP_RECV, OP_DO_AI, E_PLAYER_MOVE_NOTIFY, OP_Attack_Move, OP_Responder };
-enum Event_Type { E_MOVE, E_Attack_Move, E_Responder };
+enum OPTYPE { OP_SEND, OP_RECV, OP_InitTime };
 
 struct OverlappedEx {
 	WSAOVERLAPPED over;

@@ -22,6 +22,11 @@ table Client_info {
   rotation:Vec3;
 }
 
+table Game_Timer {
+  kind:int;
+  time:int;
+}
+
 table Client_id {
   id:int;
 }

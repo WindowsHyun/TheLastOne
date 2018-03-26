@@ -15,6 +15,8 @@ namespace Game {
 
 		struct Client_info;
 
+		struct Game_Timer;
+
 		struct Client_id;
 
 		struct Client_Shot_info;
@@ -217,6 +219,56 @@ namespace Game {
 				rotation);
 		}
 
+		struct Game_Timer FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+			enum {
+				VT_KIND = 4,
+				VT_TIME = 6
+			};
+			int32_t kind() const {
+				return GetField<int32_t>(VT_KIND, 0);
+			}
+			int32_t time() const {
+				return GetField<int32_t>(VT_TIME, 0);
+			}
+			bool Verify(flatbuffers::Verifier &verifier) const {
+				return VerifyTableStart(verifier) &&
+					VerifyField<int32_t>(verifier, VT_KIND) &&
+					VerifyField<int32_t>(verifier, VT_TIME) &&
+					verifier.EndTable();
+			}
+		};
+
+		struct Game_TimerBuilder {
+			flatbuffers::FlatBufferBuilder &fbb_;
+			flatbuffers::uoffset_t start_;
+			void add_kind(int32_t kind) {
+				fbb_.AddElement<int32_t>(Game_Timer::VT_KIND, kind, 0);
+			}
+			void add_time(int32_t time) {
+				fbb_.AddElement<int32_t>(Game_Timer::VT_TIME, time, 0);
+			}
+			explicit Game_TimerBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+				: fbb_(_fbb) {
+				start_ = fbb_.StartTable();
+			}
+			Game_TimerBuilder &operator=(const Game_TimerBuilder &);
+			flatbuffers::Offset<Game_Timer> Finish() {
+				const auto end = fbb_.EndTable(start_);
+				auto o = flatbuffers::Offset<Game_Timer>(end);
+				return o;
+			}
+		};
+
+		inline flatbuffers::Offset<Game_Timer> CreateGame_Timer(
+			flatbuffers::FlatBufferBuilder &_fbb,
+			int32_t kind = 0,
+			int32_t time = 0) {
+			Game_TimerBuilder builder_(_fbb);
+			builder_.add_time(time);
+			builder_.add_kind(kind);
+			return builder_.Finish();
+		}
+
 		struct Client_id FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 			enum {
 				VT_ID = 4
@@ -309,6 +361,7 @@ namespace Game {
 		inline const Game::TheLastOne::Client_id *GetClient_infoView(const void *buf) {
 			return flatbuffers::GetRoot<Game::TheLastOne::Client_id>(buf);
 		}
+
 
 	}  // namespace TheLastOne
 }  // namespace Game

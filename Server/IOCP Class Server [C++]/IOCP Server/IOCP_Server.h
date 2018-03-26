@@ -17,7 +17,6 @@
 #include <vector>
 #include <thread>
 #include <random>
-#include <chrono>
 #include <windows.h>
 #include <unordered_set> // 성능이 더 좋아진다. [순서가 상관없을경우]
 #include <mutex>
@@ -45,10 +44,9 @@ using namespace Game::TheLastOne; // Flatbuffers를 읽어오자.
 class IOCP_Server {
 
 private:
-	HANDLE g_hiocp;
 	SOCKET g_socket;
 	std::chrono::high_resolution_clock::time_point serverTimer;
-
+	HANDLE g_hiocp;
 	void initServer();
 	void err_quit(char *msg);							// Error 나올 경우 종료
 	void err_display(char *msg, int err_no);		// Error 표시 해주기
@@ -61,8 +59,10 @@ private:
 	void SendPacket(int type, int cl, void *packet, int psize);		// 패킷 보내기
 	void Send_Client_ID(int client_id, int value, bool allClient);	// 클라이언트 에게 패킷 아이디 보내기
 	void Send_All_Data(int client, bool allClient);					// 클라이언트에게 모든 클라이언트 위치 보내기
+	void Send_All_Time(int kind, int time, int client_id, bool allClient);					// 클라이언트에게 시간을 보내준다.
 
-public :
+public:
+	HANDLE getHandle() { return g_hiocp; }
 	IOCP_Server();
 	~IOCP_Server();
 };
