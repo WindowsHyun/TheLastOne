@@ -62,6 +62,10 @@ public class OtherPlayerCtrl : MonoBehaviour
     // PlayerCtrl에 있는 현재 실제 클라의 위치를 가지고 있는다.
     public Vector3 player_Pos;
 
+    // 적 플레이어 무기 정보
+    public GameObject ak47;
+    public GameObject m16;
+
 
     void Start()
     {
@@ -83,11 +87,9 @@ public class OtherPlayerCtrl : MonoBehaviour
 
         StartCoroutine(this.createPrefab());
 
-        // 처음 시작시 마우스를 잠궈버린다.
-        //lockMouse = true;
-        //Cursor.lockState = CursorLockMode.Locked;//마우스 커서 고정
-        //Cursor.visible = false;//마우스 커서 보이기
-
+        // 무기 비활성화 하여 보이지 않기
+        ak47.GetComponent<Renderer>().enabled = false;
+        m16.GetComponent<Renderer>().enabled = false;
     }
 
     public void get_Animator(int value)
