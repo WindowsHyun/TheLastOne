@@ -21,6 +21,7 @@ struct xyz {
 
 class Game_Client {
 private:
+	int client_id = -1;
 	xyz position;
 	xyz rotation;
 	int hp = -1;
@@ -55,15 +56,15 @@ public:
 
 
 
-	void set_prev_packet(int size) { this->prev_packet_data = size; };				// 클라이언트 패킷 사이즈 저장
-	void set_curr_packet(int size) { this->curr_packet_size = size; };				// 클라이언트 패킷 사이즈 저장
-	void set_client_position(xyz position) { this->position = position; };			// 클라이언트 포지션 저장
-	void set_client_rotation(xyz rotation) { this->rotation = rotation; };			// 클라이언트 로테이션 저장
-	void set_client_animator(int value) { this->animator = value; };					// 클라이언트 애니메이션 저장
-	void set_client_shotting(bool value) { this->shotting = value; };				// 클라이언트 Shot 저장
-	void set_Client(SOCKET sock, char * game_id);
+	void set_prev_packet(const int size) { this->prev_packet_data = size; };				// 클라이언트 패킷 사이즈 저장
+	void set_curr_packet(const int size) { this->curr_packet_size = size; };				// 클라이언트 패킷 사이즈 저장
+	void set_client_position(const xyz position) { this->position = position; };			// 클라이언트 포지션 저장
+	void set_client_rotation(const xyz rotation) { this->rotation = rotation; };			// 클라이언트 로테이션 저장
+	void set_client_animator(const int value) { this->animator = value; };					// 클라이언트 애니메이션 저장
+	void set_client_shotting(const bool value) { this->shotting = value; };				// 클라이언트 Shot 저장
 
-	Game_Client();
+	Game_Client(const SOCKET sock, const int client_id, const char * game_id);
+	Game_Client(const Game_Client& g_cl);
 	~Game_Client();
 };
 

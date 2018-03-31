@@ -47,6 +47,13 @@ private:
 	SOCKET g_socket;
 	std::chrono::high_resolution_clock::time_point serverTimer;
 	HANDLE g_hiocp;
+	//-------------------------------------------------------------------------------------
+	// 접속된 인원이 총 몇명인지 관리를 한다.
+	std::mutex cp_lock;
+	int connected_Person = 0;
+	void set_Person(int value);
+	int get_Person() { return connected_Person; }
+	//-------------------------------------------------------------------------------------
 	void initServer();
 	void err_quit(char *msg);							// Error 나올 경우 종료
 	void err_display(char *msg, int err_no);		// Error 표시 해주기

@@ -20,15 +20,21 @@ void Game_Client::init()
 	this->curr_packet_size = 0;
 }
 
-void Game_Client::set_Client(SOCKET sock, char * game_id)
+Game_Client::Game_Client(const SOCKET sock, const int client_id, const char * game_id)
 {
 	this->connect = true;
 	this->client_socket = sock;
+	this->client_id = client_id;
 	strncpy(this->nickName, game_id, 10);
 }
 
-Game_Client::Game_Client()
+Game_Client::Game_Client(const Game_Client & g_cl)
 {
+	this->connect = true;
+	this->client_socket = g_cl.client_socket;
+	this->client_id = g_cl.client_id;
+	strncpy(this->nickName, g_cl.nickName, 10);
+
 }
 
 Game_Client::~Game_Client()

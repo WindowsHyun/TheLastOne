@@ -2,7 +2,8 @@
 #include "Game_Client.h"
 #include "Timer.h"
 
-Game_Client *g_clients = new Game_Client[MAX_Client];
+//Game_Client *g_clients = new Game_Client[MAX_Client];
+std::vector <Game_Client > g_clients;
 Server_Timer Timer;
 
 IOCP_Server::IOCP_Server()
@@ -15,6 +16,13 @@ IOCP_Server::IOCP_Server()
 IOCP_Server::~IOCP_Server()
 {
 	Shutdown_Server();
+}
+
+void IOCP_Server::set_Person(int value)
+{
+	cp_lock.lock();
+	connected_Person += value;
+	cp_lock.unlock();
 }
 
 void IOCP_Server::initServer()
@@ -34,9 +42,7 @@ void IOCP_Server::initServer()
 	bind(g_socket, reinterpret_cast<sockaddr *>(&ServerAddr), sizeof(ServerAddr));
 	listen(g_socket, 5);
 
-	for (int i = 0; i < MAX_Client; ++i) {
-		g_clients[i].init();
-	}
+
 	std::cout << "init Complete..!" << std::endl;
 }
 
@@ -74,6 +80,8 @@ void IOCP_Server::makeThread()
 
 	std::thread accept_tread{ &IOCP_Server::Accept_Thread, this };
 
+	// Vector을 사용하기 때문에 나간 인원 체크를 하여 vector을 제거해줄 스레드도 만들어야 한다.
+
 	Timer.initTimer(g_hiocp);		// 타이머 스레드를 만들어 준다.
 
 	accept_tread.join();
@@ -96,13 +104,13 @@ void IOCP_Server::Worker_Thread()
 		if (FALSE == ret) {
 			int err_no = WSAGetLastError();
 			if (err_no == 64)
-				DisconnectClient(ci);
+				DisconnectClient((int)ci);
 			else
 				err_display((char *)"QOCS : ", WSAGetLastError());
 		}
 
 		if (0 == io_size) {
-			DisconnectClient(ci);
+			DisconnectClient((int)ci);
 			continue;
 		}
 
@@ -152,14 +160,14 @@ void IOCP_Server::Worker_Thread()
 			delete over;
 		}
 		else if (OP_InitTime == over->event_type) {
-			Send_All_Time(T_InitTime, ci, -1, true);
+			Send_All_Time(T_InitTime, (int)ci, -1, true);
 			if (ci <= 0) {
 				// 초기 대기시간이 만료 되었을 경우
 				std::cout << "OP_InitTime이 완료 되었습니다..!" << std::endl;
 			}
 			else {
 				// ci-1 을 한 이유는 1초씩 내리기 위하여.
-				Timer_Event t = { ci - 1, high_resolution_clock::now() + 1s, E_initTime };
+				Timer_Event t = { (int)ci - 1, high_resolution_clock::now() + 1s, E_initTime };
 				Timer.setTimerEvent(t);
 			}
 
@@ -190,30 +198,26 @@ void IOCP_Server::Accept_Thread()
 			int err_no = WSAGetLastError();
 			err_display((char *)"WSAAccept : ", err_no);
 		}
-		int new_id = -1;
-		for (int i = 0; i < MAX_Client; ++i) {
-			if (g_clients[i].get_Connect() == false) {
-				new_id = i;
-#if (DebugMod == TRUE )
-				std::cout << "New Client : " << new_id << std::endl;
-#endif
-				break;
-			}
-		}
 
-		if (new_id == -1) {
+		int new_id = get_Person();
+		std::cout << "New Client : " << new_id << std::endl;
+		set_Person(1);	// 추가로 인원이 들어왔으니 1을 넣어 증가 해준다.
+
+		if (get_Person() >= MAX_Client) {
 #if (DebugMod == TRUE )
 			std::cout << "설정된 인원 이상으로 접속하여 차단하였습니다..!" << std::endl;
 #endif
 			closesocket(new_client);
 			continue;
 		}
-
-		//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------------------------------------
 		// 들어온 접속 아이디 init 처리
-		g_clients[new_id].set_Client(new_client, (char *)"TheLastOne");
+		g_clients.emplace_back(Game_Client{new_client, new_id, (char *)"TheLastOne"});	// Vector에 넣어준다.
 		Send_Client_ID(new_id, SC_ID, false);		// 클라이언트에게 자신의 아이디를 보내준다.
 		//---------------------------------------------------------------------------------------------------------------------------------------------------
+
+		g_clients.at(new_id);
+
 		DWORD recv_flag = 0;
 		CreateIoCompletionPort(reinterpret_cast<HANDLE>(new_client), g_hiocp, new_id, 0);
 		int ret = WSARecv(new_client, &g_clients[new_id].recv_over.wsabuf, 1, NULL, &recv_flag, &g_clients[new_id].recv_over.over, NULL);
@@ -312,7 +316,7 @@ void IOCP_Server::SendPacket(int type, int cl, void * packet, int psize)
 
 		// 클라이언트에게 패킷 전송시 <패킷크기 | 패킷 타입> 으로 전송을 한다.
 		itoa(psize + 8, p_size, 10);
-		int buf_len = strlen(p_size);
+		int buf_len = (int)strlen(p_size);
 		p_size[buf_len] = '|';
 		p_size[buf_len + 1] = int(type);
 
