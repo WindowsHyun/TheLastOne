@@ -43,10 +43,6 @@ public class OtherPlayerCtrl : MonoBehaviour
     // 총알 발사 사운드
     public AudioClip fireSfx;
 
-    // 무기 정보 저장
-    public GameObject ak47;
-    public GameObject m16;
-
     // AudioSource 컴포넌트를 저장할 변수
     private AudioSource source = null;
 
@@ -198,7 +194,7 @@ public class OtherPlayerCtrl : MonoBehaviour
         } while (true);
 
 
-        //yield return null;
+        yield return null;
     }
 
 
