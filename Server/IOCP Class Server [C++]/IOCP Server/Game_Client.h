@@ -42,6 +42,7 @@ public:
 
 	void init();
 
+	int get_client_id() { return this->client_id; }																// 클라이언트 아이디 전달
 	int get_hp() { return this->hp; };																			// 클라이언트 체력 전달
 	int get_animator() { return this->animator; };															// 클라이언트 애니메이션 전달
 	int get_shotting() { return this->shotting; };																// 클라이언트 Shot 전달
@@ -62,6 +63,8 @@ public:
 	void set_client_rotation(const xyz rotation) { this->rotation = rotation; };			// 클라이언트 로테이션 저장
 	void set_client_animator(const int value) { this->animator = value; };					// 클라이언트 애니메이션 저장
 	void set_client_shotting(const bool value) { this->shotting = value; };				// 클라이언트 Shot 저장
+	void set_client_Connect(const bool value) { this->connect = value; };				// 클라이언트 Connect 저장
+
 
 	Game_Client(const SOCKET sock, const int client_id, const char * game_id);
 	Game_Client(const Game_Client& g_cl);

@@ -15,6 +15,8 @@
 #include <winsock2.h>
 #include <iostream>
 #include <vector>
+#include <unordered_map>
+#include <stack>
 #include <thread>
 #include <random>
 #include <windows.h>
@@ -39,7 +41,6 @@ using namespace Game::TheLastOne; // Flatbuffers를 읽어오자.
 // 게임 설정
 #define DebugMod TRUE
 //---------------------------------------------------------------------------------------------
-
 
 class IOCP_Server {
 

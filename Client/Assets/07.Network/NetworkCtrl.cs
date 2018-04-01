@@ -64,6 +64,15 @@ namespace TheLastOne.Game.Network
 
         private const int MaxClient = 50;    // 최대 동접자수
         public static Client_Data[] client_data = new Client_Data[MaxClient];      // 클라이언트 데이터 저장할 구조체
+        /*
+         Dictionary, Hashtable을 사용하려 하였지만, 
+         Dic의 경우 Value 값을 수정하려면 임시 변수에 복사를 한후 수정하고 다시 복사를 해줘야 한다.
+         결국 복사하는 시간이 발생하여 오히려 오버헤드가 일어 날 수 있다.
+         Hashtable의 경우 Value값을 미리 지정을 하지 않고 자유롭게 넣을 수 있는 장점이 있으나,
+         실제 Value 값을 수정을 하기 위해서는 foreach 혹은 Client_Data를 변환 하여서 가져오고 다시 대입을 해줘야 한다.
+         미리 지정된 방식이 없으므로, Client_Data 구조체 내부를 가져올 수가 없다.
+         결국 서버에서 클라이언트 고유번호를 처리 하는 방식으로 생각을 해야 겠다.
+        */
         private static int Client_imei = -1;         // 자신의 클라이언트 아이디
 
         Socket_SendFunction sF = new Socket_SendFunction();

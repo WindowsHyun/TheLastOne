@@ -3,7 +3,11 @@
 #include "Timer.h"
 
 //Game_Client *g_clients = new Game_Client[MAX_Client];
-std::vector <Game_Client > g_clients;
+//std::vector <Game_Client > g_clients;
+
+std::unordered_map< int, Game_Client>::iterator get_client_iter(int ci);
+std::unordered_map< int, Game_Client> g_clients;
+std::stack<int> remove_client_id;
 Server_Timer Timer;
 
 IOCP_Server::IOCP_Server()
@@ -41,7 +45,6 @@ void IOCP_Server::initServer()
 
 	bind(g_socket, reinterpret_cast<sockaddr *>(&ServerAddr), sizeof(ServerAddr));
 	listen(g_socket, 5);
-
 
 	std::cout << "init Complete..!" << std::endl;
 }
@@ -101,6 +104,8 @@ void IOCP_Server::Worker_Thread()
 		OverlappedEx *over;
 		BOOL ret = GetQueuedCompletionStatus(g_hiocp, &io_size, &ci, reinterpret_cast<LPWSAOVERLAPPED *>(&over), INFINITE);
 
+		auto client = get_client_iter((int)ci);
+
 		if (FALSE == ret) {
 			int err_no = WSAGetLastError();
 			if (err_no == 64)
@@ -119,17 +124,17 @@ void IOCP_Server::Worker_Thread()
 			//std::cout << "RECV from Client : " << ci << std::endl;
 			//std::cout << "IO_SIZE : " << io_size << std::endl;
 #endif
-			unsigned char *buf = g_clients[ci].recv_over.IOCP_buf;
+			unsigned char *buf = client->second.recv_over.IOCP_buf;
 
-			unsigned psize = g_clients[ci].get_curr_packet();
-			unsigned pr_size = g_clients[ci].get_prev_packet();
+			unsigned psize = client->second.get_curr_packet();
+			unsigned pr_size = client->second.get_prev_packet();
 			while (io_size != 0) {
 				if (0 == psize) psize = buf[0] + 4;
 				// 0일 경우[바로전 패킷이 처리가 끝나고 새피킷으로 시작해도 된다. / 처음 받는다] 강제로 정해준다.
 				if (io_size + pr_size >= psize) {
 					// 지금 패킷 완성이 가능하다.
 					char packet[MAX_PACKET_SIZE];
-					memcpy(packet, g_clients[ci].packet_buf, pr_size);
+					memcpy(packet, client->second.packet_buf, pr_size);
 					memcpy(packet + pr_size, buf, psize - pr_size);
 					ProcessPacket(static_cast<int>(ci), packet);
 					io_size -= psize - pr_size;
@@ -137,15 +142,15 @@ void IOCP_Server::Worker_Thread()
 					psize = 0; pr_size = 0;
 				}
 				else {
-					memcpy(g_clients[ci].packet_buf + pr_size, buf, io_size);
+					memcpy(client->second.packet_buf + pr_size, buf, io_size);
 					pr_size += io_size;
 					io_size = 0;
 				}
 			}
-			g_clients[ci].set_curr_packet(psize);
-			g_clients[ci].set_prev_packet(pr_size);
+			client->second.set_curr_packet(psize);
+			client->second.set_prev_packet(pr_size);
 			DWORD recv_flag = 0;
-			WSARecv(g_clients[ci].get_Socket(), &g_clients[ci].recv_over.wsabuf, 1, NULL, &recv_flag, &g_clients[ci].recv_over.over, NULL);
+			WSARecv(client->second.get_Socket(), &client->second.recv_over.wsabuf, 1, NULL, &recv_flag, &client->second.recv_over.over, NULL);
 
 		}
 		else if (OP_SEND == over->event_type) {
@@ -153,8 +158,8 @@ void IOCP_Server::Worker_Thread()
 #if (DebugMod == TRUE )
 				std::cout << "Send Incomplete Error!" << std::endl;
 #endif
-				closesocket(g_clients[ci].get_Socket());
-				g_clients[ci].init();
+				closesocket(client->second.get_Socket());
+				client->second.init();
 				exit(-1);
 			}
 			delete over;
@@ -199,28 +204,43 @@ void IOCP_Server::Accept_Thread()
 			err_display((char *)"WSAAccept : ", err_no);
 		}
 
-		int new_id = get_Person();
-		std::cout << "New Client : " << new_id << std::endl;
-		set_Person(1);	// 추가로 인원이 들어왔으니 1을 넣어 증가 해준다.
 
-		if (get_Person() >= MAX_Client) {
+		int new_id;
+
+		if (remove_client_id.empty()) {
+			// 스택에 값이 없을 경우 기존 값을 가져온다.
+			new_id = get_Person();
+			set_Person(1);	// 인원을 한명 늘려준다.
+		}
+		else {
+			// 스택에 값이 있을경우 스택 값을 가져온다.
+			new_id = remove_client_id.top();
+			remove_client_id.pop();
+		}
+		std::cout << "New Client : " << new_id << std::endl;
+
+		if (g_clients.size() >= MAX_Client) {
 #if (DebugMod == TRUE )
 			std::cout << "설정된 인원 이상으로 접속하여 차단하였습니다..!" << std::endl;
 #endif
 			closesocket(new_client);
 			continue;
 		}
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+		//---------------------------------------------------------------------------------------------------------------------------------------------------
 		// 들어온 접속 아이디 init 처리
-		g_clients.emplace_back(Game_Client{new_client, new_id, (char *)"TheLastOne"});	// Vector에 넣어준다.
+		g_clients.insert(std::pair< int, Game_Client>(new_id, { new_client, new_id, (char *)"TheLastOne" }));	// Map에 넣어준다.
 		Send_Client_ID(new_id, SC_ID, false);		// 클라이언트에게 자신의 아이디를 보내준다.
 		//---------------------------------------------------------------------------------------------------------------------------------------------------
-
-		g_clients.at(new_id);
+		// map에 들어간 클라이언트를 찾는다.
+		auto client = get_client_iter(new_id);
+		//client->second.init();
+		//---------------------------------------------------------------------------------------------------------------------------------------------------
 
 		DWORD recv_flag = 0;
 		CreateIoCompletionPort(reinterpret_cast<HANDLE>(new_client), g_hiocp, new_id, 0);
-		int ret = WSARecv(new_client, &g_clients[new_id].recv_over.wsabuf, 1, NULL, &recv_flag, &g_clients[new_id].recv_over.over, NULL);
+
+
+		int ret = WSARecv(new_client, &client->second.recv_over.wsabuf, 1, NULL, &recv_flag, &client->second.recv_over.over, NULL);
 
 		if (0 != ret) {
 			int error_no = WSAGetLastError();
@@ -244,11 +264,15 @@ void IOCP_Server::Shutdown_Server()
 
 void IOCP_Server::DisconnectClient(int ci)
 {
-	g_clients[ci].init();
+	auto client = get_client_iter(ci);
 
 	Send_Client_ID(ci, SC_REMOVE_PLAYER, true);
-	closesocket(g_clients[ci].get_Socket());
+	client->second.set_client_Connect(false);
+	closesocket(client->second.get_Socket());
+	g_clients.erase(client);		// Map 에서 해당 클라이언트를 삭제한다.
+	remove_client_id.push(ci);	// 나간 클라이언트 번호를 스택에 넣어준다.
 	std::cout << "Disconnect Client : " << ci << std::endl;
+
 }
 
 void IOCP_Server::ProcessPacket(int ci, char * packet)
@@ -258,6 +282,9 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 	bool all_Client_Packet = false;	// 모든 클라이언트에게 보낼 때는 True
 	for (int i = 4; i < MAX_PACKET_SIZE; ++i)
 		get_packet[i - 4] = packet[i];
+
+	auto client = get_client_iter(ci);
+
 	try {
 		switch (packet[1]) {
 		case CS_Info:
@@ -265,16 +292,17 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 			auto client_View = GetClientView(get_packet);
 			xyz packet_position{ client_View->position()->x() , client_View->position()->y() , client_View->position()->z() };
 			xyz packet_rotation{ client_View->rotation()->x() , client_View->rotation()->y() , client_View->rotation()->z() };
-			g_clients[ci].set_client_position(packet_position);
-			g_clients[ci].set_client_rotation(packet_rotation);
-			g_clients[ci].set_client_animator(client_View->animator());
+			client->second.set_client_position(packet_position);
+			client->second.set_client_rotation(packet_rotation);
+			client->second.set_client_animator(client_View->animator());
 		}
 		break;
 
 		case CS_Shot_info:
 		{
 			auto client_Shot_View = GetClient_Shot_infoView(get_packet);
-			g_clients[client_Shot_View->id()].set_client_shotting(true);
+			auto client = get_client_iter(client_Shot_View->id());
+			client->second.set_client_shotting(true);
 			all_Client_Packet = true;
 		}
 		case CS_Check_info:
@@ -307,7 +335,9 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 
 void IOCP_Server::SendPacket(int type, int cl, void * packet, int psize)
 {
-	if (g_clients[cl].get_Connect() == true) {
+	auto client = get_client_iter(cl);
+
+	if (client->second.get_Connect() == true) {
 		//int ptype = reinterpret_cast<unsigned char *>(packet)[1];
 		OverlappedEx *over = new OverlappedEx;
 		ZeroMemory(&over->over, sizeof(over->over));
@@ -329,7 +359,7 @@ void IOCP_Server::SendPacket(int type, int cl, void * packet, int psize)
 
 		over->wsabuf.buf = reinterpret_cast<CHAR *>(p_size);
 		over->wsabuf.len = psize + 8;
-		int res = WSASend(g_clients[cl].get_Socket(), &over->wsabuf, 1, NULL, 0, &over->over, NULL);
+		int res = WSASend(client->second.get_Socket(), &over->wsabuf, 1, NULL, 0, &over->over, NULL);
 		if (0 != res) {
 			int error_no = WSAGetLastError();
 			if (WSA_IO_PENDING != error_no) {
@@ -351,10 +381,10 @@ void IOCP_Server::Send_Client_ID(int client_id, int value, bool allClient)
 
 	if (allClient == true) {
 		// 모든 클라이언트 에게 나갔다는 것을 보내준다..!
-		for (int i = 0; i < MAX_Client; ++i) {
-			if (g_clients[i].get_Connect() != true)
+		for (auto iter : g_clients) {
+			if (iter.second.get_Connect() != true)
 				continue;
-			SendPacket(value, i, builder.GetBufferPointer(), builder.GetSize());
+			SendPacket(value, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
 		}
 	}
 	else {
@@ -369,16 +399,16 @@ void IOCP_Server::Send_All_Data(int client, bool allClient)
 
 	std::vector<flatbuffers::Offset<Client_info>> Individual_client;		// 개인 데이터
 
-	for (int i = 0; i < MAX_Client; ++i) {
-		if (g_clients[i].get_Connect() != true)
+	for (auto iter : g_clients) {
+		if (iter.second.get_Connect() != true)
 			continue;
-		auto id = i;
-		auto name = builder.CreateString(g_clients[i].nickName);
-		auto hp = g_clients[i].get_hp();
-		auto animator = g_clients[i].get_animator();
-		auto shot = g_clients[i].get_shotting();
-		auto xyz = g_clients[i].get_position();
-		auto rotation = g_clients[i].get_rotation();
+		auto id = iter.second.get_client_id();
+		auto name = builder.CreateString(iter.second.nickName);
+		auto hp = iter.second.get_hp();
+		auto animator = iter.second.get_animator();
+		auto shot = iter.second.get_shotting();
+		auto xyz = iter.second.get_position();
+		auto rotation = iter.second.get_rotation();
 		auto client_data = CreateClient_info(builder, id, hp, animator, shot, name, &xyz, &rotation);
 		// client_data 라는 테이블에 클라이언트 데이터가 들어가 있다.
 
@@ -392,12 +422,13 @@ void IOCP_Server::Send_All_Data(int client, bool allClient)
 
 	if (allClient == true) {
 		// 모든 클라이언트에다가 전송을 필요로 할때만 전송 한다.
-		for (int i = 0; i < MAX_Client; ++i) {
-			if (g_clients[i].get_Connect() != true)
+		for (auto iter : g_clients) {
+			if (iter.second.get_Connect() != true)
 				continue;
-			SendPacket(SC_Client_Data, i, builder.GetBufferPointer(), builder.GetSize());
+			SendPacket(SC_Client_Data, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
 		}
-		g_clients[client].set_client_shotting(false);
+		auto clients = get_client_iter(client);
+		clients->second.set_client_shotting(false);
 	}
 	else {
 		SendPacket(SC_Client_Data, client, builder.GetBufferPointer(), builder.GetSize());
@@ -415,13 +446,23 @@ void IOCP_Server::Send_All_Time(int kind, int time, int client_id, bool allClien
 
 	if (allClient == true) {
 		// 모든 클라이언트 에게 나갔다는 것을 보내준다..!
-		for (int i = 0; i < MAX_Client; ++i) {
-			if (g_clients[i].get_Connect() != true)
+		for (auto iter : g_clients) {
+			if (iter.second.get_Connect() != true)
 				continue;
-			SendPacket(SC_Server_Time, i, builder.GetBufferPointer(), builder.GetSize());
+			SendPacket(SC_Server_Time, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
 		}
 	}
 	else {
 		SendPacket(SC_Server_Time, client_id, builder.GetBufferPointer(), builder.GetSize());
+	}
+}
+
+
+std::unordered_map< int, Game_Client>::iterator get_client_iter(int ci) {
+	if (g_clients.count(ci) == 0) {
+		return g_clients.end();
+	}
+	else {
+		return g_clients.find(ci);
 	}
 }
