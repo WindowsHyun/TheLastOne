@@ -178,13 +178,10 @@ public class PlayerCtrl : MonoBehaviour
     public void RenewUpdate()
     {
         foreach (SlotCtrl sCtrl in slotctrl)
-        {//sCtrl.slot.Peek().type.ToString() == "Ammunition762"
+        {
             if (sCtrl.isSlots() == true)
             {
-                if (sCtrl.slot.Count >= 1)
-                    sCtrl.text.text = sCtrl.slot.Peek().getItemCount().ToString();
-                else
-                    sCtrl.text.text = "";
+                sCtrl.external_slotUpdate();
             }
         }
     }
@@ -388,10 +385,12 @@ public class PlayerCtrl : MonoBehaviour
         if (m16Set == true)
         {
             slot.slot.Peek().setItemCount(-1);
+            RenewUpdate();
         }
         else if (ak47Set == true)
         {
             slot.slot.Peek().setItemCount(-1);
+            RenewUpdate();
             //bullet762--;
         }
 

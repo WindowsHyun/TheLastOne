@@ -110,6 +110,11 @@ public class SlotCtrl : MonoBehaviour
         UpdateInfo(isSlot, ItemImg.sprite);
     }
 
+    public void external_slotUpdate()
+    {
+        UpdateInfo(isSlot, ItemImg.sprite);
+    }
+
     // 슬롯에 대한 각종 정보 업데이트.
     public void UpdateInfo(bool value, Sprite sprite)
     {

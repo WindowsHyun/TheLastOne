@@ -13,6 +13,7 @@ void Game_Client::init()
 	this->animator = 0;
 	this->connect = false;
 	this->shotting = false;
+	this->remove_client = false;
 	ZeroMemory(&this->recv_over, sizeof(this->recv_over));
 	this->recv_over.event_type = OP_RECV;
 	this->recv_over.wsabuf.buf = reinterpret_cast<CHAR *>(this->recv_over.IOCP_buf);
@@ -24,6 +25,7 @@ void Game_Client::init()
 Game_Client::Game_Client(const SOCKET sock, const int client_id, const char * game_id)
 {
 	this->connect = true;
+	this->remove_client = false;
 	this->client_socket = sock;
 	this->client_id = client_id;
 	strncpy(this->nickName, game_id, 10);
@@ -51,7 +53,7 @@ Game_Client::Game_Client(const Game_Client & g_cl)
 	this->client_socket = g_cl.client_socket;
 	this->client_id = g_cl.client_id;
 	strncpy(this->nickName, g_cl.nickName, 10);
-
+	this->remove_client = g_cl.remove_client;
 	this->position.x = g_cl.position.x;
 	this->position.y = g_cl.position.y;
 	this->position.z = g_cl.position.z;

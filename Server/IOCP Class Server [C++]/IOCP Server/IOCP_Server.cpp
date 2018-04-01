@@ -83,8 +83,6 @@ void IOCP_Server::makeThread()
 
 	std::thread accept_tread{ &IOCP_Server::Accept_Thread, this };
 
-	// Vector을 사용하기 때문에 나간 인원 체크를 하여 vector을 제거해줄 스레드도 만들어야 한다.
-
 	Timer.initTimer(g_hiocp);		// 타이머 스레드를 만들어 준다.
 
 	accept_tread.join();
@@ -177,6 +175,14 @@ void IOCP_Server::Worker_Thread()
 			}
 
 		}
+		else if (OP_RemoveClient == over->event_type) {
+			// 1초마다 한번씩 종료된 클라이언트를 지워 준다.
+			Remove_Client();
+
+			Timer_Event t = { 1, high_resolution_clock::now() + 1s, E_Remove_Client };
+			Timer.setTimerEvent(t);
+
+		}
 		else {
 #if (DebugMod == TRUE )
 			std::cout << "Unknown GQCS event!" << std::endl;
@@ -255,6 +261,22 @@ void IOCP_Server::Accept_Thread()
 	}	// while(true)
 }
 
+void IOCP_Server::Remove_Client()
+{
+	for (auto iter = g_clients.begin(); iter != g_clients.end();) {
+		if (iter->second.get_Connect() == false && iter->second.get_Remove() == true) {
+			std::cout << "Disconnect Client : " << iter->second.get_client_id() << std::endl;
+			Send_Client_ID(iter->second.get_client_id(), SC_REMOVE_PLAYER, true);
+			closesocket(iter->second.get_Socket());
+			remove_client_id.push(iter->second.get_client_id());	// 종료된 클라이언트 번호를 스택에 넣어준다.
+			g_clients.erase(iter++);		// Map 에서 해당 클라이언트를 삭제한다.
+		}
+		else {
+			++iter;
+		}
+	}
+}
+
 void IOCP_Server::Shutdown_Server()
 {
 	closesocket(g_socket);
@@ -264,15 +286,10 @@ void IOCP_Server::Shutdown_Server()
 
 void IOCP_Server::DisconnectClient(int ci)
 {
+	// Disconnect시 Remove_Client에서 지울 수 있게 값을 변경 해준다.
 	auto client = get_client_iter(ci);
-
-	Send_Client_ID(ci, SC_REMOVE_PLAYER, true);
 	client->second.set_client_Connect(false);
-	closesocket(client->second.get_Socket());
-	g_clients.erase(client);		// Map 에서 해당 클라이언트를 삭제한다.
-	remove_client_id.push(ci);	// 나간 클라이언트 번호를 스택에 넣어준다.
-	std::cout << "Disconnect Client : " << ci << std::endl;
-
+	client->second.set_client_Remove(true);
 }
 
 void IOCP_Server::ProcessPacket(int ci, char * packet)
@@ -337,34 +354,37 @@ void IOCP_Server::SendPacket(int type, int cl, void * packet, int psize)
 {
 	auto client = get_client_iter(cl);
 
-	if (client->second.get_Connect() == true) {
-		//int ptype = reinterpret_cast<unsigned char *>(packet)[1];
-		OverlappedEx *over = new OverlappedEx;
-		ZeroMemory(&over->over, sizeof(over->over));
-		over->event_type = OP_SEND;
-		char p_size[MAX_PACKET_SIZE]{ 0 };
+	if (client != g_clients.end()) {
+		// client가 map 안에 정상적으로 있을 경우에만 작업을 한다.
+		if (client->second.get_Socket() != NULL) {
+			//int ptype = reinterpret_cast<unsigned char *>(packet)[1];
+			OverlappedEx *over = new OverlappedEx;
+			ZeroMemory(&over->over, sizeof(over->over));
+			over->event_type = OP_SEND;
+			char p_size[MAX_PACKET_SIZE]{ 0 };
 
-		// 클라이언트에게 패킷 전송시 <패킷크기 | 패킷 타입> 으로 전송을 한다.
-		itoa(psize + 8, p_size, 10);
-		int buf_len = (int)strlen(p_size);
-		p_size[buf_len] = '|';
-		p_size[buf_len + 1] = int(type);
+			// 클라이언트에게 패킷 전송시 <패킷크기 | 패킷 타입> 으로 전송을 한다.
+			itoa(psize + 8, p_size, 10);
+			int buf_len = (int)strlen(p_size);
+			p_size[buf_len] = '|';
+			p_size[buf_len + 1] = int(type);
 
-		// 패킷 사이즈를 미리 합쳐서 보내줘야한다.
-		memcpy(over->IOCP_buf, packet, psize);
+			// 패킷 사이즈를 미리 합쳐서 보내줘야한다.
+			memcpy(over->IOCP_buf, packet, psize);
 
-		for (int i = 8; i < psize + 8; ++i) {
-			p_size[i] = over->IOCP_buf[i - 8];
-		}
+			for (int i = 8; i < psize + 8; ++i) {
+				p_size[i] = over->IOCP_buf[i - 8];
+			}
 
-		over->wsabuf.buf = reinterpret_cast<CHAR *>(p_size);
-		over->wsabuf.len = psize + 8;
-		int res = WSASend(client->second.get_Socket(), &over->wsabuf, 1, NULL, 0, &over->over, NULL);
-		if (0 != res) {
-			int error_no = WSAGetLastError();
-			if (WSA_IO_PENDING != error_no) {
-				err_display((char *)"SendPacket:WSASend", error_no);
-				DisconnectClient(cl);
+			over->wsabuf.buf = reinterpret_cast<CHAR *>(p_size);
+			over->wsabuf.len = psize + 8;
+			int res = WSASend(client->second.get_Socket(), &over->wsabuf, 1, NULL, 0, &over->over, NULL);
+			if (0 != res) {
+				int error_no = WSAGetLastError();
+				if (WSA_IO_PENDING != error_no) {
+					/*err_display((char *)"SendPacket:WSASend", error_no);
+					DisconnectClient(cl);*/
+				}
 			}
 		}
 	}
@@ -372,25 +392,29 @@ void IOCP_Server::SendPacket(int type, int cl, void * packet, int psize)
 
 void IOCP_Server::Send_Client_ID(int client_id, int value, bool allClient)
 {
-	// value = 아이디를 추가 or 삭제 할때 사용.
-	flatbuffers::FlatBufferBuilder builder;
-	auto Client_id = client_id;
-	auto orc = CreateClient_id(builder, Client_id);
-	builder.Finish(orc); // Serialize the root of the object.
+	try {
+		// value = 아이디를 추가 or 삭제 할때 사용.
+		flatbuffers::FlatBufferBuilder builder;
+		auto Client_id = client_id;
+		auto orc = CreateClient_id(builder, Client_id);
+		builder.Finish(orc); // Serialize the root of the object.
 
 
-	if (allClient == true) {
-		// 모든 클라이언트 에게 나갔다는 것을 보내준다..!
-		for (auto iter : g_clients) {
-			if (iter.second.get_Connect() != true)
-				continue;
-			SendPacket(value, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
+		if (allClient == true) {
+			// 모든 클라이언트 에게 나갔다는 것을 보내준다..!
+			for (auto iter : g_clients) {
+				if (iter.second.get_Connect() != true)
+					continue;
+				SendPacket(value, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
+			}
+		}
+		else {
+			SendPacket(value, client_id, builder.GetBufferPointer(), builder.GetSize());
 		}
 	}
-	else {
-		SendPacket(value, client_id, builder.GetBufferPointer(), builder.GetSize());
+	catch (int exceptionCode) {
+		std::cout << "Error : " << exceptionCode << std::endl;
 	}
-
 }
 
 void IOCP_Server::Send_All_Data(int client, bool allClient)
@@ -459,10 +483,5 @@ void IOCP_Server::Send_All_Time(int kind, int time, int client_id, bool allClien
 
 
 std::unordered_map< int, Game_Client>::iterator get_client_iter(int ci) {
-	if (g_clients.count(ci) == 0) {
-		return g_clients.end();
-	}
-	else {
-		return g_clients.find(ci);
-	}
+	return g_clients.find(ci);
 }
