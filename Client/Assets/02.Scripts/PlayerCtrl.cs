@@ -96,10 +96,38 @@ public class PlayerCtrl : MonoBehaviour
     // 총 발사 가능 체크
     public bool shotable;
 
+    // 인벤토리 창 키입력 변수
+    private bool inventoryShow = false;
+
+    // 인벤토리 정보 저장
+    public GameObject inventory;
+
+
+    // 헤결의 실마리가 보인다 ?
+    public SlotCtrl[] slotctrl;
 
 
     void Start()
     {
+        // 게임 하차 시 인벤토리 창을 끈다.
+        inventory.SetActive(false);
+
+
+        // 드디어!!!!!!!!!!!!!!!! 이걸로 뭔가 해결 할 수 있을것 같다.
+        //
+        //
+        //
+        //
+
+        //
+        //
+        //
+        //
+        //
+
+
+
+
         // 생명 초기값 설정
         initHp = hp;
 
@@ -129,6 +157,9 @@ public class PlayerCtrl : MonoBehaviour
         ak47.GetComponent<Renderer>().enabled = false;
         m16.GetComponent<Renderer>().enabled = false;
 
+
+        slotctrl = inventory.GetComponentsInChildren<SlotCtrl>();
+
     }
 
     public void setBullet(string type, int value)
@@ -142,6 +173,40 @@ public class PlayerCtrl : MonoBehaviour
         {
             bullet556 = value;
         }
+    }
+
+    public void RenewUpdate()
+    {
+        foreach (SlotCtrl sCtrl in slotctrl)
+        {//sCtrl.slot.Peek().type.ToString() == "Ammunition762"
+            if (sCtrl.isSlots() == true)
+            {
+                if (sCtrl.slot.Count >= 1)
+                    sCtrl.text.text = sCtrl.slot.Peek().getItemCount().ToString();
+                else
+                    sCtrl.text.text = "";
+            }
+        }
+    }
+
+    public SlotCtrl get_Bullet(string value)
+    {
+        foreach (SlotCtrl sCtrl in slotctrl)
+        {
+            if (sCtrl.isSlots() == true)
+            {
+                if (sCtrl.slot.Peek().type.ToString() == "Ammunition762" && value == "Ammunition762")
+                {
+                    return sCtrl;
+                }
+                else if (sCtrl.slot.Peek().type.ToString() == "Ammunition556" && value == "Ammunition556")
+                {
+                    return sCtrl;
+                }
+
+            }
+        }
+        return null;
     }
 
     void Update()
@@ -221,39 +286,43 @@ public class PlayerCtrl : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.G))
             {
                 itemEat = true;
-                ItemSelection();
+                //ItemSelection();
 
 
             }
         }
 
+
+        SlotCtrl Test762 = get_Bullet("Ammunition762");
+        SlotCtrl Test556 = get_Bullet("Ammunition556");
+
         // 총이 장착이 되었을때만 발사 가능
         if (shotable == true)
         {
             // 어떠한 종류의 총알이 1발 이상 있을 시
-            if (bullet556 > 0 && showItem2 == true)
+            if (Test556 != null && Test556.slot.Peek().getItemCount() > 0 && showItem2 == true)
             {
 
                 if (Input.GetMouseButtonDown(0))
                 {
                     animator.SetBool("IsShot", true);
-                    Fire();
+                    Fire(Test556);
                     //animator.SetBool("IsTrace", true);
                     networkCtrl.Player_Shot();
                     Debug.Log("m16 발사");
-                    Debug.Log(bullet556);
+                    
                 }
             }
-            else if (bullet762 > 0 && showItem1 == true)
+            else if (Test762 != null && Test762.slot.Peek().getItemCount() > 0 && showItem1 == true)
             {
                 if (Input.GetMouseButtonDown(0))
                 {
                     animator.SetBool("IsShot", true);
-                    Fire();
+                    Fire(Test762);
                     //animator.SetBool("IsTrace", true);
                     networkCtrl.Player_Shot();
                     Debug.Log("ak47 발사");
-                    Debug.Log(bullet762);
+                    //Debug.Log(bullet762);
                 }
             }
         }
@@ -294,19 +363,36 @@ public class PlayerCtrl : MonoBehaviour
         }
 
 
+
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            if (inventoryShow == false)
+            {
+
+                inventory.SetActive(true);
+                inventoryShow = true;
+                RenewUpdate();
+            }
+            else if (inventoryShow == true)
+            {
+                inventory.SetActive(false);
+                inventoryShow = false;
+            }
+        }
     }
 
-    void Fire()
+    void Fire(SlotCtrl slot)
     {
         // 동적으로 총알을 생성하는 함수
         CreateBullet();
         if (m16Set == true)
         {
-            bullet556--;
+            slot.slot.Peek().setItemCount(-1);
         }
         else if (ak47Set == true)
         {
-            bullet762--;
+            slot.slot.Peek().setItemCount(-1);
+            //bullet762--;
         }
 
         // 사운드 발생 함수
@@ -491,17 +577,17 @@ public class PlayerCtrl : MonoBehaviour
     }
 
 
-    void ItemSelection()
-    {
-        if (itemEat == true && bullet556Set == true)
-        {
-            bullet556 += 30;
-        }
-        else if (itemEat == true && bullet762Set == true)
-        {
-            bullet762 += 30;
-        }
-    }
+    //void ItemSelection()
+    //{
+    //    if (itemEat == true && bullet556Set == true)
+    //    {
+    //        bullet556 += 30;
+    //    }
+    //    else if (itemEat == true && bullet762Set == true)
+    //    {
+    //        bullet762 += 30;
+    //    }
+    //}
 
 
     void CreateBloodEffect(Vector3 pos)

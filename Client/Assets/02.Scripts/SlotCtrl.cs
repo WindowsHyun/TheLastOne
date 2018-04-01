@@ -11,7 +11,7 @@ public class SlotCtrl : MonoBehaviour
     public Text text;       // 아이템에 개수를 표현해줄 텍스트
     public Sprite DefaultImg; // 슬롯에 있는 아이템을 다 사용할 경우 아무것도 없는 이미지를 넣어줄 필요가 있다
 
-    private Image ItemImg;
+    public Image ItemImg;
     private bool isSlot;     // 현재 슬롯이 비어있는지?
 
     public ItemCtrl ItemReturn() { return slot.Peek(); } // 슬롯에 존재하는 아이템이 뭔지 반환
@@ -66,8 +66,21 @@ public class SlotCtrl : MonoBehaviour
             slot.Push(item);
         }
 
+        player.setBullet(slot.Peek().type.ToString(), slot.Peek().getItemCount());
         UpdateInfo(true, item.DefaultImg);
     }
+
+    //public void UseBullet(string type,int value)
+    //{
+    //    if(slot.Peek().type.ToString() == "Ammunition762")
+    //    {
+    //        slot.Peek().itemCount -= value;
+    //    }
+    //    if (slot.Peek().type.ToString() == "Ammunition556")
+    //    {
+    //        slot.Peek().itemCount -= value;
+    //    }
+    //}
 
     // 아이템 사용.
     public void ItemUse()
@@ -109,7 +122,7 @@ public class SlotCtrl : MonoBehaviour
         this.isSlot = value;
         transform.GetChild(0).GetComponent<Image>().sprite = sprite;
 
-        player.setBullet(slot.Peek().type.ToString(), slot.Peek().getItemCount());
+        //
 
         if (slot.Count >= 1)
             text.text = slot.Peek().getItemCount().ToString();
@@ -117,5 +130,4 @@ public class SlotCtrl : MonoBehaviour
             text.text = "";
 
     }
-
 }
