@@ -29,7 +29,6 @@ public class SlotCtrl : MonoBehaviour
         // 스택 메모리 할당.
         slot = new Stack<ItemCtrl>();
 
-
         // 맨 처음엔 슬롯이 비어있다.
         isSlot = false;
 
@@ -66,21 +65,9 @@ public class SlotCtrl : MonoBehaviour
             slot.Push(item);
         }
 
-        player.setBullet(slot.Peek().type.ToString(), slot.Peek().getItemCount());
+        //player.setBullet(slot.Peek().type.ToString(), slot.Peek().getItemCount());
         UpdateInfo(true, item.DefaultImg);
     }
-
-    //public void UseBullet(string type,int value)
-    //{
-    //    if(slot.Peek().type.ToString() == "Ammunition762")
-    //    {
-    //        slot.Peek().itemCount -= value;
-    //    }
-    //    if (slot.Peek().type.ToString() == "Ammunition556")
-    //    {
-    //        slot.Peek().itemCount -= value;
-    //    }
-    //}
 
     // 아이템 사용.
     public void ItemUse()
@@ -105,8 +92,6 @@ public class SlotCtrl : MonoBehaviour
             slot.Peek().setItemCount(-1);
             //slot.Pop();
         }
-
-
         UpdateInfo(isSlot, ItemImg.sprite);
     }
 
@@ -118,16 +103,8 @@ public class SlotCtrl : MonoBehaviour
     // 슬롯에 대한 각종 정보 업데이트.
     public void UpdateInfo(bool value, Sprite sprite)
     {
-        //SetSlots(isSlot);                                          // 슬롯이 비어있다면 false 아니면 true 셋팅.
-        //ItemImg.sprite = sprite;                                   // 슬롯안에 들어있는 아이템의 이미지를 셋팅.
-        //text.text = slot.Count > 1 ? slot.Count.ToString() : " ";   // 아이템이 2개 이상일때면 텍스트로 표현.
-        ////ItemIO.SaveDate();  
-        //// 인벤토리에 변동사항이 생겼으므로 저장
-
         this.isSlot = value;
         transform.GetChild(0).GetComponent<Image>().sprite = sprite;
-
-        //
 
         if (slot.Count >= 1)
             text.text = slot.Peek().getItemCount().ToString();

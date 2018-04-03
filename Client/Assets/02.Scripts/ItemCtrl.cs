@@ -36,31 +36,6 @@ public class ItemCtrl : MonoBehaviour {
             gameObject.SetActive(false); // 아이템을 비활성화 시켜준다.
     }
 
-    //void OnTriggerEnter(Collider coll)
-    //{
-    //    if (coll.gameObject.tag == "Player")
-    //    {
-    //        PlayerCtrl playerCtrl = GameObject.Find("Player").GetComponent<PlayerCtrl>();
-    //        playerCtrl.itemEatPossible = true;
-    //        if (type == ItemType.Ammunition556)
-    //        {
-    //            playerCtrl.bullet556Set = true;
-    //        }
-    //        else if (type == ItemType.Ammunition762)
-    //        {
-    //            playerCtrl.bullet762Set = true;
-    //        }
-    //    }
-    //}
-
-    //void OnTriggerExit(Collider coll)
-    //{
-    //    PlayerCtrl playerCtrl = GameObject.Find("Player").GetComponent<PlayerCtrl>();
-    //    playerCtrl.itemEatPossible = false;
-    //    playerCtrl.bullet556Set = false;
-    //    playerCtrl.bullet762Set = false;
-    //}
-
     // 충돌체크
     void OnTriggerEnter(Collider _col)
     {

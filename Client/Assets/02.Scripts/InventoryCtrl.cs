@@ -4,19 +4,26 @@ using UnityEngine;
 
 public class InventoryCtrl : MonoBehaviour {
     // 공개
-    public List<GameObject> AllSlot;    // 모든 슬롯을 관리해줄 리스트
+    public List<GameObject> ItemAllSlot;    // 모든 아이템 슬롯을 관리해줄 리스트
+    public List<GameObject> WeaponAllSlot;  // 모든 무기 슬롯을 관리해줄 리스트
     public RectTransform InventoryRect;     // 인벤토리의 Rect
-    public GameObject OriginSlot;       // 오리지널 슬롯
+    public GameObject OriginSlot;       // 오리지널 아이템 슬롯
+    public GameObject WeaponSlot;       // 오리지널 무기 슬롯
 
-    public float slotSize;              // 슬롯의 사이즈
-    public float slotGap;               // 슬롯간 간격
-    public float slotCountX;            // 슬롯의 가로 개수
-    public float slotCountY;            // 슬롯의 세로 개수
+    public float itemSlotSize;              // 슬롯의 사이즈
+    public float itemSlotGap;               // 슬롯간 간격
+    public float itemSlotCountX;            // 슬롯의 가로 개수
+    public float itemSlotCountY;            // 슬롯의 세로 개수
+
+    public float weaponSlotSize;            // 슬롯의 사이즈
+    public float weaponSlotGap;             // 슬롯간 간격
+    public float weaponSlotCountX;          // 슬롯의 가로 개수
+    public float weaponSlotCountY;          // 슬롯의 세로 개수
 
     // 비공개.
     private float InventoryWidth;           // 인벤토리 가로길이
     private float InventoryHeight;          // 인밴토리 세로길이
-    private float EmptySlot;            // 빈 슬롯의 개수
+    //private float EmptySlot;            // 빈 슬롯의 개수
 
     void Awake()
     {
@@ -32,55 +39,82 @@ public class InventoryCtrl : MonoBehaviour {
         InventoryRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, InventoryWidth); // 가로
         InventoryRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, InventoryHeight);  // 세로
 
-        // 슬롯 생성하기
-        for (int y = 0; y < slotCountY; y++)
+        // 아이템 슬롯 생성하기
+        for (int y = 0; y < itemSlotCountY; y++)
         {
-            for (int x = 0; x < slotCountX; x++)
+            for (int x = 0; x < itemSlotCountX; x++)
             {
                 // 슬롯을 복사한다.
                 GameObject slot = Instantiate(OriginSlot) as GameObject;
                 // 슬롯의 RectTransform을 가져온다.
                 RectTransform slotRect = slot.GetComponent<RectTransform>();
                 // 슬롯의 자식인 투명이미지의 RectTransform을 가져온다
-                RectTransform item = slot.transform.GetChild(0).GetComponent<RectTransform>();
+                //RectTransform item = slot.transform.GetChild(0).GetComponent<RectTransform>();
 
-                slot.name = "slot_" + y + "_" + x; // 슬롯 이름 설정
+                slot.name = "ItemSlot_" + y + "_" + x; // 슬롯 이름 설정
                 slot.transform.parent = transform; // 슬롯의 부모를 설정 (Inventory객체가 부모임)
 
                 // 슬롯이 생성될 위치 설정하기
-                slotRect.localPosition = new Vector3((slotSize * x) + (slotGap * (x + 1)), -((100 * y)+(slotGap * (y + 1))), 0);
+                slotRect.localPosition = new Vector3((itemSlotSize * x) + (itemSlotGap * (x + 1)), -((100 * y) + (itemSlotGap * (y + 1))), 0);
 
                 // 슬롯의 사이즈 설정하기
                 slotRect.localScale = Vector3.one;
-                slotRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, slotSize); // 가로
-                //slotRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, slotSize);   // 세로
-            
+                slotRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, itemSlotSize); // 가로
+
+                // 슬롯의 자식인 투명이미지의 사이즈 설정하기
+                //item.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, itemSlotSize - itemSlotSize * 0.2f); // 가로
+                //item.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, slotSize - slotSize * 0.3f);   // 세로
+
+                // 리스트에 슬롯을 추가
+                ItemAllSlot.Add(slot);
+            }
+        }
+
+        // 무기 슬롯 생성하기
+        for (int y = 0; y < weaponSlotCountY; y++)
+        {
+            for (int x = 0; x < weaponSlotCountX; x++)
+            {
+                // 슬롯을 복사한다.
+                GameObject slot = Instantiate(WeaponSlot) as GameObject;
+                // 슬롯의 RectTransform을 가져온다.
+                RectTransform slotRect = slot.GetComponent<RectTransform>();
+                // 슬롯의 자식인 투명이미지의 RectTransform을 가져온다
+                //RectTransform item = slot.transform.GetChild(0).GetComponent<RectTransform>();
+
+                slot.name = "WeaponSlot_" + y + "_" + x; // 슬롯 이름 설정
+                slot.transform.parent = transform; // 슬롯의 부모를 설정 (Inventory객체가 부모임)
+
+
+
+                // 슬롯이 생성될 위치 설정하기
+                slotRect.localPosition = new Vector3((weaponSlotSize * 3) + 380, -(30+((weaponSlotGap*3)*y)), 0);
+
+                // 슬롯의 사이즈 설정하기
+                slotRect.localScale = Vector3.one;
+                slotRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, weaponSlotSize); // 가로
+
                 // 슬롯의 자식인 투명이미지의 사이즈 설정하기
                 //item.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, slotSize - slotSize * 0.2f); // 가로
                 //item.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, slotSize - slotSize * 0.3f);   // 세로
 
                 // 리스트에 슬롯을 추가
-                AllSlot.Add(slot);
+                WeaponAllSlot.Add(slot);
             }
         }
-
-        // 빈 슬롯 = 슬롯의 숫자
-        EmptySlot = AllSlot.Count;
-        
     }
 
     // 아이템을 넣기위해 모든 슬롯을 검사.
     public bool AddItem(ItemCtrl item)
     {
         // 슬롯에 총 개수.
-        int slotCount = AllSlot.Count;
+        int slotCount = ItemAllSlot.Count;
 
         // 넣기위한 아이템이 슬롯에 존재하는지 검사.
         for (int i = 0; i < slotCount; i++)
         {
             // 그 슬롯의 스크립트를 가져온다.
-            SlotCtrl slot = AllSlot[i].GetComponent<SlotCtrl>();
-
+            SlotCtrl slot = ItemAllSlot[i].GetComponent<SlotCtrl>();
             // 슬롯이 비어있으면 통과.
             if (!slot.isSlots())
                 continue;
@@ -99,7 +133,7 @@ public class InventoryCtrl : MonoBehaviour {
         // 빈 슬롯에 아이템을 넣기위한 검사.
         for (int i = 0; i < slotCount; i++)
         {
-            SlotCtrl slot = AllSlot[i].GetComponent<SlotCtrl>();
+            SlotCtrl slot = ItemAllSlot[i].GetComponent<SlotCtrl>();
 
             // 슬롯이 비어있지 않으면 통과
             if (slot.isSlots())
@@ -113,16 +147,63 @@ public class InventoryCtrl : MonoBehaviour {
         return false;
     }
 
-    // 거리가 가까운 슬롯의 반환.
-    public SlotCtrl NearDisSlot(Vector3 Pos)
+    // 무기를 넣기위해 모든 슬롯을 검사.
+    public bool AddWeapon(WeaponCtrl weapon)
+    {
+        // 슬롯에 총 개수.
+        int slotCount = WeaponAllSlot.Count;
+
+        // 넣기위한 무기가 슬롯에 존재하는지 검사.
+        for (int i = 0; i < slotCount; i++)
+        {
+            // 그 슬롯의 스크립트를 가져온다.
+            WeaponSlotCtrl slot = WeaponAllSlot[i].GetComponent<WeaponSlotCtrl>();
+
+            slot.slotNumber = i+1;
+
+            // 슬롯이 비어있으면 통과.
+            if (!slot.isSlots())
+                continue;
+
+            // 슬롯에 존재하는 무기 타입과 넣을려는 무기의 타입이 같고.
+            // 슬롯에 존재하는 무기의 겹칠수 있는 최대치가 넘지않았을 때. (true일 때)
+            if (slot.WeaponReturn().type == weapon.type)
+            {
+                // 슬롯에 무기을 넣는다.
+                Debug.Log("중복 무기 이미 존재");
+                //slot.AddWeapon(weapon, true, slot);
+                return false;
+            }
+        }
+
+        // 빈 슬롯에 무기를 넣기위한 검사.
+        for (int i = 0; i < slotCount; i++)
+        {
+            WeaponSlotCtrl slot = WeaponAllSlot[i].GetComponent<WeaponSlotCtrl>();
+
+            // 슬롯이 비어있지 않으면 통과
+            if (slot.isSlots())
+                continue;
+
+            slot.AddWeapon(weapon, false, null);
+            return true;
+        }
+
+        // 위에 조건에 해당되는 것이 없을 때 아이템을 먹지 못함.
+        return false;
+    }
+
+
+    // 거리가 가까운 아이템 슬롯의 반환.
+    public SlotCtrl NearDisItemSlot(Vector3 Pos)
     {
         float Min = 10000f;
         int Index = -1;
 
-        int Count = AllSlot.Count;
+        int Count = ItemAllSlot.Count;
         for (int i = 0; i < Count; i++)
         {
-            Vector2 sPos = AllSlot[i].transform.GetChild(0).position;
+            Vector2 sPos = ItemAllSlot[i].transform.GetChild(0).position;
             float Dis = Vector2.Distance(sPos, Pos);
 
             if (Dis < Min)
@@ -132,16 +213,41 @@ public class InventoryCtrl : MonoBehaviour {
             }
         }
 
-        if (Min > slotSize)
+        if (Min > itemSlotSize)
             return null;
 
-        return AllSlot[Index].GetComponent<SlotCtrl>();
+        return ItemAllSlot[Index].GetComponent<SlotCtrl>();
+    }
+
+    // 거리가 가까운 무기 슬롯의 반환.
+    public WeaponSlotCtrl NearDisWeaponSlot(Vector3 Pos)
+    {
+        float Min = 10000f;
+        int Index = 0;
+
+        int Count = WeaponAllSlot.Count;
+        for (int i = 0; i < Count; i++)
+        {
+            Vector2 sPos = WeaponAllSlot[i].transform.GetChild(0).position;
+            float Dis = Vector2.Distance(sPos, Pos);
+
+            if (Dis < Min)
+            {
+                Min = Dis;
+                Index = i;
+            }
+        }
+
+        if (Min > weaponSlotSize)
+            return null;
+
+        return WeaponAllSlot[Index].GetComponent<WeaponSlotCtrl>();
     }
 
     // 아이템 옮기기 및 교환.
-    public void Swap(SlotCtrl value, Vector3 Pos)
+    public void ItemSwap1(SlotCtrl value, Vector3 Pos)
     {
-        SlotCtrl FirstSlot = NearDisSlot(Pos);
+        SlotCtrl FirstSlot = NearDisItemSlot(Pos);
 
         // 현재 슬롯과 옮기려는 슬롯이 같으면 함수 종료.
         if (value == FirstSlot || FirstSlot == null)
@@ -153,7 +259,7 @@ public class InventoryCtrl : MonoBehaviour {
         // 가까운 슬롯이 비어있으면 옮기기.
         if (!FirstSlot.isSlots())
         {
-            Swap(FirstSlot, value);
+            ItemSwap2(FirstSlot, value);
         }
         // 교환.
         else
@@ -169,7 +275,7 @@ public class InventoryCtrl : MonoBehaviour {
                 value.slot.Clear();
             }
 
-            Swap(value, FirstSlot);
+            ItemSwap2(value, FirstSlot);
 
             {
                 Count = temp.Count;
@@ -183,8 +289,8 @@ public class InventoryCtrl : MonoBehaviour {
         }
     }
 
-    // 1: 비어있는 슬롯, 2: 안 비어있는 슬롯.
-    void Swap(SlotCtrl xFirst, SlotCtrl oSecond)
+    // 아이템!!!!!!!!!! 1: 비어있는 슬롯, 2: 안 비어있는 슬롯.
+    void ItemSwap2(SlotCtrl xFirst, SlotCtrl oSecond)
     {
         int Count = oSecond.slot.Count;
         ItemCtrl item = oSecond.slot.Peek();
@@ -199,6 +305,70 @@ public class InventoryCtrl : MonoBehaviour {
             xFirst.UpdateInfo(true, oSecond.ItemReturn().DefaultImg);
 
         oSecond.slot.Clear();
+        oSecond.UpdateInfo(false, oSecond.DefaultImg);
+    }
+
+    // 무기 옮기기 및 교환.
+    public void WeaponSwap1(WeaponSlotCtrl value, Vector3 Pos)
+    {
+        WeaponSlotCtrl FirstSlot = NearDisWeaponSlot(Pos);
+
+        // 현재 슬롯과 옮기려는 슬롯이 같으면 함수 종료.
+        if (value == FirstSlot || FirstSlot == null)
+        {
+            value.UpdateInfo(true, value.weaponSlot.Peek().DefaultImg);
+            return;
+        }
+
+        // 가까운 슬롯이 비어있으면 옮기기.
+        if (!FirstSlot.isSlots())
+        {
+            WeaponSwap2(FirstSlot, value);
+        }
+        // 교환.
+        else
+        {
+            int Count = value.weaponSlot.Count;
+            WeaponCtrl weapon = value.weaponSlot.Peek();
+            Stack<WeaponCtrl> temp = new Stack<WeaponCtrl>();
+
+            {
+                for (int i = 0; i < Count; i++)
+                    temp.Push(weapon);
+
+                value.weaponSlot.Clear();
+            }
+
+            WeaponSwap2(value, FirstSlot);
+
+            {
+                Count = temp.Count;
+                weapon = temp.Peek();
+
+                for (int i = 0; i < Count; i++)
+                    FirstSlot.weaponSlot.Push(weapon);
+
+                FirstSlot.UpdateInfo(true, temp.Peek().DefaultImg);
+            }
+        }
+    }
+
+    // 무기!!!!!!!!!! 1: 비어있는 슬롯, 2: 안 비어있는 슬롯.
+    void WeaponSwap2(WeaponSlotCtrl xFirst, WeaponSlotCtrl oSecond)
+    {
+        int Count = oSecond.weaponSlot.Count;
+        WeaponCtrl weapon = oSecond.weaponSlot.Peek();
+
+        for (int i = 0; i < Count; i++)
+        {
+            if (xFirst != null)
+                xFirst.weaponSlot.Push(weapon);
+        }
+
+        if (xFirst != null)
+            xFirst.UpdateInfo(true, oSecond.WeaponReturn().DefaultImg);
+
+        oSecond.weaponSlot.Clear();
         oSecond.UpdateInfo(false, oSecond.DefaultImg);
     }
 }

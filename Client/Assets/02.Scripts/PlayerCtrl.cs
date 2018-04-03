@@ -59,9 +59,6 @@ public class PlayerCtrl : MonoBehaviour
     public MeshRenderer muzzleFlash1;
     public MeshRenderer muzzleFlash2;
 
-    // 마우스 고정 관련한 변수
-    public bool lockMouse = false;
-
     // 카메라 뷰 전환을 체크하기 위한 변수
     public bool sensorCheck = false;
 
@@ -73,8 +70,6 @@ public class PlayerCtrl : MonoBehaviour
     public bool weaponEat = false;
 
     // 아이템 획득 확인을 위한 변수
-    public bool itemEatPossible = false;
-    public bool itemEat = false;
     public bool bullet762Set = false;
     public bool bullet556Set = false;
     private int bullet762 = 0;
@@ -146,8 +141,7 @@ public class PlayerCtrl : MonoBehaviour
 
         animator.SetInteger("IsState", 0);
 
-        // 처음 시작시 마우스를 잠궈버린다.
-        lockMouse = true;
+
         Cursor.lockState = CursorLockMode.Locked;//마우스 커서 고정
         Cursor.visible = false;//마우스 커서 보이기
 
@@ -162,18 +156,18 @@ public class PlayerCtrl : MonoBehaviour
 
     }
 
-    public void setBullet(string type, int value)
-    {
-        if (type == "Ammunition762")
-        {
-            bullet762 = value;
-        }
+    //public void setBullet(string type, int value)
+    //{
+    //    if (type == "Ammunition762")
+    //    {
+    //        bullet762 = value;
+    //    }
 
-        if (type == "Ammunition556")
-        {
-            bullet556 = value;
-        }
-    }
+    //    if (type == "Ammunition556")
+    //    {
+    //        bullet556 = value;
+    //    }
+    //}
 
     public void RenewUpdate()
     {
@@ -277,25 +271,14 @@ public class PlayerCtrl : MonoBehaviour
             }
         }
 
-        // 아이템 획득 가능할때 g키 입력시 획득
-        if (itemEatPossible == true)
-        {
-            if (Input.GetKeyDown(KeyCode.G))
-            {
-                itemEat = true;
-                //ItemSelection();
 
 
-            }
-        }
-
-
-        SlotCtrl Test762 = get_Bullet("Ammunition762");
-        SlotCtrl Test556 = get_Bullet("Ammunition556");
-
+        
         // 총이 장착이 되었을때만 발사 가능
         if (shotable == true)
         {
+            SlotCtrl Test762 = get_Bullet("Ammunition762");
+            SlotCtrl Test556 = get_Bullet("Ammunition556");
             // 어떠한 종류의 총알이 1발 이상 있을 시
             if (Test556 != null && Test556.slot.Peek().getItemCount() > 0 && showItem2 == true)
             {
@@ -304,10 +287,7 @@ public class PlayerCtrl : MonoBehaviour
                 {
                     animator.SetBool("IsShot", true);
                     Fire(Test556);
-                    //animator.SetBool("IsTrace", true);
-                    networkCtrl.Player_Shot();
-                    Debug.Log("m16 발사");
-                    
+                    networkCtrl.Player_Shot();          
                 }
             }
             else if (Test762 != null && Test762.slot.Peek().getItemCount() > 0 && showItem1 == true)
@@ -316,30 +296,8 @@ public class PlayerCtrl : MonoBehaviour
                 {
                     animator.SetBool("IsShot", true);
                     Fire(Test762);
-                    //animator.SetBool("IsTrace", true);
                     networkCtrl.Player_Shot();
-                    Debug.Log("ak47 발사");
-                    //Debug.Log(bullet762);
                 }
-            }
-        }
-
-
-        if (Input.GetMouseButtonDown(1))
-        {
-            if (lockMouse == true)
-            {
-                // 마우스 잠겨 있을경우 푼다.
-                Cursor.lockState = CursorLockMode.None;//마우스 커서 고정 해제
-                Cursor.visible = true;//마우스 커서 보이기
-                lockMouse = false;
-            }
-            else
-            {
-                // 마우스가 안점겨 있을경우 다시 잠군다.
-                lockMouse = true;
-                Cursor.lockState = CursorLockMode.Locked;//마우스 커서 고정
-                Cursor.visible = false;//마우스 커서 보이기
             }
         }
 
@@ -359,21 +317,33 @@ public class PlayerCtrl : MonoBehaviour
             ak47.GetComponent<Renderer>().enabled = false;
         }
 
-
-
+        // Tab키 입력시 인벤토리 코드 실행
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             if (inventoryShow == false)
             {
+                // 마우스 잠겨 있을경우 푼다.
+                Cursor.lockState = CursorLockMode.None;//마우스 커서 고정 해제
+                Cursor.visible = true;//마우스 커서 보이기
 
                 inventory.SetActive(true);
                 inventoryShow = true;
                 RenewUpdate();
+
+                // 총 발사 잠금
+                shotable = false;
             }
             else if (inventoryShow == true)
             {
+                // 마우스가 안점겨 있을경우 다시 잠군다.
+                Cursor.lockState = CursorLockMode.Locked;//마우스 커서 고정
+                Cursor.visible = false;//마우스 커서 보이기
+
                 inventory.SetActive(false);
                 inventoryShow = false;
+
+                // 총 발사 잠금 해제
+                shotable = true;
             }
         }
     }
@@ -385,13 +355,20 @@ public class PlayerCtrl : MonoBehaviour
         if (m16Set == true)
         {
             slot.slot.Peek().setItemCount(-1);
-            RenewUpdate();
+            if (slot.slot.Peek().getItemCount() == 0 && slot.isSlots() == true)
+            {
+                slot.slot.Clear();
+                slot.UpdateInfo(false, slot.DefaultImg);
+            }       
         }
         else if (ak47Set == true)
         {
             slot.slot.Peek().setItemCount(-1);
-            RenewUpdate();
-            //bullet762--;
+            if (slot.slot.Peek().getItemCount() == 0 && slot.isSlots() == true)
+            {
+                slot.slot.Clear();
+                slot.UpdateInfo(false, slot.DefaultImg);
+            } 
         }
 
         // 사운드 발생 함수
@@ -427,15 +404,11 @@ public class PlayerCtrl : MonoBehaviour
         muzzleFlash2.enabled = false;
     }
 
-
-
     void OnTriggerEnter(Collider coll)
     {
-
         // 충돌한 Collider가 Camchange의 CAMCHANGE(Tag값)이면 카메라 전환 
         if (coll.gameObject.tag == "CAMCHANGE")
         {
-
             FollowCam followCam = GameObject.Find("Main Camera").GetComponent<FollowCam>();
             if (sensorCheck == false)
             {
@@ -513,23 +486,12 @@ public class PlayerCtrl : MonoBehaviour
             shotable = true;
         }
 
-
-        if (itemEat == true)
-        {
-            coll.gameObject.SetActive(false);
-            //Destroy(coll.gameObject);
-            itemEat = false;
-            //bulletCount += 30;
-        }
-
         if (weaponEat == true)
         {
-
             coll.gameObject.SetActive(false);
             //Destroy(coll.gameObject);
             weaponEat = false;
         }
-
 
     }
 
@@ -544,14 +506,12 @@ public class PlayerCtrl : MonoBehaviour
         // DIe 애니메이션 실행
         animator.SetTrigger("IsDie");
         playerState = PlayerState.die;
+
         // 캐릭터 캡슐 콜라이더 비활성화
         gameObject.GetComponent<CapsuleCollider>().enabled = false;
 
-
+        // 총구 앞 캡슐 콜라이더 비활성화
         firePos.GetComponent<CapsuleCollider>().enabled = false;
-        //FirePosCtrl firePos = GameObject.Find("FirePos").GetComponent<FirePosCtrl>();
-        //firePos.GetComponent<CapsuleCollider>().enabled = false;
-        //gameObject.SetActive(false);
     }
 
     void WeaponDisPlay()
@@ -575,20 +535,7 @@ public class PlayerCtrl : MonoBehaviour
         }
     }
 
-
-    //void ItemSelection()
-    //{
-    //    if (itemEat == true && bullet556Set == true)
-    //    {
-    //        bullet556 += 30;
-    //    }
-    //    else if (itemEat == true && bullet762Set == true)
-    //    {
-    //        bullet762 += 30;
-    //    }
-    //}
-
-
+    // 혈흔 이펙트를 위한 함수
     void CreateBloodEffect(Vector3 pos)
     {
         // 혈흔 효과 생성
