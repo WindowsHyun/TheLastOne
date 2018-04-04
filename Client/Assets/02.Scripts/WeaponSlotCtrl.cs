@@ -42,26 +42,25 @@ public class WeaponSlotCtrl : MonoBehaviour
 
     public void AddWeapon(WeaponCtrl weapon, bool same, WeaponSlotCtrl sameSlot)
     {
-        // bool same = true 일경우 아이템 같은게 들어왔으니 찾아서 넣어라.
-        // 스택에 아이템 추가.
-        //if (same == true)
-        //{
-        //    //Debug.Log(sameSlot.ItemReturn().type.ToString());
-        //    sameSlot.WeaponReturn().setItemCount(30); // 이미 존재 하면 해당 갯수를 증가한다.
-        //}
-        //else
-        //{
-
-        //    if (weapon.type.ToString() == "Ammunition762" || weapon.type.ToString() == "Ammunition556")
-        //        weapon.setItemCount(29);// 총알의 경우 기본이 1개 이므로 29개를 더해서 30개로 맞춰준다.
-        //    weaponSlot.Push(weapon);
-        //}
-
         // 무기 추가
         weaponSlot.Push(weapon);
 
         // 정보 갱신
         UpdateInfo(true, weapon.DefaultImg);
+
+        if(slotNumber == 1)
+        {
+            if(weaponSlot.Peek().type.ToString() == "AK47")
+            {
+                player.ak47Set = true;
+                player.WeaponDisPlay();
+            }else if(weaponSlot.Peek().type.ToString() == "M16")
+            {
+                player.m16Set = true;
+                player.WeaponDisPlay();
+            }
+           
+        }
     }
 
     // 무기 버리는 함수
