@@ -7,8 +7,6 @@
 #include <chrono>
 #include <queue>
 
-enum Event_Type { E_initTime, E_RoundTime, E_Remove_Client };
-
 struct Timer_Event {
 	int object_id;	// 특정 대상 혹은 시간을 넣는다.
 	high_resolution_clock::time_point exec_time; // 이 이벤트가 언제 실행되야 하는가

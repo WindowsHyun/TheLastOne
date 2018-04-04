@@ -7,7 +7,7 @@
 
 std::unordered_map< int, Game_Client>::iterator get_client_iter(int ci);
 std::unordered_map< int, Game_Client> g_clients;
-std::stack<int> remove_client_id;
+std::queue<int> remove_client_id;
 Server_Timer Timer;
 
 IOCP_Server::IOCP_Server()
@@ -20,13 +20,6 @@ IOCP_Server::IOCP_Server()
 IOCP_Server::~IOCP_Server()
 {
 	Shutdown_Server();
-}
-
-void IOCP_Server::set_Person(int value)
-{
-	cp_lock.lock();
-	connected_Person += value;
-	cp_lock.unlock();
 }
 
 void IOCP_Server::initServer()
@@ -45,6 +38,10 @@ void IOCP_Server::initServer()
 
 	bind(g_socket, reinterpret_cast<sockaddr *>(&ServerAddr), sizeof(ServerAddr));
 	listen(g_socket, 5);
+
+	for (int i = 0; i < MAX_Client; ++i) {
+		remove_client_id.push(i);
+	}
 
 	std::cout << "init Complete..!" << std::endl;
 }
@@ -213,16 +210,9 @@ void IOCP_Server::Accept_Thread()
 
 		int new_id;
 
-		if (remove_client_id.empty()) {
-			// 스택에 값이 없을 경우 기존 값을 가져온다.
-			new_id = get_Person();
-			set_Person(1);	// 인원을 한명 늘려준다.
-		}
-		else {
-			// 스택에 값이 있을경우 스택 값을 가져온다.
-			new_id = remove_client_id.top();
-			remove_client_id.pop();
-		}
+		// 스택에서 값을 가져온다.
+		new_id = remove_client_id.front();
+		remove_client_id.pop();
 		std::cout << "New Client : " << new_id << std::endl;
 
 		if (g_clients.size() >= MAX_Client) {

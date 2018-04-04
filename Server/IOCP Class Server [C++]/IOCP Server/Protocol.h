@@ -2,6 +2,18 @@
 #define __PROTOCOL_H__
 
 enum TimerType { T_InitTime };
+enum OPTYPE { OP_SEND, OP_RECV, OP_InitTime, OP_RemoveClient };
+enum Event_Type { E_initTime, E_RoundTime, E_Remove_Client };
+
+// 소켓 설정
+#define SERVERPORT 9000
+#define BUFSIZE    1024
+#define MAX_BUFF_SIZE   4000
+#define MAX_PACKET_SIZE  4000
+#define MAX_Client 50
+
+// 게임 설정
+#define DebugMod TRUE
 
 // 서버에서 클라이언트에게 보내는 패킷
 #define SC_ID           1					// 클라이언트 아이디를 보낸다.

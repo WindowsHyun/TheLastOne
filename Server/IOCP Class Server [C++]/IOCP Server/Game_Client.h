@@ -3,8 +3,6 @@
 
 #include "IOCP_Server.h"
 
-enum OPTYPE { OP_SEND, OP_RECV, OP_InitTime, OP_RemoveClient };
-
 struct OverlappedEx {
 	WSAOVERLAPPED over;
 	WSABUF wsabuf;
