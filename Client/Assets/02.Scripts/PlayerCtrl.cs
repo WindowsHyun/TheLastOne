@@ -69,6 +69,9 @@ public class PlayerCtrl : MonoBehaviour
     public bool weaponEatPossible = false;
     public bool weaponEat = false;
 
+    // 무기 슬롯 타입
+    public string[] weaponSlotType = new string[2];
+
     // 아이템 획득 확인을 위한 변수
     public bool bullet762Set = false;
     public bool bullet556Set = false;
@@ -301,44 +304,42 @@ public class PlayerCtrl : MonoBehaviour
         // 1번 , 2번 키 입력시 총 랜더링과 어떤 총인지 판별한다.
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            WeaponSlotCtrl FindM16 = GetWeaponType("M16");
-            WeaponSlotCtrl FindAK47 = GetWeaponType("AK47");
-            if (FindAK47.slotNumber == 1)
+            if (weaponSlotType[0] == "M16")
             {
+                WeaponSlotCtrl FindM16 = GetWeaponType("M16");
+                m16.GetComponent<Renderer>().enabled = true;
+                m16Set = true;
+                ak47.GetComponent<Renderer>().enabled = false;
+                ak47Set = false;
+            }
+            else if (weaponSlotType[0] == "AK47")
+            {
+                WeaponSlotCtrl FindAK47 = GetWeaponType("AK47");
                 ak47.GetComponent<Renderer>().enabled = true;
                 ak47Set = true;
 
                 m16.GetComponent<Renderer>().enabled = false;
                 m16Set = false;
-            }
-            else if (FindM16.slotNumber == 1)
-            {
-                m16.GetComponent<Renderer>().enabled = true;
-                m16Set = true;
-
-                ak47.GetComponent<Renderer>().enabled = false;
-                ak47Set = false;
             }
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            WeaponSlotCtrl FindM16 = GetWeaponType("M16");
-            WeaponSlotCtrl FindAK47 = GetWeaponType("AK47");
-            if (FindAK47.slotNumber == 2)
+            if (weaponSlotType[1] == "M16")
             {
+                WeaponSlotCtrl FindM16 = GetWeaponType("M16");
+                m16.GetComponent<Renderer>().enabled = true;
+                m16Set = true;
+                ak47.GetComponent<Renderer>().enabled = false;
+                ak47Set = false;
+            }
+            else if (weaponSlotType[1] == "AK47")
+            {
+                WeaponSlotCtrl FindAK47 = GetWeaponType("AK47");
                 ak47.GetComponent<Renderer>().enabled = true;
                 ak47Set = true;
 
                 m16.GetComponent<Renderer>().enabled = false;
                 m16Set = false;
-            }
-            else if (FindM16.slotNumber == 2)
-            {
-                m16.GetComponent<Renderer>().enabled = true;
-                m16Set = true;
-
-                ak47.GetComponent<Renderer>().enabled = false;
-                ak47Set = false;
             }
         }
 
@@ -538,16 +539,12 @@ public class PlayerCtrl : MonoBehaviour
         {
             ak47.GetComponent<Renderer>().enabled = true;
             //m16.GetComponent<Renderer>().enabled = false;
-
-
             animator.SetBool("IsEquip", true);
         }
         else if (m16Set == true)
         {
             m16.GetComponent<Renderer>().enabled = true;
             //ak47.GetComponent<Renderer>().enabled = false;
-
-
             animator.SetBool("IsEquip", true);
         }
     }

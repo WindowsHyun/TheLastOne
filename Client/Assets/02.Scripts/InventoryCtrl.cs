@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InventoryCtrl : MonoBehaviour {
+public class InventoryCtrl : MonoBehaviour
+{
     // 공개
     public List<GameObject> ItemAllSlot;    // 모든 아이템 슬롯을 관리해줄 리스트
     public List<GameObject> WeaponAllSlot;  // 모든 무기 슬롯을 관리해줄 리스트
@@ -23,10 +24,12 @@ public class InventoryCtrl : MonoBehaviour {
     // 비공개.
     private float InventoryWidth;           // 인벤토리 가로길이
     private float InventoryHeight;          // 인밴토리 세로길이
-    //private float EmptySlot;            // 빈 슬롯의 개수
+                                            //private float EmptySlot;            // 빈 슬롯의 개수
+    public PlayerCtrl player;
 
     void Awake()
     {
+        player = GameObject.FindWithTag("Player").GetComponent<PlayerCtrl>();
         // 인벤토리 이미지의 가로, 세로 사이즈 셋팅
         // (슬롯 사이즈 * 슬롯의 가로(세로)개수) + (슬롯간 거리 * 슬롯의 가로(세로)개수)
         //InventoryWidth = (slotCountX * slotSize) + (slotCountX * slotGap) + slotGap;
@@ -88,7 +91,7 @@ public class InventoryCtrl : MonoBehaviour {
 
 
                 // 슬롯이 생성될 위치 설정하기
-                slotRect.localPosition = new Vector3((weaponSlotSize * 3) + 380, -(30+((weaponSlotGap*3)*y)), 0);
+                slotRect.localPosition = new Vector3((weaponSlotSize * 3) + 380, -(30 + ((weaponSlotGap * 3) * y)), 0);
 
                 // 슬롯의 사이즈 설정하기
                 slotRect.localScale = Vector3.one;
@@ -121,7 +124,7 @@ public class InventoryCtrl : MonoBehaviour {
 
             // 슬롯에 존재하는 아이템의 타입과 넣을려는 아이템의 타입이 같고.
             // 슬롯에 존재하는 아이템의 겹칠수 있는 최대치가 넘지않았을 때. (true일 때)
-            if (slot.ItemReturn().type == item.type )
+            if (slot.ItemReturn().type == item.type)
             {
                 // 슬롯에 아이템을 넣는다.
                 Debug.Log("중복 아이템 추가..!");
@@ -159,7 +162,7 @@ public class InventoryCtrl : MonoBehaviour {
             // 그 슬롯의 스크립트를 가져온다.
             WeaponSlotCtrl slot = WeaponAllSlot[i].GetComponent<WeaponSlotCtrl>();
 
-            slot.slotNumber = i+1;
+            slot.slotNumber = i + 1;
 
             // 슬롯이 비어있으면 통과.
             if (!slot.isSlots())
@@ -324,6 +327,7 @@ public class InventoryCtrl : MonoBehaviour {
         if (!FirstSlot.isSlots())
         {
             WeaponSwap2(FirstSlot, value);
+            swapType();
         }
         // 교환.
         else
@@ -340,6 +344,7 @@ public class InventoryCtrl : MonoBehaviour {
             }
 
             WeaponSwap2(value, FirstSlot);
+            swapType();
 
             {
                 Count = temp.Count;
@@ -371,4 +376,12 @@ public class InventoryCtrl : MonoBehaviour {
         oSecond.weaponSlot.Clear();
         oSecond.UpdateInfo(false, oSecond.DefaultImg);
     }
+
+    public void swapType()
+    {
+        string tmp = player.weaponSlotType[0];
+        player.weaponSlotType[0] = player.weaponSlotType[1];
+        player.weaponSlotType[1] = tmp;
+    }
+
 }
