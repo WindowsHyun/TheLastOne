@@ -1,12 +1,11 @@
 ﻿#include "IOCP_Server.h"
 #include "Game_Client.h"
+#include "Game_Item.h"
 #include "Timer.h"
-
-//Game_Client *g_clients = new Game_Client[MAX_Client];
-//std::vector <Game_Client > g_clients;
 
 std::unordered_map< int, Game_Client>::iterator get_client_iter(int ci);
 std::unordered_map< int, Game_Client> g_clients;
+std::multiset<Game_Item> g_item;
 std::queue<int> remove_client_id;
 Server_Timer Timer;
 
@@ -14,6 +13,9 @@ IOCP_Server::IOCP_Server()
 {
 	std::wcout.imbue(std::locale("korean"));
 	initServer();
+	Game_Item temp{10.3f, 30.3f, "M16"};
+	//g_item.emplace(temp);
+	//g_item.find({ 10.3, 3.3,"M16" });
 	makeThread();
 }
 

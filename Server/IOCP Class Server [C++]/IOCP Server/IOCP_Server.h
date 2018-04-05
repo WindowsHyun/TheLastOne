@@ -22,7 +22,8 @@
 #include <windows.h>
 #include <unordered_set> // 성능이 더 좋아진다. [순서가 상관없을경우]
 #include <mutex>
-#include <string.h>    // strchr 함수가 선언된 헤더 파일
+#include <string>
+//#include <string.h>    // strchr 함수가 선언된 헤더 파일
 
 #include "Protocol.h"
 #include "Flatbuffers_View.h"
