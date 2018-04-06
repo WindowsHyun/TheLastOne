@@ -2,10 +2,11 @@
 #define __GAMEITEM_H__
 
 #include "IOCP_Server.h"
+#include <fstream>
 
 struct xz {
-	float x;
-	float z;
+	double x;
+	double z;
 };
 
 class Game_Item {
@@ -15,14 +16,16 @@ private:
 	bool item_eat;
 
 public:
-	Game_Item(const float x, const float z, const std::string item_name);
-	Game_Item(Game_Item& g_cl);
-	~Game_Item();
+	double get_x() { return item_position.x; }
+	double get_z() { return item_position.z; }
+	bool get_eat() { return item_eat; }
+	std::string get_name() { return item_name; }
 
-	bool operator()(const Game_Item *comp1, const Game_Item *comp2) const {
-		return comp1->item_position.x < comp2->item_position.x;
-	}
+	void set_eat(bool value) { this->item_eat = value; }
+	Game_Item(const double x, const double z, const std::string item_name);
+	~Game_Item();
 };
 
-
+void load_g_item(std::string filepath, std::unordered_map< int, Game_Item> *item);
+std::string splitParsing(const std::string content, const std::string start, const std::string end);
 #endif

@@ -22,6 +22,18 @@ table Client_info {
   rotation:Vec3;
 }
 
+table Game_Items{
+  data:[Gameitem];
+}
+
+table Gameitem{
+  id:int;
+  name:string;
+  x:float;
+  z:float;
+  eat:bool;
+}
+
 table Game_Timer {
   kind:int;
   time:int;

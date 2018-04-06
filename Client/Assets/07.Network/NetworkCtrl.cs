@@ -31,7 +31,6 @@ public struct Client_Data
     public OtherPlayerCtrl script;  // 프리팹 오브젝트 안의 함수를 호출하기 위한 스크립트
     public bool removeClient;   // 클라이언트 지울경우 true
 
-
     public Client_Data(Vector3 position, Vector3 rotation)
     {
         this.id = -1;
@@ -47,6 +46,25 @@ public struct Client_Data
     }
 }
 
+public struct item_Collection
+{
+    public int id;
+    public string name;
+    public Vector3 pos;
+    public bool eat;
+    public bool draw;
+    public GameObject item;
+    public item_Collection(int id, string name, Vector3 pos, bool eat)
+    {
+        this.id = id;
+        this.name = name;
+        this.pos = pos;
+        this.eat = eat;
+        this.draw = false;
+        this.item = null;
+    }
+};
+
 namespace TheLastOne.Game.Network
 {
     public class NetworkCtrl : MonoBehaviour
@@ -54,6 +72,14 @@ namespace TheLastOne.Game.Network
         public static Socket m_Socket;
         public GameObject Player;
         public GameObject PrefabPlayer;
+        //------------------------------------------
+        // 게임 아이템 Object
+        public GameObject item_AK47;
+        public GameObject item_M16;
+        public GameObject item_556;
+        public GameObject item_762;
+        public GameObject item_AidKit;
+        //------------------------------------------
         public Text DebugText;
 
         Vector3 Player_Position;
@@ -63,7 +89,9 @@ namespace TheLastOne.Game.Network
         public const int kPort = 9000;
 
         private const int MaxClient = 50;    // 최대 동접자수
+        private const int MaxViewItem = 50;    // 최대 볼 수 있는 아이템
         public static Client_Data[] client_data = new Client_Data[MaxClient];      // 클라이언트 데이터 저장할 구조체
+        public static item_Collection[] item_Collection = new item_Collection[MaxViewItem];
         /*
          Dictionary, Hashtable을 사용하려 하였지만, 
          Dic의 경우 Value 값을 수정하려면 임시 변수에 복사를 한후 수정하고 다시 복사를 해줘야 한다.
@@ -91,6 +119,7 @@ namespace TheLastOne.Game.Network
         private int SC_REMOVE_PLAYER = 3;     // 클라이언트 삭제
         private int SC_Client_Data = 4;             // 클라이언트 모든 데이터
         private int SC_Server_Time = 5;             // 서버 타이머
+        private int SC_Server_Item = 6;             // 서버 아이템
 
         IEnumerator startPrefab()
         {
@@ -132,6 +161,56 @@ namespace TheLastOne.Game.Network
                     }
                 }
                 yield return null;
+            } while (true);
+            //yield return null;
+        }
+
+        IEnumerator drawItems()
+        {
+            do
+            {
+                if (Client_imei != -1)
+                {
+                    for (int i = 0; i < MaxViewItem; ++i)
+                    {
+                        if (item_Collection[i].draw == false)
+                        {
+                            // draw가 안되어 있을 경우
+                            if (item_Collection[i].name == "AK47")
+                            {
+                                item_Collection[i].item = Instantiate(item_AK47, item_Collection[i].pos, Quaternion.identity);
+                                item_Collection[i].draw = true;
+                            }
+                            if (item_Collection[i].name == "M16")
+                            {
+                                item_Collection[i].item = Instantiate(item_M16, item_Collection[i].pos, Quaternion.identity);
+                                item_Collection[i].draw = true;
+                            }
+                            if (item_Collection[i].name == "556")
+                            {
+                                item_Collection[i].item = Instantiate(item_556, item_Collection[i].pos, Quaternion.identity);
+                                item_Collection[i].item.transform.rotation = Quaternion.Euler(-90, 0, 0);
+                                item_Collection[i].draw = true;
+                            }
+                            if (item_Collection[i].name == "762")
+                            {
+                                item_Collection[i].item = Instantiate(item_762, item_Collection[i].pos, Quaternion.identity);
+                                item_Collection[i].item.transform.rotation = Quaternion.Euler(-90, 0, 0);
+                                item_Collection[i].draw = true;
+                            }
+
+                        }
+
+                        //if (item_Collection[i].draw == true && item_Collection[i].item.activeInHierarchy == false)
+                        //{
+                        //    // 이미 그려진 상태에서 아이템이 먹어졌을 경우, 서버로 아이템을 먹었다고 보내야 한다.
+                        //    //Sendbyte = sF.makeEatItem_PacketInfo(item_Collection[i].id);
+                        //    //Send_Packet(Sendbyte);
+                        //}
+
+                    }
+                }
+                yield return new WaitForSeconds(0.1f);
             } while (true);
             //yield return null;
         }
@@ -306,7 +385,29 @@ namespace TheLastOne.Game.Network
                 //Debug.Log("Time : " + Get_ServerData.Time);
                 debugString = "Time : " + Get_ServerData.Time;
             }
+            else if (type == SC_Server_Item)
+            {
+                // 서버 아이템 관련...
+                byte[] t_buf = new byte[size + 1];
+                System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
+                ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
 
+                var Get_ServerData = Game_Items.GetRootAsGame_Items(revc_buf);
+
+                for (int i = 0; i < Get_ServerData.DataLength; i++)
+                {
+                    Vector3 pos;
+                    pos.x = Get_ServerData.Data(i).Value.X;
+                    pos.y = 29.99451f;
+                    pos.z = Get_ServerData.Data(i).Value.Z;
+
+                    item_Collection[i].id = Get_ServerData.Data(i).Value.Id;
+                    item_Collection[i].name = Get_ServerData.Data(i).Value.Name.ToString();
+                    item_Collection[i].eat = Get_ServerData.Data(i).Value.Eat;
+                    item_Collection[i].pos = pos;
+                }
+
+            }
 
 
         }
@@ -334,6 +435,7 @@ namespace TheLastOne.Game.Network
                 StartCoroutine(RecvCoroutine());
                 StartCoroutine(SendCoroutine());
                 StartCoroutine(DrawDebugText());
+                StartCoroutine(drawItems());
             }
             catch (SocketException SCE)
             {

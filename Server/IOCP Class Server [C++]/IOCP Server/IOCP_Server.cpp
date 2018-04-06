@@ -1,11 +1,11 @@
 ﻿#include "IOCP_Server.h"
 #include "Game_Client.h"
-#include "Game_Item.h"
 #include "Timer.h"
 
 std::unordered_map< int, Game_Client>::iterator get_client_iter(int ci);
 std::unordered_map< int, Game_Client> g_clients;
-std::multiset<Game_Item> g_item;
+std::unordered_map< int, Game_Item>::iterator get_item_iter(int ci);
+std::unordered_map< int, Game_Item> g_item;
 std::queue<int> remove_client_id;
 Server_Timer Timer;
 
@@ -13,9 +13,6 @@ IOCP_Server::IOCP_Server()
 {
 	std::wcout.imbue(std::locale("korean"));
 	initServer();
-	Game_Item temp{10.3f, 30.3f, "M16"};
-	//g_item.emplace(temp);
-	//g_item.find({ 10.3, 3.3,"M16" });
 	makeThread();
 }
 
@@ -42,8 +39,12 @@ void IOCP_Server::initServer()
 	listen(g_socket, 5);
 
 	for (int i = 0; i < MAX_Client; ++i) {
+		// 클라이언트 고유번호 넣어 주기.
 		remove_client_id.push(i);
 	}
+
+	// 게임 아이템 정보 g_item에 넣어주기.
+	load_g_item("./Game_Item_Collection.txt", &g_item);
 
 	std::cout << "init Complete..!" << std::endl;
 }
@@ -314,6 +315,7 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 			client->second.set_client_shotting(true);
 			all_Client_Packet = true;
 		}
+		break;
 		case CS_Check_info:
 		{
 			auto client_Check_info = GetClient_infoView(get_packet);
@@ -327,13 +329,19 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 				std::cout << "실제 값 : " << ci << std::endl;
 				//Send_Client_ID(ci, SC_ID, false);
 			}
-
-
+		}
+		break;
+		case CS_Eat_Item:
+		{
+			auto client_Check_info = GetClient_infoView(get_packet);
+			auto iter = get_item_iter(client_Check_info->id());
+			iter->second.set_eat(true);
 		}
 		break;
 		}
 
 		Send_All_Data(ci, all_Client_Packet);
+		Send_All_Item();
 	}
 	catch (DWORD dwError) {
 		errnum++;
@@ -473,7 +481,44 @@ void IOCP_Server::Send_All_Time(int kind, int time, int client_id, bool allClien
 	}
 }
 
+void IOCP_Server::Send_All_Item()
+{
+	flatbuffers::FlatBufferBuilder builder;
+
+	std::vector<flatbuffers::Offset<Gameitem>> Individual_client;		// 개인 데이터
+
+
+	for (auto iter : g_item) {
+		if (iter.second.get_eat() == true)	// 아이템을 이미 먹은경우 패스 한다.
+			continue;
+
+		auto id = iter.first;
+		auto name = builder.CreateString(iter.second.get_name());
+		auto x = iter.second.get_x();
+		auto z = iter.second.get_z();
+		auto eat = iter.second.get_eat();
+		auto client_data = CreateGameitem(builder, id, name, (float)x, (float)z, eat);
+
+		Individual_client.push_back(client_data);	// Vector에 넣었다.
+	}
+
+	auto Full_client_data = builder.CreateVector(Individual_client);		// 이제 Vector로 묶어서 전송할 데이터로 만들어주자.
+	auto orc = CreateGame_Items(builder, Full_client_data);		// 실제로 보내는 테이블 명은 Client_Data
+	builder.Finish(orc); // Serialize the root of the object.
+
+	for (auto iter : g_clients) {
+		if (iter.second.get_Connect() != true)
+			continue;
+		SendPacket(SC_Server_Item, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
+	}
+
+}
+
 
 std::unordered_map< int, Game_Client>::iterator get_client_iter(int ci) {
 	return g_clients.find(ci);
+}
+
+std::unordered_map< int, Game_Item>::iterator get_item_iter(int ci) {
+	return g_item.find(ci);
 }

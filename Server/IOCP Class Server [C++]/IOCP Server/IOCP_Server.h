@@ -27,6 +27,8 @@
 
 #include "Protocol.h"
 #include "Flatbuffers_View.h"
+#include "Game_Item.h"
+
 
 using namespace std::chrono;
 using namespace Game::TheLastOne; // Flatbuffers를 읽어오자.
@@ -52,6 +54,7 @@ private:
 	void Send_Client_ID(int client_id, int value, bool allClient);	// 클라이언트 에게 패킷 아이디 보내기
 	void Send_All_Data(int client, bool allClient);					// 클라이언트에게 모든 클라이언트 위치 보내기
 	void Send_All_Time(int kind, int time, int client_id, bool allClient);					// 클라이언트에게 시간을 보내준다.
+	void Send_All_Item();
 
 public:
 	HANDLE getHandle() { return g_hiocp; }

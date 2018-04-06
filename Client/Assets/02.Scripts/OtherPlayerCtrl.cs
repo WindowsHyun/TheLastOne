@@ -194,7 +194,7 @@ public class OtherPlayerCtrl : MonoBehaviour
         } while (true);
 
 
-        yield return null;
+        //yield return null;
     }
 
 
