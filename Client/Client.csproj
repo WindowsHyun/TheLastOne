@@ -311,6 +311,7 @@
     <Compile Include="Assets\07.Network\Client_info.cs" />
     <Compile Include="Assets\07.Network\Client_Shot_info.cs" />
     <Compile Include="Assets\07.Network\CollisionCheckCtrl.cs" />
+    <Compile Include="Assets\07.Network\Game_ItemCtrl.cs" />
     <Compile Include="Assets\07.Network\Game_Items.cs" />
     <Compile Include="Assets\07.Network\Game_Timer.cs" />
     <Compile Include="Assets\07.Network\Gameitem.cs" />

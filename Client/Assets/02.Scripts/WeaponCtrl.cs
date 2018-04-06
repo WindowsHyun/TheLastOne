@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class WeaponCtrl : MonoBehaviour
+public class WeaponCtrl : InventoryCtrl
 {
 
     public enum WeaponType { AK47, M16 }
@@ -18,20 +18,20 @@ public class WeaponCtrl : MonoBehaviour
     public void ResetItemCount(int value) { weaponCount = value; }
 
     // 인벤토리에 접근하기 위한 변수.
-    private InventoryCtrl Iv;
+    //private InventoryCtrl Iv;
 
-    void Awake()
-    {
-        // 태그명이 "Inventory"인 객체의 GameObject를 반환한다
-        // 반환된 객체가 가지고 있는 스크립트를 GetComponent를 통해 가져온다
-        Iv = GameObject.FindGameObjectWithTag("Inventory").GetComponent<InventoryCtrl>();
+    //void Awake()
+    //{
+    //    // 태그명이 "Inventory"인 객체의 GameObject를 반환한다
+    //    // 반환된 객체가 가지고 있는 스크립트를 GetComponent를 통해 가져온다
+    //    Iv = GameObject.FindGameObjectWithTag("Inventory").GetComponent<InventoryCtrl>();
 
-    }
+    //}
 
     void AddWeapon()
     {
         // 아이템 획득에 실패할 경우.
-        if (!Iv.AddWeapon(this))
+        if (!AddWeapon(this))
             Debug.Log("아이템이 가득 찼습니다.");
         else // 아이템 획득에 성공할 경우.
             gameObject.SetActive(false); // 아이템을 비활성화 시켜준다.

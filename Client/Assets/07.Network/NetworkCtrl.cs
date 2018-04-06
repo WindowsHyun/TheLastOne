@@ -15,6 +15,7 @@ using System.Linq;
 using FlatBuffers;
 using Game.TheLastOne; // Client, Vec3 을 불러오기 위해
 using TheLastOne.SendFunction;
+using TheLastOne.GameItemCtrl;
 using UnityEngine.UI;   // DebugText를 쓰기 위하여
 //---------------------------------------------------------------
 
@@ -46,25 +47,6 @@ public struct Client_Data
     }
 }
 
-public struct item_Collection
-{
-    public int id;
-    public string name;
-    public Vector3 pos;
-    public bool eat;
-    public bool draw;
-    public GameObject item;
-    public item_Collection(int id, string name, Vector3 pos, bool eat)
-    {
-        this.id = id;
-        this.name = name;
-        this.pos = pos;
-        this.eat = eat;
-        this.draw = false;
-        this.item = null;
-    }
-};
-
 namespace TheLastOne.Game.Network
 {
     public class NetworkCtrl : MonoBehaviour
@@ -82,6 +64,8 @@ namespace TheLastOne.Game.Network
         //------------------------------------------
         public Text DebugText;
 
+        public GameObject item = null;
+
         Vector3 Player_Position;
         Vector3 Player_Rotation;
 
@@ -91,7 +75,7 @@ namespace TheLastOne.Game.Network
         private const int MaxClient = 50;    // 최대 동접자수
         private const int MaxViewItem = 50;    // 최대 볼 수 있는 아이템
         public static Client_Data[] client_data = new Client_Data[MaxClient];      // 클라이언트 데이터 저장할 구조체
-        public static item_Collection[] item_Collection = new item_Collection[MaxViewItem];
+        public static Dictionary<int, Game_ItemCtrl> item_Collection = new Dictionary<int, Game_ItemCtrl>();
         /*
          Dictionary, Hashtable을 사용하려 하였지만, 
          Dic의 경우 Value 값을 수정하려면 임시 변수에 복사를 한후 수정하고 다시 복사를 해줘야 한다.
@@ -171,43 +155,46 @@ namespace TheLastOne.Game.Network
             {
                 if (Client_imei != -1)
                 {
-                    for (int i = 0; i < MaxViewItem; ++i)
+                    foreach (KeyValuePair<int, Game_ItemCtrl> iter in item_Collection)
                     {
-                        if (item_Collection[i].draw == false)
+                        if (iter.Value.get_draw() == false && iter.Value.get_name() != "")
                         {
-                            // draw가 안되어 있을 경우
-                            if (item_Collection[i].name == "AK47")
+                            // 그려져 있지 않을경우 그려준다.
+                            if (iter.Value.get_name() == "AK47")
                             {
-                                item_Collection[i].item = Instantiate(item_AK47, item_Collection[i].pos, Quaternion.identity);
-                                item_Collection[i].draw = true;
+                                iter.Value.item = (GameObject)Instantiate(item_AK47, iter.Value.get_pos(), Quaternion.identity);
+                                iter.Value.set_draw(true);
                             }
-                            if (item_Collection[i].name == "M16")
+                            else if (iter.Value.get_name() == "M16")
                             {
-                                item_Collection[i].item = Instantiate(item_M16, item_Collection[i].pos, Quaternion.identity);
-                                item_Collection[i].draw = true;
+                                iter.Value.item = Instantiate(item_M16, iter.Value.get_pos(), Quaternion.identity);
+                                iter.Value.set_draw(true);
                             }
-                            if (item_Collection[i].name == "556")
+                            else if (iter.Value.get_name() == "556")
                             {
-                                item_Collection[i].item = Instantiate(item_556, item_Collection[i].pos, Quaternion.identity);
-                                item_Collection[i].item.transform.rotation = Quaternion.Euler(-90, 0, 0);
-                                item_Collection[i].draw = true;
+                                iter.Value.item = Instantiate(item_556, iter.Value.get_pos(), Quaternion.identity);
+                                iter.Value.item.transform.rotation = Quaternion.Euler(-90, 0, 0);
+                                iter.Value.set_draw(true);
                             }
-                            if (item_Collection[i].name == "762")
+                            else if (iter.Value.get_name() == "762")
                             {
-                                item_Collection[i].item = Instantiate(item_762, item_Collection[i].pos, Quaternion.identity);
-                                item_Collection[i].item.transform.rotation = Quaternion.Euler(-90, 0, 0);
-                                item_Collection[i].draw = true;
+                                iter.Value.item = Instantiate(item_762, iter.Value.get_pos(), Quaternion.identity);
+                                iter.Value.item.transform.rotation = Quaternion.Euler(-90, 0, 0);
+                                iter.Value.set_draw(true);
                             }
-
+                            else if (iter.Value.get_name() == "AidKit")
+                            {
+                                iter.Value.item = Instantiate(item_AidKit, iter.Value.get_pos(), Quaternion.identity);
+                                iter.Value.item.transform.rotation = Quaternion.Euler(-90, 0, 0);
+                                iter.Value.set_draw(true);
+                            }
                         }
-
-                        //if (item_Collection[i].draw == true && item_Collection[i].item.activeInHierarchy == false)
-                        //{
-                        //    // 이미 그려진 상태에서 아이템이 먹어졌을 경우, 서버로 아이템을 먹었다고 보내야 한다.
-                        //    //Sendbyte = sF.makeEatItem_PacketInfo(item_Collection[i].id);
-                        //    //Send_Packet(Sendbyte);
-                        //}
-
+                        if (iter.Value.get_draw() == true && iter.Value.item.activeInHierarchy == false)
+                        {
+                            // 이미 그려진 상태에서 아이템이 먹어졌을 경우, 서버로 아이템을 먹었다고 보내야 한다.
+                            Sendbyte = sF.makeEatItem_PacketInfo(iter.Value.get_id());
+                            Send_Packet(Sendbyte);
+                        }
                     }
                 }
                 yield return new WaitForSeconds(0.1f);
@@ -285,7 +272,7 @@ namespace TheLastOne.Game.Network
                 ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
                 var Get_ServerData = Client_id.GetRootAsClient_id(revc_buf);
                 Client_imei = Int32.Parse(Get_ServerData.Id.ToString());
-                debugString = "Client ID :" + Client_imei + "/";
+                debugString = "Client ID :" + Client_imei;
                 //----------------------------------------------------------------
                 // 클라이언트 아이디가 정상적으로 받은건지 확인을 한다.
                 // 버그로 인하여 일단 임시로 나둔다.
@@ -401,10 +388,8 @@ namespace TheLastOne.Game.Network
                     pos.y = 29.99451f;
                     pos.z = Get_ServerData.Data(i).Value.Z;
 
-                    item_Collection[i].id = Get_ServerData.Data(i).Value.Id;
-                    item_Collection[i].name = Get_ServerData.Data(i).Value.Name.ToString();
-                    item_Collection[i].eat = Get_ServerData.Data(i).Value.Eat;
-                    item_Collection[i].pos = pos;
+                    item_Collection.Add(Get_ServerData.Data(i).Value.Id, new Game_ItemCtrl(Get_ServerData.Data(i).Value.Id, Get_ServerData.Data(i).Value.Name.ToString(), pos, Get_ServerData.Data(i).Value.Eat));
+
                 }
 
             }
@@ -436,6 +421,7 @@ namespace TheLastOne.Game.Network
                 StartCoroutine(SendCoroutine());
                 StartCoroutine(DrawDebugText());
                 StartCoroutine(drawItems());
+
             }
             catch (SocketException SCE)
             {

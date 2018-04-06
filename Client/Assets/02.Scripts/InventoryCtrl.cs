@@ -5,9 +5,9 @@ using UnityEngine;
 public class InventoryCtrl : MonoBehaviour
 {
     // 공개
-    public List<GameObject> ItemAllSlot;    // 모든 아이템 슬롯을 관리해줄 리스트
-    public List<GameObject> WeaponAllSlot;  // 모든 무기 슬롯을 관리해줄 리스트
-    public RectTransform InventoryRect;     // 인벤토리의 Rect
+    public static List<GameObject> ItemAllSlot = new List<GameObject>();    // 모든 아이템 슬롯을 관리해줄 리스트
+    public static List<GameObject> WeaponAllSlot = new List<GameObject>();  // 모든 무기 슬롯을 관리해줄 리스트
+    public static RectTransform InventoryRect;     // 인벤토리의 Rect
     public GameObject OriginSlot;       // 오리지널 아이템 슬롯
     public GameObject WeaponSlot;       // 오리지널 무기 슬롯
 
@@ -34,13 +34,15 @@ public class InventoryCtrl : MonoBehaviour
         // (슬롯 사이즈 * 슬롯의 가로(세로)개수) + (슬롯간 거리 * 슬롯의 가로(세로)개수)
         //InventoryWidth = (slotCountX * slotSize) + (slotCountX * slotGap) + slotGap;
         //InventoryHeight = (slotCountY * slotSize) + (slotCountY * slotGap) + slotGap;
-
+        InventoryRect = GetComponent<RectTransform>();
         InventoryWidth = 1600.0f;
         InventoryHeight = 800.0f;
 
         // 셋팅된 사이즈로 크기를 설정
+        if (InventoryRect != null) { 
         InventoryRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, InventoryWidth); // 가로
         InventoryRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, InventoryHeight);  // 세로
+        }
 
         // 아이템 슬롯 생성하기
         for (int y = 0; y < itemSlotCountY; y++)
