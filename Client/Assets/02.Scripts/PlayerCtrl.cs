@@ -55,7 +55,8 @@ public class PlayerCtrl : MonoBehaviour
     // 총알 발사 좌표
     public Transform firePos;
     // 총알 발사 사운드
-    public AudioClip fireSfx;
+    public AudioClip M16A4Sound;
+    public AudioClip AK47Sound;
 
     // AudioSource 컴포넌트를 저장할 변수
     private AudioSource source = null;
@@ -388,6 +389,7 @@ public class PlayerCtrl : MonoBehaviour
                 slot.slot.Clear();
                 slot.UpdateInfo(false, slot.DefaultImg);
             }
+            source.PlayOneShot(M16A4Sound, 0.9f);
         }
         else if (ak47Set == true)
         {
@@ -397,10 +399,11 @@ public class PlayerCtrl : MonoBehaviour
                 slot.slot.Clear();
                 slot.UpdateInfo(false, slot.DefaultImg);
             }
+            source.PlayOneShot(AK47Sound, 0.9f);
         }
 
         // 사운드 발생 함수
-        source.PlayOneShot(fireSfx, 0.9f);
+        
 
         // 잠시 기다리는 루틴을 위해 코루틴 함수로 호출
         StartCoroutine(this.ShowMuzzleFlash());

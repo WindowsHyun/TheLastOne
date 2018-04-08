@@ -41,7 +41,8 @@ public class OtherPlayerCtrl : MonoBehaviour
     // 총알 발사 좌표
     public Transform firePos;
     // 총알 발사 사운드
-    public AudioClip fireSfx;
+    public AudioClip M16A4Sound;
+    public AudioClip AK47Sound;
 
     // AudioSource 컴포넌트를 저장할 변수
     private AudioSource source = null;
@@ -208,7 +209,7 @@ public class OtherPlayerCtrl : MonoBehaviour
                 Instantiate(bullet, firePos.position, firePos.rotation);
 
                 // 사운드 발생 함수 ( 거리에 따른 소리를 다르게 하기 위하여 함수로 만듬)
-                source.PlayOneShot(fireSfx, SoundsByStreet(DistanceToPoint(player_Pos, tr.position)));
+                //source.PlayOneShot(fireSfx, SoundsByStreet(DistanceToPoint(player_Pos, tr.position)));
 
 
                 // 잠시 기다리는 루틴을 위해 코루틴 함수로 호출
