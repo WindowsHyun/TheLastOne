@@ -250,6 +250,8 @@ namespace dummy_server
             Client_info.AddAnimator(fbb, Player_Animator);
             Client_info.AddPosition(fbb, Vec3.CreateVec3(fbb, Player.x, Player.y, Player.z));
             Client_info.AddRotation(fbb, Vec3.CreateVec3(fbb, PlayerRotation.x, PlayerRotation.y, PlayerRotation.z));
+            Random rd = new Random();
+            Client_info.AddNowWeapon(fbb, rd.Next(1, 2));
             var endOffset = Client_info.EndClient_info(fbb);
             fbb.Finish(endOffset.Value);
 

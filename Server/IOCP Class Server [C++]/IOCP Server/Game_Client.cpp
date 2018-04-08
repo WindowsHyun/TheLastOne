@@ -12,7 +12,7 @@ void Game_Client::init()
 	this->hp = 100;
 	this->animator = 0;
 	this->connect = false;
-	this->shotting = false;
+	this->weaponState = 0;
 	this->remove_client = false;
 	ZeroMemory(&this->recv_over, sizeof(this->recv_over));
 	this->recv_over.event_type = OP_RECV;
@@ -37,7 +37,7 @@ Game_Client::Game_Client(const SOCKET sock, const int client_id, const char * ga
 	this->rotation.z = 0;
 	this->hp = 100;
 	this->animator = 0;
-	this->shotting = false;
+	this->weaponState = 0;
 	ZeroMemory(&this->recv_over, sizeof(this->recv_over));
 	ZeroMemory(&this->packet_buf, sizeof(this->packet_buf));
 	this->recv_over.event_type = OP_RECV;
@@ -62,7 +62,7 @@ Game_Client::Game_Client(const Game_Client & g_cl)
 	this->rotation.z = g_cl.rotation.z;
 	this->hp = g_cl.hp;
 	this->animator = g_cl.animator;
-	this->shotting = g_cl.shotting;
+	this->weaponState = g_cl.weaponState;
 	ZeroMemory(&this->recv_over, sizeof(this->recv_over));
 	ZeroMemory(&this->packet_buf, sizeof(this->packet_buf));
 	this->recv_over.event_type = OP_RECV;

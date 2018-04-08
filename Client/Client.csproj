@@ -13,12 +13,14 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile></CompilerResponseFile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
     <UnityProjectGenerator>VSTU</UnityProjectGenerator>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
     <UnityVersion>2017.3.0f3</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <LangVersion>4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -311,13 +313,15 @@
     <Compile Include="Assets\07.Network\Client_info.cs" />
     <Compile Include="Assets\07.Network\Client_Shot_info.cs" />
     <Compile Include="Assets\07.Network\CollisionCheckCtrl.cs" />
-    <Compile Include="Assets\07.Network\Game_ItemCtrl.cs" />
     <Compile Include="Assets\07.Network\Game_Items.cs" />
     <Compile Include="Assets\07.Network\Game_Timer.cs" />
     <Compile Include="Assets\07.Network\Gameitem.cs" />
     <Compile Include="Assets\07.Network\NetworkCtrl.cs" />
-    <Compile Include="Assets\07.Network\SendFunction.cs" />
+    <Compile Include="Assets\08.Class\Game_ClientClass.cs" />
+    <Compile Include="Assets\08.Class\Game_ProtocolClass.cs" />
+    <Compile Include="Assets\08.Class\SendFunction.cs" />
     <Compile Include="Assets\07.Network\Vec3.cs" />
+    <Compile Include="Assets\08.Class\Game_ItemClass.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\04.Images\Skybox\README.txt" />

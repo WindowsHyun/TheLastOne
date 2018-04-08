@@ -20,20 +20,20 @@ public struct Client_info : IFlatbufferObject
   public int Id { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
   public int Hp { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
   public int Animator { get { int o = __p.__offset(8); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
-  public bool Shotting { get { int o = __p.__offset(10); return o != 0 ? 0!=__p.bb.Get(o + __p.bb_pos) : (bool)false; } }
-  public string Name { get { int o = __p.__offset(12); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
-  public ArraySegment<byte>? GetNameBytes() { return __p.__vector_as_arraysegment(12); }
-  public Vec3? Position { get { int o = __p.__offset(14); return o != 0 ? (Vec3?)(new Vec3()).__assign(o + __p.bb_pos, __p.bb) : null; } }
-  public Vec3? Rotation { get { int o = __p.__offset(16); return o != 0 ? (Vec3?)(new Vec3()).__assign(o + __p.bb_pos, __p.bb) : null; } }
+  public string Name { get { int o = __p.__offset(10); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
+  public ArraySegment<byte>? GetNameBytes() { return __p.__vector_as_arraysegment(10); }
+  public Vec3? Position { get { int o = __p.__offset(12); return o != 0 ? (Vec3?)(new Vec3()).__assign(o + __p.bb_pos, __p.bb) : null; } }
+  public Vec3? Rotation { get { int o = __p.__offset(14); return o != 0 ? (Vec3?)(new Vec3()).__assign(o + __p.bb_pos, __p.bb) : null; } }
+  public int NowWeapon { get { int o = __p.__offset(16); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
 
   public static void StartClient_info(FlatBufferBuilder builder) { builder.StartObject(7); }
   public static void AddId(FlatBufferBuilder builder, int id) { builder.AddInt(0, id, 0); }
   public static void AddHp(FlatBufferBuilder builder, int hp) { builder.AddInt(1, hp, 0); }
   public static void AddAnimator(FlatBufferBuilder builder, int animator) { builder.AddInt(2, animator, 0); }
-  public static void AddShotting(FlatBufferBuilder builder, bool Shotting) { builder.AddBool(3, Shotting, false); }
-  public static void AddName(FlatBufferBuilder builder, StringOffset nameOffset) { builder.AddOffset(4, nameOffset.Value, 0); }
-  public static void AddPosition(FlatBufferBuilder builder, Offset<Vec3> positionOffset) { builder.AddStruct(5, positionOffset.Value, 0); }
-  public static void AddRotation(FlatBufferBuilder builder, Offset<Vec3> rotationOffset) { builder.AddStruct(6, rotationOffset.Value, 0); }
+  public static void AddName(FlatBufferBuilder builder, StringOffset nameOffset) { builder.AddOffset(3, nameOffset.Value, 0); }
+  public static void AddPosition(FlatBufferBuilder builder, Offset<Vec3> positionOffset) { builder.AddStruct(4, positionOffset.Value, 0); }
+  public static void AddRotation(FlatBufferBuilder builder, Offset<Vec3> rotationOffset) { builder.AddStruct(5, rotationOffset.Value, 0); }
+  public static void AddNowWeapon(FlatBufferBuilder builder, int nowWeapon) { builder.AddInt(6, nowWeapon, 0); }
   public static Offset<Client_info> EndClient_info(FlatBufferBuilder builder) {
     int o = builder.EndObject();
     return new Offset<Client_info>(o);

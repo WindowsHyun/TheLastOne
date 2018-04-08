@@ -19,6 +19,11 @@ public class PlayerCtrl : MonoBehaviour
         runForwordShot, runBackShot, runLeftShot, runRightShot
     };
 
+    public enum WeaponState
+    {
+        None, M16, AK47
+    };
+
     // 델리게이트 및 이벤트 선언
     public delegate void PlayerDieHandler();
     public static event PlayerDieHandler OnPlayerDie;
@@ -75,8 +80,9 @@ public class PlayerCtrl : MonoBehaviour
     // 아이템 획득 확인을 위한 변수
     public bool bullet762Set = false;
     public bool bullet556Set = false;
-    private int bullet762 = 0;
-    private int bullet556 = 0;
+    //private int bullet762 = 0;
+    //private int bullet556 = 0;
+    public WeaponState nowWeaponState = WeaponState.None;
 
     // 무기 정보 저장
     public GameObject ak47;
@@ -105,6 +111,112 @@ public class PlayerCtrl : MonoBehaviour
 
     // 모든 무기 슬롯의 데이터를 받기 위함
     public WeaponSlotCtrl[] weaponSlotCtrl;
+
+    IEnumerator StartKeyInput()
+    {
+        do
+        {
+            // 총이 장착이 되었을때만 발사 가능
+            if (shotable == true)
+            {
+                SlotCtrl Find762 = get_Bullet("Ammunition762");
+                SlotCtrl Find556 = get_Bullet("Ammunition556");
+                // 어떠한 종류의 총알이 1발 이상 있을 시
+                if (Find556 != null && Find556.slot.Peek().getItemCount() > 0 && m16Set == true)
+                {
+
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        animator.SetBool("IsShot", true);
+                        Fire(Find556);
+                        networkCtrl.Player_Shot();
+                    }
+                }
+                else if (Find762 != null && Find762.slot.Peek().getItemCount() > 0 && ak47Set == true)
+                {
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        animator.SetBool("IsShot", true);
+                        Fire(Find762);
+                        networkCtrl.Player_Shot();
+                    }
+                }
+            }
+            // 1번 , 2번 키 입력시 총 랜더링과 어떤 총인지 판별한다.
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                if (weaponSlotType[0] == "M16")
+                {
+                    m16.GetComponent<Renderer>().enabled = true;
+                    m16Set = true;
+                    ak47.GetComponent<Renderer>().enabled = false;
+                    ak47Set = false;
+                    nowWeaponState = WeaponState.M16;
+                }
+                else if (weaponSlotType[0] == "AK47")
+                {
+                    ak47.GetComponent<Renderer>().enabled = true;
+                    ak47Set = true;
+
+                    m16.GetComponent<Renderer>().enabled = false;
+                    m16Set = false;
+                    nowWeaponState = WeaponState.AK47;
+                }
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                if (weaponSlotType[1] == "M16")
+                {
+                    m16.GetComponent<Renderer>().enabled = true;
+                    m16Set = true;
+                    ak47.GetComponent<Renderer>().enabled = false;
+                    ak47Set = false;
+                    nowWeaponState = WeaponState.M16;
+                }
+                else if (weaponSlotType[1] == "AK47")
+                {
+                    ak47.GetComponent<Renderer>().enabled = true;
+                    ak47Set = true;
+
+                    m16.GetComponent<Renderer>().enabled = false;
+                    m16Set = false;
+                    nowWeaponState = WeaponState.AK47;
+                }
+            }
+
+            // Tab키 입력시 인벤토리 코드 실행
+            if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                if (inventoryShow == false)
+                {
+                    // 마우스 잠겨 있을경우 푼다.
+                    Cursor.lockState = CursorLockMode.None;//마우스 커서 고정 해제
+                    Cursor.visible = true;//마우스 커서 보이기
+
+                    inventory.SetActive(true);
+                    inventoryShow = true;
+                    RenewUpdate();
+
+                    // 총 발사 잠금
+                    shotable = false;
+                }
+                else if (inventoryShow == true)
+                {
+                    // 마우스가 안점겨 있을경우 다시 잠군다.
+                    Cursor.lockState = CursorLockMode.Locked;//마우스 커서 고정
+                    Cursor.visible = false;//마우스 커서 보이기
+
+                    inventory.SetActive(false);
+                    inventoryShow = false;
+
+                    // 총 발사 잠금 해제
+                    shotable = true;
+                }
+            }
+            yield return null;
+        } while (true);
+        //yield return null;
+    }
 
 
     void Start()
@@ -144,21 +256,8 @@ public class PlayerCtrl : MonoBehaviour
         // 인벤토리의 자식 컴포넌트의 스크립트 할당
         slotctrl = inventory.GetComponentsInChildren<SlotCtrl>();
         weaponSlotCtrl = inventory.GetComponentsInChildren<WeaponSlotCtrl>();
-
+        StartCoroutine(StartKeyInput());
     }
-
-    //public void setBullet(string type, int value)
-    //{
-    //    if (type == "Ammunition762")
-    //    {
-    //        bullet762 = value;
-    //    }
-
-    //    if (type == "Ammunition556")
-    //    {
-    //        bullet556 = value;
-    //    }
-    //}
 
     public void RenewUpdate()
     {
@@ -211,7 +310,7 @@ public class PlayerCtrl : MonoBehaviour
         return null;
     }
 
-    void Update()
+    void FixedUpdate()
     {
         h = Input.GetAxis("Horizontal");
         v = Input.GetAxis("Vertical");
@@ -271,107 +370,6 @@ public class PlayerCtrl : MonoBehaviour
             // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.idleGun 이 된다.
         }
 
-
-        // 총이 장착이 되었을때만 발사 가능
-        if (shotable == true)
-        {
-            SlotCtrl Find762 = get_Bullet("Ammunition762");
-            SlotCtrl Find556 = get_Bullet("Ammunition556");
-            // 어떠한 종류의 총알이 1발 이상 있을 시
-            if (Find556 != null && Find556.slot.Peek().getItemCount() > 0 && m16Set == true)
-            {
-
-                if (Input.GetMouseButtonDown(0))
-                {
-                    animator.SetBool("IsShot", true);
-                    Fire(Find556);
-                    networkCtrl.Player_Shot();
-                }
-            }
-            else if (Find762 != null && Find762.slot.Peek().getItemCount() > 0 && ak47Set == true)
-            {
-                if (Input.GetMouseButtonDown(0))
-                {
-                    animator.SetBool("IsShot", true);
-                    Fire(Find762);
-                    networkCtrl.Player_Shot();
-                }
-            }
-        }
-
-
-
-        // 1번 , 2번 키 입력시 총 랜더링과 어떤 총인지 판별한다.
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            if (weaponSlotType[0] == "M16")
-            {
-                WeaponSlotCtrl FindM16 = GetWeaponType("M16");
-                m16.GetComponent<Renderer>().enabled = true;
-                m16Set = true;
-                ak47.GetComponent<Renderer>().enabled = false;
-                ak47Set = false;
-            }
-            else if (weaponSlotType[0] == "AK47")
-            {
-                WeaponSlotCtrl FindAK47 = GetWeaponType("AK47");
-                ak47.GetComponent<Renderer>().enabled = true;
-                ak47Set = true;
-
-                m16.GetComponent<Renderer>().enabled = false;
-                m16Set = false;
-            }
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            if (weaponSlotType[1] == "M16")
-            {
-                WeaponSlotCtrl FindM16 = GetWeaponType("M16");
-                m16.GetComponent<Renderer>().enabled = true;
-                m16Set = true;
-                ak47.GetComponent<Renderer>().enabled = false;
-                ak47Set = false;
-            }
-            else if (weaponSlotType[1] == "AK47")
-            {
-                WeaponSlotCtrl FindAK47 = GetWeaponType("AK47");
-                ak47.GetComponent<Renderer>().enabled = true;
-                ak47Set = true;
-
-                m16.GetComponent<Renderer>().enabled = false;
-                m16Set = false;
-            }
-        }
-
-        // Tab키 입력시 인벤토리 코드 실행
-        if (Input.GetKeyDown(KeyCode.Tab))
-        {
-            if (inventoryShow == false)
-            {
-                // 마우스 잠겨 있을경우 푼다.
-                Cursor.lockState = CursorLockMode.None;//마우스 커서 고정 해제
-                Cursor.visible = true;//마우스 커서 보이기
-
-                inventory.SetActive(true);
-                inventoryShow = true;
-                RenewUpdate();
-
-                // 총 발사 잠금
-                shotable = false;
-            }
-            else if (inventoryShow == true)
-            {
-                // 마우스가 안점겨 있을경우 다시 잠군다.
-                Cursor.lockState = CursorLockMode.Locked;//마우스 커서 고정
-                Cursor.visible = false;//마우스 커서 보이기
-
-                inventory.SetActive(false);
-                inventoryShow = false;
-
-                // 총 발사 잠금 해제
-                shotable = true;
-            }
-        }
     }
 
     void Fire(SlotCtrl slot)
@@ -540,12 +538,14 @@ public class PlayerCtrl : MonoBehaviour
             ak47.GetComponent<Renderer>().enabled = true;
             //m16.GetComponent<Renderer>().enabled = false;
             animator.SetBool("IsEquip", true);
+            nowWeaponState = WeaponState.AK47;
         }
         else if (m16Set == true)
         {
             m16.GetComponent<Renderer>().enabled = true;
             //ak47.GetComponent<Renderer>().enabled = false;
             animator.SetBool("IsEquip", true);
+            nowWeaponState = WeaponState.M16;
         }
     }
 

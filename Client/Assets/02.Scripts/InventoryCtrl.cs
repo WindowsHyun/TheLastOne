@@ -57,7 +57,7 @@ public class InventoryCtrl : MonoBehaviour
                 //RectTransform item = slot.transform.GetChild(0).GetComponent<RectTransform>();
 
                 slot.name = "ItemSlot_" + y + "_" + x; // 슬롯 이름 설정
-                slot.transform.parent = transform; // 슬롯의 부모를 설정 (Inventory객체가 부모임)
+                slot.transform.SetParent(transform); // 슬롯의 부모를 설정 (Inventory객체가 부모임)
 
                 // 슬롯이 생성될 위치 설정하기
                 slotRect.localPosition = new Vector3((itemSlotSize * x) + (itemSlotGap * (x + 1)), -((100 * y) + (itemSlotGap * (y + 1))), 0);
@@ -88,7 +88,8 @@ public class InventoryCtrl : MonoBehaviour
                 //RectTransform item = slot.transform.GetChild(0).GetComponent<RectTransform>();
 
                 slot.name = "WeaponSlot_" + y + "_" + x; // 슬롯 이름 설정
-                slot.transform.parent = transform; // 슬롯의 부모를 설정 (Inventory객체가 부모임)
+                slot.transform.SetParent(transform); // 슬롯의 부모를 설정 (Inventory객체가 부모임)
+                //slot.transform.parent = transform; // 슬롯의 부모를 설정 (Inventory객체가 부모임)
 
 
 

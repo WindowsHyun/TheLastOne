@@ -20,7 +20,8 @@ void Server_Timer::Timer_Thread()
 			OverlappedEx *over = new OverlappedEx;
 			if (E_initTime == t.event) {
 				over->event_type = OP_InitTime;
-			}else if (E_Remove_Client == t.event) {
+			}
+			else if (E_Remove_Client == t.event) {
 				over->event_type = OP_RemoveClient;
 			}
 
@@ -45,7 +46,7 @@ void Server_Timer::initTimer(HANDLE handle)
 
 	t = { 1, high_resolution_clock::now() + 1s, E_Remove_Client };
 	setTimerEvent(t);
-	
+
 	timer_tread = std::thread(&Server_Timer::Timer_Thread, this);
 	timer_tread.join();
 }

@@ -10,7 +10,7 @@ public class StartCarCtrl : MonoBehaviour
 
     public GameObject player;
 
-    private bool getOff = false;
+    //private bool getOff = false;
     private bool startSet = false;
 
     // Use this for initialization

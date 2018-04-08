@@ -53,8 +53,9 @@ public class OtherPlayerCtrl : MonoBehaviour
     // 총알 프리팹 만드는 Bool 변수 [ 외부함수에서는 프리팹 생성이 안되기 때문에 ]
     private bool createBullet_b = false;
 
-    // 애니메이션 값 저장하는 변수
+    // 애니메이션, 총 상태 저장하는 변수
     private int animator_value = 0;
+    private int weapon_state = 0;
 
     // 혈흔 효과 프리팹
     public GameObject bloodEffect;
@@ -94,8 +95,13 @@ public class OtherPlayerCtrl : MonoBehaviour
 
     public void get_Animator(int value)
     {
-        // 동적으로 총알을 생성할 수 있게 true로 변경
         animator_value = value;
+    }
+
+    public void get_Weapon(int value)
+    {
+        // 동적으로 총알을 생성할 수 있게 true로 변경
+        weapon_state = value;
     }
 
     public void Fire(Vector3 player)
@@ -149,6 +155,25 @@ public class OtherPlayerCtrl : MonoBehaviour
     {
         do
         {
+
+            switch (weapon_state)
+            {
+                case 0:
+                    //animator.SetBool("IsEquip", false);
+                    ak47.GetComponent<Renderer>().enabled = false;
+                    m16.GetComponent<Renderer>().enabled = false;
+                    break;
+                case 1:
+                    animator.SetBool("IsEquip", true);
+                    ak47.GetComponent<Renderer>().enabled = false;
+                    m16.GetComponent<Renderer>().enabled = true;
+                    break;
+                case 2:
+                    animator.SetBool("IsEquip", true);
+                    ak47.GetComponent<Renderer>().enabled = true;
+                    m16.GetComponent<Renderer>().enabled = false;
+                    break;
+            }
 
             switch (animator_value)
             {
@@ -217,6 +242,7 @@ public class OtherPlayerCtrl : MonoBehaviour
             hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
             if (hp <= 0)
             {
+                isDie = true;
                 OtherPlayerDie();
             }
             // Bullet 삭제

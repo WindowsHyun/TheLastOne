@@ -4,7 +4,6 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS						// scanf 빌드 오류
 #define _CRT_NONSTDC_NO_DEPRECATE					// itoa 빌드 오류
-
 /* flatbuffers 에서의 min, max 오류 해결 방법 */
 #define _WIN32_WINNT _WIN32_WINNT_XP
 #define WIN32_LEAN_AND_MEAN
@@ -23,18 +22,15 @@
 #include <unordered_set> // 성능이 더 좋아진다. [순서가 상관없을경우]
 #include <mutex>
 #include <string>
-//#include <string.h>    // strchr 함수가 선언된 헤더 파일
 
 #include "Protocol.h"
 #include "Flatbuffers_View.h"
 #include "Game_Item.h"
 
-
 using namespace std::chrono;
 using namespace Game::TheLastOne; // Flatbuffers를 읽어오자.
 
 class IOCP_Server {
-
 private:
 	SOCKET g_socket;
 	std::chrono::high_resolution_clock::time_point serverTimer;
@@ -54,7 +50,8 @@ private:
 	void Send_Client_ID(int client_id, int value, bool allClient);	// 클라이언트 에게 패킷 아이디 보내기
 	void Send_All_Data(int client, bool allClient);					// 클라이언트에게 모든 클라이언트 위치 보내기
 	void Send_All_Time(int kind, int time, int client_id, bool allClient);					// 클라이언트에게 시간을 보내준다.
-	void Send_All_Item();
+	void Send_All_Item();		// 클라이언트에게 시간정보를 보내준다.
+	void Send_Client_Shot(int shot_client);		// 클라이언트들에게 Shot 정보를 보내준다.
 
 public:
 	HANDLE getHandle() { return g_hiocp; }

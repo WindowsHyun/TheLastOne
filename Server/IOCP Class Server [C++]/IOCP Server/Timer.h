@@ -34,7 +34,6 @@ private:
 public:
 	void setTimerEvent(Timer_Event t);
 	void initTimer(HANDLE g_hiocp);
-	
 
 	Server_Timer();
 	~Server_Timer();

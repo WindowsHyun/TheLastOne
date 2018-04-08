@@ -12,7 +12,6 @@ public class CollisionCheckCtrl : MonoBehaviour
     private int x = 0;
     private int z = 0;
     //string m_strPath = "Assets/navmesh/";
-    string txtdata = "";
 
     public void WriteData(string strData, bool line)
     {
