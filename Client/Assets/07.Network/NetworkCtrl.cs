@@ -68,6 +68,7 @@ namespace TheLastOne.Game.Network
         public string iPAdress = "127.0.0.1";
         public const int kPort = 9000;
         private byte[] Sendbyte = new byte[4000];
+        private static ManualResetEvent connectDone = new ManualResetEvent(false);
 
         //private const int MaxClient = 50;    // 최대 동접자수
         //private const int MaxViewItem = 50;    // 최대 볼 수 있는 아이템
@@ -79,7 +80,7 @@ namespace TheLastOne.Game.Network
         // 클라이언트 아이템 저장할 컨테이너
 
         Game_ProtocolClass recv_protocol = new Game_ProtocolClass();
-        
+
         private static int Client_imei = -1;         // 자신의 클라이언트 아이디
 
         Socket_SendFunction sF = new Socket_SendFunction();
@@ -88,6 +89,21 @@ namespace TheLastOne.Game.Network
 
         // 서버 연결을 했는지 체크
         private static bool serverConnect = false;
+
+        IEnumerator SocketCheck()
+        {
+            if (m_Socket.Connected == true)
+            {
+                // 서버가 정상적으로 연결 되었을경우
+                serverConnect = true;
+                StartCoroutine(startPrefab());
+                StartCoroutine(SendCoroutine());
+                StartCoroutine(DrawDebugText());
+                StartCoroutine(drawItems());
+            }
+            yield return null;
+            //yield return new WaitForSeconds(0.5f);
+        }
 
         IEnumerator startPrefab()
         {
@@ -155,8 +171,7 @@ namespace TheLastOne.Game.Network
                             }
                             else if (iter.Value.get_name() == "556")
                             {
-                                iter.Value.item = Instantiate(item_556, iter.Value.get_pos(), Quaternion.identity);
-                                iter.Value.item.transform.rotation = Quaternion.Euler(-90, 0, 0);
+                                iter.Value.item = Instantiate(item_556, iter.Value.get_pos(), Quaternion.Euler(-90, 0, 0));
                                 iter.Value.set_draw(true);
                             }
                             else if (iter.Value.get_name() == "762")
@@ -387,12 +402,8 @@ namespace TheLastOne.Game.Network
             try
             {
                 m_Socket.BeginConnect(iPAdress, kPort, new AsyncCallback(ConnectCallback), m_Socket);
-
-                StartCoroutine(startPrefab());
-                StartCoroutine(SendCoroutine());
-                StartCoroutine(DrawDebugText());
-                StartCoroutine(drawItems());
-
+                connectDone.WaitOne();
+                StartCoroutine(SocketCheck());
             }
             catch (SocketException SCE)
             {
@@ -405,10 +416,19 @@ namespace TheLastOne.Game.Network
 
         void ConnectCallback(IAsyncResult ar)
         {
-            // 서버가 정상적으로 연결이 되었을 경우.
-            Debug.Log("Connected to server, start recieve data");
-            serverConnect = true;
-            RecieveHeader();//start recieve header
+            try
+            {
+                // 서버가 정상적으로 연결이 되었을 경우.
+                Debug.Log("Connected to server, start recieve data");
+                connectDone.Set();
+                if (m_Socket.Connected == true)
+                    RecieveHeader();//start recieve header
+            }
+            catch (Exception e)
+            {
+                connectDone.Set();
+                Console.WriteLine(e.ToString());
+            }
         }
 
         void RecieveHeader()

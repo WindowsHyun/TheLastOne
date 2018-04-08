@@ -290,26 +290,6 @@ public class PlayerCtrl : MonoBehaviour
         return null;
     }
 
-    // 무기가 들어가서 isSlots이 true가 된 슬롯에서 해당 타입의 무기 슬롯을 찾아 반환하는 함수
-    public WeaponSlotCtrl GetWeaponType(string value)
-    {
-        foreach (WeaponSlotCtrl wCtrl in weaponSlotCtrl)
-        {
-            if (wCtrl.isSlots() == true)
-            {
-                if (wCtrl.weaponSlot.Peek().type.ToString() == "AK47" && value == "AK47")
-                {
-                    return wCtrl;
-                }
-                else if (wCtrl.weaponSlot.Peek().type.ToString() == "M16" && value == "M16")
-                {
-                    return wCtrl;
-                }
-            }
-        }
-        return null;
-    }
-
     void FixedUpdate()
     {
         h = Input.GetAxis("Horizontal");
