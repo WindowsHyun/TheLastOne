@@ -211,7 +211,7 @@ public class PlayerCtrl : MonoBehaviour
         return null;
     }
 
-    void Update()
+    void FixedUpdate()
     {
         h = Input.GetAxis("Horizontal");
         v = Input.GetAxis("Vertical");
