@@ -112,10 +112,32 @@ public class PlayerCtrl : MonoBehaviour
     // 모든 무기 슬롯의 데이터를 받기 위함
     public WeaponSlotCtrl[] weaponSlotCtrl;
 
+    public bool dangerLineIn = false;
+
     IEnumerator StartKeyInput()
     {
         do
         {
+
+            if (dangerLineIn == false)
+            {
+                // 범위 밖에 있을 경우 HP 감소
+                hp -= 1;
+
+                // Image UI 항목의 fillAmount 속성을 조절해 생명 게이지 값 조절
+                imgHpBar.fillAmount = (float)hp / (float)initHp;
+
+                Debug.Log("Player H{: " + hp.ToString());
+                if (hp <= 0)
+                {
+                    // 마우스 잠겨 있을경우 푼다.
+                    Cursor.lockState = CursorLockMode.None;//마우스 커서 고정 해제
+                    Cursor.visible = true;//마우스 커서 보이기
+                    PlayerDie();
+                }
+            }
+
+
             // 총이 장착이 되었을때만 발사 가능
             if (shotable == true)
             {
@@ -350,6 +372,8 @@ public class PlayerCtrl : MonoBehaviour
             // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.idleGun 이 된다.
         }
 
+
+        
     }
 
     void Fire(SlotCtrl slot)
@@ -437,6 +461,9 @@ public class PlayerCtrl : MonoBehaviour
 
             if (hp <= 0)
             {
+                // 마우스 잠겨 있을경우 푼다.
+                Cursor.lockState = CursorLockMode.None;//마우스 커서 고정 해제
+                Cursor.visible = true;//마우스 커서 보이기
                 PlayerDie();
             }
             // Bullet 삭제
@@ -463,9 +490,20 @@ public class PlayerCtrl : MonoBehaviour
             Debug.Log("Player H{: " + hp.ToString());
             if (hp <= 0)
             {
+                // 마우스 잠겨 있을경우 푼다.
+                Cursor.lockState = CursorLockMode.None;//마우스 커서 고정 해제
+                Cursor.visible = true;//마우스 커서 보이기
                 PlayerDie();
+
             }
         }
+
+        if (coll.gameObject.tag == "DangerLine")
+        {
+            dangerLineIn = true;
+        }
+
+
     }
 
     void OnTriggerExit(Collider coll)
@@ -488,6 +526,12 @@ public class PlayerCtrl : MonoBehaviour
         if (coll.gameObject.tag == "House")
         {
             shotable = true;
+        }
+
+
+        if (coll.gameObject.tag == "DangerLine")
+        {
+            dangerLineIn = false;
         }
     }
 
