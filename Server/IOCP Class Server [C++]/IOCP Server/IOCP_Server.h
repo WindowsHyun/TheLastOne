@@ -30,6 +30,12 @@
 using namespace std::chrono;
 using namespace Game::TheLastOne; // Flatbuffers를 읽어오자.
 
+struct xyz {
+	float x;
+	float y;
+	float z;
+};
+
 class IOCP_Server {
 private:
 	SOCKET g_socket;

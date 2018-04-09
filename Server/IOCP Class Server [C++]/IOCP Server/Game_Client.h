@@ -11,12 +11,6 @@ struct OverlappedEx {
 	int target_id;
 };
 
-struct xyz {
-	float x;
-	float y;
-	float z;
-};
-
 class Game_Client {
 private:
 	int client_id = -1;

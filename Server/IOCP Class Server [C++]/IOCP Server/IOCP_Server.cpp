@@ -1,6 +1,7 @@
 ﻿#include "IOCP_Server.h"
 #include "Game_Client.h"
 #include "Timer.h"
+#include "Game_DangerLine.h"
 
 std::unordered_map< int, Game_Client>::iterator get_client_iter(int ci);
 std::unordered_map< int, Game_Client> g_clients;
