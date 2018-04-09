@@ -1,9 +1,9 @@
 #ifndef __PROTOCOL_H__
 #define __PROTOCOL_H__
 
-enum TimerType { T_InitTime };
-enum OPTYPE { OP_SEND, OP_RECV, OP_InitTime, OP_RemoveClient };
-enum Event_Type { E_initTime, E_RoundTime, E_Remove_Client };
+enum TimerType { T_DangerLine };
+enum OPTYPE { OP_SEND, OP_RECV, OP_DangerLine, OP_RemoveClient, OP_MoveDangerLine };
+enum Event_Type { E_DangerLine, E_RoundTime, E_Remove_Client, E_MoveDangerLine };
 
 // 소켓 설정
 #define SERVERPORT 9000
@@ -23,11 +23,13 @@ enum Event_Type { E_initTime, E_RoundTime, E_Remove_Client };
 #define SC_Server_Time	5				// 서버 타이머
 #define SC_Server_Item	6				// 서버 아이템
 #define SC_Shot_Client	7				// 클라이언트 Shot 정보
+#define SC_DangerLine	8				// 클라이언트 DangerLine 정보 전송
 
 // 클라이언트가 서버에게 보내는 패킷
 #define CS_Info           1					// 클라이언트가 서버에게 자신의 위치정보를 보내준다.
 #define CS_Shot_info    2					// 클라이언트가 서버에게 Shot 정보를 보내준다.
 #define CS_Check_info  3					// 클라이언트가 서버에게 자신의 정보가 맞는지 확인해 준다.
 #define CS_Eat_Item	   4					// 클라이언트가 서버에게 먹은 아이템 정보를 보내준다.
+#define CS_DangerLine 5					// 클라이언트가 서버에게 DangerLine이 도착했다고 정보를 보내준다.
 
 #endif

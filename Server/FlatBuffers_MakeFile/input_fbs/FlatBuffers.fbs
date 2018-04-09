@@ -34,6 +34,12 @@ table Gameitem{
   eat:bool;
 }
 
+table GameDangerLine{
+  demage:int;
+  position:Vec3;
+  scale:Vec3;
+}
+
 table Game_Timer {
   kind:int;
   time:int;

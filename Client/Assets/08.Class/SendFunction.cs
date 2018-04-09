@@ -105,5 +105,26 @@ namespace TheLastOne.SendFunction
             return real_packet;
         }
 
+        public Byte[] DangerLine_End()
+        {
+            //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.
+            fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
+            Client_id.StartClient_id(fbb);
+            Client_id.AddId(fbb, -1);
+            var endOffset = Client_id.EndClient_id(fbb);
+            fbb.Finish(endOffset.Value);
+
+
+            byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
+            byte[] packet_len = BitConverter.GetBytes(packet.Length);   // flatbuffers의 패킷 크기
+            byte[] packet_type = BitConverter.GetBytes(CS_DangerLine);
+            byte[] real_packet = new byte[packet_len.Length + packet.Length];
+
+            System.Buffer.BlockCopy(packet_len, 0, real_packet, 0, packet_len.Length);
+            System.Buffer.BlockCopy(packet_type, 0, real_packet, 1, packet_type.Length);
+            System.Buffer.BlockCopy(packet, 0, real_packet, 4, packet.Length);
+            return real_packet;
+        }
+
     }
 }

@@ -19,6 +19,8 @@ struct Game_Items;
 
 struct Gameitem;
 
+struct GameDangerLine;
+
 struct Game_Timer;
 
 struct Client_id;
@@ -368,6 +370,66 @@ inline flatbuffers::Offset<Gameitem> CreateGameitemDirect(
       x,
       z,
       eat);
+}
+
+struct GameDangerLine FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_DEMAGE = 4,
+    VT_POSITION = 6,
+    VT_SCALE = 8
+  };
+  int32_t demage() const {
+    return GetField<int32_t>(VT_DEMAGE, 0);
+  }
+  const Vec3 *position() const {
+    return GetStruct<const Vec3 *>(VT_POSITION);
+  }
+  const Vec3 *scale() const {
+    return GetStruct<const Vec3 *>(VT_SCALE);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_DEMAGE) &&
+           VerifyField<Vec3>(verifier, VT_POSITION) &&
+           VerifyField<Vec3>(verifier, VT_SCALE) &&
+           verifier.EndTable();
+  }
+};
+
+struct GameDangerLineBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_demage(int32_t demage) {
+    fbb_.AddElement<int32_t>(GameDangerLine::VT_DEMAGE, demage, 0);
+  }
+  void add_position(const Vec3 *position) {
+    fbb_.AddStruct(GameDangerLine::VT_POSITION, position);
+  }
+  void add_scale(const Vec3 *scale) {
+    fbb_.AddStruct(GameDangerLine::VT_SCALE, scale);
+  }
+  explicit GameDangerLineBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  GameDangerLineBuilder &operator=(const GameDangerLineBuilder &);
+  flatbuffers::Offset<GameDangerLine> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<GameDangerLine>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<GameDangerLine> CreateGameDangerLine(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t demage = 0,
+    const Vec3 *position = 0,
+    const Vec3 *scale = 0) {
+  GameDangerLineBuilder builder_(_fbb);
+  builder_.add_scale(scale);
+  builder_.add_position(position);
+  builder_.add_demage(demage);
+  return builder_.Finish();
 }
 
 struct Game_Timer FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {

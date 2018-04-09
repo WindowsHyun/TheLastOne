@@ -8,6 +8,7 @@ std::unordered_map< int, Game_Client> g_clients;
 std::unordered_map< int, Game_Item>::iterator get_item_iter(int ci);
 std::unordered_map< int, Game_Item> g_item;
 std::queue<int> remove_client_id;
+Game_DangerLine DangerLine;
 Server_Timer Timer;
 
 IOCP_Server::IOCP_Server()
@@ -165,19 +166,38 @@ void IOCP_Server::Worker_Thread()
 			}
 			delete over;
 		}
-		else if (OP_InitTime == over->event_type) {
-			Send_All_Time(T_InitTime, (int)ci, -1, true);
+		else if (OP_DangerLine == over->event_type) {
+			Send_All_Time(T_DangerLine, (int)ci, -1, true);
 			if (ci <= 0) {
 				// 초기 대기시간이 만료 되었을 경우
-#if (DebugMod == TRUE )
-				std::cout << "OP_InitTime이 완료 되었습니다..!" << std::endl;
-#endif
+				DangerLine.set_level(DangerLine.get_level() - 1);
+				Send_DangerLine_info(DangerLine.get_demage(), DangerLine.get_pos(), DangerLine.get_scale());
+				if (DangerLine.get_level() != -1) {
+					Timer_Event t = { (int)DangerLine.get_scale_x() , high_resolution_clock::now() + 100ms, E_MoveDangerLine };
+					std::cout << DangerLine.get_scale_x() << std::endl;
+					Timer.setTimerEvent(t);
+				}
+
 			}
 			else {
 				// ci-1 을 한 이유는 1초씩 내리기 위하여.
-				Timer_Event t = { (int)ci - 1, high_resolution_clock::now() + 1s, E_initTime };
+				Timer_Event t = { (int)ci - 1, high_resolution_clock::now() + 1s, E_DangerLine };
 				Timer.setTimerEvent(t);
 			}
+		}
+		else if (OP_MoveDangerLine == over->event_type) {
+			DangerLine.set_scale(10);
+			Send_DangerLine_info(DangerLine.get_demage(), DangerLine.get_pos(), DangerLine.get_scale());
+
+			if (DangerLine.get_now_scale_x() <= ci) {
+				Timer_Event t = { DangerLine.get_time() , high_resolution_clock::now() + 1s, E_DangerLine };	// 자기장 시작 전 대기시간
+				Timer.setTimerEvent(t);
+			}
+			else {
+				Timer_Event t = { ci , high_resolution_clock::now() + 100ms, E_MoveDangerLine };
+				Timer.setTimerEvent(t);
+			}
+
 		}
 		else if (OP_RemoveClient == over->event_type) {
 			// 1초마다 한번씩 종료된 클라이언트를 지워 준다.
@@ -337,6 +357,11 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 			auto client_Check_info = GetClient_infoView(get_packet);
 			auto iter = get_item_iter(client_Check_info->id());
 			iter->second.set_eat(true);
+		}
+		break;
+		case CS_DangerLine:
+		{
+			std::cout << "도착했다!!!" << std::endl;
 		}
 		break;
 		}
@@ -521,6 +546,24 @@ void IOCP_Server::Send_Client_Shot(int shot_client)
 			continue;
 		SendPacket(SC_Shot_Client, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
 	}
+
+}
+
+void IOCP_Server::Send_DangerLine_info(int demage, xyz pos, xyz scale)
+{
+	flatbuffers::FlatBufferBuilder builder;
+	auto dem = demage;
+	auto position = new Vec3(pos.x, pos.y, pos.z);
+	auto sscale = new Vec3(scale.x, scale.y, scale.z);
+	auto orc = CreateGameDangerLine(builder, dem, position, sscale);
+	builder.Finish(orc); // Serialize the root of the object.
+
+	for (auto iter : g_clients) {
+		if (iter.second.get_Connect() != true)
+			continue;
+		SendPacket(SC_DangerLine, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
+	}
+
 
 }
 

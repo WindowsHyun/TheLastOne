@@ -58,6 +58,7 @@ private:
 	void Send_All_Time(int kind, int time, int client_id, bool allClient);					// 클라이언트에게 시간을 보내준다.
 	void Send_All_Item();		// 클라이언트에게 시간정보를 보내준다.
 	void Send_Client_Shot(int shot_client);		// 클라이언트들에게 Shot 정보를 보내준다.
+	void Send_DangerLine_info(int demage, xyz pos, xyz scale);
 
 public:
 	HANDLE getHandle() { return g_hiocp; }
