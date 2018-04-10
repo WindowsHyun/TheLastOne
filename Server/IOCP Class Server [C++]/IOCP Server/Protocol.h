@@ -30,6 +30,5 @@ enum Event_Type { E_DangerLine, E_RoundTime, E_Remove_Client, E_MoveDangerLine }
 #define CS_Shot_info    2					// 클라이언트가 서버에게 Shot 정보를 보내준다.
 #define CS_Check_info  3					// 클라이언트가 서버에게 자신의 정보가 맞는지 확인해 준다.
 #define CS_Eat_Item	   4					// 클라이언트가 서버에게 먹은 아이템 정보를 보내준다.
-#define CS_DangerLine 5					// 클라이언트가 서버에게 DangerLine이 도착했다고 정보를 보내준다.
 
 #endif

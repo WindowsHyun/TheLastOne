@@ -181,6 +181,7 @@ void IOCP_Server::Worker_Thread()
 			}
 			else {
 				// ci-1 을 한 이유는 1초씩 내리기 위하여.
+				Send_DangerLine_info(DangerLine.get_demage(), DangerLine.get_pos(), DangerLine.get_scale());
 				Timer_Event t = { (int)ci - 1, high_resolution_clock::now() + 1s, E_DangerLine };
 				Timer.setTimerEvent(t);
 			}
@@ -357,11 +358,6 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 			auto client_Check_info = GetClient_infoView(get_packet);
 			auto iter = get_item_iter(client_Check_info->id());
 			iter->second.set_eat(true);
-		}
-		break;
-		case CS_DangerLine:
-		{
-			std::cout << "도착했다!!!" << std::endl;
 		}
 		break;
 		}

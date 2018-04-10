@@ -21,7 +21,6 @@ namespace TheLastOne.GameClass
         public int CS_Shot_info;       // 클라이언트가 서버에게 Shot 정보를 보내준다.
         public int CS_Check_info;       // 클라이언트가 서버에게 자신의 정보가 맞는지 확인해 준다.
         public int CS_Eat_Item;					// 클라이언트가 서버에게 먹은 아이템 정보를 보내준다.
-        public int CS_DangerLine;					// 클라이언트가 서버에게 DangerLine이 도착했다고 정보를 보내준다.
 
         public Game_ProtocolClass()
         {
@@ -41,7 +40,6 @@ namespace TheLastOne.GameClass
             CS_Shot_info = 2;
             CS_Check_info = 3;
             CS_Eat_Item = 4;
-            CS_DangerLine = 5;
             //----------------------------------
         }
     }
