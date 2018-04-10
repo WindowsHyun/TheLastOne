@@ -1,0 +1,13 @@
+posx:619|posy:30|posz:1275.2|centerx:-3.5|centery:-0.6|centerz:2.5|sizex:2.5|sizey:0.2|sizez:5|scalex:4|scaley:6|scalez:2.5|
+posx:619|posy:30|posz:1275.2|centerx:2.3|centery:-2.5|centerz:2.5|sizex:5.3|sizey:0.3|sizez:5|scalex:4|scaley:6|scalez:2.5|
+posx:619|posy:30|posz:1275.2|centerx:4.8|centery:-1.33|centerz:2.5|sizex:0.4|sizey:2.1|sizez:5|scalex:4|scaley:6|scalez:2.5|
+posx:619|posy:30|posz:1275.2|centerx:4.8|centery:1.6|centerz:2.5|sizex:0.4|sizey:1.6|sizez:5|scalex:4|scaley:6|scalez:2.5|
+posx:619|posy:30|posz:1275.2|centerx:3.75|centery:1.15|centerz:2.5|sizex:1.7|sizey:0.15|sizez:5|scalex:4|scaley:6|scalez:2.5|
+posx:619|posy:30|posz:1275.2|centerx:1.7|centery:1.75|centerz:2.5|sizex:0.4|sizey:1.25|sizez:5|scalex:4|scaley:6|scalez:2.5|
+posx:619|posy:30|posz:1275.2|centerx:-4.8|centery:0|centerz:2.5|sizex:0.3|sizey:5.1|sizez:5|scalex:4|scaley:6|scalez:2.5|
+posx:619|posy:30|posz:1275.2|centerx:-3.25|centery:-2.5|centerz:2.5|sizex:2.9|sizey:0.3|sizez:5|scalex:4|scaley:6|scalez:2.5|
+posx:619|posy:30|posz:1275.2|centerx:0.2|centery:2.5|centerz:2.5|sizex:9.8|sizey:0.3|sizez:5|scalex:4|scaley:6|scalez:2.5|
+posx:619|posy:30|posz:1275.2|centerx:-2.3|centery:-0.3|centerz:2.5|sizex:0.3|sizey:0.4|sizez:5|scalex:4|scaley:6|scalez:2.5|
+posx:619|posy:30|posz:1275.2|centerx:3.75|centery:-1|centerz:2.5|sizex:1.7|sizey:0.2|sizez:5|scalex:4|scaley:6|scalez:2.5|
+posx:619|posy:30|posz:1275.2|centerx:1.65|centery:-1.65|centerz:2.5|sizex:0.5|sizey:1.4|sizez:5|scalex:4|scaley:6|scalez:2.5|
+posx:619|posy:30|posz:1275.2|centerx:-2.3|centery:1.5|centerz:2.5|sizex:0.3|sizey:1.7|sizez:5|scalex:4|scaley:6|scalez:2.5|

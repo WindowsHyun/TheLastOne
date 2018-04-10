@@ -26,6 +26,6 @@ public:
 	~Game_Item();
 };
 
-void load_g_item(std::string filepath, std::unordered_map< int, Game_Item> *item);
+void load_item_txt(std::string filepath, std::unordered_map< int, Game_Item> *item);
 std::string splitParsing(const std::string content, const std::string start, const std::string end);
 #endif

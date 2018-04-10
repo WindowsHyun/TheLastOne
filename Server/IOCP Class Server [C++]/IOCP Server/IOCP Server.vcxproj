@@ -118,6 +118,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Game_CollisionCheck.h" />
     <ClInclude Include="Game_DangerLine.h" />
     <ClInclude Include="Flatbuffers_View.h" />
     <ClInclude Include="Game_Client.h" />
@@ -128,6 +129,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game_Client.cpp" />
+    <ClCompile Include="Game_CollisionCheck.cpp" />
     <ClCompile Include="Game_DangerLine.cpp" />
     <ClCompile Include="Game_Item.cpp" />
     <ClCompile Include="IOCP_Server.cpp" />

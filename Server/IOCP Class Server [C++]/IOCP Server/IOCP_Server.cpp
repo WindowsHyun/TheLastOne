@@ -2,11 +2,13 @@
 #include "Game_Client.h"
 #include "Timer.h"
 #include "Game_DangerLine.h"
+#include "Game_CollisionCheck.h"
 
 std::unordered_map< int, Game_Client>::iterator get_client_iter(int ci);
 std::unordered_map< int, Game_Client> g_clients;
 std::unordered_map< int, Game_Item>::iterator get_item_iter(int ci);
 std::unordered_map< int, Game_Item> g_item;
+//std::unordered_map< int, Game_CollisionCheck> g_collision;
 std::queue<int> remove_client_id;
 Game_DangerLine DangerLine;
 Server_Timer Timer;
@@ -49,7 +51,8 @@ void IOCP_Server::initServer()
 		remove_client_id.push(i);
 	}
 	// 게임 아이템 정보 g_item에 넣어주기.
-	load_g_item("./Game_Item_Collection.txt", &g_item);
+	load_item_txt("./Game_Item_Collection.txt", &g_item);
+	//load_CollisionCheck_txt("./Game_CollisionCheck.txt", &g_collision);
 
 	std::cout << "init Complete..!" << std::endl;
 }
@@ -88,9 +91,12 @@ void IOCP_Server::makeThread()
 
 	std::thread accept_tread{ &IOCP_Server::Accept_Thread, this };
 
+	std::thread collision_thread{ &IOCP_Server::Collision_Thread, this };
+
 	Timer.initTimer(g_hiocp);		// 타이머 스레드를 만들어 준다.
 
 	accept_tread.join();
+	collision_thread.join();
 	for (auto pth : worker_threads) {
 		pth->join();
 		delete pth;
@@ -195,7 +201,7 @@ void IOCP_Server::Worker_Thread()
 				Timer.setTimerEvent(t);
 			}
 			else {
-				Timer_Event t = { ci , high_resolution_clock::now() + 100ms, E_MoveDangerLine };
+				Timer_Event t = { (int)ci , high_resolution_clock::now() + 100ms, E_MoveDangerLine };
 				Timer.setTimerEvent(t);
 			}
 
@@ -272,6 +278,11 @@ void IOCP_Server::Accept_Thread()
 		}
 
 	}	// while(true)
+}
+
+void IOCP_Server::Collision_Thread()
+{
+
 }
 
 void IOCP_Server::Remove_Client()

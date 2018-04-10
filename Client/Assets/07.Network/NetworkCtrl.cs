@@ -397,20 +397,7 @@ namespace TheLastOne.Game.Network
 
         void Awake()
         {
-            string filePath = "C:/Users/kwon6/Documents/TheLastOne/file.txt";
-            string coordinates = "";
-            //var objects = GameObject.FindObjectsOfType(Transform) as Transform[];
-            BoxCollider[] allObjects = UnityEngine.Object.FindObjectsOfType<BoxCollider>();
-
-            foreach (BoxCollider trans in allObjects)
-            {
-                coordinates += "x: " + trans.transform.position.x.ToString() + ", y: " + trans.transform.position.y.ToString() + ", z: " + trans.transform.position.z.ToString() + System.Environment.NewLine;
-                coordinates += "- x: " + trans.size.x.ToString()+ ", y: " + trans.size.y.ToString() + ", z: " + trans.size.z.ToString() + System.Environment.NewLine;
-            }
-
-            //Write the coords to a file
-            System.IO.File.WriteAllText(filePath, coordinates);
-
+            //get_object_collision();
             Application.runInBackground = true; // 백그라운드에서도 Network는 작동해야한다.
             DangerLineCtrl = GameObject.FindGameObjectWithTag("DangerLine").GetComponent<DangerLineCtrl>();
             //=======================================================
@@ -548,6 +535,23 @@ namespace TheLastOne.Game.Network
         {
             // 캐릭터 간의 거리 구하기.
             return (float)Math.Sqrt(Math.Pow(a.x - b.x, 2) + Math.Pow(a.z - b.z, 2));
+        }
+
+        public void get_object_collision()
+        {
+            string filePath = "./file.txt";
+            string coordinates = "";
+            BoxCollider[] boxObjects = UnityEngine.Object.FindObjectsOfType<BoxCollider>();
+
+            foreach (BoxCollider trans in boxObjects)
+            {
+                if ( trans.tag.ToString() != "CAMCHANGE") { 
+                coordinates += "posx:" + trans.transform.position.x.ToString() + "|posy:" + trans.transform.position.y.ToString() + "|posz:" + trans.transform.position.z.ToString() + "|centerx:" + trans.center.x.ToString() + "|centery:" + trans.center.y.ToString() + "|centerz:" + trans.center.z.ToString() + "|sizex:" + trans.size.x.ToString() + "|sizey:" + trans.size.y.ToString() + "|sizez:" + trans.size.z.ToString() + "|scalex:" + trans.transform.localScale.x.ToString() + "|scaley:" + trans.transform.localScale.y.ToString() + "|scalez:" + trans.transform.localScale.z.ToString()  + "|"+ System.Environment.NewLine;
+                }
+            }
+
+            //Write the coords to a file
+            System.IO.File.WriteAllText(filePath, coordinates);
         }
 
         public PacketData Get_packet_size(byte[] Receivebyte)
