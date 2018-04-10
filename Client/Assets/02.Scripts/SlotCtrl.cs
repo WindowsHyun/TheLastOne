@@ -24,6 +24,8 @@ public class SlotCtrl : MonoBehaviour
 
     public PlayerCtrl player;
 
+    public CoolTimeCtrl cooltime;
+
     void Start()
     {
         // 스택 메모리 할당.
@@ -46,6 +48,8 @@ public class SlotCtrl : MonoBehaviour
 
         player = GameObject.Find("Player").GetComponent<PlayerCtrl>();
 
+        cooltime = GameObject.Find("PanelCoolTime").GetComponent<CoolTimeCtrl>();
+
     }
 
     public void AddItem(ItemCtrl item, bool same, SlotCtrl sameSlot)
@@ -60,7 +64,7 @@ public class SlotCtrl : MonoBehaviour
         else
         {
 
-            if (item.type.ToString() == "Ammunition762" || item.type.ToString() == "Ammunition556")
+            if (item.type.ToString() == "Ammunition762" || item.type.ToString() == "Ammunition556" || item.type.ToString() == "Ammunition9")
                 item.setItemCount(29);// 총알의 경우 기본이 1개 이므로 29개를 더해서 30개로 맞춰준다.
             slot.Push(item);
         }
@@ -80,6 +84,11 @@ public class SlotCtrl : MonoBehaviour
         // 아이템이 1개일 때 사용하게 되면 0개가 된다.
         if (slot.Peek().getItemCount() == 1)
         {
+            if(slot.Peek().type.ToString() == "FirstAid")
+            {
+                cooltime.UseSkill();
+                
+            }
             // 혹시 모를 오류를 방지하기 위해 slot리스트를 Clear해준다
             slot.Clear();
             // 아이템 사용으로 인해 아이템 개수를 표현하는 텍스트가 달라졌으므로 업데이트 시켜준다.

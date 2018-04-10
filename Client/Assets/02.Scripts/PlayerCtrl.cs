@@ -21,7 +21,7 @@ public class PlayerCtrl : MonoBehaviour
 
     public enum WeaponState
     {
-        None, M16, AK47
+        None, M16, AK47, M4
     };
 
     // 델리게이트 및 이벤트 선언
@@ -45,10 +45,9 @@ public class PlayerCtrl : MonoBehaviour
     public int hp = 100;
 
     // 캐릭터 생명 초기값
-    private int initHp;
+    public int initHp;
     // 캐릭터의 HP바 이미지
     public Image imgHpBar;
-
 
     // 총알 프리팹
     public GameObject bullet;
@@ -57,6 +56,8 @@ public class PlayerCtrl : MonoBehaviour
     // 총알 발사 사운드
     public AudioClip M16A4Sound;
     public AudioClip AK47Sound;
+    public AudioClip M4A1Sound;
+    //public AudioClip UMP45Sound;
 
     // AudioSource 컴포넌트를 저장할 변수
     private AudioSource source = null;
@@ -81,6 +82,8 @@ public class PlayerCtrl : MonoBehaviour
     // 아이템 획득 확인을 위한 변수
     public bool bullet762Set = false;
     public bool bullet556Set = false;
+    public bool bullet9Set = false;
+
     //private int bullet762 = 0;
     //private int bullet556 = 0;
     public WeaponState nowWeaponState = WeaponState.None;
@@ -88,8 +91,13 @@ public class PlayerCtrl : MonoBehaviour
     // 무기 정보 저장
     public GameObject ak47;
     public GameObject m16;
+    public GameObject m4;
+    //public GameObject ump;
+
     public bool ak47Set = false;
     public bool m16Set = false;
+    public bool m4Set = false;
+    //public bool umpSet = false;
 
     // 무기 장착 여부
     public bool showItem1 = false;
@@ -114,6 +122,8 @@ public class PlayerCtrl : MonoBehaviour
     public WeaponSlotCtrl[] weaponSlotCtrl;
 
     public bool dangerLineIn = false;
+
+    public GameObject cooltime;
 
     IEnumerator StartKeyInput()
     {
@@ -144,8 +154,19 @@ public class PlayerCtrl : MonoBehaviour
             {
                 SlotCtrl Find762 = get_Bullet("Ammunition762");
                 SlotCtrl Find556 = get_Bullet("Ammunition556");
+                SlotCtrl Find9 = get_Bullet("Ammunition9");
                 // 어떠한 종류의 총알이 1발 이상 있을 시
                 if (Find556 != null && Find556.slot.Peek().getItemCount() > 0 && m16Set == true)
+                {
+
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        animator.SetBool("IsShot", true);
+                        Fire(Find556);
+                        networkCtrl.Player_Shot();
+                    }
+                }
+                else if (Find556 != null && Find556.slot.Peek().getItemCount() > 0 && m4Set == true)
                 {
 
                     if (Input.GetMouseButtonDown(0))
@@ -164,6 +185,15 @@ public class PlayerCtrl : MonoBehaviour
                         networkCtrl.Player_Shot();
                     }
                 }
+                //else if (Find9 != null && Find9.slot.Peek().getItemCount() > 0 && umpSet == true)
+                //{
+                //    if (Input.GetMouseButtonDown(0))
+                //    {
+                //        animator.SetBool("IsShot", true);
+                //        Fire(Find9);
+                //        networkCtrl.Player_Shot();
+                //    }
+                //}
             }
             // 1번 , 2번 키 입력시 총 랜더링과 어떤 총인지 판별한다.
             if (Input.GetKeyDown(KeyCode.Alpha1))
@@ -172,8 +202,14 @@ public class PlayerCtrl : MonoBehaviour
                 {
                     m16.GetComponent<Renderer>().enabled = true;
                     m16Set = true;
+
                     ak47.GetComponent<Renderer>().enabled = false;
                     ak47Set = false;
+                    m4.GetComponent<Renderer>().enabled = false;
+                    m4Set = false;
+                    //ump.GetComponent<Renderer>().enabled = false;
+                    //umpSet = false;
+
                     nowWeaponState = WeaponState.M16;
                 }
                 else if (weaponSlotType[0] == "AK47")
@@ -181,10 +217,43 @@ public class PlayerCtrl : MonoBehaviour
                     ak47.GetComponent<Renderer>().enabled = true;
                     ak47Set = true;
 
+                    m4.GetComponent<Renderer>().enabled = false;
+                    m4Set = false;
+                    //ump.GetComponent<Renderer>().enabled = false;
+                    //umpSet = false;
                     m16.GetComponent<Renderer>().enabled = false;
                     m16Set = false;
+
                     nowWeaponState = WeaponState.AK47;
                 }
+                else if (weaponSlotType[0] == "M4")
+                {
+                    m4.GetComponent<Renderer>().enabled = true;
+                    m4Set = true;
+
+                    ak47.GetComponent<Renderer>().enabled = false;
+                    ak47Set = false;
+                    //ump.GetComponent<Renderer>().enabled = false;
+                    //umpSet = false;
+                    m16.GetComponent<Renderer>().enabled = false;
+                    m16Set = false;
+
+                    nowWeaponState = WeaponState.M4;
+                }
+                //else if (weaponSlotType[0] == "UMP")
+                //{
+                //    ump.GetComponent<Renderer>().enabled = true;
+                //    umpSet = true;
+
+                //    m4.GetComponent<Renderer>().enabled = false;
+                //    m4Set = false;
+                //    ak47.GetComponent<Renderer>().enabled = false;
+                //    ak47Set = false;
+                //    m16.GetComponent<Renderer>().enabled = false;
+                //    m16Set = false;
+
+                //    nowWeaponState = WeaponState.UMP;
+                //}
             }
             else if (Input.GetKeyDown(KeyCode.Alpha2))
             {
@@ -192,8 +261,14 @@ public class PlayerCtrl : MonoBehaviour
                 {
                     m16.GetComponent<Renderer>().enabled = true;
                     m16Set = true;
+
                     ak47.GetComponent<Renderer>().enabled = false;
                     ak47Set = false;
+                    m4.GetComponent<Renderer>().enabled = false;
+                    m4Set = false;
+                    //ump.GetComponent<Renderer>().enabled = false;
+                    //umpSet = false;
+
                     nowWeaponState = WeaponState.M16;
                 }
                 else if (weaponSlotType[1] == "AK47")
@@ -201,10 +276,43 @@ public class PlayerCtrl : MonoBehaviour
                     ak47.GetComponent<Renderer>().enabled = true;
                     ak47Set = true;
 
+                    m4.GetComponent<Renderer>().enabled = false;
+                    m4Set = false;
+                    //ump.GetComponent<Renderer>().enabled = false;
+                    //umpSet = false;
                     m16.GetComponent<Renderer>().enabled = false;
                     m16Set = false;
+
                     nowWeaponState = WeaponState.AK47;
                 }
+                else if (weaponSlotType[1] == "M4")
+                {
+                    m4.GetComponent<Renderer>().enabled = true;
+                    m4Set = true;
+
+                    ak47.GetComponent<Renderer>().enabled = false;
+                    ak47Set = false;
+                    //ump.GetComponent<Renderer>().enabled = false;
+                    //umpSet = false;
+                    m16.GetComponent<Renderer>().enabled = false;
+                    m16Set = false;
+
+                    nowWeaponState = WeaponState.M4;
+                }
+                //else if (weaponSlotType[1] == "UMP")
+                //{
+                //    ump.GetComponent<Renderer>().enabled = true;
+                //    umpSet = true;
+
+                //    m4.GetComponent<Renderer>().enabled = false;
+                //    m4Set = false;
+                //    ak47.GetComponent<Renderer>().enabled = false;
+                //    ak47Set = false;
+                //    m16.GetComponent<Renderer>().enabled = false;
+                //    m16Set = false;
+
+                //    nowWeaponState = WeaponState.UMP;
+                //}
             }
 
             // Tab키 입력시 인벤토리 코드 실행
@@ -244,11 +352,19 @@ public class PlayerCtrl : MonoBehaviour
 
     void Start()
     {
+        
+
         // 게임 시작후 차량 하차 시 인벤토리 창을 끈다.
         inventory.SetActive(false);
 
+        // 게임 시작후 차량 하차 시 쿨타임 창을 끈다.
+        cooltime.SetActive(false);
+
         // 생명 초기값 설정
         initHp = hp;
+
+        hp -= 70;
+        imgHpBar.fillAmount = (float)hp / (float)initHp;
 
         // 스크립트 처음에 Transform 컴포넌트 할당
         tr = GetComponent<Transform>();
@@ -266,14 +382,16 @@ public class PlayerCtrl : MonoBehaviour
         animator.SetInteger("IsState", 0);
 
 
-        Cursor.lockState = CursorLockMode.Locked;//마우스 커서 고정
-        Cursor.visible = false;//마우스 커서 보이기
+        //Cursor.lockState = CursorLockMode.Locked;//마우스 커서 고정
+        //Cursor.visible = false;//마우스 커서 보이기
 
         // 현재 발사 가능
         shotable = true;
 
         ak47.GetComponent<Renderer>().enabled = false;
         m16.GetComponent<Renderer>().enabled = false;
+        m4.GetComponent<Renderer>().enabled = false;
+        //ump.GetComponentsInChlidren<Renderer>().enabled = false;
 
 
         // 인벤토리의 자식 컴포넌트의 스크립트 할당
@@ -401,9 +519,19 @@ public class PlayerCtrl : MonoBehaviour
             }
             source.PlayOneShot(AK47Sound, 0.9f);
         }
+        else if (m4Set == true)
+        {
+            slot.slot.Peek().setItemCount(-1);
+            if (slot.slot.Peek().getItemCount() == 0 && slot.isSlots() == true)
+            {
+                slot.slot.Clear();
+                slot.UpdateInfo(false, slot.DefaultImg);
+            }
+            source.PlayOneShot(M4A1Sound, 0.9f);
+        }
 
         // 사운드 발생 함수
-        
+
 
         // 잠시 기다리는 루틴을 위해 코루틴 함수로 호출
         StartCoroutine(this.ShowMuzzleFlash());
@@ -563,16 +691,20 @@ public class PlayerCtrl : MonoBehaviour
         if (ak47Set == true)
         {
             ak47.GetComponent<Renderer>().enabled = true;
-            //m16.GetComponent<Renderer>().enabled = false;
             animator.SetBool("IsEquip", true);
             nowWeaponState = WeaponState.AK47;
         }
         else if (m16Set == true)
         {
             m16.GetComponent<Renderer>().enabled = true;
-            //ak47.GetComponent<Renderer>().enabled = false;
             animator.SetBool("IsEquip", true);
             nowWeaponState = WeaponState.M16;
+        }
+        else if (m4Set == true)
+        {
+            m4.GetComponent<Renderer>().enabled = true;
+            animator.SetBool("IsEquip", true);
+            nowWeaponState = WeaponState.M4;
         }
     }
 

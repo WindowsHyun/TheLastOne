@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class WeaponCtrl : InventoryCtrl
 {
 
-    public enum WeaponType { AK47, M16 }
+    public enum WeaponType { AK47, M16, M4 }
 
     public WeaponType type;           // 무기 타입.
     public Sprite DefaultImg;   // 기본 이미지.

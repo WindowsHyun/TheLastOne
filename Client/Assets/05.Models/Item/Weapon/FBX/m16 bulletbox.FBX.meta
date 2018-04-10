@@ -13,7 +13,12 @@ ModelImporter:
     4300000: M16 BulletBox
     7400000: Take 001
     9500000: //RootNode
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 02 - Default
+    second: {fileID: 2100000, guid: 2e1b7154648e2fe4f84f1007e33cb5d1, type: 2}
   materials:
     importMaterials: 1
     materialName: 0
