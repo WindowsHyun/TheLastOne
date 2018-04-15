@@ -1,0 +1,27 @@
+LIBRARY detourhelper
+
+EXPORTS
+
+dh_create
+dh_delete
+
+dh_load
+dh_unload
+
+dh_get_triangles
+dh_get_vectices
+dh_get_indices
+
+dh_findpath
+dh_createpath
+dh_deletepath
+dh_getpathdata
+
+dh_getheight
+
+dh_findpath_cpp
+
+
+dh_is_point_near_navmesh
+dh_find_straight_path
+dh_find_straight_path_cpp

@@ -19,10 +19,10 @@ void CollisionCheck(xyz player, std::unordered_map<int, Game_CollisionCheck>* co
 
 		// rc1 을 플레이어
 		RECT rc1;
-		rc1.left = player.x - 1.0;
-		rc1.right = player.x + 1.0;
-		rc1.top = player.z + 1.0;
-		rc1.bottom = player.z - 1.0;
+		rc1.left = player.x - 0.6;
+		rc1.right = player.x + 0.6;
+		rc1.top = player.z + 0.6;
+		rc1.bottom = player.z - 0.6;
 		// rc2 를 오브젝트
 		RECT rc2;
 		rc2.left = iter.second.get_startX();
@@ -36,9 +36,9 @@ void CollisionCheck(xyz player, std::unordered_map<int, Game_CollisionCheck>* co
 			rc1.bottom	<=	rc2.top)
 		{
 			//충돌시
-	/*		std::cout << iter.second.get_startX() << " ~ " << iter.second.get_endX() << " | " << iter.second.get_startY() << " ~ " << iter.second.get_endY() << std::endl;
+			std::cout << iter.second.get_startX() << " ~ " << iter.second.get_endX() << " | " << iter.second.get_startY() << " ~ " << iter.second.get_endY() << std::endl;
 			std::cout << player.x - 1 << " ~ " << player.x + 1 << " | " << player.z - 1 << " ~ " << player.z + 1 << std::endl;
-			std::cout << "충돌..!" << std::endl << std::endl;*/
+			std::cout << "충돌..!" << std::endl << std::endl;
 			break;
 		}
 

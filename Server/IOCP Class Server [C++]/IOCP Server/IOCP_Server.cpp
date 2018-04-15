@@ -8,7 +8,7 @@ std::unordered_map< int, Game_Client>::iterator get_client_iter(int ci);
 std::unordered_map< int, Game_Client> g_clients;
 std::unordered_map< int, Game_Item>::iterator get_item_iter(int ci);
 std::unordered_map< int, Game_Item> g_item;
-//std::unordered_map< int, Game_CollisionCheck> g_collision;
+std::unordered_map< int, Game_CollisionCheck> g_collision;
 std::queue<int> remove_client_id;
 Game_DangerLine DangerLine;
 Server_Timer Timer;
@@ -52,7 +52,7 @@ void IOCP_Server::initServer()
 	}
 	// 게임 아이템 정보 g_item에 넣어주기.
 	load_item_txt("./Game_Item_Collection.txt", &g_item);
-	//load_CollisionCheck_txt("./Game_CollisionCheck.txt", &g_collision);
+	load_CollisionCheck_txt("./Game_CollisionCheck.txt", &g_collision);
 
 	std::cout << "init Complete..!" << std::endl;
 }
