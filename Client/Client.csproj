@@ -304,7 +304,6 @@
     <Compile Include="Assets\02.Scripts\PlayerCtrl.cs" />
     <Compile Include="Assets\02.Scripts\SlotCtrl.cs" />
     <Compile Include="Assets\02.Scripts\StartCarCtrl.cs" />
-    <Compile Include="Assets\02.Scripts\VehicleCtrl.cs" />
     <Compile Include="Assets\02.Scripts\WeaponCtrl.cs" />
     <Compile Include="Assets\02.Scripts\WeaponDragCtrl.cs" />
     <Compile Include="Assets\02.Scripts\WeaponSlotCtrl.cs" />

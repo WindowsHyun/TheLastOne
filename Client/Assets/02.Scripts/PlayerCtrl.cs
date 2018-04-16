@@ -125,14 +125,7 @@ public class PlayerCtrl : MonoBehaviour
 
     public GameObject cooltime;
 
-
-    // 차량 탈 수 있는지
-    public bool rideCar = false;
-
-    // 차량 정보
-    public VehicleCtrl ridingCar;
-
-    public IEnumerator StartKeyInput()
+    IEnumerator StartKeyInput()
     {
         do
         {
@@ -351,43 +344,6 @@ public class PlayerCtrl : MonoBehaviour
                     shotable = true;
                 }
             }
-
-            if (Input.GetKeyDown(KeyCode.G))
-            {
-                if (rideCar == false)
-                {
-                    rideCar = true;
-
-                    // 차량 스크립트 활성화
-                    ridingCar.GetComponent<VehicleCtrl>().enabled = true;
-
-                    // 캐릭터 스크립트 비활성화
-                    gameObject.GetComponent<PlayerCtrl>().enabled = false;
-                    
-                    // 캐릭터 캡슐 콜라이더 비활성화
-                    gameObject.GetComponent<CapsuleCollider>().enabled = false;
-
-                    // 총구 앞 캡슐 콜라이더 비활성화
-                    firePos.GetComponent<CapsuleCollider>().enabled = false;
-                }
-                else if (rideCar == true)
-                {
-                    rideCar = false;
-
-                    // 차량 스크립트 비활성화
-                    ridingCar.GetComponent<VehicleCtrl>().enabled = false;
-
-                    // 캐릭터 스크립트 활성화
-                    gameObject.GetComponent<PlayerCtrl>().enabled = true;
-
-                    // 캐릭터 캡슐 콜라이더 활성화
-                    gameObject.GetComponent<CapsuleCollider>().enabled = true;
-
-                    // 총구 앞 캡슐 콜라이더 활성화
-                    firePos.GetComponent<CapsuleCollider>().enabled = true;
-
-                }
-            }
             yield return null;
         } while (true);
         //yield return null;
@@ -396,7 +352,7 @@ public class PlayerCtrl : MonoBehaviour
 
     void Start()
     {
-        ridingCar = GameObject.FindWithTag("Vehicle").GetComponent<VehicleCtrl>();
+        
 
         // 게임 시작후 차량 하차 시 인벤토리 창을 끈다.
         inventory.SetActive(false);
@@ -678,11 +634,6 @@ public class PlayerCtrl : MonoBehaviour
             dangerLineIn = true;
         }
 
-        if (coll.gameObject.tag == "Vehicle")
-        {
-            rideCar = true;
-        }
-
 
     }
 
@@ -713,13 +664,7 @@ public class PlayerCtrl : MonoBehaviour
         {
             dangerLineIn = false;
         }
-
-        if (coll.gameObject.tag == "Vehicle")
-        {
-            rideCar = false;
-        }
     }
-
 
     // 플레이어 죽을 때 실행되는 함수
     void PlayerDie()
