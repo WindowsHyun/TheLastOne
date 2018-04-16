@@ -61,6 +61,11 @@ public class WeaponSlotCtrl : MonoBehaviour
                 player.m4Set = true;
                 player.WeaponDisPlay();
             }
+            else if (weaponSlot.Peek().type.ToString() == "UMP")
+            {
+                player.umpSet = true;
+                player.WeaponDisPlay();
+            }
         }
         else
         {
