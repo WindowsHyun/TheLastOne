@@ -7,7 +7,7 @@ bool mapLoaded = false;
 int main() {
 	auto iter = dh_create();
 	//mapLoaded = dh_load(iter, "./navmesh_demo.obj");
-	mapLoaded = dh_load(iter, "./navmesh_InGameScene.obj");
+	mapLoaded = dh_load(iter, "./InGameScene.navmesh");
 
 	DHVertex start{ 1007.09f, 29.99451f, 344.01f };
 	DHVertex end{ 1060.153f, 29.99451f, 1114.969f };

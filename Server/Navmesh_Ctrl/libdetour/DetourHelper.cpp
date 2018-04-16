@@ -364,11 +364,11 @@ bool DetourHelper::Load(const std::string& filepath)
 	params.nvp = 3;
 	params.vertCount = (int)m_vertices.size();
 	params.polyCount = (int)m_triangles.size();
-	params.walkableHeight = 0;
-	params.walkableRadius = 0;
-	params.walkableClimb = 1.0f;
-	params.cs = 1;
-	params.ch = 1;
+	params.walkableHeight = 5.0f;
+	params.walkableRadius = 0.8f;
+	params.walkableClimb = 2.5f;
+	params.cs = 0.8f;
+	params.ch = 0.10f;
 	memcpy(params.bmin, m_bmin, sizeof(float) * 3);
 	memcpy(params.bmax, m_bmax, sizeof(float) * 3);
 

@@ -41,7 +41,7 @@ extern "C" {
 
 	void dh_get_triangles(const void* ug, void* &start, int* length) {
 		auto obj = (DetourHelper*)ug;
-		*length = obj->GetTriangles().size();
+		*length = (int)obj->GetTriangles().size();
 		start = (void*)obj->GetTriangles().data();
 #if _DEBUG
 		cout << "triangles:" << *length << endl;
@@ -50,7 +50,7 @@ extern "C" {
 	}
 	void dh_get_vectices(const void* ug, void* &start, int* length) {
 		auto obj = (DetourHelper*)ug;
-		*length = obj->GetVertices().size();
+		*length = (int)obj->GetVertices().size();
 		start = (void*)obj->GetVertices().data();
 #if _DEBUG
 		cout << "dh_get_vectices:" << *length << "\tstart:" << start << endl;
@@ -58,7 +58,7 @@ extern "C" {
 	}
 	void dh_get_indices(const void* ug, void* &start, int* length) {
 		auto obj = (DetourHelper*)ug;
-		*length = obj->GetIndices().size();
+		*length = (int)obj->GetIndices().size();
 		start = (void*)obj->GetIndices().data();
 #if _DEBUG
 		cout << "dh_get_indices:" << *length << "\tstart:" << start << endl;
@@ -72,7 +72,7 @@ extern "C" {
 		DHVertex v1 = *(DHVertex*)start;
 		DHVertex v2 = *(DHVertex*)end;
 		bool success = obj->FindPath(v1, v2, *path);
-		*length = path->size();
+		*length = (int)path->size();
 #if _DEBUG
 		cout << "dh_findpath: size:" << *length << endl;
 #endif
@@ -129,7 +129,7 @@ extern "C" {
 		DHVertex v1 = *(DHVertex*)start;
 		DHVertex v2 = *(DHVertex*)end;
 		bool success = obj->FindStraightPath(v1, v2, *path);
-		*length = path->size();
+		*length = (int)path->size();
 #if _DEBUG
 		cout << "dh_find_straight_path: size:" << *length << endl;
 #endif

@@ -20,8 +20,8 @@ public class NavMeshExport : MonoBehaviour
         mesh.vertices = triangulatedNavMesh.vertices;
         mesh.triangles = triangulatedNavMesh.indices;
 
-        string baseName = "navmesh_" + SceneManager.GetActiveScene().name;
-        string fileName = Application.dataPath + "/navmesh/" + baseName + ".obj";
+        string baseName = SceneManager.GetActiveScene().name;
+        string fileName = Application.dataPath + "/navmesh/" + baseName + ".navmesh";
         ExportNavmesh(mesh, fileName);
 
         AssetDatabase.Refresh();
@@ -76,28 +76,28 @@ public class NavMeshExport : MonoBehaviour
 
     private static void ExportNavData(GameObject obj)
     {
-        Vector3[] localVectors = obj.transform.Find("_NavMesh").GetComponent<MeshFilter>().sharedMesh.vertices;
-        int[] triangles = obj.transform.Find("_NavMesh").GetComponent<MeshFilter>().sharedMesh.triangles;
-        //메쉬의 로컬 좌표를 월드 좌표로 변환합니다.
-        Vector3[] worldVectors = new Vector3[localVectors.Length];
-        for (int i = 0; i < localVectors.Length; i++)
-        {
-            Vector3 pos = obj.transform.TransformPoint(localVectors[i]);
-            worldVectors[i] = pos;
-        }
-        StringBuilder sb = new StringBuilder();
-        sb.Append("local nav = {\n");
-        for (int i = 0; i < triangles.Length; i += 3)
-        {
-            sb.AppendFormat("\t{{{0},{1},{2}}},\n", _VectorToLua(worldVectors[triangles[i]]), _VectorToLua(worldVectors[triangles[i + 1]]), _VectorToLua(worldVectors[triangles[i + 2]]));
-        }
-        sb.Append("}\n");
-        sb.Append("return nav");
-        using (StreamWriter sw = new StreamWriter(Application.dataPath + "/navmesh/" + obj.name + ".lua"))
-        {
-            sw.Write(sb.ToString());
-        }
-        DestroyImmediate(obj);
+        //Vector3[] localVectors = obj.transform.Find("_NavMesh").GetComponent<MeshFilter>().sharedMesh.vertices;
+        //int[] triangles = obj.transform.Find("_NavMesh").GetComponent<MeshFilter>().sharedMesh.triangles;
+        ////메쉬의 로컬 좌표를 월드 좌표로 변환합니다.
+        //Vector3[] worldVectors = new Vector3[localVectors.Length];
+        //for (int i = 0; i < localVectors.Length; i++)
+        //{
+        //    Vector3 pos = obj.transform.TransformPoint(localVectors[i]);
+        //    worldVectors[i] = pos;
+        //}
+        //StringBuilder sb = new StringBuilder();
+        //sb.Append("local nav = {\n");
+        //for (int i = 0; i < triangles.Length; i += 3)
+        //{
+        //    sb.AppendFormat("\t{{{0},{1},{2}}},\n", _VectorToLua(worldVectors[triangles[i]]), _VectorToLua(worldVectors[triangles[i + 1]]), _VectorToLua(worldVectors[triangles[i + 2]]));
+        //}
+        //sb.Append("}\n");
+        //sb.Append("return nav");
+        //using (StreamWriter sw = new StreamWriter(Application.dataPath + "/navmesh/" + obj.name + ".lua"))
+        //{
+        //    sw.Write(sb.ToString());
+        //}
+        //DestroyImmediate(obj);
     }
 
     private static string _VectorToLua(Vector3 vec)
