@@ -4,12 +4,13 @@ using UnityEngine;
 
 public class VehicleCtrl : MonoBehaviour
 {
-
     // 최고 속도
     public float maxTorque = 4000.0f;
 
     // 차량 체력
-    public int hp = 200;
+    public int vehicleHp = 200;
+
+    public int vehicleInitHp;
 
     // 휠 콜라이더와 휠 메쉬 할당
     public WheelCollider[] wheelColliders = new WheelCollider[4];
@@ -27,43 +28,46 @@ public class VehicleCtrl : MonoBehaviour
     public GameObject expCar;
     public GameObject expEffect;
 
-    // 플레이어 정보
-    public GameObject player;
+    // 플레이어 스크립트 할당
+    public PlayerCtrl player;
+
+    // 차량 자체의 브레이크를 위함
+    public bool vehicleStop = false;
 
 
     void Awake()
     {
+        // 생명 초기값 설정
+        vehicleInitHp = vehicleHp;
+
         // 차량의 무게중심을 중심으로 맞춘다.
         tr = GetComponent<Transform>();
         m_rigidbody = GetComponent<Rigidbody>();
-        m_rigidbody.centerOfMass = new Vector3(0, 0, 0);
 
-        this.GetComponent<VehicleCtrl>().enabled = false;
+        // 무게 중심 위치 잡아준다.
+        m_rigidbody.centerOfMass = new Vector3(0, 0, 0); 
     }
 
-    void Update()
+    void FixedUpdate()
     {     
         // 바퀴 회전의 랜더링을 위함
         UpdateMeshsPositions();
-    }
-
-
-    void FixedUpdate()
-    {
-        float steer = Input.GetAxis("Horizontal");
-        float accelerate = Input.GetAxis("Vertical");
-
-        float finalAngle = steer * 45f;
-        wheelColliders[0].steerAngle = finalAngle;
-        wheelColliders[1].steerAngle = finalAngle;
-
-        for (int i = 0; i < 4; i++)
+        
+        // 차량 브레이크 변수가 true일 경우 자체 브레이크 작동
+        if(vehicleStop == true)
         {
-            wheelColliders[i].motorTorque = accelerate * maxTorque;
+            for (int i = 0; i < 4; i++)
+            {
+                wheelColliders[i].brakeTorque = 0.1f;
+            }
         }
-
-        // 차량 이동 동안 플레이어 위치 동기화
-        player.transform.position = new Vector3(transform.position.x, 29.99451f, transform.position.z);
+        else
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                wheelColliders[i].brakeTorque = 0.0f;
+            }
+        }
     }
 
     void UpdateMeshsPositions()
@@ -85,13 +89,27 @@ public class VehicleCtrl : MonoBehaviour
         if (coll.gameObject.tag == "BULLET")
         {
             // 맞은 총알의 Damage를 추출해 Player HP 차감
-            hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
+            vehicleHp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
+            if (player.GetTheCar == true)
+            {
+                player.vehicleHpBar.fillAmount = (float)vehicleHp / (float)vehicleInitHp;
+            }
+            //    player.imgHpBar.fillAmount = (float)player.hp / (float)player.initHp;
 
-            if (hp <= 0 && carDestroy == false)
+
+            if (vehicleHp <= 0 && carDestroy == false)
             {
                 ExpCar();
                 carDestroy = true;
                 gameObject.SetActive(false);
+                
+                // 미래를 위한 예비 코드
+                //if(player.GetTheCar == true)
+                //{
+                //    player.hp = 0;
+                //    player.imgHpBar.fillAmount = (float)player.hp / (float)player.initHp;
+                //    player.PlayerDie();
+                //}
             }
         }
     }

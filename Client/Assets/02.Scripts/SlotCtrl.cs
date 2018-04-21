@@ -26,6 +26,12 @@ public class SlotCtrl : MonoBehaviour
 
     public CoolTimeCtrl cooltime;
 
+    private void Awake()
+    {
+        player = GameObject.Find("Player").GetComponent<PlayerCtrl>();
+
+        cooltime = GameObject.Find("PanelCoolTime").GetComponent<CoolTimeCtrl>();
+    }
     void Start()
     {
         // 스택 메모리 할당.
@@ -78,6 +84,9 @@ public class SlotCtrl : MonoBehaviour
     {
         // 슬롯이 비어있으면 함수를 종료.
         if (!isSlot)
+            return;
+
+        if (slot.Peek().type.ToString() == "Ammunition762" || slot.Peek().type.ToString() == "Ammunition556" || slot.Peek().type.ToString() == "Ammunition9")
             return;
 
         // 슬롯에 아이템이 1개인 경우.

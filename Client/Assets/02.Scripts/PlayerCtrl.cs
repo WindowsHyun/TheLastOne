@@ -27,6 +27,7 @@ public class PlayerCtrl : MonoBehaviour
     // 델리게이트 및 이벤트 선언
     public delegate void PlayerDieHandler();
     public static event PlayerDieHandler OnPlayerDie;
+
     // 캐릭터의 현재 상태 정보를 저장할 Enum 변수
     public PlayerState playerState = PlayerState.idle;
 
@@ -72,17 +73,13 @@ public class PlayerCtrl : MonoBehaviour
     // 플레이어가 총알 발사시 Packet을 전송하기 위하여
     NetworkCtrl networkCtrl = new NetworkCtrl();
 
-    // 무기 획득 확인을 위한 변수
-    public bool weaponEatPossible = false;
-    public bool weaponEat = false;
-
     // 무기 슬롯 타입
     public string[] weaponSlotType = new string[2];
 
     // 아이템 획득 확인을 위한 변수
-    public bool bullet762Set = false;
-    public bool bullet556Set = false;
-    public bool bullet9Set = false;
+    //public bool bullet762Set = false;
+    //public bool bullet556Set = false;
+    //public bool bullet9Set = false;
 
     //private int bullet762 = 0;
     //private int bullet556 = 0;
@@ -98,10 +95,6 @@ public class PlayerCtrl : MonoBehaviour
     public bool m16Set = false;
     public bool m4Set = false;
     public bool umpSet = false;
-
-    // 무기 장착 여부
-    public bool showItem1 = false;
-    public bool showItem2 = false;
 
     // 혈흔 효과 프리팹
     public GameObject bloodEffect;
@@ -128,8 +121,16 @@ public class PlayerCtrl : MonoBehaviour
     // 차량 탈 수 있는지
     public bool rideCar = false;
 
+    // 차량에 탑승하고 있는지
+    public bool GetTheCar = false;
+
     // 차량 정보
     public VehicleCtrl ridingCar;
+
+    public GameObject VehicleUI;
+    //public Image vehicleImage;
+    public Image vehicleHpBar;
+   
 
     IEnumerator StartKeyInput()
     {
@@ -353,32 +354,45 @@ public class PlayerCtrl : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.G))
             {
-                if (rideCar == false)
+                if (rideCar == true && GetTheCar == false)
                 {
-                    rideCar = true;
+                    // 차량 탑승 여부를 나타냄 (탑승)
+                    GetTheCar = true;
 
-                    // 차량 스크립트 활성화
-                    ridingCar.GetComponent<VehicleCtrl>().enabled = true;
-                    
-
-                    // 캐릭터 스크립트 비활성화
-                    gameObject.GetComponent<PlayerCtrl>().enabled = false;
+                    // 총 발사 가능
+                    shotable = false;
+                    ridingCar.vehicleStop = false;
 
                     // 캐릭터 캡슐 콜라이더 비활성화
                     gameObject.GetComponent<CapsuleCollider>().enabled = false;
 
                     // 총구 앞 캡슐 콜라이더 비활성화
                     firePos.GetComponent<CapsuleCollider>().enabled = false;
+
+                    // 차량 UI 활성화
+                    VehicleUI.SetActive(true);
+
+                           
+                    vehicleHpBar.fillAmount = (float)ridingCar.vehicleHp / (float)ridingCar.vehicleInitHp;
+
+
                 }
-                else if (rideCar == true)
+                else if (rideCar == true && GetTheCar == true)
                 {
+                    // 차량 탑승 가능한지 여부를 나타냄
                     rideCar = false;
 
-                    // 차량 스크립트 비활성화
-                    ridingCar.GetComponent<VehicleCtrl>().enabled = false;
+                    // 차량을 탑승 여부를 나타냄 (하차)
+                    GetTheCar = false;
 
-                    // 캐릭터 스크립트 활성화
-                    gameObject.GetComponent<PlayerCtrl>().enabled = true;
+                    // 총 발사 가능
+                    shotable = true;
+
+                    // 하차 후 차량 브레이크 작동
+                    ridingCar.vehicleStop = true;
+
+                    // 차량 하차 시 좌표 이동
+                    this.transform.position = new Vector3(ridingCar.transform.position.x-1, 29.99451f, ridingCar.transform.position.z);
 
                     // 캐릭터 캡슐 콜라이더 활성화
                     gameObject.GetComponent<CapsuleCollider>().enabled = true;
@@ -386,13 +400,14 @@ public class PlayerCtrl : MonoBehaviour
                     // 총구 앞 캡슐 콜라이더 활성화
                     firePos.GetComponent<CapsuleCollider>().enabled = true;
 
+                    // 차량 UI 활성화
+                    VehicleUI.SetActive(false);
                 }
             }
             yield return null;
         } while (true);
         //yield return null;
     }
-
 
     void Start()
     {
@@ -403,6 +418,11 @@ public class PlayerCtrl : MonoBehaviour
 
         // 게임 시작후 차량 하차 시 쿨타임 창을 끈다.
         cooltime.SetActive(false);
+
+        
+        VehicleUI.SetActive(false);
+
+
 
         // 생명 초기값 설정
         initHp = hp;
@@ -442,7 +462,9 @@ public class PlayerCtrl : MonoBehaviour
         slotctrl = inventory.GetComponentsInChildren<SlotCtrl>();
         weaponSlotCtrl = inventory.GetComponentsInChildren<WeaponSlotCtrl>();
 
-        ridingCar = GameObject.FindWithTag("Vehicle").GetComponent<VehicleCtrl>();
+
+       
+        //ridingCar = GameObject.FindWithTag("Vehicle").GetComponent<VehicleCtrl>();
 
 
         StartCoroutine(StartKeyInput());
@@ -485,66 +507,85 @@ public class PlayerCtrl : MonoBehaviour
 
     void FixedUpdate()
     {
-        h = Input.GetAxis("Horizontal");
-        v = Input.GetAxis("Vertical");
-
-        //Debug.Log("H=" + h.ToString());
-        //Debug.Log("V=" + v.ToString());
-
-        // 전후좌우 이동 방향 벡터 계산
-        Vector3 moveDir = (Vector3.forward * v) + (Vector3.right * h);
-
-        // Translate(이동 방향 * 속도 * 변위값 * Time.deltaTime, 기준 좌표)
-        tr.Translate(moveDir.normalized * Time.deltaTime * moveSpeed, Space.Self);
-
-        // Vector3.up 축을 기준으로 rotSpeed만큼의 속도로 회전
-        tr.Rotate(Vector3.up * Time.deltaTime * rotSpeed * Input.GetAxis("Mouse X"));
-
-        // 대기 0, 전진 1, 후진 2, 왼쪽 3, 오른쪽 4
-        // IsState란 애니메이터 상태 변수 추가됨
-        // 키보드 입력값을 기준으로 동작할 애니메이션 수행
-        if (v >= 0.1f)
+        if (GetTheCar == false)
         {
-            // 전진 애니메이션
-            animator.SetInteger("IsState", 1);
-            playerState = PlayerState.runForword;
-            // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.runForwordGun 이 된다.
-            // animator.SetBool("IsShot", true)  이면 playerState = PlayerState.runForwordShot 이 된다.
+            h = Input.GetAxis("Horizontal");
+            v = Input.GetAxis("Vertical");
+
+            //Debug.Log("H=" + h.ToString());
+            //Debug.Log("V=" + v.ToString());
+
+            // 전후좌우 이동 방향 벡터 계산
+            Vector3 moveDir = (Vector3.forward * v) + (Vector3.right * h);
+
+            // Translate(이동 방향 * 속도 * 변위값 * Time.deltaTime, 기준 좌표)
+            tr.Translate(moveDir.normalized * Time.deltaTime * moveSpeed, Space.Self);
+
+            // Vector3.up 축을 기준으로 rotSpeed만큼의 속도로 회전
+            tr.Rotate(Vector3.up * Time.deltaTime * rotSpeed * Input.GetAxis("Mouse X"));
+
+            // 대기 0, 전진 1, 후진 2, 왼쪽 3, 오른쪽 4
+            // IsState란 애니메이터 상태 변수 추가됨
+            // 키보드 입력값을 기준으로 동작할 애니메이션 수행
+            if (v >= 0.1f)
+            {
+                // 전진 애니메이션
+                animator.SetInteger("IsState", 1);
+                playerState = PlayerState.runForword;
+                // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.runForwordGun 이 된다.
+                // animator.SetBool("IsShot", true)  이면 playerState = PlayerState.runForwordShot 이 된다.
+            }
+            else if (v <= -0.1f)
+            {
+                // 후진 애니메이션
+                animator.SetInteger("IsState", 2);
+                playerState = PlayerState.runBack;
+                // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.runBackGun 이 된다.
+                // animator.SetBool("IsShot", true)  이면 playerState = PlayerState.runBackShot 이 된다.
+            }
+            else if (h <= -0.1f)
+            {
+                // 왼쪽 이동 애니메이션
+                animator.SetInteger("IsState", 3);
+                playerState = PlayerState.runLeft;
+                // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.runLeftGun 이 된다.
+                // animator.SetBool("IsShot", true)  이면 playerState = PlayerState.runLeftShot 이 된다.
+            }
+            else if (h >= 0.1f)
+            {
+                // 오른쪽 이동 애니메이션
+                animator.SetInteger("IsState", 4);
+                playerState = PlayerState.runRight;
+                // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.runRightGun 이 된다.
+                // animator.SetBool("IsShot", true)  이면 playerState = PlayerState.runRightShot 이 된다.
+            }
+            else
+            {
+                // 정지 시 idle애니메이션
+                animator.SetInteger("IsState", 0);
+                playerState = PlayerState.idle;
+                // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.idleGun 이 된다.
+            }
         }
-        else if (v <= -0.1f)
+        else if(GetTheCar == true)
         {
-            // 후진 애니메이션
-            animator.SetInteger("IsState", 2);
-            playerState = PlayerState.runBack;
-            // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.runBackGun 이 된다.
-            // animator.SetBool("IsShot", true)  이면 playerState = PlayerState.runBackShot 이 된다.
-        }
-        else if (h <= -0.1f)
-        {
-            // 왼쪽 이동 애니메이션
-            animator.SetInteger("IsState", 3);
-            playerState = PlayerState.runLeft;
-            // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.runLeftGun 이 된다.
-            // animator.SetBool("IsShot", true)  이면 playerState = PlayerState.runLeftShot 이 된다.
-        }
-        else if (h >= 0.1f)
-        {
-            // 오른쪽 이동 애니메이션
-            animator.SetInteger("IsState", 4);
-            playerState = PlayerState.runRight;
-            // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.runRightGun 이 된다.
-            // animator.SetBool("IsShot", true)  이면 playerState = PlayerState.runRightShot 이 된다.
-        }
-        else
-        {
-            // 정지 시 idle애니메이션
-            animator.SetInteger("IsState", 0);
-            playerState = PlayerState.idle;
-            // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.idleGun 이 된다.
-        }
+            float steer = Input.GetAxis("Horizontal");
+            float accelerate = Input.GetAxis("Vertical");
 
 
+            float finalAngle = steer * 45f;
+            ridingCar.wheelColliders[0].steerAngle = finalAngle;
+            ridingCar.wheelColliders[1].steerAngle = finalAngle;
 
+            for (int i = 0; i < 4; i++)
+            {
+                ridingCar.wheelColliders[i].motorTorque = accelerate * ridingCar.maxTorque;
+            }
+
+            // 탑승시 캐릭터를 차량 위치와 동기화
+            this.transform.position = new Vector3(ridingCar.transform.position.x, 29.99451f, ridingCar.transform.position.z);
+
+        }
     }
 
     void Fire(SlotCtrl slot)
@@ -700,6 +741,7 @@ public class PlayerCtrl : MonoBehaviour
         if (coll.gameObject.tag == "Vehicle")
         {
             rideCar = true;
+            ridingCar = GameObject.Find(coll.gameObject.name).GetComponent<VehicleCtrl>();
         }
 
     }
@@ -739,7 +781,7 @@ public class PlayerCtrl : MonoBehaviour
     }
 
     // 플레이어 죽을 때 실행되는 함수
-    void PlayerDie()
+    public void PlayerDie()
     {
         // 이벤트 발생 시킴
         OnPlayerDie();
