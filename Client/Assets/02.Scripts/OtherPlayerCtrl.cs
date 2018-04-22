@@ -234,9 +234,9 @@ public class OtherPlayerCtrl : MonoBehaviour
 
             if (createBullet_b == true)
             {
-                // 총쏘는 애니메이션으로 변경.
-                animator.SetBool("IsEquip", true);
-                animator.SetBool("IsShot", true);
+                //// 총쏘는 애니메이션으로 변경.
+                //animator.SetBool("IsEquip", true);
+                //animator.SetBool("IsShot", true);
 
                 Instantiate(bullet, firePos.position, firePos.rotation);
 

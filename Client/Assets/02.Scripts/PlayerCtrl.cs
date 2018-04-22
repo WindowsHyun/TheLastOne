@@ -31,8 +31,8 @@ public class PlayerCtrl : MonoBehaviour
     // 캐릭터의 현재 상태 정보를 저장할 Enum 변수
     public PlayerState playerState = PlayerState.idle;
 
-    private float h = 0.0f;
-    private float v = 0.0f;
+    public float h = 0.0f;
+    public float v = 0.0f;
 
     // 접근해야 하는 컴포넌트는 반드시 변수에 할당한 후 사용
     private Transform tr;
@@ -155,7 +155,6 @@ public class PlayerCtrl : MonoBehaviour
                 }
             }
 
-
             // 총이 장착이 되었을때만 발사 가능
             if (shotable == true)
             {
@@ -168,7 +167,6 @@ public class PlayerCtrl : MonoBehaviour
 
                     if (Input.GetMouseButtonDown(0))
                     {
-                        animator.SetBool("IsShot", true);
                         Fire(Find556);
                         networkCtrl.Player_Shot();
                     }
@@ -178,7 +176,6 @@ public class PlayerCtrl : MonoBehaviour
 
                     if (Input.GetMouseButtonDown(0))
                     {
-                        animator.SetBool("IsShot", true);
                         Fire(Find556);
                         networkCtrl.Player_Shot();
                     }
@@ -187,7 +184,6 @@ public class PlayerCtrl : MonoBehaviour
                 {
                     if (Input.GetMouseButtonDown(0))
                     {
-                        animator.SetBool("IsShot", true);
                         Fire(Find762);
                         networkCtrl.Player_Shot();
                     }
@@ -196,7 +192,6 @@ public class PlayerCtrl : MonoBehaviour
                 {
                     if (Input.GetMouseButtonDown(0))
                     {
-                        animator.SetBool("IsShot", true);
                         Fire(Find9);
                         networkCtrl.Player_Shot();
                     }
@@ -443,9 +438,6 @@ public class PlayerCtrl : MonoBehaviour
         muzzleFlash1.enabled = false;
         muzzleFlash2.enabled = false;
 
-        animator.SetInteger("IsState", 0);
-
-
         //Cursor.lockState = CursorLockMode.Locked;//마우스 커서 고정
         //Cursor.visible = false;//마우스 커서 보이기
 
@@ -461,11 +453,6 @@ public class PlayerCtrl : MonoBehaviour
         // 인벤토리의 자식 컴포넌트의 스크립트 할당
         slotctrl = inventory.GetComponentsInChildren<SlotCtrl>();
         weaponSlotCtrl = inventory.GetComponentsInChildren<WeaponSlotCtrl>();
-
-
-       
-        //ridingCar = GameObject.FindWithTag("Vehicle").GetComponent<VehicleCtrl>();
-
 
         StartCoroutine(StartKeyInput());
     }
@@ -511,10 +498,7 @@ public class PlayerCtrl : MonoBehaviour
         {
             h = Input.GetAxis("Horizontal");
             v = Input.GetAxis("Vertical");
-
-            //Debug.Log("H=" + h.ToString());
-            //Debug.Log("V=" + v.ToString());
-
+ 
             // 전후좌우 이동 방향 벡터 계산
             Vector3 moveDir = (Vector3.forward * v) + (Vector3.right * h);
 
@@ -524,55 +508,16 @@ public class PlayerCtrl : MonoBehaviour
             // Vector3.up 축을 기준으로 rotSpeed만큼의 속도로 회전
             tr.Rotate(Vector3.up * Time.deltaTime * rotSpeed * Input.GetAxis("Mouse X"));
 
-            // 대기 0, 전진 1, 후진 2, 왼쪽 3, 오른쪽 4
-            // IsState란 애니메이터 상태 변수 추가됨
-            // 키보드 입력값을 기준으로 동작할 애니메이션 수행
-            if (v >= 0.1f)
-            {
-                // 전진 애니메이션
-                animator.SetInteger("IsState", 1);
-                playerState = PlayerState.runForword;
-                // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.runForwordGun 이 된다.
-                // animator.SetBool("IsShot", true)  이면 playerState = PlayerState.runForwordShot 이 된다.
-            }
-            else if (v <= -0.1f)
-            {
-                // 후진 애니메이션
-                animator.SetInteger("IsState", 2);
-                playerState = PlayerState.runBack;
-                // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.runBackGun 이 된다.
-                // animator.SetBool("IsShot", true)  이면 playerState = PlayerState.runBackShot 이 된다.
-            }
-            else if (h <= -0.1f)
-            {
-                // 왼쪽 이동 애니메이션
-                animator.SetInteger("IsState", 3);
-                playerState = PlayerState.runLeft;
-                // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.runLeftGun 이 된다.
-                // animator.SetBool("IsShot", true)  이면 playerState = PlayerState.runLeftShot 이 된다.
-            }
-            else if (h >= 0.1f)
-            {
-                // 오른쪽 이동 애니메이션
-                animator.SetInteger("IsState", 4);
-                playerState = PlayerState.runRight;
-                // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.runRightGun 이 된다.
-                // animator.SetBool("IsShot", true)  이면 playerState = PlayerState.runRightShot 이 된다.
-            }
-            else
-            {
-                // 정지 시 idle애니메이션
-                animator.SetInteger("IsState", 0);
-                playerState = PlayerState.idle;
-                // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.idleGun 이 된다.
-            }
+            // 블랜드 트리에서 v값과 h 값을 계산해서 애니메이션 실행된다.
+            animator.SetFloat("Vertical", v);
+            animator.SetFloat("Horizontal", h);   
         }
         else if(GetTheCar == true)
         {
             float steer = Input.GetAxis("Horizontal");
             float accelerate = Input.GetAxis("Vertical");
 
-
+            // 차량 바퀴 각도 계산
             float finalAngle = steer * 45f;
             ridingCar.wheelColliders[0].steerAngle = finalAngle;
             ridingCar.wheelColliders[1].steerAngle = finalAngle;
@@ -632,10 +577,6 @@ public class PlayerCtrl : MonoBehaviour
             }
             source.PlayOneShot(UMP45Sound, 0.9f);
         }
-
-
-        // 사운드 발생 함수
-
 
         // 잠시 기다리는 루틴을 위해 코루틴 함수로 호출
         StartCoroutine(this.ShowMuzzleFlash());
