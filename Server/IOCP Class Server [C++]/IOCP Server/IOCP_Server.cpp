@@ -3,12 +3,15 @@
 #include "Timer.h"
 #include "Game_DangerLine.h"
 #include "Game_CollisionCheck.h"
+#include "Game_Zombie.h"
 
 std::unordered_map< int, Game_Client>::iterator get_client_iter(int ci);
 std::unordered_map< int, Game_Client> g_clients;
 std::unordered_map< int, Game_Item>::iterator get_item_iter(int ci);
 std::unordered_map< int, Game_Item> g_item;
-std::unordered_map< int, Game_CollisionCheck> g_collision;
+std::unordered_map< int, Game_Zombie>::iterator get_zombie_iter(int ci);
+std::unordered_map< int, Game_Zombie> g_zombie;
+//std::unordered_map< int, Game_CollisionCheck> g_collision;
 std::queue<int> remove_client_id;
 Game_DangerLine DangerLine;
 Server_Timer Timer;
@@ -52,7 +55,12 @@ void IOCP_Server::initServer()
 	}
 	// 게임 아이템 정보 g_item에 넣어주기.
 	load_item_txt("./Game_Item_Collection.txt", &g_item);
-	load_CollisionCheck_txt("./Game_CollisionCheck.txt", &g_collision);
+
+	// 좀비 캐릭터 생성하기
+	init_Zombie(100, &g_zombie);
+	
+	// 충돌체크 넣기
+	//load_CollisionCheck_txt("./Game_CollisionCheck.txt", &g_collision);
 
 	std::cout << "init Complete..!" << std::endl;
 }
@@ -91,12 +99,12 @@ void IOCP_Server::makeThread()
 
 	std::thread accept_tread{ &IOCP_Server::Accept_Thread, this };
 
-	std::thread collision_thread{ &IOCP_Server::Collision_Thread, this };
+	//std::thread zombie_thread{ &IOCP_Server::Zombie_Thread, this };
 
 	Timer.initTimer(g_hiocp);		// 타이머 스레드를 만들어 준다.
 
 	accept_tread.join();
-	collision_thread.join();
+	//zombie_thread.join();
 	for (auto pth : worker_threads) {
 		pth->join();
 		delete pth;
@@ -280,9 +288,25 @@ void IOCP_Server::Accept_Thread()
 	}	// while(true)
 }
 
-void IOCP_Server::Collision_Thread()
+void IOCP_Server::Zombie_Thread()
 {
+		for (auto zombie : g_zombie) {
+			flatbuffers::FlatBufferBuilder builder;
+			auto z_id = zombie.first;
+			auto z_hp = zombie.second.get_hp();
+			auto z_ani = zombie.second.get_animator();
+			auto z_pos = zombie.second.get_position();
+			auto z_rot = zombie.second.get_rotation();
 
+			auto orc = CreateZombie_info(builder, z_id, z_hp, z_ani, &z_pos, &z_rot);
+			builder.Finish(orc); // Serialize the root of the object.
+
+			for (auto iter : g_clients) {
+				if (iter.second.get_Connect() != true)
+					continue;
+				SendPacket(SC_Zombie_Info, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
+			}
+		}
 }
 
 void IOCP_Server::Remove_Client()
@@ -375,6 +399,7 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 
 		Send_All_Data(ci, all_Client_Packet);
 		Send_All_Item();
+		Zombie_Thread();
 	}
 	catch (DWORD dwError) {
 		errnum++;
@@ -580,4 +605,9 @@ std::unordered_map< int, Game_Client>::iterator get_client_iter(int ci) {
 
 std::unordered_map< int, Game_Item>::iterator get_item_iter(int ci) {
 	return g_item.find(ci);
+}
+
+std::unordered_map<int, Game_Zombie>::iterator get_zombie_iter(int ci)
+{
+	return g_zombie.find(ci);
 }

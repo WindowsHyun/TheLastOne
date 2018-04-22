@@ -319,9 +319,11 @@
     <Compile Include="Assets\07.Network\navmesh_export.cs" />
     <Compile Include="Assets\07.Network\NetworkCtrl.cs" />
     <Compile Include="Assets\07.Network\Vec3.cs" />
+    <Compile Include="Assets\07.Network\Zombie_info.cs" />
     <Compile Include="Assets\08.Class\Game_ClientClass.cs" />
     <Compile Include="Assets\08.Class\Game_ItemClass.cs" />
     <Compile Include="Assets\08.Class\Game_ProtocolClass.cs" />
+    <Compile Include="Assets\08.Class\Game_ZombieClass.cs" />
     <Compile Include="Assets\08.Class\SendFunction.cs" />
   </ItemGroup>
   <ItemGroup>

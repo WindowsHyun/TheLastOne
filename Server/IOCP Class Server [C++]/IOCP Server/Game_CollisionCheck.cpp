@@ -19,16 +19,16 @@ void CollisionCheck(xyz player, std::unordered_map<int, Game_CollisionCheck>* co
 
 		// rc1 을 플레이어
 		RECT rc1;
-		rc1.left = player.x - 0.6;
-		rc1.right = player.x + 0.6;
-		rc1.top = player.z + 0.6;
-		rc1.bottom = player.z - 0.6;
+		rc1.left = (long)(player.x - 0.6);
+		rc1.right = (long)(player.x + 0.6);
+		rc1.top = (long)(player.z + 0.6);
+		rc1.bottom = (long)(player.z - 0.6);
 		// rc2 를 오브젝트
 		RECT rc2;
-		rc2.left = iter.second.get_startX();
-		rc2.right = iter.second.get_endX();
-		rc2.top = iter.second.get_endY();
-		rc2.bottom = iter.second.get_startY();
+		rc2.left = (long)(iter.second.get_startX());
+		rc2.right = (long)(iter.second.get_endX());
+		rc2.top = (long)(iter.second.get_endY());
+		rc2.bottom = (long)(iter.second.get_startY());
 
 		if (rc1.left  <=	rc2.right	&&
 			rc1.right >= rc2.left && 
@@ -41,29 +41,7 @@ void CollisionCheck(xyz player, std::unordered_map<int, Game_CollisionCheck>* co
 			std::cout << "충돌..!" << std::endl << std::endl;
 			break;
 		}
-
-
-
-		//if (player.x + 1.5	<	iter.second.get_endX() && player.z - 1.5	<	iter.second.get_endY() && player.x -1.5	>	iter.second.get_startX() && player.z +1.5 >	 iter.second.get_startY())
-		//{
-		//	
-		//}
-
-		//if (rc1.left	<	rc2.right	&& rc1.top	<	rc2.bottom	&& rc1.right	>	rc2.left	&& rc1.bottom	>	rc2.top) { 충돌시에 실행할 명령; }
-
-
-		/*if (iter.second.get_startX() <= (player.x + 1.7)  &&  (player.x +1.7) <= iter.second.get_endX()) {
-			if (iter.second.get_startY() <= (player.z + 1.7) && ( player.z + 1.7) <= iter.second.get_endY()) {
-
-				std::cout << iter.second.get_startX() << " ~ " << iter.second.get_endX() << std::endl;
-				std::cout << iter.second.get_startY() << " ~ " << iter.second.get_endY() << std::endl;
-				std::cout << "충돌..!" << std::endl<< std::endl;
-				break;
-			}
-		}*/
-
 	}
-
 }
 
 void load_CollisionCheck_txt(std::string filepath, std::unordered_map<int, Game_CollisionCheck>* collision)

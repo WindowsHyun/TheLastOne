@@ -24,11 +24,21 @@ enum Event_Type { E_DangerLine, E_RoundTime, E_Remove_Client, E_MoveDangerLine }
 #define SC_Server_Item	6				// 서버 아이템
 #define SC_Shot_Client	7				// 클라이언트 Shot 정보
 #define SC_DangerLine	8				// 클라이언트 DangerLine 정보 전송
+#define SC_Zombie_Info 9				// 클라이언트에게 좀비 위치를 전달해 준다.
+
 
 // 클라이언트가 서버에게 보내는 패킷
 #define CS_Info           1					// 클라이언트가 서버에게 자신의 위치정보를 보내준다.
 #define CS_Shot_info    2					// 클라이언트가 서버에게 Shot 정보를 보내준다.
 #define CS_Check_info  3					// 클라이언트가 서버에게 자신의 정보가 맞는지 확인해 준다.
 #define CS_Eat_Item	   4					// 클라이언트가 서버에게 먹은 아이템 정보를 보내준다.
+
+
+// 자기장 시간
+#define DangerLine_Level4 240
+#define DangerLine_Level3 240
+#define DangerLine_Level2 240
+#define DangerLine_Level1 240
+#define DangerLine_Level0 240
 
 #endif

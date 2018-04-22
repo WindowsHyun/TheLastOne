@@ -32,6 +32,10 @@ public class ZombieCtrl : MonoBehaviour
     // 좀비 체력 변수
     private int hp = 100;
 
+    // 좀비 Nav 켜기
+    public bool startNav = false;
+    private float pos_x = 0;
+
     // Use this for initialization
     void Start()
     {
@@ -52,6 +56,11 @@ public class ZombieCtrl : MonoBehaviour
 
         // 좀비의 상태에 따라 동작하는 루틴을 실행하는 코루틴 함수 실행
         StartCoroutine(this.ZombieAction());
+
+        // 좀비의 Nav를 키기 위한 코루틴
+        StartCoroutine(this.CheckZombieNav());
+
+        pos_x = zombieTr.position.x;
     }
 
     void OnEnable()
@@ -63,6 +72,26 @@ public class ZombieCtrl : MonoBehaviour
     void OnDisable()
     {
         PlayerCtrl.OnPlayerDie -= this.OnPlayerDie;
+    }
+
+    IEnumerator CheckZombieNav()
+    {
+        while (true)
+        {
+
+            if (startNav == true)
+            {
+                nvAgent.enabled = false;
+                nvAgent.enabled = true;
+                if (pos_x != zombieTr.position.x)
+                {
+                    break;
+                }
+            }
+
+            yield return new WaitForSeconds(0.2f);
+
+        }
     }
 
 

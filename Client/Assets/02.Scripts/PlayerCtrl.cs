@@ -128,7 +128,7 @@ public class PlayerCtrl : MonoBehaviour
                 // Image UI 항목의 fillAmount 속성을 조절해 생명 게이지 값 조절
                 imgHpBar.fillAmount = (float)hp / (float)initHp;
 
-                Debug.Log("Player H{: " + hp.ToString());
+                //Debug.Log("Player H{: " + hp.ToString());
                 if (hp <= 0)
                 {
                     // 마우스 잠겨 있을경우 푼다.

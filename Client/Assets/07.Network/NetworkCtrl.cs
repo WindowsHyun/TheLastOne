@@ -52,6 +52,7 @@ namespace TheLastOne.Game.Network
         public static Socket m_Socket;
         public GameObject Player;
         public GameObject PrefabPlayer;
+        public GameObject Zombie;
         //------------------------------------------
         // 게임 아이템 Object
         public GameObject item_AK47;
@@ -72,6 +73,8 @@ namespace TheLastOne.Game.Network
 
         public static Dictionary<int, Game_ClientClass> client_data = new Dictionary<int, Game_ClientClass>();
         // 클라이언트 데이터 저장할 컨테이너
+        public static Dictionary<int, Game_ZombieClass> zombie_data = new Dictionary<int, Game_ZombieClass>();
+        // 좀비 데이터 저장할 컨테이너
         public static Dictionary<int, Game_ItemClass> item_Collection = new Dictionary<int, Game_ItemClass>();
         // 클라이언트 아이템 저장할 컨테이너
 
@@ -137,6 +140,44 @@ namespace TheLastOne.Game.Network
                             //StartCoroutine(RemovePlayerCoroutine(iter.Key));
                         }
                     }
+                    // 좀비 관련한 프리팹
+                    foreach (var key in zombie_data.Keys.ToList())
+                    {
+                        if (zombie_data[key].get_prefab() == false)
+                        {
+                            zombie_data[key].Zombie = Instantiate(Zombie, zombie_data[key].get_pos(), Quaternion.identity);
+                            zombie_data[key].script = zombie_data[key].Zombie.GetComponent<ZombieCtrl>();
+                            zombie_data[key].set_prefab(true);
+
+                            // 처음 위치를 넣어 줘야 한다. 그러지 않을경우 다른 클라이언트 에서는 0,0 에서부터 천천히 올라오게 보인다
+                            zombie_data[key].Zombie.transform.position = zombie_data[key].get_pos();
+                        }
+                        else if (zombie_data[key].get_prefab() == true)
+                        {
+                            // 실제로 캐릭터를 움직이는 것은 코루틴 여기서 움직임을 진행 한다.
+                            if (zombie_data[key].Zombie.transform.position.x == 0 && zombie_data[key].Zombie.transform.position.y == 0 
+                                && zombie_data[key].Zombie.transform.position.z == 0) {
+                                zombie_data[key].Zombie.transform.position = zombie_data[key].get_pos();
+
+                                zombie_data[key].script.enabled = true;
+                                zombie_data[key].script.startNav = true;
+                            }
+                            //
+                        }
+                        //if (zombie_data[key].get_removeClient() == true)
+                        //{
+                        //    // 연결은 해지 되었는데 프리팹이 살아 있는경우는 나간 경우 이므로
+                        //    // 코루틴을 통하여 지워주자!
+                        //    Game_ClientClass iter2 = zombie_data[key];
+                        //    Destroy(iter2.Player);
+                        //    zombie_data.Remove(key);
+                        //    //StartCoroutine(RemovePlayerCoroutine(iter.Key));
+                        //}
+                    }
+
+
+
+
                 }
                 yield return null;
             } while (true);
@@ -333,7 +374,7 @@ namespace TheLastOne.Game.Network
                 ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
                 var Get_ServerData = Game_Timer.GetRootAsGame_Timer(revc_buf);
                 //Debug.Log("Time : " + Get_ServerData.Time);
-                debugString = "Time : " + (Get_ServerData.Time/60) + "m " + (Get_ServerData.Time % 60) + "s";
+                debugString = "Time : " + (Get_ServerData.Time / 60) + "m " + (Get_ServerData.Time % 60) + "s";
             }
             else if (type == recv_protocol.SC_Server_Item)
             {
@@ -391,6 +432,39 @@ namespace TheLastOne.Game.Network
                 DangerLineCtrl.set_pos(new Vector3(Get_ServerData.Position.Value.X, Get_ServerData.Position.Value.Y, Get_ServerData.Position.Value.Z));
                 DangerLineCtrl.set_scale(new Vector3(Get_ServerData.Scale.Value.X, Get_ServerData.Scale.Value.Y, Get_ServerData.Scale.Value.Z));
                 DangerLineCtrl.set_start(true);
+            }
+            else if (type == recv_protocol.SC_Zombie_Info)
+            {
+                // 좀비 관련한 데이터를 받았다.
+                byte[] t_buf = new byte[size + 1];
+                System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
+                ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
+                var Get_ServerData = Zombie_info.GetRootAsZombie_info(revc_buf);
+
+                if (zombie_data.ContainsKey(Get_ServerData.Id))
+                {
+                    // 이미 값이 들어가 있는 상태라면
+                    Game_ZombieClass iter = zombie_data[Get_ServerData.Id];
+
+                    if (iter.get_pos().x == 0 && iter.get_pos().y == 0 && iter.get_pos().z == 0)
+                    {
+                        iter.set_pos(new Vector3(Get_ServerData.Position.Value.X, Get_ServerData.Position.Value.Y, Get_ServerData.Position.Value.Z));
+                        iter.set_rot(new Vector3(Get_ServerData.Rotation.Value.X, Get_ServerData.Rotation.Value.Y, Get_ServerData.Rotation.Value.Z));
+                    }
+
+                    //iter.set_animator(Get_ServerData.Animator);
+
+                    //if (iter.get_prefab() == true)
+                    //{
+                    //    // 프리팹이 만들어진 이후 부터 script를 사용할 수 있기 때문에 그 이후 애니메이션 동기화를 시작한다.
+                    //}
+                }
+                else
+                {
+                    // 클라이언트가 자기 자신이 아닐경우에만 추가해준다.
+                    zombie_data.Add(Get_ServerData.Id, new Game_ZombieClass(Get_ServerData.Id, new Vector3(Get_ServerData.Position.Value.X, Get_ServerData.Position.Value.Y, Get_ServerData.Position.Value.Z), new Vector3(Get_ServerData.Rotation.Value.X, Get_ServerData.Rotation.Value.Y, Get_ServerData.Rotation.Value.Z)));
+                }
+
             }
 
         }
@@ -545,8 +619,9 @@ namespace TheLastOne.Game.Network
 
             foreach (BoxCollider trans in boxObjects)
             {
-                if ( trans.tag.ToString() != "CAMCHANGE") { 
-                coordinates += "posx:" + trans.transform.position.x.ToString() + "|posy:" + trans.transform.position.y.ToString() + "|posz:" + trans.transform.position.z.ToString() + "|centerx:" + trans.center.x.ToString() + "|centery:" + trans.center.y.ToString() + "|centerz:" + trans.center.z.ToString() + "|sizex:" + trans.size.x.ToString() + "|sizey:" + trans.size.y.ToString() + "|sizez:" + trans.size.z.ToString() + "|scalex:" + trans.transform.localScale.x.ToString() + "|scaley:" + trans.transform.localScale.y.ToString() + "|scalez:" + trans.transform.localScale.z.ToString()  + "|"+ System.Environment.NewLine;
+                if (trans.tag.ToString() != "CAMCHANGE")
+                {
+                    coordinates += "posx:" + trans.transform.position.x.ToString() + "|posy:" + trans.transform.position.y.ToString() + "|posz:" + trans.transform.position.z.ToString() + "|centerx:" + trans.center.x.ToString() + "|centery:" + trans.center.y.ToString() + "|centerz:" + trans.center.z.ToString() + "|sizex:" + trans.size.x.ToString() + "|sizey:" + trans.size.y.ToString() + "|sizez:" + trans.size.z.ToString() + "|scalex:" + trans.transform.localScale.x.ToString() + "|scaley:" + trans.transform.localScale.y.ToString() + "|scalez:" + trans.transform.localScale.z.ToString() + "|" + System.Environment.NewLine;
                 }
             }
 
