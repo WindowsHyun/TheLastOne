@@ -22,7 +22,7 @@ std::string splitParsing(const std::string content, const std::string start, con
 	return content.substr(startPos, endPos);
 }
 
-void load_g_item(std::string filepath, std::unordered_map<int, Game_Item>* item)
+void load_item_txt(std::string filepath, std::unordered_map<int, Game_Item>* item)
 {
 	int item_num = 0;
 	std::ifstream openFile(filepath);

@@ -22,6 +22,16 @@ void Game_Client::init()
 	this->curr_packet_size = 0;
 }
 
+Vec3 Game_Client::get_position()
+{
+	 return Vec3(this->position.x, this->position.y, this->position.z); 
+}
+
+Vec3 Game_Client::get_rotation()
+{
+	return Vec3(this->rotation.x, this->rotation.y, this->rotation.z);
+}
+
 Game_Client::Game_Client(const SOCKET sock, const int client_id, const char * game_id)
 {
 	this->connect = true;

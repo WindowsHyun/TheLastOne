@@ -1,12 +1,21 @@
 ﻿#include "IOCP_Server.h"
 #include "Game_Client.h"
 #include "Timer.h"
+#include "Game_DangerLine.h"
+#include "Game_CollisionCheck.h"
+#include "Game_Zombie.h"
 
 std::unordered_map< int, Game_Client>::iterator get_client_iter(int ci);
 std::unordered_map< int, Game_Client> g_clients;
 std::unordered_map< int, Game_Item>::iterator get_item_iter(int ci);
 std::unordered_map< int, Game_Item> g_item;
+std::unordered_map< int, Game_Zombie>::iterator get_zombie_iter(int ci);
+std::unordered_map< int, Game_Zombie> g_zombie;
+void player_To_Zombie(std::unordered_map<int, Game_Zombie> &zombie, std::unordered_map<int, Game_Client> &player);
+
+//std::unordered_map< int, Game_CollisionCheck> g_collision;
 std::queue<int> remove_client_id;
+Game_DangerLine DangerLine;
 Server_Timer Timer;
 
 IOCP_Server::IOCP_Server()
@@ -47,7 +56,13 @@ void IOCP_Server::initServer()
 		remove_client_id.push(i);
 	}
 	// 게임 아이템 정보 g_item에 넣어주기.
-	load_g_item("./Game_Item_Collection.txt", &g_item);
+	load_item_txt("./Game_Item_Collection.txt", &g_item);
+
+	// 좀비 캐릭터 생성하기
+	init_Zombie(50, &g_zombie);
+
+	// 충돌체크 넣기
+	//load_CollisionCheck_txt("./Game_CollisionCheck.txt", &g_collision);
 
 	std::cout << "init Complete..!" << std::endl;
 }
@@ -86,9 +101,12 @@ void IOCP_Server::makeThread()
 
 	std::thread accept_tread{ &IOCP_Server::Accept_Thread, this };
 
+	//std::thread zombie_thread{ &IOCP_Server::Zombie_Thread, this };
+
 	Timer.initTimer(g_hiocp);		// 타이머 스레드를 만들어 준다.
 
 	accept_tread.join();
+	//zombie_thread.join();
 	for (auto pth : worker_threads) {
 		pth->join();
 		delete pth;
@@ -164,19 +182,39 @@ void IOCP_Server::Worker_Thread()
 			}
 			delete over;
 		}
-		else if (OP_InitTime == over->event_type) {
-			Send_All_Time(T_InitTime, (int)ci, -1, true);
+		else if (OP_DangerLine == over->event_type) {
+			Send_All_Time(T_DangerLine, (int)ci, -1, true);
 			if (ci <= 0) {
 				// 초기 대기시간이 만료 되었을 경우
-#if (DebugMod == TRUE )
-				std::cout << "OP_InitTime이 완료 되었습니다..!" << std::endl;
-#endif
+				DangerLine.set_level(DangerLine.get_level() - 1);
+				Send_DangerLine_info(DangerLine.get_demage(), DangerLine.get_pos(), DangerLine.get_scale());
+				if (DangerLine.get_level() != -1) {
+					Timer_Event t = { (int)DangerLine.get_scale_x() , high_resolution_clock::now() + 100ms, E_MoveDangerLine };
+					std::cout << DangerLine.get_scale_x() << std::endl;
+					Timer.setTimerEvent(t);
+				}
+
 			}
 			else {
 				// ci-1 을 한 이유는 1초씩 내리기 위하여.
-				Timer_Event t = { (int)ci - 1, high_resolution_clock::now() + 1s, E_initTime };
+				Send_DangerLine_info(DangerLine.get_demage(), DangerLine.get_pos(), DangerLine.get_scale());
+				Timer_Event t = { (int)ci - 1, high_resolution_clock::now() + 1s, E_DangerLine };
 				Timer.setTimerEvent(t);
 			}
+		}
+		else if (OP_MoveDangerLine == over->event_type) {
+			DangerLine.set_scale(10);
+			Send_DangerLine_info(DangerLine.get_demage(), DangerLine.get_pos(), DangerLine.get_scale());
+
+			if (DangerLine.get_now_scale_x() <= ci) {
+				Timer_Event t = { DangerLine.get_time() , high_resolution_clock::now() + 1s, E_DangerLine };	// 자기장 시작 전 대기시간
+				Timer.setTimerEvent(t);
+			}
+			else {
+				Timer_Event t = { (int)ci , high_resolution_clock::now() + 100ms, E_MoveDangerLine };
+				Timer.setTimerEvent(t);
+			}
+
 		}
 		else if (OP_RemoveClient == over->event_type) {
 			// 1초마다 한번씩 종료된 클라이언트를 지워 준다.
@@ -250,6 +288,28 @@ void IOCP_Server::Accept_Thread()
 		}
 
 	}	// while(true)
+}
+
+void IOCP_Server::Zombie_Thread()
+{
+	for (auto zombie : g_zombie) {
+		flatbuffers::FlatBufferBuilder builder;
+		auto z_id = zombie.first;
+		auto z_hp = zombie.second.get_hp();
+		auto z_ani = zombie.second.get_animator();
+		auto z_target = zombie.second.get_target();
+		auto z_pos = zombie.second.get_position();
+		auto z_rot = zombie.second.get_rotation();
+
+		auto orc = CreateZombie_info(builder, z_id, z_hp, z_ani, z_target, &z_pos, &z_rot);
+		builder.Finish(orc); // Serialize the root of the object.
+
+		for (auto iter : g_clients) {
+			if (iter.second.get_Connect() != true)
+				continue;
+			SendPacket(SC_Zombie_Info, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
+		}
+	}
 }
 
 void IOCP_Server::Remove_Client()
@@ -338,10 +398,25 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 			iter->second.set_eat(true);
 		}
 		break;
+		case CS_Zombie_info:
+		{
+			auto client_Check_info = getZombie_infoView(get_packet);
+			auto iter = get_zombie_iter(client_Check_info->id());
+
+			iter->second.set_animator(client_Check_info->animator());
+			iter->second.set_hp(client_Check_info->hp());
+			xyz packet_position{ client_Check_info->position()->x() , client_Check_info->position()->y() , client_Check_info->position()->z() };
+			iter->second.set_zombie_position(packet_position);
+			xyz packet_rotation{ client_Check_info->rotation()->x() , client_Check_info->rotation()->y() , client_Check_info->rotation()->z() };
+			iter->second.set_zombie_rotation(packet_rotation);
+		}
+		break;
 		}
 
 		Send_All_Data(ci, all_Client_Packet);
 		Send_All_Item();
+		player_To_Zombie(g_zombie, g_clients);
+		Zombie_Thread();
 	}
 	catch (DWORD dwError) {
 		errnum++;
@@ -523,10 +598,83 @@ void IOCP_Server::Send_Client_Shot(int shot_client)
 
 }
 
+void IOCP_Server::Send_DangerLine_info(int demage, xyz pos, xyz scale)
+{
+	flatbuffers::FlatBufferBuilder builder;
+	auto dem = demage;
+	auto position = new Vec3(pos.x, pos.y, pos.z);
+	auto sscale = new Vec3(scale.x, scale.y, scale.z);
+	auto orc = CreateGameDangerLine(builder, dem, position, sscale);
+	builder.Finish(orc); // Serialize the root of the object.
+
+	for (auto iter : g_clients) {
+		if (iter.second.get_Connect() != true)
+			continue;
+		SendPacket(SC_DangerLine, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
+	}
+
+
+}
+
 std::unordered_map< int, Game_Client>::iterator get_client_iter(int ci) {
 	return g_clients.find(ci);
 }
 
 std::unordered_map< int, Game_Item>::iterator get_item_iter(int ci) {
 	return g_item.find(ci);
+}
+
+std::unordered_map<int, Game_Zombie>::iterator get_zombie_iter(int ci)
+{
+	return g_zombie.find(ci);
+}
+
+float DistanceToPoint(float player_x, float player_z, float zombie_x, float zombie_z)
+{
+	// 캐릭터 간의 거리 구하기.
+	return (float)sqrt(pow(player_x - zombie_x, 2) + pow(player_z - zombie_z, 2));
+}
+
+void player_To_Zombie(std::unordered_map<int, Game_Zombie> &zombie, std::unordered_map<int, Game_Client> &player)
+{
+	for (auto z : zombie) {
+		// TargetPlayer가 실제 서버에 존재하는지 확인하자.
+		if (player.find(z.second.get_target()) != player.end()) {
+			// 플레이어가 존재한다.
+			auto iter = player.find(z.second.get_target());
+			float check_dist = DistanceToPoint(iter->second.get_pos().x, iter->second.get_pos().z, z.second.get_pos().x, z.second.get_pos().z);
+			if (check_dist >= Zombie_Dist) {
+				// 플레이어가 존재하지만 거리가 멀어져 있을 경우 좀비 Target을 초기화
+				iter->second.set_limit_zombie(-1);
+				zombie.find(z.first)->second.set_target(-1);
+			}
+			if(z.second.get_hp() <= 0 && z.second.get_live() != false) {
+				// 좀비의 체력이 0일경우
+				zombie.find(z.first)->second.set_live(false);
+				iter->second.set_limit_zombie(-1);
+				std::cout << iter->first << ", " << iter->second.get_limit_zombie() << std::endl;
+				zombie.find(z.first)->second.set_target(-1);
+			}else {
+				// 아직 근처일 경우 넘긴다.
+				continue;
+			}
+		}
+		else {
+			int player_num = -1;
+			float dist = Zombie_Dist;
+			for (auto p : player) {
+				float check_dist = DistanceToPoint(p.second.get_pos().x, p.second.get_pos().z, z.second.get_pos().x, z.second.get_pos().z);
+				if (dist >= check_dist) {
+					dist = check_dist;
+					player_num = p.first;
+				}
+			}
+			if (player_num == -1)
+				continue;
+			if ( player.find(player_num)->second.get_limit_zombie() < 1){
+				player.find(player_num)->second.set_limit_zombie(1);
+				zombie.find(z.first)->second.set_target(player_num);
+			}
+		}
+	}
 }

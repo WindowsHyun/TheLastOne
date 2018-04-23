@@ -15,9 +15,13 @@ namespace Game {
 
 		struct Client_info;
 
+		struct Zombie_info;
+
 		struct Game_Items;
 
 		struct Gameitem;
+
+		struct GameDangerLine;
 
 		struct Game_Timer;
 
@@ -223,6 +227,96 @@ namespace Game {
 				nowWeapon);
 		}
 
+		struct Zombie_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+			enum {
+				VT_ID = 4,
+				VT_HP = 6,
+				VT_ANIMATOR = 8,
+				VT_TARGETPLAYER = 10,
+				VT_POSITION = 12,
+				VT_ROTATION = 14
+			};
+			int32_t id() const {
+				return GetField<int32_t>(VT_ID, 0);
+			}
+			int32_t hp() const {
+				return GetField<int32_t>(VT_HP, 0);
+			}
+			int32_t animator() const {
+				return GetField<int32_t>(VT_ANIMATOR, 0);
+			}
+			int32_t targetPlayer() const {
+				return GetField<int32_t>(VT_TARGETPLAYER, 0);
+			}
+			const Vec3 *position() const {
+				return GetStruct<const Vec3 *>(VT_POSITION);
+			}
+			const Vec3 *rotation() const {
+				return GetStruct<const Vec3 *>(VT_ROTATION);
+			}
+			bool Verify(flatbuffers::Verifier &verifier) const {
+				return VerifyTableStart(verifier) &&
+					VerifyField<int32_t>(verifier, VT_ID) &&
+					VerifyField<int32_t>(verifier, VT_HP) &&
+					VerifyField<int32_t>(verifier, VT_ANIMATOR) &&
+					VerifyField<int32_t>(verifier, VT_TARGETPLAYER) &&
+					VerifyField<Vec3>(verifier, VT_POSITION) &&
+					VerifyField<Vec3>(verifier, VT_ROTATION) &&
+					verifier.EndTable();
+			}
+		};
+
+		struct Zombie_infoBuilder {
+			flatbuffers::FlatBufferBuilder &fbb_;
+			flatbuffers::uoffset_t start_;
+			void add_id(int32_t id) {
+				fbb_.AddElement<int32_t>(Zombie_info::VT_ID, id, 0);
+			}
+			void add_hp(int32_t hp) {
+				fbb_.AddElement<int32_t>(Zombie_info::VT_HP, hp, 0);
+			}
+			void add_animator(int32_t animator) {
+				fbb_.AddElement<int32_t>(Zombie_info::VT_ANIMATOR, animator, 0);
+			}
+			void add_targetPlayer(int32_t targetPlayer) {
+				fbb_.AddElement<int32_t>(Zombie_info::VT_TARGETPLAYER, targetPlayer, 0);
+			}
+			void add_position(const Vec3 *position) {
+				fbb_.AddStruct(Zombie_info::VT_POSITION, position);
+			}
+			void add_rotation(const Vec3 *rotation) {
+				fbb_.AddStruct(Zombie_info::VT_ROTATION, rotation);
+			}
+			explicit Zombie_infoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+				: fbb_(_fbb) {
+				start_ = fbb_.StartTable();
+			}
+			Zombie_infoBuilder &operator=(const Zombie_infoBuilder &);
+			flatbuffers::Offset<Zombie_info> Finish() {
+				const auto end = fbb_.EndTable(start_);
+				auto o = flatbuffers::Offset<Zombie_info>(end);
+				return o;
+			}
+		};
+
+		inline flatbuffers::Offset<Zombie_info> CreateZombie_info(
+			flatbuffers::FlatBufferBuilder &_fbb,
+			int32_t id = 0,
+			int32_t hp = 0,
+			int32_t animator = 0,
+			int32_t targetPlayer = 0,
+			const Vec3 *position = 0,
+			const Vec3 *rotation = 0) {
+			Zombie_infoBuilder builder_(_fbb);
+			builder_.add_rotation(rotation);
+			builder_.add_position(position);
+			builder_.add_targetPlayer(targetPlayer);
+			builder_.add_animator(animator);
+			builder_.add_hp(hp);
+			builder_.add_id(id);
+			return builder_.Finish();
+		}
+
 		struct Game_Items FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 			enum {
 				VT_DATA = 4
@@ -370,6 +464,66 @@ namespace Game {
 				eat);
 		}
 
+		struct GameDangerLine FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+			enum {
+				VT_DEMAGE = 4,
+				VT_POSITION = 6,
+				VT_SCALE = 8
+			};
+			int32_t demage() const {
+				return GetField<int32_t>(VT_DEMAGE, 0);
+			}
+			const Vec3 *position() const {
+				return GetStruct<const Vec3 *>(VT_POSITION);
+			}
+			const Vec3 *scale() const {
+				return GetStruct<const Vec3 *>(VT_SCALE);
+			}
+			bool Verify(flatbuffers::Verifier &verifier) const {
+				return VerifyTableStart(verifier) &&
+					VerifyField<int32_t>(verifier, VT_DEMAGE) &&
+					VerifyField<Vec3>(verifier, VT_POSITION) &&
+					VerifyField<Vec3>(verifier, VT_SCALE) &&
+					verifier.EndTable();
+			}
+		};
+
+		struct GameDangerLineBuilder {
+			flatbuffers::FlatBufferBuilder &fbb_;
+			flatbuffers::uoffset_t start_;
+			void add_demage(int32_t demage) {
+				fbb_.AddElement<int32_t>(GameDangerLine::VT_DEMAGE, demage, 0);
+			}
+			void add_position(const Vec3 *position) {
+				fbb_.AddStruct(GameDangerLine::VT_POSITION, position);
+			}
+			void add_scale(const Vec3 *scale) {
+				fbb_.AddStruct(GameDangerLine::VT_SCALE, scale);
+			}
+			explicit GameDangerLineBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+				: fbb_(_fbb) {
+				start_ = fbb_.StartTable();
+			}
+			GameDangerLineBuilder &operator=(const GameDangerLineBuilder &);
+			flatbuffers::Offset<GameDangerLine> Finish() {
+				const auto end = fbb_.EndTable(start_);
+				auto o = flatbuffers::Offset<GameDangerLine>(end);
+				return o;
+			}
+		};
+
+		inline flatbuffers::Offset<GameDangerLine> CreateGameDangerLine(
+			flatbuffers::FlatBufferBuilder &_fbb,
+			int32_t demage = 0,
+			const Vec3 *position = 0,
+			const Vec3 *scale = 0) {
+			GameDangerLineBuilder builder_(_fbb);
+			builder_.add_scale(scale);
+			builder_.add_position(position);
+			builder_.add_demage(demage);
+			return builder_.Finish();
+		}
+
 		struct Game_Timer FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 			enum {
 				VT_KIND = 4,
@@ -511,6 +665,10 @@ namespace Game {
 
 		inline const Game::TheLastOne::Client_id *GetClient_infoView(const void *buf) {
 			return flatbuffers::GetRoot<Game::TheLastOne::Client_id>(buf);
+		}
+
+		inline const Game::TheLastOne::Zombie_info *getZombie_infoView(const void *buf) {
+			return flatbuffers::GetRoot<Game::TheLastOne::Zombie_info>(buf);
 		}
 
 	}  // namespace TheLastOne

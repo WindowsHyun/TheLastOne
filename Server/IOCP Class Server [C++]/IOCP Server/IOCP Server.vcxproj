@@ -118,16 +118,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Game_CollisionCheck.h" />
+    <ClInclude Include="Game_DangerLine.h" />
     <ClInclude Include="Flatbuffers_View.h" />
     <ClInclude Include="Game_Client.h" />
     <ClInclude Include="Game_Item.h" />
+    <ClInclude Include="Game_Zombie.h" />
     <ClInclude Include="IOCP_Server.h" />
     <ClInclude Include="Protocol.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game_Client.cpp" />
+    <ClCompile Include="Game_CollisionCheck.cpp" />
+    <ClCompile Include="Game_DangerLine.cpp" />
     <ClCompile Include="Game_Item.cpp" />
+    <ClCompile Include="Game_Zombie.cpp" />
     <ClCompile Include="IOCP_Server.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Timer.cpp" />

@@ -22,6 +22,15 @@ table Client_info {
   nowWeapon:int;
 }
 
+table Zombie_info {
+  id:int;
+  hp:int;
+  animator:int;
+  targetPlayer:int;
+  position:Vec3;
+  rotation:Vec3;
+}
+
 table Game_Items{
   data:[Gameitem];
 }
@@ -32,6 +41,12 @@ table Gameitem{
   x:float;
   z:float;
   eat:bool;
+}
+
+table GameDangerLine{
+  demage:int;
+  position:Vec3;
+  scale:Vec3;
 }
 
 table Game_Timer {

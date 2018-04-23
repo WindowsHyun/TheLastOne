@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+using System;
+
 using TheLastOne.Game.Network;
 
 [RequireComponent(typeof(AudioSource))]
@@ -79,6 +81,9 @@ public class PlayerCtrl : MonoBehaviour
 
     // 플레이어가 총알 발사시 Packet을 전송하기 위하여
     NetworkCtrl networkCtrl = new NetworkCtrl();
+
+    // 플레이어의 고유번호
+    public int Client_imei = -1;
 
     // 무기 슬롯 타입
     public string[] weaponSlotType = new string[2];
@@ -458,6 +463,8 @@ public class PlayerCtrl : MonoBehaviour
         m4.GetComponent<Renderer>().enabled = false;
         ump.GetComponent<Renderer>().enabled = false;
 
+        // 클라이언트 고유번호 가져오기.
+        Client_imei = networkCtrl.get_imei();
 
         // 인벤토리의 자식 컴포넌트의 스크립트 할당
         slotctrl = inventory.GetComponentsInChildren<SlotCtrl>();
@@ -605,7 +612,7 @@ public class PlayerCtrl : MonoBehaviour
     IEnumerator ShowMuzzleFlash()
     {
         // MuzzleFlash 스케일을 불규칙하게 변경
-        float scale = Random.Range(0.05f, 0.2f);
+        float scale = UnityEngine.Random.Range(0.05f, 0.2f);
         muzzleFlash1.transform.localScale = Vector3.one * scale;
         muzzleFlash2.transform.localScale = Vector3.one * scale;
 
@@ -614,7 +621,7 @@ public class PlayerCtrl : MonoBehaviour
         muzzleFlash2.enabled = true;
 
         // 불규칙적인 시간 동안 Delay한 다음MeshRenderer를 비활성화
-        yield return new WaitForSeconds(Random.Range(0.05f, 0.03f));
+        yield return new WaitForSeconds(UnityEngine.Random.Range(0.05f, 0.03f));
 
         // 비활성화해서 보이지 않게 함
         muzzleFlash1.enabled = false;
@@ -825,5 +832,10 @@ public class PlayerCtrl : MonoBehaviour
         // 혈흔 효과 생성
         GameObject blood1 = (GameObject)Instantiate(bloodEffect, pos, Quaternion.identity);
         Destroy(blood1, 1.0f);
+    }
+
+    public void send_ZombieData(Vector3 pos, Vector3 rotation, int zombieNum, int hp, Enum animation)
+    {
+        networkCtrl.Zombie_Pos(pos, rotation, zombieNum, hp, animation);
     }
 }

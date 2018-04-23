@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 //---------------------------------------------------------------
@@ -52,6 +52,7 @@ namespace TheLastOne.Game.Network
         public static Socket m_Socket;
         public GameObject Player;
         public GameObject PrefabPlayer;
+        public GameObject Zombie;
         //------------------------------------------
         // 게임 아이템 Object
         public GameObject item_AK47;
@@ -70,25 +71,23 @@ namespace TheLastOne.Game.Network
         private byte[] Sendbyte = new byte[4000];
         private static ManualResetEvent connectDone = new ManualResetEvent(false);
 
-        //private const int MaxClient = 50;    // 최대 동접자수
-        //private const int MaxViewItem = 50;    // 최대 볼 수 있는 아이템
-        //public static Client_Data[] client_data = new Client_Data[MaxClient];      // 클라이언트 데이터 저장할 구조체
-
         public static Dictionary<int, Game_ClientClass> client_data = new Dictionary<int, Game_ClientClass>();
         // 클라이언트 데이터 저장할 컨테이너
+        public static Dictionary<int, Game_ZombieClass> zombie_data = new Dictionary<int, Game_ZombieClass>();
+        // 좀비 데이터 저장할 컨테이너
         public static Dictionary<int, Game_ItemClass> item_Collection = new Dictionary<int, Game_ItemClass>();
         // 클라이언트 아이템 저장할 컨테이너
 
         Game_ProtocolClass recv_protocol = new Game_ProtocolClass();
+        Socket_SendFunction sF = new Socket_SendFunction();
+        DangerLineCtrl DangerLineCtrl;
+
 
         private static int Client_imei = -1;         // 자신의 클라이언트 아이디
-
-        Socket_SendFunction sF = new Socket_SendFunction();
-
+        public int get_imei() { return Client_imei; }
         private string debugString;        // Debug 출력을 위한 string
+        private static bool serverConnect = false;  // 서버 연결을 했는지 체크
 
-        // 서버 연결을 했는지 체크
-        private static bool serverConnect = false;
 
         IEnumerator SocketCheck()
         {
@@ -142,6 +141,41 @@ namespace TheLastOne.Game.Network
                             //StartCoroutine(RemovePlayerCoroutine(iter.Key));
                         }
                     }
+                    // 좀비 관련한 프리팹
+                    foreach (var key in zombie_data.Keys.ToList())
+                    {
+                        if (zombie_data[key].get_prefab() == false)
+                        {
+                            // 좀비 프리팹을 생성해준다.
+                            zombie_data[key].Zombie = Instantiate(Zombie, zombie_data[key].get_pos(), Quaternion.identity);
+                            zombie_data[key].script = zombie_data[key].Zombie.GetComponent<ZombieCtrl>();
+                            zombie_data[key].script.zombieNum = key;
+                            zombie_data[key].set_prefab(true);
+
+                            // 처음 위치를 넣어 줘야 한다. 그러지 않을경우 다른 클라이언트 에서는 0,0 에서부터 천천히 올라오게 보인다
+                            zombie_data[key].Zombie.transform.position = zombie_data[key].get_pos();
+                        }
+                        else if (zombie_data[key].get_prefab() == true)
+                        {
+                            if (zombie_data[key].script.targetPlayer == -1 || zombie_data[key].Zombie.transform.position.x == 0)
+                            {
+                                // 포지션이 서버위치와 다를경우 초기화를 해준다.
+                                zombie_data[key].Zombie.transform.position = zombie_data[key].get_pos();
+                                zombie_data[key].script.zombieNum = key;
+                            }
+                           else if (zombie_data[key].script.targetPlayer != Client_imei)
+                            {
+                                // 좀비 Target과 내 IMEI가 다른경우 다른 클라이언트의 데이터를 동기화 해준다.
+                                zombie_data[key].script.MovePos(zombie_data[key].get_pos());
+                                Vector3 rotation = zombie_data[key].get_rot();
+                                zombie_data[key].Zombie.transform.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
+                                zombie_data[key].script.animator_value = zombie_data[key].get_animator();
+                            }
+                            zombie_data[key].script.targetPlayer = zombie_data[key].get_target();
+                        }
+
+                    }
+
                 }
                 yield return null;
             } while (true);
@@ -338,7 +372,7 @@ namespace TheLastOne.Game.Network
                 ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
                 var Get_ServerData = Game_Timer.GetRootAsGame_Timer(revc_buf);
                 //Debug.Log("Time : " + Get_ServerData.Time);
-                debugString = "Time : " + Get_ServerData.Time;
+                debugString = "Time : " + (Get_ServerData.Time / 60) + "m " + (Get_ServerData.Time % 60) + "s";
             }
             else if (type == recv_protocol.SC_Server_Item)
             {
@@ -384,12 +418,52 @@ namespace TheLastOne.Game.Network
                     iter.script.Fire(iter2.get_pos());      // 자신의 위치를 보내는 것은 총 소리를 판별 하기 위하여.
                 }
             }
+            else if (type == recv_protocol.SC_DangerLine)
+            {
+                // 클라이언트 DangerLine 정보를 가져온다.
+                byte[] t_buf = new byte[size + 1];
+                System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
+                ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
+                var Get_ServerData = GameDangerLine.GetRootAsGameDangerLine(revc_buf);
+
+                DangerLineCtrl.set_demage(Get_ServerData.Demage);
+                DangerLineCtrl.set_pos(new Vector3(Get_ServerData.Position.Value.X, Get_ServerData.Position.Value.Y, Get_ServerData.Position.Value.Z));
+                DangerLineCtrl.set_scale(new Vector3(Get_ServerData.Scale.Value.X, Get_ServerData.Scale.Value.Y, Get_ServerData.Scale.Value.Z));
+                DangerLineCtrl.set_start(true);
+            }
+            else if (type == recv_protocol.SC_Zombie_Info)
+            {
+                // 좀비 관련한 데이터를 받았다.
+                byte[] t_buf = new byte[size + 1];
+                System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
+                ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
+                var Get_ServerData = Zombie_info.GetRootAsZombie_info(revc_buf);
+
+                if (zombie_data.ContainsKey(Get_ServerData.Id))
+                {
+                    // 이미 값이 들어가 있는 상태라면
+                    Game_ZombieClass iter = zombie_data[Get_ServerData.Id];
+                    iter.set_pos(new Vector3(Get_ServerData.Position.Value.X, Get_ServerData.Position.Value.Y, Get_ServerData.Position.Value.Z));
+                    iter.set_rot(new Vector3(Get_ServerData.Rotation.Value.X, Get_ServerData.Rotation.Value.Y, Get_ServerData.Rotation.Value.Z));
+                    iter.set_hp(Get_ServerData.Hp);
+                    iter.set_animator(Get_ServerData.Animator);
+                    iter.set_target(Get_ServerData.TargetPlayer);
+                }
+                else
+                {
+                    // 좀비를 추가해준다.
+                    zombie_data.Add(Get_ServerData.Id, new Game_ZombieClass(Get_ServerData.Id, Get_ServerData.TargetPlayer, new Vector3(Get_ServerData.Position.Value.X, Get_ServerData.Position.Value.Y, Get_ServerData.Position.Value.Z), new Vector3(Get_ServerData.Rotation.Value.X, Get_ServerData.Rotation.Value.Y, Get_ServerData.Rotation.Value.Z)));
+                }
+
+            }
 
         }
 
         void Awake()
         {
+            //get_object_collision();
             Application.runInBackground = true; // 백그라운드에서도 Network는 작동해야한다.
+            DangerLineCtrl = GameObject.FindGameObjectWithTag("DangerLine").GetComponent<DangerLineCtrl>();
             //=======================================================
             // Socket create.
             m_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -419,10 +493,13 @@ namespace TheLastOne.Game.Network
             try
             {
                 // 서버가 정상적으로 연결이 되었을 경우.
-                Debug.Log("Connected to server, start recieve data");
+
                 connectDone.Set();
                 if (m_Socket.Connected == true)
+                {
+                    Debug.Log("Connected to server, start recieve data");
                     RecieveHeader();//start recieve header
+                }
             }
             catch (Exception e)
             {
@@ -464,26 +541,6 @@ namespace TheLastOne.Game.Network
                     NetworkMessage new_msg = new NetworkMessage();
                     m_Socket.BeginReceive(new_msg.Receivebyte, 0, new_msg.LimitReceivebyte, SocketFlags.None, new AsyncCallback(RecieveHeaderCallback), new_msg);
                 }
-                //else if (msg.prev_packet_size != 0)
-                //{
-                //    // 실제 패킷 사이즈가 달라서 다시 한번 읽어오라 한 경우
-                //    Debug.Log("Packet ReLoad");
-                //    msg.sb.Append(Encoding.ASCII.GetString(msg.Receivebyte, 0, bytesRead));
-                //    // 패킷을 합친것을 다시 Receivebyte에 넣어준다.
-                //    msg.Receivebyte = Encoding.UTF8.GetBytes(msg.sb.ToString());
-
-                //    size_data = Get_packet_size(msg.Receivebyte);
-                //    psize = size_data.p_size;
-                //    ptype = msg.Receivebyte[size_data.type_Pos + 1]; // 패킷 타입
-
-                //    if (psize == bytesRead)
-                //    {
-                //        ProcessPacket(psize, ptype, msg.Receivebyte);
-                //    }
-
-                //    NetworkMessage new_msg = new NetworkMessage();
-                //    m_Socket.BeginReceive(new_msg.Receivebyte, 0, new_msg.LimitReceivebyte, SocketFlags.None, new AsyncCallback(RecieveHeaderCallback), new_msg);
-                //}
                 else
                 {
                     // 소켓에서 받은 데이터와 실제 패킷 사이즈가 다를 경우
@@ -505,7 +562,7 @@ namespace TheLastOne.Game.Network
             }
             catch (Exception e)
             {
-                Debug.Log(e.Message);
+                //Debug.Log(e.Message);
                 NetworkMessage new_msg = new NetworkMessage();
                 m_Socket.BeginReceive(new_msg.Receivebyte, 0, new_msg.LimitReceivebyte, SocketFlags.None, new AsyncCallback(RecieveHeaderCallback), new_msg);
             }
@@ -532,6 +589,12 @@ namespace TheLastOne.Game.Network
             Send_Packet(Sendbyte);
         }
 
+        public void Zombie_Pos(Vector3 pos, Vector3 rotation, int zombieNum, int hp, Enum animation)
+        {
+            Sendbyte = sF.makeZombie_PacketInfo(pos, rotation, zombieNum, hp, animation);
+            Send_Packet(Sendbyte);
+        }
+
         void OnApplicationQuit()
         {
             m_Socket.Close();
@@ -542,6 +605,24 @@ namespace TheLastOne.Game.Network
         {
             // 캐릭터 간의 거리 구하기.
             return (float)Math.Sqrt(Math.Pow(a.x - b.x, 2) + Math.Pow(a.z - b.z, 2));
+        }
+
+        public void get_object_collision()
+        {
+            string filePath = "./file.txt";
+            string coordinates = "";
+            BoxCollider[] boxObjects = UnityEngine.Object.FindObjectsOfType<BoxCollider>();
+
+            foreach (BoxCollider trans in boxObjects)
+            {
+                if (trans.tag.ToString() != "CAMCHANGE")
+                {
+                    coordinates += "posx:" + trans.transform.position.x.ToString() + "|posy:" + trans.transform.position.y.ToString() + "|posz:" + trans.transform.position.z.ToString() + "|centerx:" + trans.center.x.ToString() + "|centery:" + trans.center.y.ToString() + "|centerz:" + trans.center.z.ToString() + "|sizex:" + trans.size.x.ToString() + "|sizey:" + trans.size.y.ToString() + "|sizez:" + trans.size.z.ToString() + "|scalex:" + trans.transform.localScale.x.ToString() + "|scaley:" + trans.transform.localScale.y.ToString() + "|scalez:" + trans.transform.localScale.z.ToString() + "|" + System.Environment.NewLine;
+                }
+            }
+
+            //Write the coords to a file
+            System.IO.File.WriteAllText(filePath, coordinates);
         }
 
         public PacketData Get_packet_size(byte[] Receivebyte)

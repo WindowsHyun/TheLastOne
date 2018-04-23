@@ -15,11 +15,14 @@ namespace TheLastOne.GameClass
         public int SC_Server_Time;             // 서버 타이머
         public int SC_Server_Item;             // 서버 아이템
         public int SC_Shot_Client;              // 클라이언트 Shot 정보
+        public int SC_DangerLine;				// 클라이언트 DangerLine 정보 전송
+        public int SC_Zombie_Info;               // 클라이언트에게 좀비 위치를 전달해 준다.
 
         public int CS_Info;              // 클라이언트가 서버에게 자신의 위치정보를 보내준다.
         public int CS_Shot_info;       // 클라이언트가 서버에게 Shot 정보를 보내준다.
         public int CS_Check_info;       // 클라이언트가 서버에게 자신의 정보가 맞는지 확인해 준다.
         public int CS_Eat_Item;					// 클라이언트가 서버에게 먹은 아이템 정보를 보내준다.
+        public int CS_Zombie_info;      // 클라이언트가 서버에게 좀비 데이터를 전달해 준다.
 
         public Game_ProtocolClass()
         {
@@ -32,12 +35,15 @@ namespace TheLastOne.GameClass
             SC_Server_Time = 5;
             SC_Server_Item = 6;
             SC_Shot_Client = 7;
+            SC_DangerLine = 8;
+            SC_Zombie_Info = 9;
             //----------------------------------
             // 클라이언트에서 서버로
             CS_Info = 1;
             CS_Shot_info = 2;
             CS_Check_info = 3;
             CS_Eat_Item = 4;
+            CS_Zombie_info = 5;
             //----------------------------------
         }
     }

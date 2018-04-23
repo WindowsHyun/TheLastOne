@@ -18,11 +18,14 @@ void Server_Timer::Timer_Thread()
 			timer_queue.pop();
 			tq_lock.unlock();
 			OverlappedEx *over = new OverlappedEx;
-			if (E_initTime == t.event) {
-				over->event_type = OP_InitTime;
+			if (E_DangerLine == t.event) {
+				over->event_type = OP_DangerLine;
 			}
 			else if (E_Remove_Client == t.event) {
 				over->event_type = OP_RemoveClient;
+			}
+			else if (E_MoveDangerLine == t.event) {
+				over->event_type = OP_MoveDangerLine;
 			}
 
 			PostQueuedCompletionStatus(g_hiocp, 1, t.object_id, &over->over);
@@ -41,7 +44,7 @@ void Server_Timer::initTimer(HANDLE handle)
 {
 	g_hiocp = handle;
 
-	Timer_Event t = { 600, high_resolution_clock::now() + 1s, E_initTime };
+	Timer_Event t = { 10, high_resolution_clock::now() + 1s, E_DangerLine };	// 자기장 시작 전 대기시간
 	setTimerEvent(t);
 
 	t = { 1, high_resolution_clock::now() + 1s, E_Remove_Client };

@@ -22,6 +22,7 @@
 #include <unordered_set> // 성능이 더 좋아진다. [순서가 상관없을경우]
 #include <mutex>
 #include <string>
+#include <cmath>
 
 #include "Protocol.h"
 #include "Flatbuffers_View.h"
@@ -29,6 +30,12 @@
 
 using namespace std::chrono;
 using namespace Game::TheLastOne; // Flatbuffers를 읽어오자.
+
+struct xyz {
+	float x;
+	float y;
+	float z;
+};
 
 class IOCP_Server {
 private:
@@ -42,6 +49,7 @@ private:
 	void makeThread();								// 스레드 만들기
 	void Worker_Thread();							// 실제 동작 스레드
 	void Accept_Thread();								// 클라이언트 받는 스레드
+	void Zombie_Thread();							// 좀비 스레드
 	void Remove_Client();							// 클라이언트가 종료시 지우는 스레드
 	void Shutdown_Server();							// 서버 종료
 	void DisconnectClient(int ci);					// 클라이언트 종료
@@ -52,6 +60,7 @@ private:
 	void Send_All_Time(int kind, int time, int client_id, bool allClient);					// 클라이언트에게 시간을 보내준다.
 	void Send_All_Item();		// 클라이언트에게 시간정보를 보내준다.
 	void Send_Client_Shot(int shot_client);		// 클라이언트들에게 Shot 정보를 보내준다.
+	void Send_DangerLine_info(int demage, xyz pos, xyz scale);
 
 public:
 	HANDLE getHandle() { return g_hiocp; }

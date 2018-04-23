@@ -2,24 +2,38 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DangerLineCtrl : MonoBehaviour {
+public class DangerLineCtrl : MonoBehaviour
+{
+    private bool start = false;
+    private int demage = 1;
+    private Vector3 start_pos;
+    private Vector3 limit_scale = new Vector3(4500, 4500, 4500);
+    //private Vector3 limit_scale = new Vector3(2700, 2700, 2700);
 
-    //private Transform tr;
-    // Update is called once per frame
-	void FixedUpdate () {
-
-        if(this.transform.localScale.x >= 0.0f)
-        {
-            this.transform.localScale -= new Vector3(1.0f, 1.0f, 1.0f);
-        }
-        else
-        {
-            gameObject.SetActive(false);
-        }
-        //transform.localScale.x += 0.1; 
-        //transform.localScale.y += 0.1; 
-        //transform.localScale.z += 0.1; 
+    public void set_start(bool value)
+    {
+        this.start = value;
     }
- 
-       
+
+    public void set_demage(int value)
+    {
+        this.demage = value;
+    }
+
+    public void set_pos(Vector3 pos)
+    {
+        this.start_pos = pos;
+    }
+
+    public void set_scale(Vector3 scale)
+    {
+        this.limit_scale = scale;
+    }
+
+    void FixedUpdate()
+    {
+        this.transform.localScale = limit_scale;
+    }
+
+
 }
