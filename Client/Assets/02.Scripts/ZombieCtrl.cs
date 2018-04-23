@@ -23,6 +23,9 @@ public class ZombieCtrl : MonoBehaviour
     // 공격 사정거리
     public float attackDist = 3.0f;
 
+    // 좀비 공격력
+    public int damage = 20;
+
     // 좀비의 사망 여부
     private bool isDie = false;
 

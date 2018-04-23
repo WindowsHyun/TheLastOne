@@ -42,13 +42,20 @@ public class PlayerCtrl : MonoBehaviour
     public float moveSpeed = 23.0f;
     // 캐릭터 회전 속도 변수
     public float rotSpeed = 100.0f;
+    
     // 캐릭터 체력
     public int hp = 100;
-
     // 캐릭터 생명 초기값
     public int initHp;
-    // 캐릭터의 HP바 이미지
+    // 캐릭터의 HP 게이지 이미지
     public Image imgHpBar;
+
+    // 캐릭터 방어력
+    public int armour = 0;
+    // 캐릭터 방어력 초기값
+    public int initArmour = 100;
+    // 캐릭터의 방어력 게이지 이미지
+    public Image imgArmourBar;
 
     // 총알 프리팹
     public GameObject bullet;
@@ -158,9 +165,9 @@ public class PlayerCtrl : MonoBehaviour
             // 총이 장착이 되었을때만 발사 가능
             if (shotable == true)
             {
-                SlotCtrl Find762 = get_Bullet("Ammunition762");
-                SlotCtrl Find556 = get_Bullet("Ammunition556");
-                SlotCtrl Find9 = get_Bullet("Ammunition9");
+                SlotCtrl Find762 = GetItem("Ammunition762");
+                SlotCtrl Find556 = GetItem("Ammunition556");
+                SlotCtrl Find9 = GetItem("Ammunition9");
                 // 어떠한 종류의 총알이 1발 이상 있을 시
                 if (Find556 != null && Find556.slot.Peek().getItemCount() > 0 && m16Set == true)
                 {
@@ -421,9 +428,11 @@ public class PlayerCtrl : MonoBehaviour
 
         // 생명 초기값 설정
         initHp = hp;
-
         hp -= 70;
         imgHpBar.fillAmount = (float)hp / (float)initHp;
+
+        // 방어력 초기값 설정
+        imgArmourBar.fillAmount = (float)armour / (float)initArmour;
 
         // 스크립트 처음에 Transform 컴포넌트 할당
         tr = GetComponent<Transform>();
@@ -469,7 +478,7 @@ public class PlayerCtrl : MonoBehaviour
     }
 
     // 아이템이 들어가서 isSlots이 true가 된 슬롯에서 해당 타입의 아이템 슬롯을 찾아 반환하는 함수
-    public SlotCtrl get_Bullet(string value)
+    public SlotCtrl GetItem(string value)
     {
         foreach (SlotCtrl sCtrl in slotctrl)
         {
@@ -484,6 +493,10 @@ public class PlayerCtrl : MonoBehaviour
                     return sCtrl;
                 }
                 else if (sCtrl.slot.Peek().type.ToString() == "Ammunition9" && value == "Ammunition9")
+                {
+                    return sCtrl;
+                }
+                else if (sCtrl.slot.Peek().type.ToString() == "ProofVest" && value == "ProofVest")
                 {
                     return sCtrl;
                 }
@@ -628,12 +641,30 @@ public class PlayerCtrl : MonoBehaviour
         if (coll.gameObject.tag == "BULLET")
         {
             CreateBloodEffect(coll.transform.position);
+            if (armour <= 0)
+            {
+                // 맞은 총알의 Damage를 추출해 Player HP 차감
+                hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
+                // Image UI 항목의 fillAmount 속성을 조절해 생명 게이지 값 조절
+                imgHpBar.fillAmount = (float)hp / (float)initHp;
+            }
+            else
+            {
+                // 방어력 차감
+                armour -= coll.gameObject.GetComponent<BulletCtrl>().damage;
+                // Image UI 항목의 fillAmount 속성을 조절해 방어력 게이지 값 조절
+                imgArmourBar.fillAmount = (float)armour / (float)initArmour;
 
-            // 맞은 총알의 Damage를 추출해 Player HP 차감
-            hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
-
+                // 방어력 0일때 방탄조끼 아이템 인벤토리에서 삭제
+                if (armour <= 0)
+                {
+                    SlotCtrl proofVest = GetItem("ProofVest");
+                    proofVest.slot.Clear();
+                    proofVest.UpdateInfo(false, proofVest.DefaultImg);
+                }
+            }
             // Image UI 항목의 fillAmount 속성을 조절해 생명 게이지 값 조절
-            imgHpBar.fillAmount = (float)hp / (float)initHp;
+            //imgHpBar.fillAmount = (float)hp / (float)initHp;
 
             if (hp <= 0)
             {
@@ -657,11 +688,30 @@ public class PlayerCtrl : MonoBehaviour
         {
             CreateBloodEffect(coll.transform.position);
 
-            // 좀비 공격의 Damage만큼 HP 차감
-            hp -= 10;
 
-            // Image UI 항목의 fillAmount 속성을 조절해 생명 게이지 값 조절
-            imgHpBar.fillAmount = (float)hp / (float)initHp;
+            if (armour <= 0)
+            {
+                // 체력 차감
+                hp -= 20;
+                //Image UI 항목의 fillAmount 속성을 조절해 생명 게이지 값 조절
+                imgHpBar.fillAmount = (float)hp / (float)initHp;
+            }
+            else if (armour > 0)
+            {
+                // 방어력 차감
+                armour -= 20;
+                // Image UI 항목의 fillAmount 속성을 조절해 방어력 게이지 값 조절
+                imgArmourBar.fillAmount = (float)armour / (float)initArmour;
+
+                // 방어력 0일때 방탄조끼 아이템 인벤토리에서 삭제
+                if (armour <= 0)
+                {
+                    SlotCtrl proofVest = GetItem("ProofVest");
+                    proofVest.slot.Clear();
+                    proofVest.UpdateInfo(false, proofVest.DefaultImg);
+                }
+               
+            }
 
             Debug.Log("Player H{: " + hp.ToString());
             if (hp <= 0)

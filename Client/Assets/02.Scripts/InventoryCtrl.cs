@@ -129,6 +129,10 @@ public class InventoryCtrl : MonoBehaviour
             // 슬롯에 존재하는 아이템의 겹칠수 있는 최대치가 넘지않았을 때. (true일 때)
             if (slot.ItemReturn().type == item.type)
             {
+                if(slot.ItemReturn().type.ToString() == "ProofVest")
+                {     
+                    return false;
+                }
                 // 슬롯에 아이템을 넣는다.
                 Debug.Log("중복 아이템 추가..!");
                 slot.AddItem(item, true, slot);
@@ -144,6 +148,12 @@ public class InventoryCtrl : MonoBehaviour
             // 슬롯이 비어있지 않으면 통과
             if (slot.isSlots())
                 continue;
+
+            if(item.type.ToString() == "ProofVest")
+            {
+                player.armour += 100;
+                player.imgArmourBar.fillAmount = (float)player.armour / (float)player.initArmour;
+            }
 
             slot.AddItem(item, false, null);
             return true;

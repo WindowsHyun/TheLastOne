@@ -60,6 +60,12 @@ public class SlotCtrl : MonoBehaviour
 
     public void AddItem(ItemCtrl item, bool same, SlotCtrl sameSlot)
     {
+
+        //if(item.type.ToString() == "ProofVest")
+        //{
+        //    player.armour += 100;
+        //    player.imgArmourBar.fillAmount = (float)player.armour / (float)player.initArmour;
+        //}
         // bool same = true 일경우 아이템 같은게 들어왔으니 찾아서 넣어라.
         // 스택에 아이템 추가.
         if (same == true)

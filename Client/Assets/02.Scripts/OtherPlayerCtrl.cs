@@ -30,6 +30,9 @@ public class OtherPlayerCtrl : MonoBehaviour
     public float rotSpeed = 100.0f;
     // 캐릭터 체력
     private int hp = 100;
+
+    public int armour = 0;
+
     // 캐릭터의 사망 여부
     private bool isDie = false;
 
@@ -271,15 +274,50 @@ public class OtherPlayerCtrl : MonoBehaviour
         {
             CreateBloodEffect(coll.transform.position);
 
-            // 맞은 총알의 Damage를 추출해 OtherPlayer HP 차감
-            hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
+            if (armour <= 0)
+            {
+                hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;   
+            }
+            else
+            {
+                armour -= coll.gameObject.GetComponent<BulletCtrl>().damage;  
+            }  
+            
             if (hp <= 0)
             {
                 isDie = true;
                 OtherPlayerDie();
             }
+
             // Bullet 삭제
             Destroy(coll.gameObject);
+        }
+
+        // 충돌한 게임오브젝트의 태그값 비교
+        if (coll.gameObject.tag == "ZombieAttack")
+        {
+            CreateBloodEffect(coll.transform.position);
+
+            if (armour <= 0)
+            {
+                // 체력 차감
+                hp -= 20;
+             
+            }
+            else if (armour > 0)
+            {
+                // 방어력 차감
+                armour -= 20;        
+            }
+
+            if (hp <= 0)
+            {
+                isDie = true;
+                OtherPlayerDie();
+            }
+
+            Debug.Log("Player H{: " + hp.ToString());
+            
         }
     }
 
