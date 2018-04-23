@@ -20,15 +20,17 @@ public struct Zombie_info : IFlatbufferObject
   public int Id { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
   public int Hp { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
   public int Animator { get { int o = __p.__offset(8); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
-  public Vec3? Position { get { int o = __p.__offset(10); return o != 0 ? (Vec3?)(new Vec3()).__assign(o + __p.bb_pos, __p.bb) : null; } }
-  public Vec3? Rotation { get { int o = __p.__offset(12); return o != 0 ? (Vec3?)(new Vec3()).__assign(o + __p.bb_pos, __p.bb) : null; } }
+  public int TargetPlayer { get { int o = __p.__offset(10); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+  public Vec3? Position { get { int o = __p.__offset(12); return o != 0 ? (Vec3?)(new Vec3()).__assign(o + __p.bb_pos, __p.bb) : null; } }
+  public Vec3? Rotation { get { int o = __p.__offset(14); return o != 0 ? (Vec3?)(new Vec3()).__assign(o + __p.bb_pos, __p.bb) : null; } }
 
-  public static void StartZombie_info(FlatBufferBuilder builder) { builder.StartObject(5); }
+  public static void StartZombie_info(FlatBufferBuilder builder) { builder.StartObject(6); }
   public static void AddId(FlatBufferBuilder builder, int id) { builder.AddInt(0, id, 0); }
   public static void AddHp(FlatBufferBuilder builder, int hp) { builder.AddInt(1, hp, 0); }
   public static void AddAnimator(FlatBufferBuilder builder, int animator) { builder.AddInt(2, animator, 0); }
-  public static void AddPosition(FlatBufferBuilder builder, Offset<Vec3> positionOffset) { builder.AddStruct(3, positionOffset.Value, 0); }
-  public static void AddRotation(FlatBufferBuilder builder, Offset<Vec3> rotationOffset) { builder.AddStruct(4, rotationOffset.Value, 0); }
+  public static void AddTargetPlayer(FlatBufferBuilder builder, int targetPlayer) { builder.AddInt(3, targetPlayer, 0); }
+  public static void AddPosition(FlatBufferBuilder builder, Offset<Vec3> positionOffset) { builder.AddStruct(4, positionOffset.Value, 0); }
+  public static void AddRotation(FlatBufferBuilder builder, Offset<Vec3> rotationOffset) { builder.AddStruct(5, rotationOffset.Value, 0); }
   public static Offset<Zombie_info> EndZombie_info(FlatBufferBuilder builder) {
     int o = builder.EndObject();
     return new Offset<Zombie_info>(o);

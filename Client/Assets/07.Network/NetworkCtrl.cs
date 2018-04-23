@@ -84,6 +84,7 @@ namespace TheLastOne.Game.Network
 
 
         private static int Client_imei = -1;         // 자신의 클라이언트 아이디
+        public int get_imei() { return Client_imei; }
         private string debugString;        // Debug 출력을 위한 string
         private static bool serverConnect = false;  // 서버 연결을 했는지 체크
 
@@ -145,8 +146,10 @@ namespace TheLastOne.Game.Network
                     {
                         if (zombie_data[key].get_prefab() == false)
                         {
+                            // 좀비 프리팹을 생성해준다.
                             zombie_data[key].Zombie = Instantiate(Zombie, zombie_data[key].get_pos(), Quaternion.identity);
                             zombie_data[key].script = zombie_data[key].Zombie.GetComponent<ZombieCtrl>();
+                            zombie_data[key].script.zombieNum = key;
                             zombie_data[key].set_prefab(true);
 
                             // 처음 위치를 넣어 줘야 한다. 그러지 않을경우 다른 클라이언트 에서는 0,0 에서부터 천천히 올라오게 보인다
@@ -154,29 +157,24 @@ namespace TheLastOne.Game.Network
                         }
                         else if (zombie_data[key].get_prefab() == true)
                         {
-                            // 실제로 캐릭터를 움직이는 것은 코루틴 여기서 움직임을 진행 한다.
-                            if (zombie_data[key].Zombie.transform.position.x == 0 && zombie_data[key].Zombie.transform.position.y == 0 
-                                && zombie_data[key].Zombie.transform.position.z == 0) {
+                            if (zombie_data[key].script.targetPlayer == -1 || zombie_data[key].Zombie.transform.position.x == 0)
+                            {
+                                // 포지션이 서버위치와 다를경우 초기화를 해준다.
                                 zombie_data[key].Zombie.transform.position = zombie_data[key].get_pos();
-
-                                zombie_data[key].script.enabled = true;
-                                zombie_data[key].script.startNav = true;
+                                zombie_data[key].script.zombieNum = key;
                             }
-                            //
+                           else if (zombie_data[key].script.targetPlayer != Client_imei)
+                            {
+                                // 좀비 Target과 내 IMEI가 다른경우 다른 클라이언트의 데이터를 동기화 해준다.
+                                zombie_data[key].script.MovePos(zombie_data[key].get_pos());
+                                Vector3 rotation = zombie_data[key].get_rot();
+                                zombie_data[key].Zombie.transform.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
+                                zombie_data[key].script.animator_value = zombie_data[key].get_animator();
+                            }
+                            zombie_data[key].script.targetPlayer = zombie_data[key].get_target();
                         }
-                        //if (zombie_data[key].get_removeClient() == true)
-                        //{
-                        //    // 연결은 해지 되었는데 프리팹이 살아 있는경우는 나간 경우 이므로
-                        //    // 코루틴을 통하여 지워주자!
-                        //    Game_ClientClass iter2 = zombie_data[key];
-                        //    Destroy(iter2.Player);
-                        //    zombie_data.Remove(key);
-                        //    //StartCoroutine(RemovePlayerCoroutine(iter.Key));
-                        //}
+
                     }
-
-
-
 
                 }
                 yield return null;
@@ -445,24 +443,16 @@ namespace TheLastOne.Game.Network
                 {
                     // 이미 값이 들어가 있는 상태라면
                     Game_ZombieClass iter = zombie_data[Get_ServerData.Id];
-
-                    if (iter.get_pos().x == 0 && iter.get_pos().y == 0 && iter.get_pos().z == 0)
-                    {
-                        iter.set_pos(new Vector3(Get_ServerData.Position.Value.X, Get_ServerData.Position.Value.Y, Get_ServerData.Position.Value.Z));
-                        iter.set_rot(new Vector3(Get_ServerData.Rotation.Value.X, Get_ServerData.Rotation.Value.Y, Get_ServerData.Rotation.Value.Z));
-                    }
-
-                    //iter.set_animator(Get_ServerData.Animator);
-
-                    //if (iter.get_prefab() == true)
-                    //{
-                    //    // 프리팹이 만들어진 이후 부터 script를 사용할 수 있기 때문에 그 이후 애니메이션 동기화를 시작한다.
-                    //}
+                    iter.set_pos(new Vector3(Get_ServerData.Position.Value.X, Get_ServerData.Position.Value.Y, Get_ServerData.Position.Value.Z));
+                    iter.set_rot(new Vector3(Get_ServerData.Rotation.Value.X, Get_ServerData.Rotation.Value.Y, Get_ServerData.Rotation.Value.Z));
+                    iter.set_hp(Get_ServerData.Hp);
+                    iter.set_animator(Get_ServerData.Animator);
+                    iter.set_target(Get_ServerData.TargetPlayer);
                 }
                 else
                 {
-                    // 클라이언트가 자기 자신이 아닐경우에만 추가해준다.
-                    zombie_data.Add(Get_ServerData.Id, new Game_ZombieClass(Get_ServerData.Id, new Vector3(Get_ServerData.Position.Value.X, Get_ServerData.Position.Value.Y, Get_ServerData.Position.Value.Z), new Vector3(Get_ServerData.Rotation.Value.X, Get_ServerData.Rotation.Value.Y, Get_ServerData.Rotation.Value.Z)));
+                    // 좀비를 추가해준다.
+                    zombie_data.Add(Get_ServerData.Id, new Game_ZombieClass(Get_ServerData.Id, Get_ServerData.TargetPlayer, new Vector3(Get_ServerData.Position.Value.X, Get_ServerData.Position.Value.Y, Get_ServerData.Position.Value.Z), new Vector3(Get_ServerData.Rotation.Value.X, Get_ServerData.Rotation.Value.Y, Get_ServerData.Rotation.Value.Z)));
                 }
 
             }
@@ -572,7 +562,7 @@ namespace TheLastOne.Game.Network
             }
             catch (Exception e)
             {
-                Debug.Log(e.Message);
+                //Debug.Log(e.Message);
                 NetworkMessage new_msg = new NetworkMessage();
                 m_Socket.BeginReceive(new_msg.Receivebyte, 0, new_msg.LimitReceivebyte, SocketFlags.None, new AsyncCallback(RecieveHeaderCallback), new_msg);
             }
@@ -596,6 +586,12 @@ namespace TheLastOne.Game.Network
         public void Player_Shot()
         {
             Sendbyte = sF.makeShot_PacketInfo(Client_imei);
+            Send_Packet(Sendbyte);
+        }
+
+        public void Zombie_Pos(Vector3 pos, Vector3 rotation, int zombieNum, int hp, Enum animation)
+        {
+            Sendbyte = sF.makeZombie_PacketInfo(pos, rotation, zombieNum, hp, animation);
             Send_Packet(Sendbyte);
         }
 

@@ -15,6 +15,7 @@ public class ZombieCtrl : MonoBehaviour
     // 속도 향상을 위해 각종 컴포넌트를 변수에 할당
     private Transform zombieTr;
     private Transform playerTr;
+    private PlayerCtrl playerCtrl;
     private NavMeshAgent nvAgent;
     private Animator animator;
 
@@ -33,8 +34,14 @@ public class ZombieCtrl : MonoBehaviour
     private int hp = 100;
 
     // 좀비 Nav 켜기
-    public bool startNav = false;
-    private float pos_x = 0;
+    private bool stopPos = false;    // NetworkCtrl Pos 고정을 멈추게 한다.
+    public int zombieNum = -1;
+    public int targetPlayer = -1;
+    public int animator_value = 0;
+
+    //private bool sendPacket = false;
+    //public int zombieNum = -1;
+
 
     // Use this for initialization
     void Start()
@@ -43,6 +50,7 @@ public class ZombieCtrl : MonoBehaviour
         zombieTr = this.gameObject.GetComponent<Transform>();
         // 추적 대상인 Player의 Transform 할당
         playerTr = GameObject.FindWithTag("Player").GetComponent<Transform>();
+        playerCtrl = GameObject.FindWithTag("Player").GetComponent<PlayerCtrl>();
         // NavMeshAgent 컴포넌트 할당
         nvAgent = this.gameObject.GetComponent<NavMeshAgent>();
         // Animator 컴포넌트 할당
@@ -59,8 +67,6 @@ public class ZombieCtrl : MonoBehaviour
 
         // 좀비의 Nav를 키기 위한 코루틴
         StartCoroutine(this.CheckZombieNav());
-
-        pos_x = zombieTr.position.x;
     }
 
     void OnEnable()
@@ -78,19 +84,14 @@ public class ZombieCtrl : MonoBehaviour
     {
         while (true)
         {
-
-            if (startNav == true)
+            if (zombieTr.position.x != 0 && zombieTr.position.y != 0 && zombieTr.position.z != 0)
             {
                 nvAgent.enabled = false;
                 nvAgent.enabled = true;
-                if (pos_x != zombieTr.position.x)
-                {
-                    break;
-                }
+                stopPos = true;
+                break;
             }
-
             yield return new WaitForSeconds(0.2f);
-
         }
     }
 
@@ -99,26 +100,51 @@ public class ZombieCtrl : MonoBehaviour
     {
         while (!isDie)
         {
-            // 0.2초 동안 기다렸다가 다음으로 넘어감
-            yield return new WaitForSeconds(0.2f);
 
-            float dist = Vector3.Distance(playerTr.position, zombieTr.position);
-
-            if (dist <= attackDist)
+            if (playerCtrl.Client_imei != targetPlayer)
             {
-                // 공격거리 범위 이내로 들어왔는지 확인{
-                zombieState = ZombieState.attack;
-            }
-            else if (dist <= traceDist)
-            {
-                zombieState = ZombieState.walk;
+                // 좀비의 Target과 자신의 IMEI가 다른경우 Walk 등을 하지 않는다.
+                switch (animator_value)
+                {
+                    case 0:
+                        zombieState = ZombieState.idle;
+                        break;
+                    case 1:
+                        zombieState = ZombieState.walk;
+                        break;
+                    case 2:
+                        zombieState = ZombieState.attack;
+                        break;
+                    case 3:
+                        zombieState = ZombieState.die;
+                        break;
+                }
+                yield return new WaitForSeconds(0.2f);
             }
             else
             {
-                zombieState = ZombieState.idle;
+                float dist = Vector3.Distance(playerTr.position, zombieTr.position);
+
+                if (dist <= attackDist)
+                {
+                    // 공격거리 범위 이내로 들어왔는지 확인{
+                    zombieState = ZombieState.attack;
+                }
+                else if (dist <= traceDist)
+                {
+                    zombieState = ZombieState.walk;
+                }
+                else if (dist > traceDist)
+                {
+                    zombieState = ZombieState.idle;
+                }
+
+                playerCtrl.send_ZombieData(zombieTr.position, zombieTr.eulerAngles, zombieNum, hp, zombieState);
             }
+
+            yield return null;
         }
-       
+
 
     }
 
@@ -176,6 +202,7 @@ public class ZombieCtrl : MonoBehaviour
     void ZombieDie()
     {
         // 모든 코루틴 종료
+        playerCtrl.send_ZombieData(zombieTr.position, zombieTr.eulerAngles, zombieNum, 0, zombieState);
         StopAllCoroutines();
 
         isDie = true;
@@ -184,7 +211,7 @@ public class ZombieCtrl : MonoBehaviour
         animator.SetTrigger("IsDie");
         gameObject.GetComponentInChildren<SphereCollider>().enabled = false;
         gameObject.GetComponent<CapsuleCollider>().enabled = false;
-        
+
     }
 
     void CreateBloodEffect(Vector3 pos)
@@ -201,5 +228,11 @@ public class ZombieCtrl : MonoBehaviour
         StopAllCoroutines();
         animator.SetBool("IsTrace", false);
         animator.SetBool("IsAttack", false);
+    }
+
+    public void MovePos(Vector3 pos)
+    {
+        float moveSpeed = 23.0f;
+        zombieTr.position = Vector3.MoveTowards(zombieTr.position, pos, Time.deltaTime * moveSpeed);
     }
 }

@@ -42,6 +42,31 @@ namespace TheLastOne.SendFunction
             return real_packet;
         }
 
+        public Byte[] makeZombie_PacketInfo(Vector3 pos, Vector3 rotation, int zombieNum, int hp, Enum animation)
+        {
+            //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.
+            fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
+            Zombie_info.StartZombie_info(fbb);
+            Zombie_info.AddId(fbb, zombieNum);
+            Zombie_info.AddHp(fbb, hp);
+            Zombie_info.AddAnimator(fbb, Convert.ToInt32(animation));
+            Zombie_info.AddPosition(fbb, Vec3.CreateVec3(fbb, pos.x, pos.y, pos.z));
+            Zombie_info.AddRotation(fbb, Vec3.CreateVec3(fbb, rotation.x, rotation.y, rotation.z));
+            var endOffset = Zombie_info.EndZombie_info(fbb);
+            fbb.Finish(endOffset.Value);
+
+
+            byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
+            byte[] packet_len = BitConverter.GetBytes(packet.Length);   // flatbuffers의 패킷 크기
+            byte[] packet_type = BitConverter.GetBytes(CS_Zombie_info);
+            byte[] real_packet = new byte[packet_len.Length + packet.Length];
+
+            System.Buffer.BlockCopy(packet_len, 0, real_packet, 0, packet_len.Length);
+            System.Buffer.BlockCopy(packet_type, 0, real_packet, 1, packet_type.Length);
+            System.Buffer.BlockCopy(packet, 0, real_packet, 4, packet.Length);
+            return real_packet;
+        }
+
         public Byte[] makeShot_PacketInfo(int client)
         {
             //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.

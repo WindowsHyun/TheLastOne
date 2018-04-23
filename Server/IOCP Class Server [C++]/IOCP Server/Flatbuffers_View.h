@@ -232,8 +232,9 @@ namespace Game {
 				VT_ID = 4,
 				VT_HP = 6,
 				VT_ANIMATOR = 8,
-				VT_POSITION = 10,
-				VT_ROTATION = 12
+				VT_TARGETPLAYER = 10,
+				VT_POSITION = 12,
+				VT_ROTATION = 14
 			};
 			int32_t id() const {
 				return GetField<int32_t>(VT_ID, 0);
@@ -243,6 +244,9 @@ namespace Game {
 			}
 			int32_t animator() const {
 				return GetField<int32_t>(VT_ANIMATOR, 0);
+			}
+			int32_t targetPlayer() const {
+				return GetField<int32_t>(VT_TARGETPLAYER, 0);
 			}
 			const Vec3 *position() const {
 				return GetStruct<const Vec3 *>(VT_POSITION);
@@ -255,6 +259,7 @@ namespace Game {
 					VerifyField<int32_t>(verifier, VT_ID) &&
 					VerifyField<int32_t>(verifier, VT_HP) &&
 					VerifyField<int32_t>(verifier, VT_ANIMATOR) &&
+					VerifyField<int32_t>(verifier, VT_TARGETPLAYER) &&
 					VerifyField<Vec3>(verifier, VT_POSITION) &&
 					VerifyField<Vec3>(verifier, VT_ROTATION) &&
 					verifier.EndTable();
@@ -272,6 +277,9 @@ namespace Game {
 			}
 			void add_animator(int32_t animator) {
 				fbb_.AddElement<int32_t>(Zombie_info::VT_ANIMATOR, animator, 0);
+			}
+			void add_targetPlayer(int32_t targetPlayer) {
+				fbb_.AddElement<int32_t>(Zombie_info::VT_TARGETPLAYER, targetPlayer, 0);
 			}
 			void add_position(const Vec3 *position) {
 				fbb_.AddStruct(Zombie_info::VT_POSITION, position);
@@ -296,11 +304,13 @@ namespace Game {
 			int32_t id = 0,
 			int32_t hp = 0,
 			int32_t animator = 0,
+			int32_t targetPlayer = 0,
 			const Vec3 *position = 0,
 			const Vec3 *rotation = 0) {
 			Zombie_infoBuilder builder_(_fbb);
 			builder_.add_rotation(rotation);
 			builder_.add_position(position);
+			builder_.add_targetPlayer(targetPlayer);
 			builder_.add_animator(animator);
 			builder_.add_hp(hp);
 			builder_.add_id(id);
@@ -655,6 +665,10 @@ namespace Game {
 
 		inline const Game::TheLastOne::Client_id *GetClient_infoView(const void *buf) {
 			return flatbuffers::GetRoot<Game::TheLastOne::Client_id>(buf);
+		}
+
+		inline const Game::TheLastOne::Zombie_info *getZombie_infoView(const void *buf) {
+			return flatbuffers::GetRoot<Game::TheLastOne::Zombie_info>(buf);
 		}
 
 	}  // namespace TheLastOne

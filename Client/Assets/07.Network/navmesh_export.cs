@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using System.Text;
-using UnityEditor;
+//using UnityEditor;
 using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.AI;
@@ -8,6 +8,7 @@ using UnityEngine.AI;
 //navmesh Export
 public class NavMeshExport : MonoBehaviour
 {
+    /*
     private GameObject _testMap;
 
     [MenuItem("Tools/Export NavMesh Data")]
@@ -135,4 +136,5 @@ public class NavMeshExport : MonoBehaviour
         return u + v <= 1;
 
     }
+    */
 }

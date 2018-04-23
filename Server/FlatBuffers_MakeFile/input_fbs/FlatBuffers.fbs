@@ -26,6 +26,7 @@ table Zombie_info {
   id:int;
   hp:int;
   animator:int;
+  targetPlayer:int;
   position:Vec3;
   rotation:Vec3;
 }
