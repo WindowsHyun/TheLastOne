@@ -8,6 +8,7 @@ public class FollowCam : MonoBehaviour
     public Transform targetTr1;      // 추적할 타깃 게임오브젝트의 Transform 변수 (쿼터뷰 시점)
     public Transform targetTr2;      // 추적할 타깃 게임오브젝트의 Transform 변수 (벡뷰 시점)
 
+
     public float dist = 20.0f;       // 카메라와의 일정 거리
     public float height = 100.0f;     // 카메라의 높이 설정
     public float dampTrace = 120.0f;  // 부드러운 추적을 위한 변수
@@ -18,10 +19,18 @@ public class FollowCam : MonoBehaviour
     // 카메라 자신의 Transform 변수
     private Transform tr;
 
+    public PlayerCtrl Player;
+
+    [SerializeField] Vector3 cameraOffset;
+    [SerializeField] float damping;
+
+
+
     void Start()
     {
         // 카메라 자신의 Transform 컴포넌트를 tr에 할당
         tr = GetComponent<Transform>();
+
     }
 
     // Update 함수 호출 이후 한 번씩 호출되는 함수인 LastUpdate 사용
@@ -37,7 +46,6 @@ public class FollowCam : MonoBehaviour
                                         targetTr0.position - (targetTr0.forward * dist) + (Vector3.up * height)// 종료 위치
                                         , Time.deltaTime * dampTrace);                                       // 보간 시간
 
-
             // 카메라가 타깃 게임오브젝트를 바라보게 설정
             tr.LookAt(targetTr0.position);
         }
@@ -50,21 +58,43 @@ public class FollowCam : MonoBehaviour
                                         targetTr1.position - (targetTr1.forward * dist) + (Vector3.up * height)// 종료 위치
                                         , Time.deltaTime * dampTrace);                                       // 보간 시간
 
-
             // 카메라가 타깃 게임오브젝트를 바라보게 설정
             tr.LookAt(targetTr1.position);
         }
-        else if(change == true && getOff == true)
+        else if (change == true && getOff == true)
         {
-            // 카메라의 위치를 추적대상의 dist 변수만큼 뒤쪽으로 배치
-            // height 변수만큼 위로 올림
-            tr.position = Vector3.Lerp(tr.position,                                                          // 시작 위치
-                                        targetTr2.position - (targetTr2.forward * dist) + (Vector3.up * height)// 종료 위치
-                                        , Time.deltaTime * dampTrace);                                       // 보간 시간
+            Vector3 targetPosition = targetTr2.position + Player.transform.forward * cameraOffset.z +
+                Player.transform.up * cameraOffset.y +
+                Player.transform.right * cameraOffset.x;
+
+            //Quaternion targetRotation = Quaternion.LookRotation(cameraLookTarget - targetPosition, Vector3.up);
+
+            Vector3 collisionTargetPoint = targetTr2.position + Player.transform.up * 1 - Player.transform.forward * 0.5f;
+            //Debug.DrawLine(targetPosition, collisionCheckEnd, Color.blue);
+
+            RaycastHit hit;
+            if (Physics.Linecast(collisionTargetPoint, targetPosition, out hit))
+            {
+                Vector3 hitPoint = new Vector3(hit.point.x + hit.normal.x * 0.2f, hit.point.y, hit.point.z + hit.normal.z * 0.2f);
+                targetPosition = new Vector3(hitPoint.x, targetPosition.y, hitPoint.z);
+            }
 
 
-            // 카메라가 타깃 게임오브젝트를 바라보게 설정
+            tr.transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * damping);
+
+
             tr.LookAt(targetTr2.position);
+
+
+            //// 카메라의 위치를 추적대상의 dist 변수만큼 뒤쪽으로 배치
+            //// height 변수만큼 위로 올림
+            //tr.position = Vector3.Lerp(tr.position,                                                          // 시작 위치
+            //                            targetTr2.position - (targetTr2.forward * dist) + (Vector3.up * height)// 종료 위치
+            //                            , Time.deltaTime * dampTrace);                                       // 보간 시간
+
+            //// 카메라가 타깃 게임오브젝트를 바라보게 설정
+            //tr.LookAt(targetTr2.position);
         }
     }
 }
+

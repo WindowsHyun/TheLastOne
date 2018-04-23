@@ -24,6 +24,9 @@ public class ZombieCtrl : MonoBehaviour
     // 공격 사정거리
     public float attackDist = 3.0f;
 
+    // 좀비 공격력
+    public int damage = 20;
+
     // 좀비의 사망 여부
     private bool isDie = false;
 
@@ -56,6 +59,7 @@ public class ZombieCtrl : MonoBehaviour
         // Animator 컴포넌트 할당
         animator = this.gameObject.GetComponent<Animator>();
 
+<<<<<<< HEAD
         // 추적 대상의 위치를 설정하면 바로 추적 시작
         nvAgent.destination = playerTr.position;
 
@@ -67,6 +71,16 @@ public class ZombieCtrl : MonoBehaviour
 
         // 좀비의 Nav를 키기 위한 코루틴
         StartCoroutine(this.CheckZombieNav());
+=======
+        //추적 대상의 위치를 설정하면 바로 추적 시작
+        nvAgent.destination = playerTr.position;
+
+        //일정한 간격으로 좀비의 행동 상태를 체크하는 코루틴 함수 실행
+        StartCoroutine(this.CheckZombieState());
+
+        //좀비의 상태에 따라 동작하는 루틴을 실행하는 코루틴 함수 실행
+        StartCoroutine(this.ZombieAction());
+>>>>>>> master
     }
 
     void OnEnable()

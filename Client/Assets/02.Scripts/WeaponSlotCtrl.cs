@@ -56,6 +56,16 @@ public class WeaponSlotCtrl : MonoBehaviour
                 player.m16Set = true;
                 player.WeaponDisPlay();
             }
+            else if (weaponSlot.Peek().type.ToString() == "M4")
+            {
+                player.m4Set = true;
+                player.WeaponDisPlay();
+            }
+            else if (weaponSlot.Peek().type.ToString() == "UMP")
+            {
+                player.umpSet = true;
+                player.WeaponDisPlay();
+            }
         }
         else
         {
@@ -76,7 +86,7 @@ public class WeaponSlotCtrl : MonoBehaviour
         if (weaponSlot.Peek().getItemCount() == 1)
         {
             // ㅄ 같은 코드 바꿔야 한다. = 난 안바꿈~
-           for ( int i=0; i < 2; ++i)
+           for (int i=0; i < 2; ++i)
             {
                 if (weaponSlot.Peek().type.ToString() == player.weaponSlotType[i].ToString())
                 {

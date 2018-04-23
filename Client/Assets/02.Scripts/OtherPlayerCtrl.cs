@@ -20,9 +20,6 @@ public class OtherPlayerCtrl : MonoBehaviour
     // 캐릭터의 현재 상태 정보를 저장할 Enum 변수
     public PlayerState playerState = PlayerState.idle;
 
-    //private float h = 0.0f;
-    //private float v = 0.0f;
-
     // 접근해야 하는 컴포넌트는 반드시 변수에 할당한 후 사용
     private Transform tr;
     private Animator animator;
@@ -33,6 +30,9 @@ public class OtherPlayerCtrl : MonoBehaviour
     public float rotSpeed = 100.0f;
     // 캐릭터 체력
     private int hp = 100;
+
+    public int armour = 0;
+
     // 캐릭터의 사망 여부
     private bool isDie = false;
 
@@ -43,6 +43,8 @@ public class OtherPlayerCtrl : MonoBehaviour
     // 총알 발사 사운드
     public AudioClip M16A4Sound;
     public AudioClip AK47Sound;
+    public AudioClip M4A1Sound;
+    public AudioClip UMP45Sound;
 
     // AudioSource 컴포넌트를 저장할 변수
     private AudioSource source = null;
@@ -67,6 +69,8 @@ public class OtherPlayerCtrl : MonoBehaviour
     // 적 플레이어 무기 정보
     public GameObject ak47;
     public GameObject m16;
+    public GameObject m4;
+    public GameObject ump;
 
 
     void Start()
@@ -92,6 +96,8 @@ public class OtherPlayerCtrl : MonoBehaviour
         // 무기 비활성화 하여 보이지 않기
         ak47.GetComponent<Renderer>().enabled = false;
         m16.GetComponent<Renderer>().enabled = false;
+        m4.GetComponent<Renderer>().enabled = false;
+        ump.GetComponent<Renderer>().enabled = false;
     }
 
     public void get_Animator(int value)
@@ -163,16 +169,45 @@ public class OtherPlayerCtrl : MonoBehaviour
                     //animator.SetBool("IsEquip", false);
                     ak47.GetComponent<Renderer>().enabled = false;
                     m16.GetComponent<Renderer>().enabled = false;
+                    m4.GetComponent<Renderer>().enabled = false;
+                    ump.GetComponent<Renderer>().enabled = false;
                     break;
                 case 1:
+                    // m16 장착 상태
                     animator.SetBool("IsEquip", true);
+                    m16.GetComponent<Renderer>().enabled = true;
+
+                    m4.GetComponent<Renderer>().enabled = false;
+                    ump.GetComponent<Renderer>().enabled = false;
                     ak47.GetComponent<Renderer>().enabled = false;
                     m16.GetComponent<Renderer>().enabled = true;
                     break;
                 case 2:
+                    // ak47 장착 상태
                     animator.SetBool("IsEquip", true);
                     ak47.GetComponent<Renderer>().enabled = true;
+
                     m16.GetComponent<Renderer>().enabled = false;
+                    m4.GetComponent<Renderer>().enabled = false;
+                    ump.GetComponent<Renderer>().enabled = false;
+                    break;
+                case 3:
+                    // m4 장착 상태
+                    animator.SetBool("IsEquip", true);
+                    m4.GetComponent<Renderer>().enabled = true;
+
+                    m16.GetComponent<Renderer>().enabled = false;
+                    ak47.GetComponent<Renderer>().enabled = false;
+                    ump.GetComponent<Renderer>().enabled = false;
+                    break;
+                case 4:
+                    // ump 장착 상태
+                    animator.SetBool("IsEquip", true);
+                    ump.GetComponent<Renderer>().enabled = true;
+
+                    m16.GetComponent<Renderer>().enabled = false;
+                    m4.GetComponent<Renderer>().enabled = false;
+                    ak47.GetComponent<Renderer>().enabled = false;
                     break;
             }
 
@@ -202,9 +237,9 @@ public class OtherPlayerCtrl : MonoBehaviour
 
             if (createBullet_b == true)
             {
-                // 총쏘는 애니메이션으로 변경.
-                animator.SetBool("IsEquip", true);
-                animator.SetBool("IsShot", true);
+                //// 총쏘는 애니메이션으로 변경.
+                //animator.SetBool("IsEquip", true);
+                //animator.SetBool("IsShot", true);
 
                 Instantiate(bullet, firePos.position, firePos.rotation);
 
@@ -239,36 +274,52 @@ public class OtherPlayerCtrl : MonoBehaviour
         {
             CreateBloodEffect(coll.transform.position);
 
-            // 맞은 총알의 Damage를 추출해 OtherPlayer HP 차감
-            hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
+            if (armour <= 0)
+            {
+                hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;   
+            }
+            else
+            {
+                armour -= coll.gameObject.GetComponent<BulletCtrl>().damage;  
+            }  
+            
             if (hp <= 0)
             {
                 isDie = true;
                 OtherPlayerDie();
             }
+
             // Bullet 삭제
             Destroy(coll.gameObject);
         }
+
+        // 충돌한 게임오브젝트의 태그값 비교
+        if (coll.gameObject.tag == "ZombieAttack")
+        {
+            CreateBloodEffect(coll.transform.position);
+
+            if (armour <= 0)
+            {
+                // 체력 차감
+                hp -= 20;
+             
+            }
+            else if (armour > 0)
+            {
+                // 방어력 차감
+                armour -= 20;        
+            }
+
+            if (hp <= 0)
+            {
+                isDie = true;
+                OtherPlayerDie();
+            }
+
+            Debug.Log("Player H{: " + hp.ToString());
+            
+        }
     }
-
-    //// 충돌을 시작할 때 발생하는 이벤트
-    //void OnCollisionEnter(Collision coll)
-    //{
-    //    // 충돌한 게임오브젝트의 태그값 비교
-    //    if (coll.gameObject.tag == "BULLET")
-    //    {
-    //        CreateBloodEffect(coll.transform.position);
-
-    //        // 맞은 총알의 Damage를 추출해 OtherPlayer HP 차감
-    //        hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
-    //        if (hp <= 0)
-    //        {
-    //            OtherPlayerDie();
-    //        }
-    //        // Bullet 삭제
-    //        Destroy(coll.gameObject);
-    //    }
-    //}
 
     // 적 플레이어 죽을때 실행되는 함수
     void OtherPlayerDie()

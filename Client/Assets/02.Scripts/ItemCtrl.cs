@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class ItemCtrl : InventoryCtrl
 {
 
-    public enum ItemType { Ammunition762, Ammunition556, FirstAid } // 탄약, 구급상자
+    public enum ItemType { Ammunition762, Ammunition556, Ammunition9, FirstAid, ProofVest } // 탄약, 구급상자
 
     public ItemType type;           // 아이템의 타입.
     public Sprite DefaultImg;   // 기본 이미지.

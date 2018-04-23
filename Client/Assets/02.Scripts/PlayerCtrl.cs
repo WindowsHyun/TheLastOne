@@ -23,17 +23,18 @@ public class PlayerCtrl : MonoBehaviour
 
     public enum WeaponState
     {
-        None, M16, AK47
+        None, M16, AK47, M4, UMP
     };
 
     // 델리게이트 및 이벤트 선언
     public delegate void PlayerDieHandler();
     public static event PlayerDieHandler OnPlayerDie;
+
     // 캐릭터의 현재 상태 정보를 저장할 Enum 변수
     public PlayerState playerState = PlayerState.idle;
 
-    private float h = 0.0f;
-    private float v = 0.0f;
+    public float h = 0.0f;
+    public float v = 0.0f;
 
     // 접근해야 하는 컴포넌트는 반드시 변수에 할당한 후 사용
     private Transform tr;
@@ -43,14 +44,20 @@ public class PlayerCtrl : MonoBehaviour
     public float moveSpeed = 23.0f;
     // 캐릭터 회전 속도 변수
     public float rotSpeed = 100.0f;
+    
     // 캐릭터 체력
     public int hp = 100;
-
     // 캐릭터 생명 초기값
-    private int initHp;
-    // 캐릭터의 HP바 이미지
+    public int initHp;
+    // 캐릭터의 HP 게이지 이미지
     public Image imgHpBar;
 
+    // 캐릭터 방어력
+    public int armour = 0;
+    // 캐릭터 방어력 초기값
+    public int initArmour = 100;
+    // 캐릭터의 방어력 게이지 이미지
+    public Image imgArmourBar;
 
     // 총알 프리팹
     public GameObject bullet;
@@ -59,6 +66,8 @@ public class PlayerCtrl : MonoBehaviour
     // 총알 발사 사운드
     public AudioClip M16A4Sound;
     public AudioClip AK47Sound;
+    public AudioClip M4A1Sound;
+    public AudioClip UMP45Sound;
 
     // AudioSource 컴포넌트를 저장할 변수
     private AudioSource source = null;
@@ -73,6 +82,7 @@ public class PlayerCtrl : MonoBehaviour
     // 플레이어가 총알 발사시 Packet을 전송하기 위하여
     NetworkCtrl networkCtrl = new NetworkCtrl();
 
+<<<<<<< HEAD
     // 플레이어의 고유번호
     public int Client_imei = -1;
 
@@ -80,12 +90,16 @@ public class PlayerCtrl : MonoBehaviour
     public bool weaponEatPossible = false;
     public bool weaponEat = false;
 
+=======
+>>>>>>> master
     // 무기 슬롯 타입
     public string[] weaponSlotType = new string[2];
 
     // 아이템 획득 확인을 위한 변수
-    public bool bullet762Set = false;
-    public bool bullet556Set = false;
+    //public bool bullet762Set = false;
+    //public bool bullet556Set = false;
+    //public bool bullet9Set = false;
+
     //private int bullet762 = 0;
     //private int bullet556 = 0;
     public WeaponState nowWeaponState = WeaponState.None;
@@ -93,12 +107,13 @@ public class PlayerCtrl : MonoBehaviour
     // 무기 정보 저장
     public GameObject ak47;
     public GameObject m16;
+    public GameObject m4;
+    public GameObject ump;
+
     public bool ak47Set = false;
     public bool m16Set = false;
-
-    // 무기 장착 여부
-    public bool showItem1 = false;
-    public bool showItem2 = false;
+    public bool m4Set = false;
+    public bool umpSet = false;
 
     // 혈흔 효과 프리팹
     public GameObject bloodEffect;
@@ -119,6 +134,22 @@ public class PlayerCtrl : MonoBehaviour
     public WeaponSlotCtrl[] weaponSlotCtrl;
 
     public bool dangerLineIn = false;
+
+    public GameObject cooltime;
+
+    // 차량 탈 수 있는지
+    public bool rideCar = false;
+
+    // 차량에 탑승하고 있는지
+    public bool GetTheCar = false;
+
+    // 차량 정보
+    public VehicleCtrl ridingCar;
+
+    public GameObject VehicleUI;
+    //public Image vehicleImage;
+    public Image vehicleHpBar;
+   
 
     IEnumerator StartKeyInput()
     {
@@ -143,19 +174,27 @@ public class PlayerCtrl : MonoBehaviour
                 }
             }
 
-
             // 총이 장착이 되었을때만 발사 가능
             if (shotable == true)
             {
-                SlotCtrl Find762 = get_Bullet("Ammunition762");
-                SlotCtrl Find556 = get_Bullet("Ammunition556");
+                SlotCtrl Find762 = GetItem("Ammunition762");
+                SlotCtrl Find556 = GetItem("Ammunition556");
+                SlotCtrl Find9 = GetItem("Ammunition9");
                 // 어떠한 종류의 총알이 1발 이상 있을 시
                 if (Find556 != null && Find556.slot.Peek().getItemCount() > 0 && m16Set == true)
                 {
 
                     if (Input.GetMouseButtonDown(0))
                     {
-                        animator.SetBool("IsShot", true);
+                        Fire(Find556);
+                        networkCtrl.Player_Shot();
+                    }
+                }
+                else if (Find556 != null && Find556.slot.Peek().getItemCount() > 0 && m4Set == true)
+                {
+
+                    if (Input.GetMouseButtonDown(0))
+                    {
                         Fire(Find556);
                         networkCtrl.Player_Shot();
                     }
@@ -164,8 +203,15 @@ public class PlayerCtrl : MonoBehaviour
                 {
                     if (Input.GetMouseButtonDown(0))
                     {
-                        animator.SetBool("IsShot", true);
                         Fire(Find762);
+                        networkCtrl.Player_Shot();
+                    }
+                }
+                else if (Find9 != null && Find9.slot.Peek().getItemCount() > 0 && umpSet == true)
+                {
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        Fire(Find9);
                         networkCtrl.Player_Shot();
                     }
                 }
@@ -177,8 +223,14 @@ public class PlayerCtrl : MonoBehaviour
                 {
                     m16.GetComponent<Renderer>().enabled = true;
                     m16Set = true;
+
                     ak47.GetComponent<Renderer>().enabled = false;
                     ak47Set = false;
+                    m4.GetComponent<Renderer>().enabled = false;
+                    m4Set = false;
+                    ump.GetComponent<Renderer>().enabled = false;
+                    umpSet = false;
+
                     nowWeaponState = WeaponState.M16;
                 }
                 else if (weaponSlotType[0] == "AK47")
@@ -186,9 +238,42 @@ public class PlayerCtrl : MonoBehaviour
                     ak47.GetComponent<Renderer>().enabled = true;
                     ak47Set = true;
 
+                    m4.GetComponent<Renderer>().enabled = false;
+                    m4Set = false;
+                    ump.GetComponent<Renderer>().enabled = false;
+                    umpSet = false;
                     m16.GetComponent<Renderer>().enabled = false;
                     m16Set = false;
+
                     nowWeaponState = WeaponState.AK47;
+                }
+                else if (weaponSlotType[0] == "M4")
+                {
+                    m4.GetComponent<Renderer>().enabled = true;
+                    m4Set = true;
+
+                    ak47.GetComponent<Renderer>().enabled = false;
+                    ak47Set = false;
+                    ump.GetComponent<Renderer>().enabled = false;
+                    umpSet = false;
+                    m16.GetComponent<Renderer>().enabled = false;
+                    m16Set = false;
+
+                    nowWeaponState = WeaponState.M4;
+                }
+                else if (weaponSlotType[0] == "UMP")
+                {
+                    ump.GetComponent<Renderer>().enabled = true;
+                    umpSet = true;
+
+                    m4.GetComponent<Renderer>().enabled = false;
+                    m4Set = false;
+                    ak47.GetComponent<Renderer>().enabled = false;
+                    ak47Set = false;
+                    m16.GetComponent<Renderer>().enabled = false;
+                    m16Set = false;
+
+                    nowWeaponState = WeaponState.UMP;
                 }
             }
             else if (Input.GetKeyDown(KeyCode.Alpha2))
@@ -197,8 +282,14 @@ public class PlayerCtrl : MonoBehaviour
                 {
                     m16.GetComponent<Renderer>().enabled = true;
                     m16Set = true;
+
                     ak47.GetComponent<Renderer>().enabled = false;
                     ak47Set = false;
+                    m4.GetComponent<Renderer>().enabled = false;
+                    m4Set = false;
+                    ump.GetComponent<Renderer>().enabled = false;
+                    umpSet = false;
+
                     nowWeaponState = WeaponState.M16;
                 }
                 else if (weaponSlotType[1] == "AK47")
@@ -206,9 +297,42 @@ public class PlayerCtrl : MonoBehaviour
                     ak47.GetComponent<Renderer>().enabled = true;
                     ak47Set = true;
 
+                    m4.GetComponent<Renderer>().enabled = false;
+                    m4Set = false;
+                    ump.GetComponent<Renderer>().enabled = false;
+                    umpSet = false;
                     m16.GetComponent<Renderer>().enabled = false;
                     m16Set = false;
+
                     nowWeaponState = WeaponState.AK47;
+                }
+                else if (weaponSlotType[1] == "M4")
+                {
+                    m4.GetComponent<Renderer>().enabled = true;
+                    m4Set = true;
+
+                    ak47.GetComponent<Renderer>().enabled = false;
+                    ak47Set = false;
+                    ump.GetComponent<Renderer>().enabled = false;
+                    umpSet = false;
+                    m16.GetComponent<Renderer>().enabled = false;
+                    m16Set = false;
+
+                    nowWeaponState = WeaponState.M4;
+                }
+                else if (weaponSlotType[1] == "UMP")
+                {
+                    ump.GetComponent<Renderer>().enabled = true;
+                    umpSet = true;
+
+                    m4.GetComponent<Renderer>().enabled = false;
+                    m4Set = false;
+                    ak47.GetComponent<Renderer>().enabled = false;
+                    ak47Set = false;
+                    m16.GetComponent<Renderer>().enabled = false;
+                    m16Set = false;
+
+                    nowWeaponState = WeaponState.UMP;
                 }
             }
 
@@ -241,6 +365,59 @@ public class PlayerCtrl : MonoBehaviour
                     shotable = true;
                 }
             }
+
+            if (Input.GetKeyDown(KeyCode.G))
+            {
+                if (rideCar == true && GetTheCar == false)
+                {
+                    // 차량 탑승 여부를 나타냄 (탑승)
+                    GetTheCar = true;
+
+                    // 총 발사 가능
+                    shotable = false;
+                    ridingCar.vehicleStop = false;
+
+                    // 캐릭터 캡슐 콜라이더 비활성화
+                    gameObject.GetComponent<CapsuleCollider>().enabled = false;
+
+                    // 총구 앞 캡슐 콜라이더 비활성화
+                    firePos.GetComponent<CapsuleCollider>().enabled = false;
+
+                    // 차량 UI 활성화
+                    VehicleUI.SetActive(true);
+
+                           
+                    vehicleHpBar.fillAmount = (float)ridingCar.vehicleHp / (float)ridingCar.vehicleInitHp;
+
+
+                }
+                else if (rideCar == true && GetTheCar == true)
+                {
+                    // 차량 탑승 가능한지 여부를 나타냄
+                    rideCar = false;
+
+                    // 차량을 탑승 여부를 나타냄 (하차)
+                    GetTheCar = false;
+
+                    // 총 발사 가능
+                    shotable = true;
+
+                    // 하차 후 차량 브레이크 작동
+                    ridingCar.vehicleStop = true;
+
+                    // 차량 하차 시 좌표 이동
+                    this.transform.position = new Vector3(ridingCar.transform.position.x-1, 29.99451f, ridingCar.transform.position.z);
+
+                    // 캐릭터 캡슐 콜라이더 활성화
+                    gameObject.GetComponent<CapsuleCollider>().enabled = true;
+
+                    // 총구 앞 캡슐 콜라이더 활성화
+                    firePos.GetComponent<CapsuleCollider>().enabled = true;
+
+                    // 차량 UI 활성화
+                    VehicleUI.SetActive(false);
+                }
+            }
             yield return null;
         } while (true);
         //yield return null;
@@ -248,11 +425,26 @@ public class PlayerCtrl : MonoBehaviour
 
     void Start()
     {
+
+
         // 게임 시작후 차량 하차 시 인벤토리 창을 끈다.
         inventory.SetActive(false);
 
+        // 게임 시작후 차량 하차 시 쿨타임 창을 끈다.
+        cooltime.SetActive(false);
+
+        
+        VehicleUI.SetActive(false);
+
+
+
         // 생명 초기값 설정
         initHp = hp;
+        hp -= 70;
+        imgHpBar.fillAmount = (float)hp / (float)initHp;
+
+        // 방어력 초기값 설정
+        imgArmourBar.fillAmount = (float)armour / (float)initArmour;
 
         // 스크립트 처음에 Transform 컴포넌트 할당
         tr = GetComponent<Transform>();
@@ -267,17 +459,16 @@ public class PlayerCtrl : MonoBehaviour
         muzzleFlash1.enabled = false;
         muzzleFlash2.enabled = false;
 
-        animator.SetInteger("IsState", 0);
-
-
-        Cursor.lockState = CursorLockMode.Locked;//마우스 커서 고정
-        Cursor.visible = false;//마우스 커서 보이기
+        //Cursor.lockState = CursorLockMode.Locked;//마우스 커서 고정
+        //Cursor.visible = false;//마우스 커서 보이기
 
         // 현재 발사 가능
         shotable = true;
 
         ak47.GetComponent<Renderer>().enabled = false;
         m16.GetComponent<Renderer>().enabled = false;
+        m4.GetComponent<Renderer>().enabled = false;
+        ump.GetComponent<Renderer>().enabled = false;
 
         // 클라이언트 고유번호 가져오기.
         Client_imei = networkCtrl.get_imei();
@@ -285,6 +476,7 @@ public class PlayerCtrl : MonoBehaviour
         // 인벤토리의 자식 컴포넌트의 스크립트 할당
         slotctrl = inventory.GetComponentsInChildren<SlotCtrl>();
         weaponSlotCtrl = inventory.GetComponentsInChildren<WeaponSlotCtrl>();
+
         StartCoroutine(StartKeyInput());
     }
 
@@ -300,7 +492,7 @@ public class PlayerCtrl : MonoBehaviour
     }
 
     // 아이템이 들어가서 isSlots이 true가 된 슬롯에서 해당 타입의 아이템 슬롯을 찾아 반환하는 함수
-    public SlotCtrl get_Bullet(string value)
+    public SlotCtrl GetItem(string value)
     {
         foreach (SlotCtrl sCtrl in slotctrl)
         {
@@ -314,6 +506,14 @@ public class PlayerCtrl : MonoBehaviour
                 {
                     return sCtrl;
                 }
+                else if (sCtrl.slot.Peek().type.ToString() == "Ammunition9" && value == "Ammunition9")
+                {
+                    return sCtrl;
+                }
+                else if (sCtrl.slot.Peek().type.ToString() == "ProofVest" && value == "ProofVest")
+                {
+                    return sCtrl;
+                }
             }
         }
         return null;
@@ -321,66 +521,43 @@ public class PlayerCtrl : MonoBehaviour
 
     void FixedUpdate()
     {
-        h = Input.GetAxis("Horizontal");
-        v = Input.GetAxis("Vertical");
-
-        //Debug.Log("H=" + h.ToString());
-        //Debug.Log("V=" + v.ToString());
-
-        // 전후좌우 이동 방향 벡터 계산
-        Vector3 moveDir = (Vector3.forward * v) + (Vector3.right * h);
-
-        // Translate(이동 방향 * 속도 * 변위값 * Time.deltaTime, 기준 좌표)
-        tr.Translate(moveDir.normalized * Time.deltaTime * moveSpeed, Space.Self);
-
-        // Vector3.up 축을 기준으로 rotSpeed만큼의 속도로 회전
-        tr.Rotate(Vector3.up * Time.deltaTime * rotSpeed * Input.GetAxis("Mouse X"));
-
-        // 대기 0, 전진 1, 후진 2, 왼쪽 3, 오른쪽 4
-        // IsState란 애니메이터 상태 변수 추가됨
-        // 키보드 입력값을 기준으로 동작할 애니메이션 수행
-        if (v >= 0.1f)
+        if (GetTheCar == false)
         {
-            // 전진 애니메이션
-            animator.SetInteger("IsState", 1);
-            playerState = PlayerState.runForword;
-            // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.runForwordGun 이 된다.
-            // animator.SetBool("IsShot", true)  이면 playerState = PlayerState.runForwordShot 이 된다.
-        }
-        else if (v <= -0.1f)
-        {
-            // 후진 애니메이션
-            animator.SetInteger("IsState", 2);
-            playerState = PlayerState.runBack;
-            // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.runBackGun 이 된다.
-            // animator.SetBool("IsShot", true)  이면 playerState = PlayerState.runBackShot 이 된다.
-        }
-        else if (h <= -0.1f)
-        {
-            // 왼쪽 이동 애니메이션
-            animator.SetInteger("IsState", 3);
-            playerState = PlayerState.runLeft;
-            // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.runLeftGun 이 된다.
-            // animator.SetBool("IsShot", true)  이면 playerState = PlayerState.runLeftShot 이 된다.
-        }
-        else if (h >= 0.1f)
-        {
-            // 오른쪽 이동 애니메이션
-            animator.SetInteger("IsState", 4);
-            playerState = PlayerState.runRight;
-            // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.runRightGun 이 된다.
-            // animator.SetBool("IsShot", true)  이면 playerState = PlayerState.runRightShot 이 된다.
-        }
-        else
-        {
-            // 정지 시 idle애니메이션
-            animator.SetInteger("IsState", 0);
-            playerState = PlayerState.idle;
-            // animator.SetBool("IsEquip", true) 이면 playerState = PlayerState.idleGun 이 된다.
-        }
+            h = Input.GetAxis("Horizontal");
+            v = Input.GetAxis("Vertical");
+ 
+            // 전후좌우 이동 방향 벡터 계산
+            Vector3 moveDir = (Vector3.forward * v) + (Vector3.right * h);
 
+            // Translate(이동 방향 * 속도 * 변위값 * Time.deltaTime, 기준 좌표)
+            tr.Translate(moveDir.normalized * Time.deltaTime * moveSpeed, Space.Self);
 
-        
+            // Vector3.up 축을 기준으로 rotSpeed만큼의 속도로 회전
+            tr.Rotate(Vector3.up * Time.deltaTime * rotSpeed * Input.GetAxis("Mouse X"));
+
+            // 블랜드 트리에서 v값과 h 값을 계산해서 애니메이션 실행된다.
+            animator.SetFloat("Vertical", v);
+            animator.SetFloat("Horizontal", h);   
+        }
+        else if(GetTheCar == true)
+        {
+            float steer = Input.GetAxis("Horizontal");
+            float accelerate = Input.GetAxis("Vertical");
+
+            // 차량 바퀴 각도 계산
+            float finalAngle = steer * 45f;
+            ridingCar.wheelColliders[0].steerAngle = finalAngle;
+            ridingCar.wheelColliders[1].steerAngle = finalAngle;
+
+            for (int i = 0; i < 4; i++)
+            {
+                ridingCar.wheelColliders[i].motorTorque = accelerate * ridingCar.maxTorque;
+            }
+
+            // 탑승시 캐릭터를 차량 위치와 동기화
+            this.transform.position = new Vector3(ridingCar.transform.position.x, 29.99451f, ridingCar.transform.position.z);
+
+        }
     }
 
     void Fire(SlotCtrl slot)
@@ -407,9 +584,26 @@ public class PlayerCtrl : MonoBehaviour
             }
             source.PlayOneShot(AK47Sound, 0.9f);
         }
-
-        // 사운드 발생 함수
-        
+        else if (m4Set == true)
+        {
+            slot.slot.Peek().setItemCount(-1);
+            if (slot.slot.Peek().getItemCount() == 0 && slot.isSlots() == true)
+            {
+                slot.slot.Clear();
+                slot.UpdateInfo(false, slot.DefaultImg);
+            }
+            source.PlayOneShot(M4A1Sound, 0.9f);
+        }
+        else if (umpSet == true)
+        {
+            slot.slot.Peek().setItemCount(-1);
+            if (slot.slot.Peek().getItemCount() == 0 && slot.isSlots() == true)
+            {
+                slot.slot.Clear();
+                slot.UpdateInfo(false, slot.DefaultImg);
+            }
+            source.PlayOneShot(UMP45Sound, 0.9f);
+        }
 
         // 잠시 기다리는 루틴을 위해 코루틴 함수로 호출
         StartCoroutine(this.ShowMuzzleFlash());
@@ -461,12 +655,30 @@ public class PlayerCtrl : MonoBehaviour
         if (coll.gameObject.tag == "BULLET")
         {
             CreateBloodEffect(coll.transform.position);
+            if (armour <= 0)
+            {
+                // 맞은 총알의 Damage를 추출해 Player HP 차감
+                hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
+                // Image UI 항목의 fillAmount 속성을 조절해 생명 게이지 값 조절
+                imgHpBar.fillAmount = (float)hp / (float)initHp;
+            }
+            else
+            {
+                // 방어력 차감
+                armour -= coll.gameObject.GetComponent<BulletCtrl>().damage;
+                // Image UI 항목의 fillAmount 속성을 조절해 방어력 게이지 값 조절
+                imgArmourBar.fillAmount = (float)armour / (float)initArmour;
 
-            // 맞은 총알의 Damage를 추출해 Player HP 차감
-            hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
-
+                // 방어력 0일때 방탄조끼 아이템 인벤토리에서 삭제
+                if (armour <= 0)
+                {
+                    SlotCtrl proofVest = GetItem("ProofVest");
+                    proofVest.slot.Clear();
+                    proofVest.UpdateInfo(false, proofVest.DefaultImg);
+                }
+            }
             // Image UI 항목의 fillAmount 속성을 조절해 생명 게이지 값 조절
-            imgHpBar.fillAmount = (float)hp / (float)initHp;
+            //imgHpBar.fillAmount = (float)hp / (float)initHp;
 
             if (hp <= 0)
             {
@@ -490,11 +702,30 @@ public class PlayerCtrl : MonoBehaviour
         {
             CreateBloodEffect(coll.transform.position);
 
-            // 좀비 공격의 Damage만큼 HP 차감
-            hp -= 10;
 
-            // Image UI 항목의 fillAmount 속성을 조절해 생명 게이지 값 조절
-            imgHpBar.fillAmount = (float)hp / (float)initHp;
+            if (armour <= 0)
+            {
+                // 체력 차감
+                hp -= 20;
+                //Image UI 항목의 fillAmount 속성을 조절해 생명 게이지 값 조절
+                imgHpBar.fillAmount = (float)hp / (float)initHp;
+            }
+            else if (armour > 0)
+            {
+                // 방어력 차감
+                armour -= 20;
+                // Image UI 항목의 fillAmount 속성을 조절해 방어력 게이지 값 조절
+                imgArmourBar.fillAmount = (float)armour / (float)initArmour;
+
+                // 방어력 0일때 방탄조끼 아이템 인벤토리에서 삭제
+                if (armour <= 0)
+                {
+                    SlotCtrl proofVest = GetItem("ProofVest");
+                    proofVest.slot.Clear();
+                    proofVest.UpdateInfo(false, proofVest.DefaultImg);
+                }
+               
+            }
 
             Debug.Log("Player H{: " + hp.ToString());
             if (hp <= 0)
@@ -512,6 +743,11 @@ public class PlayerCtrl : MonoBehaviour
             dangerLineIn = true;
         }
 
+        if (coll.gameObject.tag == "Vehicle")
+        {
+            rideCar = true;
+            ridingCar = GameObject.Find(coll.gameObject.name).GetComponent<VehicleCtrl>();
+        }
 
     }
 
@@ -542,10 +778,15 @@ public class PlayerCtrl : MonoBehaviour
         {
             dangerLineIn = false;
         }
+
+        if (coll.gameObject.tag == "Vehicle")
+        {
+            rideCar = false;
+        }
     }
 
     // 플레이어 죽을 때 실행되는 함수
-    void PlayerDie()
+    public void PlayerDie()
     {
         // 이벤트 발생 시킴
         OnPlayerDie();
@@ -569,16 +810,26 @@ public class PlayerCtrl : MonoBehaviour
         if (ak47Set == true)
         {
             ak47.GetComponent<Renderer>().enabled = true;
-            //m16.GetComponent<Renderer>().enabled = false;
             animator.SetBool("IsEquip", true);
             nowWeaponState = WeaponState.AK47;
         }
         else if (m16Set == true)
         {
             m16.GetComponent<Renderer>().enabled = true;
-            //ak47.GetComponent<Renderer>().enabled = false;
             animator.SetBool("IsEquip", true);
             nowWeaponState = WeaponState.M16;
+        }
+        else if (m4Set == true)
+        {
+            m4.GetComponent<Renderer>().enabled = true;
+            animator.SetBool("IsEquip", true);
+            nowWeaponState = WeaponState.M4;
+        }
+        else if (umpSet == true)
+        {
+            ump.GetComponent<Renderer>().enabled = true;
+            animator.SetBool("IsEquip", true);
+            nowWeaponState = WeaponState.UMP;
         }
     }
 
@@ -596,4 +847,3 @@ public class PlayerCtrl : MonoBehaviour
     }
 
 }
-
