@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> Server
 public class DangerLineCtrl : MonoBehaviour
 {
     private bool start = false;
@@ -18,6 +22,7 @@ public class DangerLineCtrl : MonoBehaviour
     public void set_demage(int value)
     {
         this.demage = value;
+<<<<<<< HEAD
     }
 
     public void set_pos(Vector3 pos)
@@ -25,6 +30,15 @@ public class DangerLineCtrl : MonoBehaviour
         this.start_pos = pos;
     }
 
+=======
+    }
+
+    public void set_pos(Vector3 pos)
+    {
+        this.start_pos = pos;
+    }
+
+>>>>>>> Server
     public void set_scale(Vector3 scale)
     {
         this.limit_scale = scale;

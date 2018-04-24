@@ -42,6 +42,13 @@ public class ZombieCtrl : MonoBehaviour
     public int targetPlayer = -1;
     public int animator_value = 0;
 
+<<<<<<< HEAD
+=======
+    //private bool sendPacket = false;
+    //public int zombieNum = -1;
+
+
+>>>>>>> Server
     // Use this for initialization
     void Start()
     {
@@ -55,6 +62,19 @@ public class ZombieCtrl : MonoBehaviour
         // Animator 컴포넌트 할당
         animator = this.gameObject.GetComponent<Animator>();
 
+<<<<<<< HEAD
+        // 추적 대상의 위치를 설정하면 바로 추적 시작
+        nvAgent.destination = playerTr.position;
+
+        // 일정한 간격으로 좀비의 행동 상태를 체크하는 코루틴 함수 실행
+        StartCoroutine(this.CheckZombieState());
+
+        // 좀비의 상태에 따라 동작하는 루틴을 실행하는 코루틴 함수 실행
+        StartCoroutine(this.ZombieAction());
+
+        // 좀비의 Nav를 키기 위한 코루틴
+        StartCoroutine(this.CheckZombieNav());
+=======
         //추적 대상의 위치를 설정하면 바로 추적 시작
         nvAgent.destination = playerTr.position;
 
@@ -63,9 +83,13 @@ public class ZombieCtrl : MonoBehaviour
 
         //좀비의 상태에 따라 동작하는 루틴을 실행하는 코루틴 함수 실행
         StartCoroutine(this.ZombieAction());
+<<<<<<< HEAD
 
         // 좀비의 Nav를 키기 위한 코루틴
         StartCoroutine(this.CheckZombieNav());
+=======
+>>>>>>> master
+>>>>>>> Server
     }
 
     void OnEnable()
@@ -93,13 +117,21 @@ public class ZombieCtrl : MonoBehaviour
             yield return new WaitForSeconds(0.2f);
         }
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> Server
 
     IEnumerator CheckZombieState()
     {
         while (!isDie)
         {
 
+<<<<<<< HEAD
             if (playerCtrl.Client_imei != targetPlayer )
+=======
+            if (playerCtrl.Client_imei != targetPlayer)
+>>>>>>> Server
             {
                 // 좀비의 Target과 자신의 IMEI가 다른경우 Walk 등을 하지 않는다.
                 switch (animator_value)
@@ -136,7 +168,11 @@ public class ZombieCtrl : MonoBehaviour
                 {
                     zombieState = ZombieState.idle;
                 }
+<<<<<<< HEAD
                 if (stopPos)
+=======
+
+>>>>>>> Server
                 playerCtrl.send_ZombieData(zombieTr.position, zombieTr.eulerAngles, zombieNum, hp, zombieState);
             }
 

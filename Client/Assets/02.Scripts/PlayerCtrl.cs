@@ -82,9 +82,22 @@ public class PlayerCtrl : MonoBehaviour
     // 플레이어가 총알 발사시 Packet을 전송하기 위하여
     NetworkCtrl networkCtrl = new NetworkCtrl();
 
+<<<<<<< HEAD
     // 플레이어의 고유번호
     public int Client_imei = -1;
 
+=======
+<<<<<<< HEAD
+    // 플레이어의 고유번호
+    public int Client_imei = -1;
+
+    // 무기 획득 확인을 위한 변수
+    public bool weaponEatPossible = false;
+    public bool weaponEat = false;
+
+=======
+>>>>>>> master
+>>>>>>> Server
     // 무기 슬롯 타입
     public string[] weaponSlotType = new string[2];
 
@@ -157,7 +170,7 @@ public class PlayerCtrl : MonoBehaviour
                 // Image UI 항목의 fillAmount 속성을 조절해 생명 게이지 값 조절
                 imgHpBar.fillAmount = (float)hp / (float)initHp;
 
-                Debug.Log("Player H{: " + hp.ToString());
+                //Debug.Log("Player H{: " + hp.ToString());
                 if (hp <= 0)
                 {
                     // 마우스 잠겨 있을경우 푼다.
@@ -838,4 +851,8 @@ public class PlayerCtrl : MonoBehaviour
     {
         networkCtrl.Zombie_Pos(pos, rotation, zombieNum, hp, animation);
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> Server
 }

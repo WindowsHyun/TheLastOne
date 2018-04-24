@@ -415,8 +415,13 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 
 		Send_All_Data(ci, all_Client_Packet);
 		Send_All_Item();
+<<<<<<< HEAD
 		player_To_Zombie(g_zombie, g_clients);
 		Zombie_Thread();
+=======
+		Zombie_Thread();
+		player_To_Zombie(g_zombie, g_clients);
+>>>>>>> Server
 	}
 	catch (DWORD dwError) {
 		errnum++;
