@@ -24,6 +24,9 @@ public class OtherPlayerCtrl : MonoBehaviour
     private Transform tr;
     private Animator animator;
 
+    public float Horizontal = 0.0f;
+    public float Vertical = 0.0f;
+
     // 캐릭터 이동 속도 변수
     public float moveSpeed = 23.0f;
     // 캐릭터 회전 속도 변수
@@ -211,41 +214,15 @@ public class OtherPlayerCtrl : MonoBehaviour
                     break;
             }
 
-            switch (animator_value)
-            {
-                case 0:
-                    animator.SetInteger("IsState", 0);
-                    //playerState = PlayerState.idle;
-                    break;
-                case 3:
-                    animator.SetInteger("IsState", 1);
-                    //playerState = PlayerState.runForword;
-                    break;
-                case 4:
-                    animator.SetInteger("IsState", 2);
-                    //playerState = PlayerState.runBack;
-                    break;
-                case 5:
-                    animator.SetInteger("IsState", 3);
-                    //playerState = PlayerState.runLeft;
-                    break;
-                case 6:
-                    animator.SetInteger("IsState", 4);
-                    //playerState = PlayerState.runRight;
-                    break;
-            }
+            animator.SetFloat("Vertical", Vertical);
+            animator.SetFloat("Horizontal", Horizontal);
 
             if (createBullet_b == true)
             {
-                //// 총쏘는 애니메이션으로 변경.
-                //animator.SetBool("IsEquip", true);
-                //animator.SetBool("IsShot", true);
-
                 Instantiate(bullet, firePos.position, firePos.rotation);
 
                 // 사운드 발생 함수 ( 거리에 따른 소리를 다르게 하기 위하여 함수로 만듬)
                 //source.PlayOneShot(fireSfx, SoundsByStreet(DistanceToPoint(player_Pos, tr.position)));
-
 
                 // 잠시 기다리는 루틴을 위해 코루틴 함수로 호출
                 StartCoroutine(this.ShowMuzzleFlash());
@@ -276,13 +253,13 @@ public class OtherPlayerCtrl : MonoBehaviour
 
             if (armour <= 0)
             {
-                hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;   
+                hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
             }
             else
             {
-                armour -= coll.gameObject.GetComponent<BulletCtrl>().damage;  
-            }  
-            
+                armour -= coll.gameObject.GetComponent<BulletCtrl>().damage;
+            }
+
             if (hp <= 0)
             {
                 isDie = true;
@@ -302,12 +279,12 @@ public class OtherPlayerCtrl : MonoBehaviour
             {
                 // 체력 차감
                 hp -= 20;
-             
+
             }
             else if (armour > 0)
             {
                 // 방어력 차감
-                armour -= 20;        
+                armour -= 20;
             }
 
             if (hp <= 0)
@@ -317,7 +294,7 @@ public class OtherPlayerCtrl : MonoBehaviour
             }
 
             Debug.Log("Player H{: " + hp.ToString());
-            
+
         }
     }
 

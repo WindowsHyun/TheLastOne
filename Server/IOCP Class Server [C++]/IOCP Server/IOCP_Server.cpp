@@ -59,7 +59,7 @@ void IOCP_Server::initServer()
 	load_item_txt("./Game_Item_Collection.txt", &g_item);
 
 	// 좀비 캐릭터 생성하기
-	init_Zombie(50, &g_zombie);
+	init_Zombie(5, &g_zombie);
 
 	// 충돌체크 넣기
 	//load_CollisionCheck_txt("./Game_CollisionCheck.txt", &g_collision);
@@ -366,6 +366,8 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 			client->second.set_client_rotation(packet_rotation);
 			client->second.set_client_animator(client_View->animator());
 			client->second.set_client_weapon(client_View->nowWeapon());
+			client->second.set_horizontal(client_View->Horizontal());
+			client->second.set_vertical(client_View->Vertical());
 		}
 		break;
 
@@ -415,8 +417,8 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 
 		Send_All_Data(ci, all_Client_Packet);
 		Send_All_Item();
-		player_To_Zombie(g_zombie, g_clients);
 		Zombie_Thread();
+		//player_To_Zombie(g_zombie, g_clients);
 	}
 	catch (DWORD dwError) {
 		errnum++;
@@ -505,10 +507,12 @@ void IOCP_Server::Send_All_Data(int client, bool allClient)
 		auto name = builder.CreateString(iter.second.nickName);
 		auto hp = iter.second.get_hp();
 		auto animator = iter.second.get_animator();
+		float horizontal = iter.second.get_horizontal();
+		float vertical = iter.second.get_vertical();
 		auto xyz = iter.second.get_position();
 		auto rotation = iter.second.get_rotation();
 		auto weaponState = iter.second.get_weapon();
-		auto client_data = CreateClient_info(builder, id, hp, animator, name, &xyz, &rotation, weaponState);
+		auto client_data = CreateClient_info(builder, id, hp, animator, horizontal, vertical, name, &xyz, &rotation, weaponState);
 		// client_data 라는 테이블에 클라이언트 데이터가 들어가 있다.
 
 		Individual_client.push_back(client_data);	// Vector에 넣었다.

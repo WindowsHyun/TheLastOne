@@ -17,13 +17,15 @@ namespace TheLastOne.SendFunction
     {
         FlatBufferBuilder fbb = new FlatBufferBuilder(1);
 
-        public Byte[] makeClient_PacketInfo(Vector3 Player, int Player_Animator, Vector3 PlayerRotation, int Player_Weapone)
+        public Byte[] makeClient_PacketInfo(Vector3 Player, int Player_Animator, float horizontal, float vertical, Vector3 PlayerRotation, int Player_Weapone)
         {
             //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.
             fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
             Client_info.StartClient_info(fbb);
             //Client.AddName(fbb, offset); // string 사용
             Client_info.AddAnimator(fbb, Player_Animator);
+            Client_info.AddHorizontal(fbb, horizontal);
+            Client_info.AddVertical(fbb, vertical);
             Client_info.AddPosition(fbb, Vec3.CreateVec3(fbb, Player.x, Player.y, Player.z));
             Client_info.AddRotation(fbb, Vec3.CreateVec3(fbb, PlayerRotation.x, PlayerRotation.y, PlayerRotation.z));
             Client_info.AddNowWeapon(fbb, Player_Weapone);

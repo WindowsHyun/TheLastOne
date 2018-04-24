@@ -16,11 +16,16 @@ namespace TheLastOne.GameClass
         private bool prefab;    // 클라이언트 프리팹이 만들어졌는지 확인
         private bool connect;    // 클라이언트 접속
         private string name;     // 클라이언트 닉네임
+        private float horizontal;
+        private float vertical;
         private bool removeClient;   // 클라이언트 지울경우 true
         private int nowWeaponState; // 클라이언트 무기 상태
         public GameObject Player;   // 프리팹을 위한 게임 오브젝트
         public OtherPlayerCtrl script;  // 프리팹 오브젝트 안의 함수를 호출하기 위한 스크립트
 
+
+        public float get_vertical() { return this.vertical; }
+        public float get_horizontal() { return this.horizontal; }
         public int get_id() { return this.id; }
         public int get_animator() { return this.animator; }
         public Vector3 get_pos() { return this.position; }
@@ -31,6 +36,8 @@ namespace TheLastOne.GameClass
         public bool get_removeClient() { return this.removeClient; }
         public int get_weapon() { return this.nowWeaponState; }
 
+        public void set_vertical(float value) {  this.vertical = value; }
+        public void set_horizontal(float value) { this.horizontal = value; }
         public void set_id(int value) { this.id = value; }
         public void set_animator(int value) { this.animator = value; }
         public void set_pos(Vector3 pos) { this.position = pos; }
@@ -54,6 +61,8 @@ namespace TheLastOne.GameClass
             this.prefab = false;
             this.removeClient = false;
             this.nowWeaponState = 0;
+            this.vertical = 0.0f;
+            this.horizontal = 0.0f;
         }
 
     }

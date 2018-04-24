@@ -20,6 +20,8 @@ private:
 	int animator = 0;
 	int weaponState = 0;
 	int limit_Zombie = 0;
+	float horizontal = 0.0f;
+	float vertical = 0.0f;
 	bool connect;
 	bool remove_client;
 
@@ -36,6 +38,8 @@ public:
 
 	void init();
 
+	float get_vertical() { return (float)this->vertical; }
+	float get_horizontal() { return (float)this->horizontal; }
 	int get_limit_zombie() { return this->limit_Zombie; }													// 클라이언트 좀비 최대치 전달
 	int get_client_id() { return this->client_id; }																// 클라이언트 아이디 전달
 	int get_hp() { return this->hp; };																			// 클라이언트 체력 전달
@@ -61,6 +65,8 @@ public:
 	void set_client_Connect(const bool value) { this->connect = value; };				// 클라이언트 Connect 저장
 	void set_client_Remove(const bool value) { this->remove_client = value; };				// 클라이언트 Remove 저장
 	void set_limit_zombie(const int value) { this->limit_Zombie += value; }				// 클라이언트 좀비 최대치 저장
+	void set_vertical(float value) { this->vertical = (float)value; }
+	void set_horizontal(float value) {  this->horizontal = (float)value; }
 
 	Game_Client(const SOCKET sock, const int client_id, const char * game_id);
 	Game_Client(const Game_Client& g_cl);

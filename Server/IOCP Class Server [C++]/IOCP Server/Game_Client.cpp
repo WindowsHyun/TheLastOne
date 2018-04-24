@@ -45,6 +45,8 @@ Game_Client::Game_Client(const SOCKET sock, const int client_id, const char * ga
 	this->rotation.x = 0;
 	this->rotation.y = 0;
 	this->rotation.z = 0;
+	this->horizontal = 0.0f;
+	this->vertical = 0.0f;
 	this->hp = 100;
 	this->animator = 0;
 	this->weaponState = 0;
@@ -70,6 +72,8 @@ Game_Client::Game_Client(const Game_Client & g_cl)
 	this->rotation.x = g_cl.rotation.x;
 	this->rotation.y = g_cl.rotation.y;
 	this->rotation.z = g_cl.rotation.z;
+	this->horizontal = g_cl.horizontal;
+	this->vertical = g_cl.vertical;
 	this->hp = g_cl.hp;
 	this->animator = g_cl.animator;
 	this->weaponState = g_cl.weaponState;

@@ -117,6 +117,7 @@ namespace TheLastOne.Game.Network
                         if (client_data[key].get_connect() == true && client_data[key].get_prefab() == false)
                         {
                             client_data[key].Player = Instantiate(PrefabPlayer, client_data[key].get_pos(), Quaternion.identity);
+
                             client_data[key].script = client_data[key].Player.GetComponent<OtherPlayerCtrl>();
                             client_data[key].set_prefab(true);
 
@@ -163,7 +164,7 @@ namespace TheLastOne.Game.Network
                                 zombie_data[key].Zombie.transform.position = zombie_data[key].get_pos();
                                 zombie_data[key].script.zombieNum = key;
                             }
-                           else if (zombie_data[key].script.targetPlayer != Client_imei)
+                            else if (zombie_data[key].script.targetPlayer != Client_imei)
                             {
                                 // 좀비 Target과 내 IMEI가 다른경우 다른 클라이언트의 데이터를 동기화 해준다.
                                 zombie_data[key].script.MovePos(zombie_data[key].get_pos());
@@ -252,7 +253,8 @@ namespace TheLastOne.Game.Network
                     Player_Rotation.z = Player.transform.eulerAngles.z;
                     Enum get_int_enum = Player.GetComponent<PlayerCtrl>().playerState;
                     Enum get_weaponState = Player.GetComponent<PlayerCtrl>().nowWeaponState;
-                    Sendbyte = sF.makeClient_PacketInfo(Player_Position, Convert.ToInt32(get_int_enum), Player_Rotation, Convert.ToInt32(get_weaponState));
+                    float h = Player.GetComponent<PlayerCtrl>().h, v = Player.GetComponent<PlayerCtrl>().v;
+                    Sendbyte = sF.makeClient_PacketInfo(Player_Position, Convert.ToInt32(get_int_enum), 1.02113f, v, Player_Rotation, Convert.ToInt32(get_weaponState));
                     Send_Packet(Sendbyte);
                     yield return new WaitForSeconds(0.04f);
                     // 초당25번 패킷 전송으로 제한을 한다.
@@ -337,12 +339,17 @@ namespace TheLastOne.Game.Network
                         iter.set_pos(new Vector3(Get_ServerData.Data(i).Value.Position.Value.X, Get_ServerData.Data(i).Value.Position.Value.Y, Get_ServerData.Data(i).Value.Position.Value.Z));
                         iter.set_rot(new Vector3(Get_ServerData.Data(i).Value.Rotation.Value.X, Get_ServerData.Data(i).Value.Rotation.Value.Y, Get_ServerData.Data(i).Value.Rotation.Value.Z));
                         iter.set_weapon(Get_ServerData.Data(i).Value.NowWeapon);
+                        iter.set_horizontal(Get_ServerData.Data(i).Value.Horizontal);
+                        iter.set_vertical(Get_ServerData.Data(i).Value.Vertical);
 
                         if (iter.get_prefab() == true)
                         {
                             // 프리팹이 만들어진 이후 부터 script를 사용할 수 있기 때문에 그 이후 애니메이션 동기화를 시작한다.
                             iter.script.get_Animator(Get_ServerData.Data(i).Value.Animator);
                             iter.script.get_Weapon(Get_ServerData.Data(i).Value.NowWeapon);
+                            iter.script.Vertical = Get_ServerData.Data(i).Value.Vertical;
+                            iter.script.Horizontal = Get_ServerData.Data(i).Value.Horizontal;
+                            Debug.Log(iter.script.Vertical + ", " + iter.script.Horizontal);
                         }
                     }
                     else

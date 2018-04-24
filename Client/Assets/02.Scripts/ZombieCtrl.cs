@@ -136,7 +136,7 @@ public class ZombieCtrl : MonoBehaviour
                 {
                     zombieState = ZombieState.idle;
                 }
-                if (stopPos)
+                if (stopPos && zombieNum != -1)
                     playerCtrl.send_ZombieData(zombieTr.position, zombieTr.eulerAngles, zombieNum, hp, zombieState);
             }
 

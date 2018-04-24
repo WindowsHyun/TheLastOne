@@ -16,6 +16,8 @@ table Client_info {
   id:int;
   hp:int;
   animator:int;
+  Horizontal:float;
+  Vertical:float;
   name:string;
   position:Vec3;
   rotation:Vec3;
