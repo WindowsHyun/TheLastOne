@@ -9,7 +9,26 @@ using TheLastOne.Game.Network;
 
 [RequireComponent(typeof(AudioSource))]
 
-public class PlayerCtrl : MonoBehaviour
+public class PlayerVehicleCtrl : MonoBehaviour
+{
+    /*
+     PlayerVehicleCtrl 클래스를 만든 이유는 PlayerCtrl을 전체 상속을 받으면
+     내부의 Public코드가 매우 많기 떄문에 차량 움직임에 필요한 일부만 상속을 받게 하였다.
+     PlayerVehicleCtrl는 PlayerCtrl에 상속을 받기 때문에 PlayerCtrl에서의 사용에 문제가 없다.
+     */
+    // Player의 Transform 정보
+    public static Transform VehicleCtrl_tr;
+    // 차량에 탑승하고 있는지
+    public static bool GetTheCar = false;
+    // 차량 탈 수 있는지
+    public bool rideCar = false;
+    // 차량 정보
+    public VehicleCtrl ridingCar;
+    public GameObject VehicleUI;
+    public Image vehicleHpBar;
+}
+
+public class PlayerCtrl : PlayerVehicleCtrl
 {
     // 캐릭터의 상태 정보가 있는 Enumerable 변수 선언
     // enum 변수에서 fire 삭제
@@ -37,14 +56,14 @@ public class PlayerCtrl : MonoBehaviour
     public float v = 0.0f;
 
     // 접근해야 하는 컴포넌트는 반드시 변수에 할당한 후 사용
-    private Transform tr;
+    public Transform tr;
     private Animator animator;
 
     // 캐릭터 이동 속도 변수
     public float moveSpeed = 23.0f;
     // 캐릭터 회전 속도 변수
     public float rotSpeed = 100.0f;
-    
+
     // 캐릭터 체력
     public int hp = 100;
     // 캐릭터 생명 초기값
@@ -134,19 +153,6 @@ public class PlayerCtrl : MonoBehaviour
 
     public GameObject cooltime;
 
-    // 차량 탈 수 있는지
-    public bool rideCar = false;
-
-    // 차량에 탑승하고 있는지
-    public bool GetTheCar = false;
-
-    // 차량 정보
-    public VehicleCtrl ridingCar;
-
-    public GameObject VehicleUI;
-    //public Image vehicleImage;
-    public Image vehicleHpBar;
-   
 
     IEnumerator StartKeyInput()
     {
@@ -383,7 +389,7 @@ public class PlayerCtrl : MonoBehaviour
                     // 차량 UI 활성화
                     VehicleUI.SetActive(true);
 
-                           
+
                     vehicleHpBar.fillAmount = (float)ridingCar.vehicleHp / (float)ridingCar.vehicleInitHp;
 
 
@@ -403,7 +409,7 @@ public class PlayerCtrl : MonoBehaviour
                     ridingCar.vehicleStop = true;
 
                     // 차량 하차 시 좌표 이동
-                    this.transform.position = new Vector3(ridingCar.transform.position.x-1, 29.99451f, ridingCar.transform.position.z);
+                    this.transform.position = new Vector3(ridingCar.transform.position.x - 1, 29.99451f, ridingCar.transform.position.z);
 
                     // 캐릭터 캡슐 콜라이더 활성화
                     gameObject.GetComponent<CapsuleCollider>().enabled = true;
@@ -422,17 +428,12 @@ public class PlayerCtrl : MonoBehaviour
 
     void Start()
     {
-
-
         // 게임 시작후 차량 하차 시 인벤토리 창을 끈다.
         inventory.SetActive(false);
-
         // 게임 시작후 차량 하차 시 쿨타임 창을 끈다.
         cooltime.SetActive(false);
 
-        
         VehicleUI.SetActive(false);
-
 
 
         // 생명 초기값 설정
@@ -445,6 +446,7 @@ public class PlayerCtrl : MonoBehaviour
 
         // 스크립트 처음에 Transform 컴포넌트 할당
         tr = GetComponent<Transform>();
+        VehicleCtrl_tr = tr;
 
         // Animator 컴포넌트 할당
         animator = this.transform.GetChild(0).GetComponent<Animator>();
@@ -456,8 +458,8 @@ public class PlayerCtrl : MonoBehaviour
         muzzleFlash1.enabled = false;
         muzzleFlash2.enabled = false;
 
-        //Cursor.lockState = CursorLockMode.Locked;//마우스 커서 고정
-        //Cursor.visible = false;//마우스 커서 보이기
+        Cursor.lockState = CursorLockMode.Locked;//마우스 커서 고정
+        Cursor.visible = false;//마우스 커서 보이기
 
         // 현재 발사 가능
         shotable = true;
@@ -522,7 +524,7 @@ public class PlayerCtrl : MonoBehaviour
         {
             h = Input.GetAxis("Horizontal");
             v = Input.GetAxis("Vertical");
- 
+
             // 전후좌우 이동 방향 벡터 계산
             Vector3 moveDir = (Vector3.forward * v) + (Vector3.right * h);
 
@@ -534,9 +536,9 @@ public class PlayerCtrl : MonoBehaviour
 
             // 블랜드 트리에서 v값과 h 값을 계산해서 애니메이션 실행된다.
             animator.SetFloat("Vertical", v);
-            animator.SetFloat("Horizontal", h);   
+            animator.SetFloat("Horizontal", h);
         }
-        else if(GetTheCar == true)
+        else if (GetTheCar == true)
         {
             float steer = Input.GetAxis("Horizontal");
             float accelerate = Input.GetAxis("Vertical");
@@ -721,7 +723,7 @@ public class PlayerCtrl : MonoBehaviour
                     proofVest.slot.Clear();
                     proofVest.UpdateInfo(false, proofVest.DefaultImg);
                 }
-               
+
             }
 
             Debug.Log("Player H{: " + hp.ToString());

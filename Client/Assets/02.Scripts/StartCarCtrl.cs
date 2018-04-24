@@ -42,7 +42,7 @@ public class StartCarCtrl : MonoBehaviour
             followCam.dist = 25.0f;
 
             // 차량의 포지션을 내리기 전까지 플레이어 포지션과 동일하게 이동을 시킨다.
-            //player.transform.position = new Vector3(transform.position.x, 29.99451f, transform.position.z);
+            player.transform.position = new Vector3(transform.position.x, 30.0f, transform.position.z);
 
             // 차량 하차 후 true로 F키 입력 시 재하차 불가능하게 만듬
             startSet = true;

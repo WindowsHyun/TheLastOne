@@ -200,13 +200,13 @@ public class ZombieCtrl : MonoBehaviour
     void ZombieDie()
     {
         // 모든 코루틴 종료
-        playerCtrl.send_ZombieData(zombieTr.position, zombieTr.eulerAngles, zombieNum, 0, zombieState);
-        StopAllCoroutines();
-
-        isDie = true;
         zombieState = ZombieState.die;
         nvAgent.isStopped = true;
         animator.SetTrigger("IsDie");
+        isDie = true;
+        playerCtrl.send_ZombieData(zombieTr.position, zombieTr.eulerAngles, zombieNum, 0, zombieState);
+        StopAllCoroutines();
+
         gameObject.GetComponentInChildren<SphereCollider>().enabled = false;
         gameObject.GetComponent<CapsuleCollider>().enabled = false;
 
