@@ -82,12 +82,6 @@ public class PlayerCtrl : MonoBehaviour
     // 플레이어가 총알 발사시 Packet을 전송하기 위하여
     NetworkCtrl networkCtrl = new NetworkCtrl();
 
-<<<<<<< HEAD
-    // 플레이어의 고유번호
-    public int Client_imei = -1;
-
-=======
-<<<<<<< HEAD
     // 플레이어의 고유번호
     public int Client_imei = -1;
 
@@ -95,9 +89,6 @@ public class PlayerCtrl : MonoBehaviour
     public bool weaponEatPossible = false;
     public bool weaponEat = false;
 
-=======
->>>>>>> master
->>>>>>> Server
     // 무기 슬롯 타입
     public string[] weaponSlotType = new string[2];
 
@@ -851,8 +842,4 @@ public class PlayerCtrl : MonoBehaviour
     {
         networkCtrl.Zombie_Pos(pos, rotation, zombieNum, hp, animation);
     }
-<<<<<<< HEAD
-=======
-
->>>>>>> Server
 }
