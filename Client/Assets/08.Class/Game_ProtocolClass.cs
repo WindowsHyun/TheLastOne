@@ -24,6 +24,9 @@ namespace TheLastOne.GameClass
         public int CS_Eat_Item;					// 클라이언트가 서버에게 먹은 아이템 정보를 보내준다.
         public int CS_Zombie_info;      // 클라이언트가 서버에게 좀비 데이터를 전달해 준다.
 
+        public int Kind_Item;
+        public int Kind_Car;
+
         public Game_ProtocolClass()
         {
             //----------------------------------
@@ -44,6 +47,10 @@ namespace TheLastOne.GameClass
             CS_Check_info = 3;
             CS_Eat_Item = 4;
             CS_Zombie_info = 5;
+            //----------------------------------
+            // 아이템 종류
+            Kind_Item = 0;
+            Kind_Car = 1;
             //----------------------------------
         }
     }

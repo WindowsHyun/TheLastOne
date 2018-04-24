@@ -18,9 +18,11 @@ table Client_info {
   animator:int;
   Horizontal:float;
   Vertical:float;
+  inCar:int;
   name:string;
   position:Vec3;
   rotation:Vec3;
+  carrotation:Vec3;
   nowWeapon:int;
 }
 
@@ -40,9 +42,10 @@ table Game_Items{
 table Gameitem{
   id:int;
   name:string;
-  x:float;
-  z:float;
+  position:Vec3;
+  rotation:Vec3;
   eat:bool;
+  kind:int;
 }
 
 table GameDangerLine{

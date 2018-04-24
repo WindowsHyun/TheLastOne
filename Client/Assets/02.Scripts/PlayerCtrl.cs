@@ -103,6 +103,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
     // 플레이어의 고유번호
     public int Client_imei = -1;
+    public int CarNum = -1;
 
     // 무기 획득 확인을 위한 변수
     public bool weaponEatPossible = false;
@@ -111,13 +112,6 @@ public class PlayerCtrl : PlayerVehicleCtrl
     // 무기 슬롯 타입
     public string[] weaponSlotType = new string[2];
 
-    // 아이템 획득 확인을 위한 변수
-    //public bool bullet762Set = false;
-    //public bool bullet556Set = false;
-    //public bool bullet9Set = false;
-
-    //private int bullet762 = 0;
-    //private int bullet556 = 0;
     public WeaponState nowWeaponState = WeaponState.None;
 
     // 무기 정보 저장
@@ -338,7 +332,6 @@ public class PlayerCtrl : PlayerVehicleCtrl
                     nowWeaponState = WeaponState.UMP;
                 }
             }
-
             // Tab키 입력시 인벤토리 코드 실행
             if (Input.GetKeyDown(KeyCode.Tab))
             {
@@ -379,6 +372,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
                     // 총 발사 가능
                     shotable = false;
                     ridingCar.vehicleStop = false;
+                    CarNum = ridingCar.carNum;  // 차량의 번호를 가지고 온다.
 
                     // 캐릭터 캡슐 콜라이더 비활성화
                     gameObject.GetComponent<CapsuleCollider>().enabled = false;
@@ -398,6 +392,9 @@ public class PlayerCtrl : PlayerVehicleCtrl
                 {
                     // 차량 탑승 가능한지 여부를 나타냄
                     rideCar = false;
+
+                    // 차량을 내렸을 경우 차량 번호를 지운다.
+                    CarNum = -1;
 
                     // 차량을 탑승 여부를 나타냄 (하차)
                     GetTheCar = false;

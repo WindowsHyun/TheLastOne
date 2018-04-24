@@ -28,7 +28,7 @@ public class OtherPlayerCtrl : MonoBehaviour
     public float Vertical = 0.0f;
 
     // 캐릭터 이동 속도 변수
-    public float moveSpeed = 23.0f;
+    public float moveSpeed = 20.0f;
     // 캐릭터 회전 속도 변수
     public float rotSpeed = 100.0f;
     // 캐릭터 체력
@@ -76,6 +76,9 @@ public class OtherPlayerCtrl : MonoBehaviour
     public GameObject ump;
 
 
+    // 캐릭터 캡슐 콜라이더 비활성화
+    public CapsuleCollider collider_script;
+
     void Start()
     {
         // 스크립트 처음에 Transform 컴포넌트 할당
@@ -101,6 +104,8 @@ public class OtherPlayerCtrl : MonoBehaviour
         m16.GetComponent<Renderer>().enabled = false;
         m4.GetComponent<Renderer>().enabled = false;
         ump.GetComponent<Renderer>().enabled = false;
+
+        collider_script = gameObject.GetComponent<CapsuleCollider>();
     }
 
     public void get_Animator(int value)

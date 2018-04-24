@@ -368,6 +368,15 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 			client->second.set_client_weapon(client_View->nowWeapon());
 			client->second.set_horizontal(client_View->Horizontal());
 			client->second.set_vertical(client_View->Vertical());
+			client->second.set_inCar(client_View->inCar());
+			if (client_View->inCar() != -1) {
+				// 차량을 실제로 탑승 하고 있을 경우.
+				auto item = get_item_iter(client_View->inCar());
+				item->second.set_pos(client_View->position()->x(), client_View->position()->z());
+				xyz car_rotation{ client_View->carrotation()->x() , client_View->carrotation()->y() , client_View->carrotation()->z() };
+				client->second.set_client_car_rotation(car_rotation);
+				item->second.set_rotation(client_View->carrotation()->x(), client_View->carrotation()->y(), client_View->carrotation()->z());
+			}
 		}
 		break;
 
@@ -512,7 +521,9 @@ void IOCP_Server::Send_All_Data(int client, bool allClient)
 		auto xyz = iter.second.get_position();
 		auto rotation = iter.second.get_rotation();
 		auto weaponState = iter.second.get_weapon();
-		auto client_data = CreateClient_info(builder, id, hp, animator, horizontal, vertical, name, &xyz, &rotation, weaponState);
+		auto inCar = iter.second.get_inCar();
+		auto car_rotation = iter.second.get_car_rotation();
+		auto client_data = CreateClient_info(builder, id, hp, animator, horizontal, vertical, inCar, name, &xyz, &rotation, &car_rotation, weaponState);
 		// client_data 라는 테이블에 클라이언트 데이터가 들어가 있다.
 
 		Individual_client.push_back(client_data);	// Vector에 넣었다.
@@ -567,10 +578,11 @@ void IOCP_Server::Send_All_Item()
 		//	continue;
 		auto id = iter.first;
 		auto name = builder.CreateString(iter.second.get_name());
-		auto x = iter.second.get_x();
-		auto z = iter.second.get_z();
+		Vec3 pos = { iter.second.get_pos().x, iter.second.get_pos().y,  iter.second.get_pos().z };
+		Vec3 rotation = { iter.second.get_rotation().x, iter.second.get_rotation().y,  iter.second.get_rotation().z };
 		auto eat = iter.second.get_eat();
-		auto client_data = CreateGameitem(builder, id, name, (float)x, (float)z, eat);
+		auto kind = iter.second.get_kind();
+		auto client_data = CreateGameitem(builder, id, name, &pos, &rotation, eat, kind);
 
 		Individual_client.push_back(client_data);	// Vector에 넣었다.
 	}
@@ -652,13 +664,14 @@ void player_To_Zombie(std::unordered_map<int, Game_Zombie> &zombie, std::unorder
 				iter->second.set_limit_zombie(-1);
 				zombie.find(z.first)->second.set_target(-1);
 			}
-			if(z.second.get_hp() <= 0 && z.second.get_live() != false) {
+			if (z.second.get_hp() <= 0 && z.second.get_live() != false) {
 				// 좀비의 체력이 0일경우
 				zombie.find(z.first)->second.set_live(false);
 				iter->second.set_limit_zombie(-1);
 				std::cout << iter->first << ", " << iter->second.get_limit_zombie() << std::endl;
 				zombie.find(z.first)->second.set_target(-1);
-			}else {
+			}
+			else {
 				// 아직 근처일 경우 넘긴다.
 				continue;
 			}
@@ -675,7 +688,7 @@ void player_To_Zombie(std::unordered_map<int, Game_Zombie> &zombie, std::unorder
 			}
 			if (player_num == -1)
 				continue;
-			if ( player.find(player_num)->second.get_limit_zombie() < 1){
+			if (player.find(player_num)->second.get_limit_zombie() < 1) {
 				player.find(player_num)->second.set_limit_zombie(1);
 				zombie.find(z.first)->second.set_target(player_num);
 			}
