@@ -72,9 +72,39 @@ public class SlotCtrl : MonoBehaviour
         {
             //Debug.Log(sameSlot.ItemReturn().type.ToString());
             sameSlot.ItemReturn().setItemCount(30); // 이미 존재 하면 해당 갯수를 증가한다.
+
+            // 장전용 변수
+            if (item.type.ToString() == "Ammunition762")
+            {
+                player.bullet762 += 30;
+                //player.weaponText.text = player.reloadBullet762 + " / " + player.bullet762;
+            }
+            else if (item.type.ToString() == "Ammunition556")
+            {
+                player.bullet556 += 30;
+                //player.weaponText.text = player.reloadBullet556 + " / " + player.bullet556;
+            }
+            else if (item.type.ToString() == "Ammunition9")
+            {
+                player.bullet9 += 30;
+                //player.weaponText.text = player.reloadBullet9 + " / " + player.bullet9;
+            }
         }
         else
         {
+            // 장전용 변수
+            if (item.type.ToString() == "Ammunition762")
+            {
+                player.bullet762 += 30;
+            }
+            else if (item.type.ToString() == "Ammunition556")
+            {
+                player.bullet556 += 30;
+            }
+            else if (item.type.ToString() == "Ammunition9")
+            {
+                player.bullet9 += 30;    
+            }
 
             if (item.type.ToString() == "Ammunition762" || item.type.ToString() == "Ammunition556" || item.type.ToString() == "Ammunition9")
                 item.setItemCount(29);// 총알의 경우 기본이 1개 이므로 29개를 더해서 30개로 맞춰준다.
@@ -101,7 +131,7 @@ public class SlotCtrl : MonoBehaviour
         {
             if(slot.Peek().type.ToString() == "FirstAid")
             {
-                cooltime.UseSkill();
+                cooltime.UseItemCollTime();
                 
             }
             // 혹시 모를 오류를 방지하기 위해 slot리스트를 Clear해준다

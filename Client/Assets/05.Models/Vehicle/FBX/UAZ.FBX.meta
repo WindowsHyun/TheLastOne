@@ -34,7 +34,12 @@ ModelImporter:
     4300008: UAZ_wheel_RR
     7400000: Take 001
     9500000: //RootNode
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 01 - Default
+    second: {fileID: 2100000, guid: 0c4b56d53fa93004598d5029fab638ee, type: 2}
   materials:
     importMaterials: 1
     materialName: 0

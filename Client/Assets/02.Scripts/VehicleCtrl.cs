@@ -55,7 +55,7 @@ public class VehicleCtrl : PlayerVehicleCtrl
 
         // 차량 탑승 후에도 좌우 화면 전환이 가능하게 수정
         if (GetTheCar == true) {
-            VehicleCtrl_tr.transform.Rotate(Vector3.up * Time.deltaTime * 100.0f * Input.GetAxis("Mouse X"));
+            VehicleCtrl_tr.transform.Rotate(Vector3.up * Time.deltaTime * 50.0f * Input.GetAxis("Mouse X"));
         }
 
         // 바퀴 회전의 랜더링을 위함
