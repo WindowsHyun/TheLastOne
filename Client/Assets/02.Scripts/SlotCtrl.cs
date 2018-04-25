@@ -55,63 +55,65 @@ public class SlotCtrl : MonoBehaviour
         player = GameObject.Find("Player").GetComponent<PlayerCtrl>();
 
         cooltime = GameObject.Find("PanelCoolTime").GetComponent<CoolTimeCtrl>();
-
     }
 
     public void AddItem(ItemCtrl item, bool same, SlotCtrl sameSlot)
     {
-
-        //if(item.type.ToString() == "ProofVest")
-        //{
-        //    player.armour += 100;
-        //    player.imgArmourBar.fillAmount = (float)player.armour / (float)player.initArmour;
-        //}
-        // bool same = true 일경우 아이템 같은게 들어왔으니 찾아서 넣어라.
-        // 스택에 아이템 추가.
         if (same == true)
         {
-            //Debug.Log(sameSlot.ItemReturn().type.ToString());
-            sameSlot.ItemReturn().setItemCount(30); // 이미 존재 하면 해당 갯수를 증가한다.
+            if (item.type == 0)
+            {
+                player.bulletCount[0] += 30;
+                sameSlot.ItemReturn().setItemCount(30); // 이미 존재 하면 해당 갯수를 증가한다.
+            }
+            else if ((int)item.type == 1)
+            {
+                player.bulletCount[1] += 30;
+                player.bulletCount[2] += 30;
+                sameSlot.ItemReturn().setItemCount(30); // 이미 존재 하면 해당 갯수를 증가한다.
 
-            // 장전용 변수
-            if (item.type.ToString() == "Ammunition762")
-            {
-                player.bullet762 += 30;
-                //player.weaponText.text = player.reloadBullet762 + " / " + player.bullet762;
             }
-            else if (item.type.ToString() == "Ammunition556")
+            else if ((int)item.type == 2)
             {
-                player.bullet556 += 30;
-                //player.weaponText.text = player.reloadBullet556 + " / " + player.bullet556;
+                player.bulletCount[3] += 30;
+                sameSlot.ItemReturn().setItemCount(30); // 이미 존재 하면 해당 갯수를 증가한다.
+
             }
-            else if (item.type.ToString() == "Ammunition9")
+            else if ((int)item.type == 3)
             {
-                player.bullet9 += 30;
-                //player.weaponText.text = player.reloadBullet9 + " / " + player.bullet9;
+                sameSlot.ItemReturn().setItemCount(1); // 이미 존재 하면 해당 갯수를 증가한다
             }
+
+            if (player.now_Weapon != -1)
+            {
+                player.weaponText.text = player.reloadBulletCount[player.now_Weapon] + " / " + player.bulletCount[player.now_Weapon];
+
+            }  
         }
         else
         {
-            // 장전용 변수
-            if (item.type.ToString() == "Ammunition762")
+            if (item.type == 0)
             {
-                player.bullet762 += 30;
+                player.bulletCount[0] += 30;
             }
-            else if (item.type.ToString() == "Ammunition556")
+            else if ((int)item.type == 1)
             {
-                player.bullet556 += 30;
+                player.bulletCount[1] += 30;
+                player.bulletCount[2] += 30;
             }
-            else if (item.type.ToString() == "Ammunition9")
+            else if ((int)item.type == 2)
             {
-                player.bullet9 += 30;    
+                player.bulletCount[3] += 30;
             }
 
-            if (item.type.ToString() == "Ammunition762" || item.type.ToString() == "Ammunition556" || item.type.ToString() == "Ammunition9")
-                item.setItemCount(29);// 총알의 경우 기본이 1개 이므로 29개를 더해서 30개로 맞춰준다.
+            if (player.now_Weapon != -1)
+            {
+                player.weaponText.text = player.reloadBulletCount[player.now_Weapon] + " / " + player.bulletCount[player.now_Weapon];
+
+            }
             slot.Push(item);
         }
 
-        //player.setBullet(slot.Peek().type.ToString(), slot.Peek().getItemCount());
         UpdateInfo(true, item.DefaultImg);
     }
 
@@ -120,11 +122,11 @@ public class SlotCtrl : MonoBehaviour
     {
         // 슬롯이 비어있으면 함수를 종료.
         if (!isSlot)
-            return;
+            return;;
 
-        if (slot.Peek().type.ToString() == "Ammunition762" || slot.Peek().type.ToString() == "Ammunition556" || slot.Peek().type.ToString() == "Ammunition9")
+        if (0 <= (int)slot.Peek().type && (int)slot.Peek().type < 3)
             return;
-
+        
         // 슬롯에 아이템이 1개인 경우.
         // 아이템이 1개일 때 사용하게 되면 0개가 된다.
         if (slot.Peek().getItemCount() == 1)
@@ -134,6 +136,12 @@ public class SlotCtrl : MonoBehaviour
                 cooltime.UseItemCollTime();
                 
             }
+            else if (slot.Peek().type.ToString() == "ProofVest")
+            {
+                player.armour = 0;
+                player.imgArmourBar.fillAmount = (float)player.armour / (float)player.initArmour;
+
+            }
             // 혹시 모를 오류를 방지하기 위해 slot리스트를 Clear해준다
             slot.Clear();
             // 아이템 사용으로 인해 아이템 개수를 표현하는 텍스트가 달라졌으므로 업데이트 시켜준다.
@@ -142,9 +150,13 @@ public class SlotCtrl : MonoBehaviour
         }
         else
         {
+            if (slot.Peek().type.ToString() == "FirstAid")
+            {
+                cooltime.UseItemCollTime();
+
+            }
             // 아이템 갯수가 여러개 일 경우
-            slot.Peek().setItemCount(-1);
-            //slot.Pop();
+            slot.Peek().setItemCount(-1);     
         }
         UpdateInfo(isSlot, ItemImg.sprite);
     }

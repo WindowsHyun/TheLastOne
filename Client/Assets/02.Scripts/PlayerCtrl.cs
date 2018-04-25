@@ -34,10 +34,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
     // enum 변수에서 fire 삭제
     public enum PlayerState
     {
-        idle, idleGun, die,
-        runForword, runBack, runLeft, runRight,
-        runForwordGun, runBackGun, runLeftGun, runRightgun,
-        runForwordShot, runBackShot, runLeftShot, runRightShot
+        idle, die,
     };
 
     public enum WeaponState
@@ -51,6 +48,8 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
     // 캐릭터의 현재 상태 정보를 저장할 Enum 변수
     public PlayerState playerState = PlayerState.idle;
+
+    public WeaponState nowWeaponState = WeaponState.None;
 
     public float h = 0.0f;
     public float v = 0.0f;
@@ -82,9 +81,11 @@ public class PlayerCtrl : PlayerVehicleCtrl
     public GameObject bullet;
     // 총알 발사 좌표
     public Transform firePos;
+
     // 총알 발사 사운드
-    public AudioClip M16A4Sound;
+    private AudioClip[] soundCollection = new AudioClip[4];
     public AudioClip AK47Sound;
+    public AudioClip M16A4Sound;
     public AudioClip M4A1Sound;
     public AudioClip UMP45Sound;
 
@@ -106,28 +107,24 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
     // 무기 슬롯 타입
     public string[] weaponSlotType = new string[2];
+    public int[] weaponSlotNumber = new int[2];
 
-    public int bullet762 = 0;
-    public int bullet556 = 0;
-    public int bullet9 = 0;
-    public int reloadBullet762 = 0;
-    public int reloadBullet556 = 0;
-    public int reloadBullet9 = 0;
-    private int equipWeaponNumber = 1;
+    // 총알 값 찾아오는 변수
+    //public SlotCtrl[] bulletFind = new SlotCtrl[4];
+    public SlotCtrl bulletFinding;
 
-    public WeaponState nowWeaponState = WeaponState.None;
+    // 0번 7.62mm 총알, 1번 5.56mm 총알(m16),2번 5.56mm 총알(m4), 3번 9mm 총알
+    public int[] bulletCount = new int[4];
+    public int[] reloadBulletCount = new int[4];
 
     // 무기 정보 저장
+    private GameObject[] weaponView = new GameObject[4];
     public GameObject ak47;
     public GameObject m16;
     public GameObject m4;
     public GameObject ump;
 
-    public bool ak47Set = false;
-    public bool m16Set = false;
-    public bool m4Set = false;
-    public bool umpSet = false;
-
+    // 현재 무기가 무엇인지?
     public int now_Weapon = -1;
 
     // 혈흔 효과 프리팹
@@ -143,10 +140,10 @@ public class PlayerCtrl : PlayerVehicleCtrl
     public GameObject inventory;
 
     // 모든 아이템 슬롯의 데이터를 받기 위함
-    public SlotCtrl[] slotctrl;
+    private SlotCtrl[] slotctrl;
 
     // 모든 무기 슬롯의 데이터를 받기 위함
-    public WeaponSlotCtrl[] weaponSlotCtrl;
+    private WeaponSlotCtrl[] weaponSlotCtrl;
 
     public bool dangerLineIn = false;
 
@@ -157,10 +154,8 @@ public class PlayerCtrl : PlayerVehicleCtrl
     public Image weaponImage;
     public Text weaponText;
 
-    private Sprite ak47Image;
-    private Sprite m4Image;
-    private Sprite m16Image;
-    private Sprite umpImage;
+    // 0번 AK47, 1번 M16, 2번 M4, 3번 UMP
+    private Sprite[] weaponIEquipImage = new Sprite[4];
 
 
     IEnumerator StartKeyInput()
@@ -188,171 +183,80 @@ public class PlayerCtrl : PlayerVehicleCtrl
             // 총이 장착이 되었을때만 발사 가능
             if (shotable == true)
             {
-                SlotCtrl Find762 = GetItem("Ammunition762");
-                SlotCtrl Find556 = GetItem("Ammunition556");
-                SlotCtrl Find9 = GetItem("Ammunition9");
-                // 어떠한 종류의 총알이 1발 이상 있을 시
-                if (Find556 != null && Find556.slot.Peek().getItemCount() > 0 && reloadBullet556 > 0 && m16Set == true)
+                if (Input.GetMouseButtonDown(0) && now_Weapon != -1)
                 {
+                    if (now_Weapon >= 3)
+                        bulletFinding = GetItem(2);
+                    else if(now_Weapon == 2)
+                        bulletFinding = GetItem(1);
+                    else
+                        bulletFinding = GetItem(now_Weapon);
 
-                    if (Input.GetMouseButtonDown(0))
+
+                    if (bulletFinding != null && reloadBulletCount[now_Weapon] != 0)
                     {
-                        Fire(Find556);
-                        networkCtrl.Player_Shot();
-                    }
-                }
-                else if (Find556 != null && Find556.slot.Peek().getItemCount() > 0 && reloadBullet556 > 0 && m4Set == true)
-                {
-                    if (Input.GetMouseButtonDown(0))
-                    {
-                        Fire(Find556);
-                        networkCtrl.Player_Shot();
-                    }
-                }
-                else if (Find762 != null && Find762.slot.Peek().getItemCount() > 0 && reloadBullet762 > 0 && ak47Set == true)
-                {
-                    if (Input.GetMouseButtonDown(0))
-                    {
-                        Fire(Find762);
-                        networkCtrl.Player_Shot();
-                    }
-                }
-                else if (Find9 != null && Find9.slot.Peek().getItemCount() > 0 && reloadBullet9 > 0 && umpSet == true)
-                {
-                    if (Input.GetMouseButtonDown(0))
-                    {
-                        Fire(Find9);
+                        Fire(bulletFinding);
                         networkCtrl.Player_Shot();
                     }
                 }
             }
-            // 1번 , 2번 키 입력시 총 랜더링과 어떤 총인지 판별한다.
-            if (Input.GetKeyDown(KeyCode.Alpha1))
+            // 1번 , 2번 키 입력시 총 랜더링과 어떤 총인지 판별한다. 
+            if (Input.GetKeyDown(KeyCode.Alpha1) && weaponSlotNumber[0] != -1)
             {
-                equipWeaponNumber = 1;
-                if (weaponSlotType[0] == "M16")
+                // 아래의 if else if문은 M4와 M16으로 총을 장착하였을 때 5.56mm의 종합적인 개수의 동기화를 위함.
+                // 1번 장착 m16, 2번 장착 m4일때
+                if (weaponSlotNumber[0] == 1 && weaponSlotNumber[1] == 2)
                 {
-                    weaponImage.GetComponent<Image>().sprite = m16Image;
-                    m16.GetComponent<Renderer>().enabled = true;
-                    m16Set = true;
-
-                    ak47.GetComponent<Renderer>().enabled = false;
-                    ak47Set = false;
-                    m4.GetComponent<Renderer>().enabled = false;
-                    m4Set = false;
-                    ump.GetComponent<Renderer>().enabled = false;
-                    umpSet = false;
-
-                    nowWeaponState = WeaponState.M16;
+                    bulletCount[1] = bulletCount[2];
                 }
-                else if (weaponSlotType[0] == "AK47")
+                // 1번 장착 m4, 2번 장착 m16일때
+                else if (weaponSlotNumber[0] == 2 && weaponSlotNumber[1] == 1)
                 {
-                    weaponImage.GetComponent<Image>().sprite = ak47Image;
-                    ak47.GetComponent<Renderer>().enabled = true;
-                    ak47Set = true;
-
-                    m4.GetComponent<Renderer>().enabled = false;
-                    m4Set = false;
-                    ump.GetComponent<Renderer>().enabled = false;
-                    umpSet = false;
-                    m16.GetComponent<Renderer>().enabled = false;
-                    m16Set = false;
-
-                    nowWeaponState = WeaponState.AK47;
+                    bulletCount[2] = bulletCount[1];
                 }
-                else if (weaponSlotType[0] == "M4")
+
+                now_Weapon = weaponSlotNumber[0];
+                weaponImage.GetComponent<Image>().sprite = weaponIEquipImage[now_Weapon];
+                weaponText.text = reloadBulletCount[now_Weapon] + " / " + bulletCount[now_Weapon];
+                for (int i = 0; i < 4; ++i)
                 {
-                    weaponImage.GetComponent<Image>().sprite = m4Image;
-                    m4.GetComponent<Renderer>().enabled = true;
-                    m4Set = true;
-
-                    ak47.GetComponent<Renderer>().enabled = false;
-                    ak47Set = false;
-                    ump.GetComponent<Renderer>().enabled = false;
-                    umpSet = false;
-                    m16.GetComponent<Renderer>().enabled = false;
-                    m16Set = false;
-
-                    nowWeaponState = WeaponState.M4;
-                }
-                else if (weaponSlotType[0] == "UMP")
-                {
-                    weaponImage.GetComponent<Image>().sprite = umpImage;
-                    ump.GetComponent<Renderer>().enabled = true;
-                    umpSet = true;
-
-                    m4.GetComponent<Renderer>().enabled = false;
-                    m4Set = false;
-                    ak47.GetComponent<Renderer>().enabled = false;
-                    ak47Set = false;
-                    m16.GetComponent<Renderer>().enabled = false;
-                    m16Set = false;
-
-                    nowWeaponState = WeaponState.UMP;
+                    if (now_Weapon == i)
+                    {
+                        weaponView[now_Weapon].GetComponent<Renderer>().enabled = true;
+                    }
+                    else
+                    {
+                        weaponView[i].GetComponent<Renderer>().enabled = false;
+                    }
                 }
             }
-            else if (Input.GetKeyDown(KeyCode.Alpha2))
+            else if (Input.GetKeyDown(KeyCode.Alpha2) && weaponSlotNumber[1] != -1)
             {
-                equipWeaponNumber = 2;
-                if (weaponSlotType[1] == "M16")
+                // 아래의 if else if문은 M4와 M16으로 총을 장착하였을 때 5.56mm의 종합적인 개수의 동기화를 위함.
+                // 1번 장착 m16, 2번 장착 m4일때
+                if (weaponSlotNumber[0] == 1 && weaponSlotNumber[1] == 2)
                 {
-                    weaponImage.GetComponent<Image>().sprite = m16Image;
-                    m16.GetComponent<Renderer>().enabled = true;
-                    m16Set = true;
-
-                    ak47.GetComponent<Renderer>().enabled = false;
-                    ak47Set = false;
-                    m4.GetComponent<Renderer>().enabled = false;
-                    m4Set = false;
-                    ump.GetComponent<Renderer>().enabled = false;
-                    umpSet = false;
-
-                    nowWeaponState = WeaponState.M16;
+                    bulletCount[1] = bulletCount[2];
                 }
-                else if (weaponSlotType[1] == "AK47")
+                // 1번 장착 m4, 2번 장착 m16일때
+                else if (weaponSlotNumber[0] == 2 && weaponSlotNumber[1] == 1)
                 {
-                    weaponImage.GetComponent<Image>().sprite = ak47Image;
-                    ak47.GetComponent<Renderer>().enabled = true;
-                    ak47Set = true;
-
-                    m4.GetComponent<Renderer>().enabled = false;
-                    m4Set = false;
-                    ump.GetComponent<Renderer>().enabled = false;
-                    umpSet = false;
-                    m16.GetComponent<Renderer>().enabled = false;
-                    m16Set = false;
-
-                    nowWeaponState = WeaponState.AK47;
+                    bulletCount[2] = bulletCount[1];
                 }
-                else if (weaponSlotType[1] == "M4")
+
+                now_Weapon = weaponSlotNumber[1];
+                weaponImage.GetComponent<Image>().sprite = weaponIEquipImage[now_Weapon];
+                weaponText.text = reloadBulletCount[now_Weapon] + " / " + bulletCount[now_Weapon];
+                for (int i = 0; i < 4; ++i)
                 {
-                    weaponImage.GetComponent<Image>().sprite = m4Image;
-                    m4.GetComponent<Renderer>().enabled = true;
-                    m4Set = true;
-
-                    ak47.GetComponent<Renderer>().enabled = false;
-                    ak47Set = false;
-                    ump.GetComponent<Renderer>().enabled = false;
-                    umpSet = false;
-                    m16.GetComponent<Renderer>().enabled = false;
-                    m16Set = false;
-
-                    nowWeaponState = WeaponState.M4;
-                }
-                else if (weaponSlotType[1] == "UMP")
-                {
-                    weaponImage.GetComponent<Image>().sprite = umpImage;
-                    ump.GetComponent<Renderer>().enabled = true;
-                    umpSet = true;
-
-                    m4.GetComponent<Renderer>().enabled = false;
-                    m4Set = false;
-                    ak47.GetComponent<Renderer>().enabled = false;
-                    ak47Set = false;
-                    m16.GetComponent<Renderer>().enabled = false;
-                    m16Set = false;
-
-                    nowWeaponState = WeaponState.UMP;
+                    if (now_Weapon == i)
+                    {
+                        weaponView[now_Weapon].GetComponent<Renderer>().enabled = true;
+                    }
+                    else
+                    {
+                        weaponView[i].GetComponent<Renderer>().enabled = false;
+                    }
                 }
             }
 
@@ -439,12 +343,9 @@ public class PlayerCtrl : PlayerVehicleCtrl
             // R키를 누르면 재장전
             if (Input.GetKeyDown(KeyCode.R))
             {
-                if (bullet556 > 0 || bullet762 > 0 || bullet9 > 0)
+                if (now_Weapon != -1 && bulletCount[now_Weapon] != 0)
                     cooltimeCtrl.ReloadCollTime();
             }
-
-            //if()
-
             yield return null;
         } while (true);
         //yield return null;
@@ -452,10 +353,27 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
     void Start()
     {
-        ak47Image = Resources.Load<Sprite>("AK47_White");
-        m16Image = Resources.Load<Sprite>("M16_White");
-        m4Image = Resources.Load<Sprite>("M4A1_White");
-        umpImage = Resources.Load<Sprite>("UMP45_White");
+        weaponIEquipImage[0] = Resources.Load<Sprite>("AK47_White");
+        weaponIEquipImage[1] = Resources.Load<Sprite>("M16_White");
+        weaponIEquipImage[2] = Resources.Load<Sprite>("M4A1_White");
+        weaponIEquipImage[3] = Resources.Load<Sprite>("UMP45_White");
+        weaponView[0] = ak47;
+        weaponView[1] = m16;
+        weaponView[2] = m4;
+        weaponView[3] = ump;
+
+        soundCollection[0] = AK47Sound;
+        soundCollection[1] = M16A4Sound;
+        soundCollection[2] = M4A1Sound;
+        soundCollection[3] = UMP45Sound;
+
+        weaponSlotNumber[0] = -1;
+        weaponSlotNumber[1] = -1;
+
+        for (int i = 0; i < 4; ++i)
+        {
+            weaponView[i].GetComponent<Renderer>().enabled = false;
+        }
 
         // 쿨타임 스크립트 할당
         cooltimeCtrl = GameObject.Find("PanelCoolTime").GetComponent<CoolTimeCtrl>();
@@ -494,12 +412,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
         Cursor.visible = false;//마우스 커서 보이기
 
         // 현재 발사 가능
-        shotable = true;
-
-        ak47.GetComponent<Renderer>().enabled = false;
-        m16.GetComponent<Renderer>().enabled = false;
-        m4.GetComponent<Renderer>().enabled = false;
-        ump.GetComponent<Renderer>().enabled = false;
+        shotable = false;
 
         // 클라이언트 고유번호 가져오기.
         Client_imei = networkCtrl.get_imei();
@@ -523,25 +436,13 @@ public class PlayerCtrl : PlayerVehicleCtrl
     }
 
     // 아이템이 들어가서 isSlots이 true가 된 슬롯에서 해당 타입의 아이템 슬롯을 찾아 반환하는 함수
-    public SlotCtrl GetItem(string value)
+    public SlotCtrl GetItem(int value)
     {
         foreach (SlotCtrl sCtrl in slotctrl)
         {
             if (sCtrl.isSlots() == true)
             {
-                if (sCtrl.slot.Peek().type.ToString() == "Ammunition762" && value == "Ammunition762")
-                {
-                    return sCtrl;
-                }
-                else if (sCtrl.slot.Peek().type.ToString() == "Ammunition556" && value == "Ammunition556")
-                {
-                    return sCtrl;
-                }
-                else if (sCtrl.slot.Peek().type.ToString() == "Ammunition9" && value == "Ammunition9")
-                {
-                    return sCtrl;
-                }
-                else if (sCtrl.slot.Peek().type.ToString() == "ProofVest" && value == "ProofVest")
+                if ((int)sCtrl.slot.Peek().type == value)
                 {
                     return sCtrl;
                 }
@@ -595,54 +496,16 @@ public class PlayerCtrl : PlayerVehicleCtrl
     {
         // 동적으로 총알을 생성하는 함수
         CreateBullet();
-        if (m16Set == true)
+
+        reloadBulletCount[now_Weapon] -= 1;
+        slot.slot.Peek().setItemCount(-1);
+        weaponText.text = reloadBulletCount[now_Weapon] + " / " + bulletCount[now_Weapon];
+        if (slot.slot.Peek().getItemCount() == 0 && slot.isSlots() == true)
         {
-            reloadBullet556 -= 1;
-            weaponText.text = reloadBullet556 + " / " + bullet556;
-            slot.slot.Peek().setItemCount(-1);
-            if (slot.slot.Peek().getItemCount() == 0 && slot.isSlots() == true)
-            {
-                slot.slot.Clear();
-                slot.UpdateInfo(false, slot.DefaultImg);
-            }
-            source.PlayOneShot(M16A4Sound, 0.9f);
+            slot.slot.Clear();
+            slot.UpdateInfo(false, slot.DefaultImg);
         }
-        else if (ak47Set == true)
-        {
-            reloadBullet762 -= 1;
-            weaponText.text = reloadBullet762 + " / " + bullet762;
-            slot.slot.Peek().setItemCount(-1);
-            if (slot.slot.Peek().getItemCount() == 0 && slot.isSlots() == true)
-            {
-                slot.slot.Clear();
-                slot.UpdateInfo(false, slot.DefaultImg);
-            }
-            source.PlayOneShot(AK47Sound, 0.9f);
-        }
-        else if (m4Set == true)
-        {
-            reloadBullet556 -= 1;
-            weaponText.text = reloadBullet556 + " / " + bullet556;
-            slot.slot.Peek().setItemCount(-1);
-            if (slot.slot.Peek().getItemCount() == 0 && slot.isSlots() == true)
-            {
-                slot.slot.Clear();
-                slot.UpdateInfo(false, slot.DefaultImg);
-            }
-            source.PlayOneShot(M4A1Sound, 0.9f);
-        }
-        else if (umpSet == true)
-        {
-            reloadBullet9 -= 1;
-            weaponText.text = reloadBullet9 + " / " + bullet9;
-            slot.slot.Peek().setItemCount(-1);
-            if (slot.slot.Peek().getItemCount() == 0 && slot.isSlots() == true)
-            {
-                slot.slot.Clear();
-                slot.UpdateInfo(false, slot.DefaultImg);
-            }
-            source.PlayOneShot(UMP45Sound, 0.9f);
-        }
+        source.PlayOneShot(soundCollection[now_Weapon], 0.9f);
 
         // 잠시 기다리는 루틴을 위해 코루틴 함수로 호출
         StartCoroutine(this.ShowMuzzleFlash());
@@ -711,7 +574,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
                 // 방어력 0일때 방탄조끼 아이템 인벤토리에서 삭제
                 if (armour <= 0)
                 {
-                    SlotCtrl proofVest = GetItem("ProofVest");
+                    SlotCtrl proofVest = GetItem(4);
                     proofVest.slot.Clear();
                     proofVest.UpdateInfo(false, proofVest.DefaultImg);
                 }
@@ -759,7 +622,8 @@ public class PlayerCtrl : PlayerVehicleCtrl
                 // 방어력 0일때 방탄조끼 아이템 인벤토리에서 삭제
                 if (armour <= 0)
                 {
-                    SlotCtrl proofVest = GetItem("ProofVest");
+                    // GetItem(4)는 ProofVest를 받아옴
+                    SlotCtrl proofVest = GetItem(4);
                     proofVest.slot.Clear();
                     proofVest.UpdateInfo(false, proofVest.DefaultImg);
                 }
@@ -845,47 +709,12 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
     public void WeaponDisPlay()
     {
+        shotable = true;
+        weaponImage.GetComponent<Image>().sprite = weaponIEquipImage[now_Weapon];
+        weaponView[now_Weapon].GetComponent<Renderer>().enabled = true;
+        animator.SetBool("IsEquip", true);
 
-        //weaponImage.GetComponent<Image>().sprite = gunimage[now_Weapon];
-        //objectim[now_Weapon].GetComponent<Renderer>().enabled = true;
-        //animator.SetBool("IsEquip", true);
-        //if ( now_Weapon = 0, 1)
-        //    weaponText.text = bullet[now_Weapon] + " / " + bulletTotal[now_Weapon];
-        //elss if 
-
-        // 총이 장착되지않은 상태에서 총을 획득할 경우
-        if (ak47Set == true)
-        {
-            weaponImage.GetComponent<Image>().sprite = ak47Image;
-            ak47.GetComponent<Renderer>().enabled = true;
-            animator.SetBool("IsEquip", true);
-            nowWeaponState = WeaponState.AK47;
-            weaponText.text = reloadBullet762 + " / " + bullet762;
-        }
-        else if (m16Set == true)
-        {
-            weaponImage.GetComponent<Image>().sprite = m16Image;
-            m16.GetComponent<Renderer>().enabled = true;
-            animator.SetBool("IsEquip", true);
-            nowWeaponState = WeaponState.M16;
-            weaponText.text = reloadBullet556 + " / " + bullet556;
-        }
-        else if (m4Set == true)
-        {
-            weaponImage.GetComponent<Image>().sprite = m4Image;
-            m4.GetComponent<Renderer>().enabled = true;
-            animator.SetBool("IsEquip", true);
-            nowWeaponState = WeaponState.M4;
-            weaponText.text = reloadBullet556 + " / " + bullet556;
-        }
-        else if (umpSet == true)
-        {
-            weaponImage.GetComponent<Image>().sprite = umpImage;
-            ump.GetComponent<Renderer>().enabled = true;
-            animator.SetBool("IsEquip", true);
-            nowWeaponState = WeaponState.UMP;
-            weaponText.text = reloadBullet9 + " / " + bullet9;
-        }
+        weaponText.text = reloadBulletCount[now_Weapon] + " / " + bulletCount[now_Weapon];
     }
 
     // 혈흔 이펙트를 위한 함수
@@ -904,102 +733,20 @@ public class PlayerCtrl : PlayerVehicleCtrl
     // 총알 재장전 함수
     public void ReloadBullet()
     {
-        if (equipWeaponNumber == 1)
+        if (bulletCount[now_Weapon] >= (30 - reloadBulletCount[now_Weapon]))
         {
-            if (weaponSlotType[0] == "M4" || weaponSlotType[0] == "M16")
+            bulletCount[now_Weapon] -= (30 - reloadBulletCount[now_Weapon]);
+            reloadBulletCount[now_Weapon] = 30;
+            weaponText.text = reloadBulletCount[now_Weapon] + " / " + bulletCount[now_Weapon];
+            if(now_Weapon ==1)
             {
-                if (bullet556 >= (30 - reloadBullet556))
-                {
-                    bullet556 -= (30 - reloadBullet556);
-                    reloadBullet556 = 30;
-                    weaponText.text = reloadBullet556 + " / " + bullet556;
-                }
-                else
-                {
-                    reloadBullet556 += bullet556;
-                    bullet556 = 0;
-                    weaponText.text = reloadBullet556 + " / " + bullet556;
-                }
+                bulletCount[2] -= (30 - reloadBulletCount[2]);
             }
-            else if (weaponSlotType[0] == "AK47")
+            else if (now_Weapon == 2)
             {
-                if (bullet762 >= (30 - reloadBullet762))
-                {
-                    bullet762 -= (30 - reloadBullet762);
-                    reloadBullet762 = 30;
-                    weaponText.text = reloadBullet762 + " / " + bullet762;
-                }
-                else
-                {
-                    reloadBullet762 += bullet762;
-                    bullet762 = 0;
-                    weaponText.text = reloadBullet762 + " / " + bullet762;
-                }
+                bulletCount[1] -= (30 - reloadBulletCount[1]);
             }
-            else if (weaponSlotType[0] == "UMP")
-            {
-                if (bullet9 >= (30 - reloadBullet9))
-                {
-                    bullet9 -= (30 - reloadBullet9);
-                    reloadBullet9 = 30;
-                    weaponText.text = reloadBullet9 + " / " + bullet9;
-                }
-                else
-                {
-                    reloadBullet9 += bullet9;
-                    bullet9 = 0;
-                    weaponText.text = reloadBullet9 + " / " + bullet9;
-                }
-            }
-        }
-        else if (equipWeaponNumber == 2)
-        {
-            if (weaponSlotType[1] == "M4" || weaponSlotType[1] == "M16")
-            {
-                if (bullet556 >= (30 - reloadBullet556))
-                {
-                    bullet556 -= (30 - reloadBullet556);
-                    reloadBullet556 = 30;
-                    weaponText.text = reloadBullet556 + " / " + bullet556;
-                }
-                else
-                {
-                    reloadBullet556 += bullet556;
-                    bullet556 = 0;
-                    weaponText.text = reloadBullet556 + " / " + bullet556;
-                }
 
-            }
-            else if (weaponSlotType[1] == "AK47")
-            {
-                if (bullet762 >= (30 - reloadBullet762))
-                {
-                    bullet762 -= (30 - reloadBullet762);
-                    reloadBullet762 = 30;
-                    weaponText.text = reloadBullet762 + " / " + bullet762;
-                }
-                else
-                {
-                    reloadBullet762 += bullet762;
-                    bullet762 = 0;
-                    weaponText.text = reloadBullet762 + " / " + bullet762;
-                }
-            }
-            else if (weaponSlotType[1] == "UMP")
-            {
-                if (bullet9 >= (30 - reloadBullet9))
-                {
-                    bullet9 -= (30 - reloadBullet9);
-                    reloadBullet9 = 30;
-                    weaponText.text = reloadBullet9 + " / " + bullet9;
-                }
-                else
-                {
-                    reloadBullet9 += bullet9;
-                    bullet9 = 0;
-                    weaponText.text = reloadBullet9 + " / " + bullet9;
-                }
-            }
         }
     }
 }

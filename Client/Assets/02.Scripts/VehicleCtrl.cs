@@ -30,10 +30,8 @@ public class VehicleCtrl : PlayerVehicleCtrl
     public GameObject expCar;
     public GameObject expEffect;
 
-
     // 차량 자체의 브레이크를 위함
     public bool vehicleStop = false;
-
 
     void Awake()
     {

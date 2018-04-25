@@ -46,31 +46,15 @@ public class WeaponSlotCtrl : MonoBehaviour
         if (slotNumber == 1)
         {
             player.weaponSlotType[0] = weaponSlot.Peek().type.ToString();
-            if (weaponSlot.Peek().type.ToString() == "AK47")
-            {
-                player.ak47Set = true;
-                player.WeaponDisPlay();
-            }
-            else if (weaponSlot.Peek().type.ToString() == "M16")
-            {
-                player.m16Set = true;
-                player.WeaponDisPlay();
-            }
-            else if (weaponSlot.Peek().type.ToString() == "M4")
-            {
-                player.m4Set = true;
-                player.WeaponDisPlay();
-            }
-            else if (weaponSlot.Peek().type.ToString() == "UMP")
-            {
-                player.umpSet = true;
-                player.WeaponDisPlay();
-            }
+            player.weaponSlotNumber[0] = (int)weaponSlot.Peek().type;
+            player.now_Weapon = (int)weaponSlot.Peek().type;
+            player.WeaponDisPlay();
         }
         else
         {
             // 두번째의 경우 무기 슬롯 데이터를 넣어준다.
             player.weaponSlotType[1] = weaponSlot.Peek().type.ToString();
+            player.weaponSlotNumber[1] = (int)weapon.type;
         }
     }
 

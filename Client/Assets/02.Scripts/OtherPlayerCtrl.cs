@@ -41,8 +41,8 @@ public class OtherPlayerCtrl : MonoBehaviour
     // 총알 발사 좌표
     public Transform firePos;
     // 총알 발사 사운드
-    public AudioClip M16A4Sound;
     public AudioClip AK47Sound;
+    public AudioClip M16A4Sound;
     public AudioClip M4A1Sound;
     public AudioClip UMP45Sound;
 
