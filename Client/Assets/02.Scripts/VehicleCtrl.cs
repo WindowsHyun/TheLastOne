@@ -49,16 +49,11 @@ public class VehicleCtrl : PlayerVehicleCtrl
     void FixedUpdate()
     {
 
-<<<<<<< HEAD
-        // 차량 탑승 후에도 좌우 화면 전환이 가능하게 수정
-        if (GetTheCar == true) {
-=======
         if (GetTheCar == true)
         {
             // 차량 탑승 후에도 좌우 화면 전환이 가능하게 수정
             float h = Input.GetAxis("Horizontal");
             float v = Input.GetAxis("Vertical");
->>>>>>> Server
             VehicleCtrl_tr.transform.Rotate(Vector3.up * Time.deltaTime * 50.0f * Input.GetAxis("Mouse X"));
         }
         // 바퀴 회전의 랜더링을 위함

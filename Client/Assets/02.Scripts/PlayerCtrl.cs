@@ -110,17 +110,13 @@ public class PlayerCtrl : PlayerVehicleCtrl
     public string[] weaponSlotType = new string[2];
     public int[] weaponSlotNumber = new int[2];
 
-<<<<<<< HEAD
+
     // 총알 값 찾아오는 변수
-    //public SlotCtrl[] bulletFind = new SlotCtrl[4];
     public SlotCtrl bulletFinding;
 
     // 0번 7.62mm 총알, 1번 5.56mm 총알(m16),2번 5.56mm 총알(m4), 3번 9mm 총알
     public int[] bulletCount = new int[4];
     public int[] reloadBulletCount = new int[4];
-=======
-    public WeaponState nowWeaponState = WeaponState.None;
->>>>>>> Server
 
     // 무기 정보 저장
     private GameObject[] weaponView = new GameObject[4];
