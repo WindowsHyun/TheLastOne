@@ -20,20 +20,28 @@ public struct Client_info : IFlatbufferObject
   public int Id { get { int o = __p.__offset(4); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
   public int Hp { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
   public int Animator { get { int o = __p.__offset(8); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
-  public string Name { get { int o = __p.__offset(10); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
-  public ArraySegment<byte>? GetNameBytes() { return __p.__vector_as_arraysegment(10); }
-  public Vec3? Position { get { int o = __p.__offset(12); return o != 0 ? (Vec3?)(new Vec3()).__assign(o + __p.bb_pos, __p.bb) : null; } }
-  public Vec3? Rotation { get { int o = __p.__offset(14); return o != 0 ? (Vec3?)(new Vec3()).__assign(o + __p.bb_pos, __p.bb) : null; } }
-  public int NowWeapon { get { int o = __p.__offset(16); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+  public float Horizontal { get { int o = __p.__offset(10); return o != 0 ? __p.bb.GetFloat(o + __p.bb_pos) : (float)0.0f; } }
+  public float Vertical { get { int o = __p.__offset(12); return o != 0 ? __p.bb.GetFloat(o + __p.bb_pos) : (float)0.0f; } }
+  public int InCar { get { int o = __p.__offset(14); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+  public string Name { get { int o = __p.__offset(16); return o != 0 ? __p.__string(o + __p.bb_pos) : null; } }
+  public ArraySegment<byte>? GetNameBytes() { return __p.__vector_as_arraysegment(16); }
+  public Vec3? Position { get { int o = __p.__offset(18); return o != 0 ? (Vec3?)(new Vec3()).__assign(o + __p.bb_pos, __p.bb) : null; } }
+  public Vec3? Rotation { get { int o = __p.__offset(20); return o != 0 ? (Vec3?)(new Vec3()).__assign(o + __p.bb_pos, __p.bb) : null; } }
+  public Vec3? Carrotation { get { int o = __p.__offset(22); return o != 0 ? (Vec3?)(new Vec3()).__assign(o + __p.bb_pos, __p.bb) : null; } }
+  public int NowWeapon { get { int o = __p.__offset(24); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
 
-  public static void StartClient_info(FlatBufferBuilder builder) { builder.StartObject(7); }
+  public static void StartClient_info(FlatBufferBuilder builder) { builder.StartObject(11); }
   public static void AddId(FlatBufferBuilder builder, int id) { builder.AddInt(0, id, 0); }
   public static void AddHp(FlatBufferBuilder builder, int hp) { builder.AddInt(1, hp, 0); }
   public static void AddAnimator(FlatBufferBuilder builder, int animator) { builder.AddInt(2, animator, 0); }
-  public static void AddName(FlatBufferBuilder builder, StringOffset nameOffset) { builder.AddOffset(3, nameOffset.Value, 0); }
-  public static void AddPosition(FlatBufferBuilder builder, Offset<Vec3> positionOffset) { builder.AddStruct(4, positionOffset.Value, 0); }
-  public static void AddRotation(FlatBufferBuilder builder, Offset<Vec3> rotationOffset) { builder.AddStruct(5, rotationOffset.Value, 0); }
-  public static void AddNowWeapon(FlatBufferBuilder builder, int nowWeapon) { builder.AddInt(6, nowWeapon, 0); }
+  public static void AddHorizontal(FlatBufferBuilder builder, float Horizontal) { builder.AddFloat(3, Horizontal, 0.0f); }
+  public static void AddVertical(FlatBufferBuilder builder, float Vertical) { builder.AddFloat(4, Vertical, 0.0f); }
+  public static void AddInCar(FlatBufferBuilder builder, int inCar) { builder.AddInt(5, inCar, 0); }
+  public static void AddName(FlatBufferBuilder builder, StringOffset nameOffset) { builder.AddOffset(6, nameOffset.Value, 0); }
+  public static void AddPosition(FlatBufferBuilder builder, Offset<Vec3> positionOffset) { builder.AddStruct(7, positionOffset.Value, 0); }
+  public static void AddRotation(FlatBufferBuilder builder, Offset<Vec3> rotationOffset) { builder.AddStruct(8, rotationOffset.Value, 0); }
+  public static void AddCarrotation(FlatBufferBuilder builder, Offset<Vec3> carrotationOffset) { builder.AddStruct(9, carrotationOffset.Value, 0); }
+  public static void AddNowWeapon(FlatBufferBuilder builder, int nowWeapon) { builder.AddInt(10, nowWeapon, 0); }
   public static Offset<Client_info> EndClient_info(FlatBufferBuilder builder) {
     int o = builder.EndObject();
     return new Offset<Client_info>(o);

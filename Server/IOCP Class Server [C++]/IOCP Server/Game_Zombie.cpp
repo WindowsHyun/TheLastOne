@@ -4,8 +4,8 @@ Game_Zombie::Game_Zombie(const int client_id)
 {
 	this->client_id = client_id;
 	this->hp = 100;
-	this->position.x = (float)(rand() % 1007) + 50;
-	//this->position.x = 1007.09f;
+	//this->position.x = (float)(rand() % 1007) + 100;
+	this->position.x = 1007.09f;
 	this->position.y = 29.99451f;
 	this->position.z = (float)(rand() % 344) + 50;
 	//this->position.z = 347.01f;

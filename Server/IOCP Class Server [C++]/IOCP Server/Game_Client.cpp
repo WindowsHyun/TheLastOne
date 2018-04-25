@@ -32,6 +32,11 @@ Vec3 Game_Client::get_rotation()
 	return Vec3(this->rotation.x, this->rotation.y, this->rotation.z);
 }
 
+Vec3 Game_Client::get_car_rotation()
+{
+	return Vec3(this->car_rotation.x, this->car_rotation.y, this->car_rotation.z);
+}
+
 Game_Client::Game_Client(const SOCKET sock, const int client_id, const char * game_id)
 {
 	this->connect = true;
@@ -45,6 +50,12 @@ Game_Client::Game_Client(const SOCKET sock, const int client_id, const char * ga
 	this->rotation.x = 0;
 	this->rotation.y = 0;
 	this->rotation.z = 0;
+	this->car_rotation.x = 0;
+	this->car_rotation.y = 0;
+	this->car_rotation.z = 0;
+	this->horizontal = 0.0f;
+	this->vertical = 0.0f;
+	this->inCar = -1;
 	this->hp = 100;
 	this->animator = 0;
 	this->weaponState = 0;
@@ -70,6 +81,12 @@ Game_Client::Game_Client(const Game_Client & g_cl)
 	this->rotation.x = g_cl.rotation.x;
 	this->rotation.y = g_cl.rotation.y;
 	this->rotation.z = g_cl.rotation.z;
+	this->car_rotation.x = g_cl.car_rotation.x;
+	this->car_rotation.y = g_cl.car_rotation.y;
+	this->car_rotation.z = g_cl.car_rotation.z;
+	this->horizontal = g_cl.horizontal;
+	this->vertical = g_cl.vertical;
+	this->inCar = g_cl.inCar;
 	this->hp = g_cl.hp;
 	this->animator = g_cl.animator;
 	this->weaponState = g_cl.weaponState;

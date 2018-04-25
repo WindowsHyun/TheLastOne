@@ -8,32 +8,32 @@ namespace Game.TheLastOne
 using global::System;
 using global::FlatBuffers;
 
-public struct All_information : IFlatbufferObject
+public struct Client_Collection : IFlatbufferObject
 {
   private Table __p;
   public ByteBuffer ByteBuffer { get { return __p.bb; } }
-  public static All_information GetRootAsAll_information(ByteBuffer _bb) { return GetRootAsAll_information(_bb, new All_information()); }
-  public static All_information GetRootAsAll_information(ByteBuffer _bb, All_information obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
+  public static Client_Collection GetRootAsClient_Collection(ByteBuffer _bb) { return GetRootAsClient_Collection(_bb, new Client_Collection()); }
+  public static Client_Collection GetRootAsClient_Collection(ByteBuffer _bb, Client_Collection obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
   public void __init(int _i, ByteBuffer _bb) { __p.bb_pos = _i; __p.bb = _bb; }
-  public All_information __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+  public Client_Collection __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
   public Client_info? Data(int j) { int o = __p.__offset(4); return o != 0 ? (Client_info?)(new Client_info()).__assign(__p.__indirect(__p.__vector(o) + j * 4), __p.bb) : null; }
   public int DataLength { get { int o = __p.__offset(4); return o != 0 ? __p.__vector_len(o) : 0; } }
 
-  public static Offset<All_information> CreateAll_information(FlatBufferBuilder builder,
+  public static Offset<Client_Collection> CreateClient_Collection(FlatBufferBuilder builder,
       VectorOffset dataOffset = default(VectorOffset)) {
     builder.StartObject(1);
-    All_information.AddData(builder, dataOffset);
-    return All_information.EndAll_information(builder);
+    Client_Collection.AddData(builder, dataOffset);
+    return Client_Collection.EndClient_Collection(builder);
   }
 
-  public static void StartAll_information(FlatBufferBuilder builder) { builder.StartObject(1); }
+  public static void StartClient_Collection(FlatBufferBuilder builder) { builder.StartObject(1); }
   public static void AddData(FlatBufferBuilder builder, VectorOffset dataOffset) { builder.AddOffset(0, dataOffset.Value, 0); }
   public static VectorOffset CreateDataVector(FlatBufferBuilder builder, Offset<Client_info>[] data) { builder.StartVector(4, data.Length, 4); for (int i = data.Length - 1; i >= 0; i--) builder.AddOffset(data[i].Value); return builder.EndVector(); }
   public static void StartDataVector(FlatBufferBuilder builder, int numElems) { builder.StartVector(4, numElems, 4); }
-  public static Offset<All_information> EndAll_information(FlatBufferBuilder builder) {
+  public static Offset<Client_Collection> EndClient_Collection(FlatBufferBuilder builder) {
     int o = builder.EndObject();
-    return new Offset<All_information>(o);
+    return new Offset<Client_Collection>(o);
   }
 };
 

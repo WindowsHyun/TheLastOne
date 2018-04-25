@@ -25,7 +25,7 @@ enum Event_Type { E_DangerLine, E_RoundTime, E_Remove_Client, E_MoveDangerLine }
 #define SC_Shot_Client	7				// 클라이언트 Shot 정보
 #define SC_DangerLine	8				// 클라이언트 DangerLine 정보 전송
 #define SC_Zombie_Info 9				// 클라이언트에게 좀비 위치를 전달해 준다.
-
+#define SC_Remove_Zombie 10		// 좀비 삭제
 
 // 클라이언트가 서버에게 보내는 패킷
 #define CS_Info           1					// 클라이언트가 서버에게 자신의 위치정보를 보내준다.
@@ -41,7 +41,19 @@ enum Event_Type { E_DangerLine, E_RoundTime, E_Remove_Client, E_MoveDangerLine }
 #define DangerLine_Level1 240
 #define DangerLine_Level0 240
 
+// 플레이어 볼 수 있는 거리
+#define Player_Dist 300
+
 // 좀비가 볼 수 있는 거리
-#define Zombie_Dist 100
+#define Zombie_Dist 200
+#define Limit_Zombie 2
+
+// 아이템 종류
+#define Kind_Item 0
+#define Kind_Car 1
+
+// 플레이어 종류
+#define Kind_Player 0
+#define Kind_Zombie 1
 
 #endif

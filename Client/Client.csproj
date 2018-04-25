@@ -309,7 +309,7 @@
     <Compile Include="Assets\02.Scripts\WeaponDragCtrl.cs" />
     <Compile Include="Assets\02.Scripts\WeaponSlotCtrl.cs" />
     <Compile Include="Assets\02.Scripts\ZombieCtrl.cs" />
-    <Compile Include="Assets\07.Network\All_information.cs" />
+    <Compile Include="Assets\07.Network\Client_Collection.cs" />
     <Compile Include="Assets\07.Network\Client_id.cs" />
     <Compile Include="Assets\07.Network\Client_info.cs" />
     <Compile Include="Assets\07.Network\Client_Shot_info.cs" />
@@ -321,6 +321,7 @@
     <Compile Include="Assets\07.Network\navmesh_export.cs" />
     <Compile Include="Assets\07.Network\NetworkCtrl.cs" />
     <Compile Include="Assets\07.Network\Vec3.cs" />
+    <Compile Include="Assets\07.Network\Zombie_Collection.cs" />
     <Compile Include="Assets\07.Network\Zombie_info.cs" />
     <Compile Include="Assets\08.Class\Game_ClientClass.cs" />
     <Compile Include="Assets\08.Class\Game_ItemClass.cs" />

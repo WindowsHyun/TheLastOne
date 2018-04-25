@@ -11,8 +11,10 @@ public class VehicleCtrl : PlayerVehicleCtrl
 
     // 차량 체력
     public int vehicleHp = 200;
-
     public int vehicleInitHp;
+
+    // 차량 번호
+    public int carNum = -1;
 
     // 휠 콜라이더와 휠 메쉬 할당
     public WheelCollider[] wheelColliders = new WheelCollider[4];
@@ -20,9 +22,7 @@ public class VehicleCtrl : PlayerVehicleCtrl
 
     // 리지드바디 변수
     private Rigidbody m_rigidbody;
-
-
-    private Transform vehicle_tr;
+    public Transform vehicle_tr;
 
     public bool carDestroy = false;
 
@@ -48,14 +48,19 @@ public class VehicleCtrl : PlayerVehicleCtrl
 
     void FixedUpdate()
     {
-        float h = Input.GetAxis("Horizontal");
-        float v = Input.GetAxis("Vertical");
 
+<<<<<<< HEAD
         // 차량 탑승 후에도 좌우 화면 전환이 가능하게 수정
         if (GetTheCar == true) {
+=======
+        if (GetTheCar == true)
+        {
+            // 차량 탑승 후에도 좌우 화면 전환이 가능하게 수정
+            float h = Input.GetAxis("Horizontal");
+            float v = Input.GetAxis("Vertical");
+>>>>>>> Server
             VehicleCtrl_tr.transform.Rotate(Vector3.up * Time.deltaTime * 50.0f * Input.GetAxis("Mouse X"));
         }
-
         // 바퀴 회전의 랜더링을 위함
         UpdateMeshsPositions();
 
