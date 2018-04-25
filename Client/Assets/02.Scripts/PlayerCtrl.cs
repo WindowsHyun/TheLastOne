@@ -723,7 +723,6 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
             }
 
-            Debug.Log("Player H{: " + hp.ToString());
             if (hp <= 0)
             {
                 // 마우스 잠겨 있을경우 푼다.

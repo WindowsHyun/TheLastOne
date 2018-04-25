@@ -166,7 +166,7 @@ public class OtherPlayerCtrl : MonoBehaviour
         muzzleFlash2.enabled = false;
     }
 
-    IEnumerator createPrefab()
+    public IEnumerator createPrefab()
     {
         do
         {
@@ -297,9 +297,6 @@ public class OtherPlayerCtrl : MonoBehaviour
                 isDie = true;
                 OtherPlayerDie();
             }
-
-            Debug.Log("Player H{: " + hp.ToString());
-
         }
     }
 

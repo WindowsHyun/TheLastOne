@@ -22,6 +22,7 @@ namespace TheLastOne.GameClass
         private int inCar;
         private bool removeClient;   // 클라이언트 지울경우 true
         private int nowWeaponState; // 클라이언트 무기 상태
+        private bool activePlayer;
         public GameObject Player;   // 프리팹을 위한 게임 오브젝트
         public OtherPlayerCtrl script;  // 프리팹 오브젝트 안의 함수를 호출하기 위한 스크립트
 
@@ -35,6 +36,7 @@ namespace TheLastOne.GameClass
         public Vector3 get_rot() { return this.rotation; }
         public Vector3 get_car_rot() { return this.carrotation; }
         public bool get_prefab() { return this.prefab; }
+        public bool get_activePlayer() { return this.activePlayer; }
         public bool get_connect() { return this.connect; }
         public string get_name() { return this.name; }
         public bool get_removeClient() { return this.removeClient; }
@@ -49,6 +51,7 @@ namespace TheLastOne.GameClass
         public void set_rot(Vector3 rot) { this.rotation = rot; }
         public void set_car_rot(Vector3 rot) { this.carrotation = rot; }
         public void set_prefab(bool value) { this.prefab = value; }
+        public void set_activePlayer(bool value) { this.activePlayer = value; }
         public void set_connect(bool value) { this.connect = value; }
         public void set_name(string name) { this.name = name; }
         public void set_removeClient(bool value) { this.removeClient = value; }
@@ -66,6 +69,7 @@ namespace TheLastOne.GameClass
             this.script = null;
             this.prefab = false;
             this.removeClient = false;
+            this.activePlayer = true;
             this.nowWeaponState = 0;
             this.vertical = 0.0f;
             this.horizontal = 0.0f;

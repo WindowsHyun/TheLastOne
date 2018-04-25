@@ -8,7 +8,7 @@ struct Vec3 {
   z:float;
 }
 
-table All_information{
+table Client_Collection{
   data:[Client_info];
 }
 
@@ -24,6 +24,10 @@ table Client_info {
   rotation:Vec3;
   carrotation:Vec3;
   nowWeapon:int;
+}
+
+table Zombie_Collection{
+  data:[Zombie_info];
 }
 
 table Zombie_info {

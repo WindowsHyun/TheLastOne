@@ -79,7 +79,7 @@ public class ZombieCtrl : MonoBehaviour
         PlayerCtrl.OnPlayerDie -= this.OnPlayerDie;
     }
 
-    IEnumerator CheckZombieNav()
+    public IEnumerator CheckZombieNav()
     {
         while (true)
         {
@@ -94,7 +94,7 @@ public class ZombieCtrl : MonoBehaviour
         }
     }
 
-    IEnumerator CheckZombieState()
+    public IEnumerator CheckZombieState()
     {
         while (!isDie)
         {
@@ -140,13 +140,13 @@ public class ZombieCtrl : MonoBehaviour
                     playerCtrl.send_ZombieData(zombieTr.position, zombieTr.eulerAngles, zombieNum, hp, zombieState);
             }
 
-            yield return null;
+            yield return new WaitForSeconds(0.05f);
         }
 
 
     }
 
-    IEnumerator ZombieAction()
+    public IEnumerator ZombieAction()
     {
         while (!isDie)
         {
@@ -180,7 +180,7 @@ public class ZombieCtrl : MonoBehaviour
 
     void OnTriggerEnter(Collider coll)
     {
-        Debug.Log(coll.tag);
+        //Debug.Log(coll.tag);
         // 충돌한 게임오브젝트의 태그값 비교
         if (coll.gameObject.tag == "BULLET")
         {
@@ -230,7 +230,7 @@ public class ZombieCtrl : MonoBehaviour
 
     public void MovePos(Vector3 pos)
     {
-        float moveSpeed = 23.0f;
+        float moveSpeed = 6.0f;
         zombieTr.position = Vector3.MoveTowards(zombieTr.position, pos, Time.deltaTime * moveSpeed);
     }
 }

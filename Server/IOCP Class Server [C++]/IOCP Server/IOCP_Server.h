@@ -49,18 +49,20 @@ private:
 	void makeThread();								// 스레드 만들기
 	void Worker_Thread();							// 실제 동작 스레드
 	void Accept_Thread();								// 클라이언트 받는 스레드
-	void Zombie_Thread();							// 좀비 스레드
 	void Remove_Client();							// 클라이언트가 종료시 지우는 스레드
 	void Shutdown_Server();							// 서버 종료
 	void DisconnectClient(int ci);					// 클라이언트 종료
 	void ProcessPacket(int ci, char *packet);		// 패킷 처리
 	void SendPacket(int type, int cl, void *packet, int psize);		// 패킷 보내기
 	void Send_Client_ID(int client_id, int value, bool allClient);	// 클라이언트 에게 패킷 아이디 보내기
-	void Send_All_Data(int client, bool allClient);					// 클라이언트에게 모든 클라이언트 위치 보내기
+	void Send_All_Player(int client);					// 클라이언트에게 모든 클라이언트 위치 보내기
+	void Send_All_Zombie(int client);							// 클라이언트에게 모든 좀비 위치 보내기
 	void Send_All_Time(int kind, int time, int client_id, bool allClient);					// 클라이언트에게 시간을 보내준다.
 	void Send_All_Item();		// 클라이언트에게 시간정보를 보내준다.
 	void Send_Client_Shot(int shot_client);		// 클라이언트들에게 Shot 정보를 보내준다.
 	void Send_DangerLine_info(int demage, xyz pos, xyz scale);
+	void Send_Hide_Player(int client);		// 클라이언트 범위를 벗어날 경우 지워준다.
+	void Send_Hide_Zombie(int client);		// 클라이언트 범위를 벗어날 경우 지워준다.
 
 public:
 	HANDLE getHandle() { return g_hiocp; }

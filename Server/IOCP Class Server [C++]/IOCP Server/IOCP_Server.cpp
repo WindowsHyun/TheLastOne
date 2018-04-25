@@ -59,7 +59,7 @@ void IOCP_Server::initServer()
 	load_item_txt("./Game_Item_Collection.txt", &g_item);
 
 	// 좀비 캐릭터 생성하기
-	init_Zombie(5, &g_zombie);
+	init_Zombie(10, &g_zombie);
 
 	// 충돌체크 넣기
 	//load_CollisionCheck_txt("./Game_CollisionCheck.txt", &g_collision);
@@ -290,28 +290,6 @@ void IOCP_Server::Accept_Thread()
 	}	// while(true)
 }
 
-void IOCP_Server::Zombie_Thread()
-{
-	for (auto zombie : g_zombie) {
-		flatbuffers::FlatBufferBuilder builder;
-		auto z_id = zombie.first;
-		auto z_hp = zombie.second.get_hp();
-		auto z_ani = zombie.second.get_animator();
-		auto z_target = zombie.second.get_target();
-		auto z_pos = zombie.second.get_position();
-		auto z_rot = zombie.second.get_rotation();
-
-		auto orc = CreateZombie_info(builder, z_id, z_hp, z_ani, z_target, &z_pos, &z_rot);
-		builder.Finish(orc); // Serialize the root of the object.
-
-		for (auto iter : g_clients) {
-			if (iter.second.get_Connect() != true)
-				continue;
-			SendPacket(SC_Zombie_Info, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
-		}
-	}
-}
-
 void IOCP_Server::Remove_Client()
 {
 	for (auto iter = g_clients.begin(); iter != g_clients.end();) {
@@ -424,10 +402,17 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 		break;
 		}
 
-		Send_All_Data(ci, all_Client_Packet);
+
+		Send_All_Player(ci);
+		Send_Hide_Player(ci);
+
+		Send_All_Zombie(ci);
+		Send_Hide_Zombie(ci);
+
+		player_To_Zombie(g_zombie, g_clients);
+
 		Send_All_Item();
-		Zombie_Thread();
-		//player_To_Zombie(g_zombie, g_clients);
+
 	}
 	catch (DWORD dwError) {
 		errnum++;
@@ -502,16 +487,17 @@ void IOCP_Server::Send_Client_ID(int client_id, int value, bool allClient)
 	}
 }
 
-void IOCP_Server::Send_All_Data(int client, bool allClient)
+void IOCP_Server::Send_All_Player(int client)
 {
+	auto client_iter = get_client_iter(client);
 	flatbuffers::FlatBufferBuilder builder;
 	std::vector<flatbuffers::Offset<Client_info>> Individual_client;		// 개인 데이터
 
 	for (auto iter : g_clients) {
-		if (iter.second.get_Connect() != true)	// 클라이언트가 연결 안되어 있으면 제외 한다.
+		if (iter.second.get_Connect() != true || Distance(client_iter->second.get_client_id(), iter.second.get_client_id(), Player_Dist, Kind_Player) == false)
+			// 클라이언트가 연결 안되어 있으면 제외 한다.
 			continue;
-		//else if (iter.first == client)	// 자기 고유번호는 제외 한다.
-		//	continue;
+
 		auto id = iter.second.get_client_id();
 		auto name = builder.CreateString(iter.second.nickName);
 		auto hp = iter.second.get_hp();
@@ -531,20 +517,40 @@ void IOCP_Server::Send_All_Data(int client, bool allClient)
 	}
 
 	auto Full_client_data = builder.CreateVector(Individual_client);		// 이제 Vector로 묶어서 전송할 데이터로 만들어주자.
-	auto orc = CreateAll_information(builder, Full_client_data);		// 실제로 보내는 테이블 명은 Client_Data
+	auto orc = CreateClient_Collection(builder, Full_client_data);		// 실제로 보내는 테이블 명은 Client_Data
 	builder.Finish(orc); // Serialize the root of the object.
 
-	if (allClient == true) {
-		// 모든 클라이언트에다가 전송을 필요로 할때만 전송 한다.
-		for (auto iter : g_clients) {
-			if (iter.second.get_Connect() != true)
-				continue;
-			SendPacket(SC_Client_Data, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
-		}
+	SendPacket(SC_Client_Data, client, builder.GetBufferPointer(), builder.GetSize());
+}
+
+void IOCP_Server::Send_All_Zombie(int client)
+{
+	auto client_iter = get_client_iter(client);
+
+	flatbuffers::FlatBufferBuilder builder;
+	std::vector<flatbuffers::Offset<Zombie_info>> Individual_zombie;		// 개인 데이터
+
+	for (auto zombie : g_zombie) {
+		if (Distance(client_iter->second.get_client_id(), zombie.second.get_client_id(), Zombie_Dist, Kind_Zombie) == false)
+			// 클라이언트가 연결 안되어 있으면 제외 한다.
+			continue;
+
+		auto z_id = zombie.first;
+		auto z_hp = zombie.second.get_hp();
+		auto z_ani = zombie.second.get_animator();
+		auto z_target = zombie.second.get_target();
+		auto z_pos = zombie.second.get_position();
+		auto z_rot = zombie.second.get_rotation();
+		auto zombie_data = CreateZombie_info(builder, z_id, z_hp, z_ani, z_target, &z_pos, &z_rot);
+
+		Individual_zombie.push_back(zombie_data);
 	}
-	else {
-		SendPacket(SC_Client_Data, client, builder.GetBufferPointer(), builder.GetSize());
-	}
+
+	auto All_zombie_data = builder.CreateVector(Individual_zombie);		// 이제 Vector로 묶어서 전송할 데이터로 만들어주자.
+	auto orc = CreateZombie_Collection(builder, All_zombie_data);		// 실제로 보내는 테이블 명은 Client_Data
+	builder.Finish(orc); // Serialize the root of the object.
+
+	SendPacket(SC_Zombie_Info, client, builder.GetBufferPointer(), builder.GetSize());
 }
 
 void IOCP_Server::Send_All_Time(int kind, int time, int client_id, bool allClient)
@@ -601,13 +607,14 @@ void IOCP_Server::Send_All_Item()
 
 void IOCP_Server::Send_Client_Shot(int shot_client)
 {
+	auto client_iter = get_client_iter(shot_client);
 	flatbuffers::FlatBufferBuilder builder;
 	auto id = shot_client;
 	auto orc = CreateClient_id(builder, id);
 	builder.Finish(orc); // Serialize the root of the object.
 
 	for (auto iter : g_clients) {
-		if (iter.second.get_Connect() != true)
+		if (iter.second.get_Connect() != true || Distance(client_iter->second.get_client_id(), iter.second.get_client_id(), Player_Dist, Kind_Player) == false)
 			continue;
 		SendPacket(SC_Shot_Client, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
 	}
@@ -632,6 +639,42 @@ void IOCP_Server::Send_DangerLine_info(int demage, xyz pos, xyz scale)
 
 }
 
+void IOCP_Server::Send_Hide_Player(int client)
+{
+	auto client_iter = get_client_iter(client);
+
+	for (auto iter : g_clients) {
+		if (iter.second.get_Connect() != true)
+			continue;
+		if (Distance(client_iter->second.get_client_id(), iter.second.get_client_id(), Player_Dist, Kind_Player) == true)
+			continue;		// 범위내에 있을경우 넘긴다.
+
+		flatbuffers::FlatBufferBuilder builder;
+		auto Client_id = iter.second.get_client_id();
+		auto orc = CreateClient_id(builder, Client_id);
+		builder.Finish(orc); // Serialize the root of the object.
+
+		SendPacket(SC_REMOVE_PLAYER, client_iter->second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
+	}
+}
+
+void IOCP_Server::Send_Hide_Zombie(int client)
+{
+	auto client_iter = get_client_iter(client);
+
+	for (auto iter : g_zombie) {
+		if (Distance(client_iter->second.get_client_id(), iter.second.get_client_id(), Zombie_Dist, Kind_Zombie) == true)
+			continue;		// 범위내에 있을경우 넘긴다.
+
+		flatbuffers::FlatBufferBuilder builder;
+		auto Client_id = iter.second.get_client_id();
+		auto orc = CreateClient_id(builder, Client_id);
+		builder.Finish(orc); // Serialize the root of the object.
+
+		SendPacket(SC_Remove_Zombie, client_iter->second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
+	}
+}
+
 std::unordered_map< int, Game_Client>::iterator get_client_iter(int ci) {
 	return g_clients.find(ci);
 }
@@ -643,6 +686,19 @@ std::unordered_map< int, Game_Item>::iterator get_item_iter(int ci) {
 std::unordered_map<int, Game_Zombie>::iterator get_zombie_iter(int ci)
 {
 	return g_zombie.find(ci);
+}
+
+bool Distance(int me, int  you, int Radius, int kind) {
+	auto iter_me = g_clients.find(me);
+	auto iter_you = g_clients.find(you);
+	auto iter_zombie = g_zombie.find(you);
+
+	if (kind == Kind_Player)
+		return (iter_me->second.get_pos().x - iter_you->second.get_pos().x) * (iter_me->second.get_pos().x - iter_you->second.get_pos().x) +
+		(iter_me->second.get_pos().z - iter_you->second.get_pos().z) * (iter_me->second.get_pos().z - iter_you->second.get_pos().z) <= Radius * Radius;
+	else
+		return (iter_me->second.get_pos().x - iter_zombie->second.get_pos().x) * (iter_me->second.get_pos().x - iter_zombie->second.get_pos().x) +
+		(iter_me->second.get_pos().z - iter_zombie->second.get_pos().z) * (iter_me->second.get_pos().z - iter_zombie->second.get_pos().z) <= Radius * Radius;
 }
 
 float DistanceToPoint(float player_x, float player_z, float zombie_x, float zombie_z)
@@ -668,7 +724,7 @@ void player_To_Zombie(std::unordered_map<int, Game_Zombie> &zombie, std::unorder
 				// 좀비의 체력이 0일경우
 				zombie.find(z.first)->second.set_live(false);
 				iter->second.set_limit_zombie(-1);
-				std::cout << iter->first << ", " << iter->second.get_limit_zombie() << std::endl;
+				//std::cout << iter->first << ", " << iter->second.get_limit_zombie() << std::endl;
 				zombie.find(z.first)->second.set_target(-1);
 			}
 			else {
@@ -688,7 +744,7 @@ void player_To_Zombie(std::unordered_map<int, Game_Zombie> &zombie, std::unorder
 			}
 			if (player_num == -1)
 				continue;
-			if (player.find(player_num)->second.get_limit_zombie() < 1) {
+			if (player.find(player_num)->second.get_limit_zombie() < Limit_Zombie) {
 				player.find(player_num)->second.set_limit_zombie(1);
 				zombie.find(z.first)->second.set_target(player_num);
 			}

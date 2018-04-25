@@ -11,9 +11,11 @@ namespace TheLastOne {
 
 struct Vec3;
 
-struct All_information;
+struct Client_Collection;
 
 struct Client_info;
+
+struct Zombie_Collection;
 
 struct Zombie_info;
 
@@ -56,7 +58,7 @@ MANUALLY_ALIGNED_STRUCT(4) Vec3 FLATBUFFERS_FINAL_CLASS {
 };
 STRUCT_END(Vec3, 12);
 
-struct All_information FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+struct Client_Collection FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_DATA = 4
   };
@@ -72,36 +74,36 @@ struct All_information FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
 };
 
-struct All_informationBuilder {
+struct Client_CollectionBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_data(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Client_info>>> data) {
-    fbb_.AddOffset(All_information::VT_DATA, data);
+    fbb_.AddOffset(Client_Collection::VT_DATA, data);
   }
-  explicit All_informationBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  explicit Client_CollectionBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  All_informationBuilder &operator=(const All_informationBuilder &);
-  flatbuffers::Offset<All_information> Finish() {
+  Client_CollectionBuilder &operator=(const Client_CollectionBuilder &);
+  flatbuffers::Offset<Client_Collection> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<All_information>(end);
+    auto o = flatbuffers::Offset<Client_Collection>(end);
     return o;
   }
 };
 
-inline flatbuffers::Offset<All_information> CreateAll_information(
+inline flatbuffers::Offset<Client_Collection> CreateClient_Collection(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Client_info>>> data = 0) {
-  All_informationBuilder builder_(_fbb);
+  Client_CollectionBuilder builder_(_fbb);
   builder_.add_data(data);
   return builder_.Finish();
 }
 
-inline flatbuffers::Offset<All_information> CreateAll_informationDirect(
+inline flatbuffers::Offset<Client_Collection> CreateClient_CollectionDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<flatbuffers::Offset<Client_info>> *data = nullptr) {
-  return Game::TheLastOne::CreateAll_information(
+  return Game::TheLastOne::CreateClient_Collection(
       _fbb,
       data ? _fbb.CreateVector<flatbuffers::Offset<Client_info>>(*data) : 0);
 }
@@ -273,6 +275,56 @@ inline flatbuffers::Offset<Client_info> CreateClient_infoDirect(
       rotation,
       carrotation,
       nowWeapon);
+}
+
+struct Zombie_Collection FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_DATA = 4
+  };
+  const flatbuffers::Vector<flatbuffers::Offset<Zombie_info>> *data() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Zombie_info>> *>(VT_DATA);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_DATA) &&
+           verifier.Verify(data()) &&
+           verifier.VerifyVectorOfTables(data()) &&
+           verifier.EndTable();
+  }
+};
+
+struct Zombie_CollectionBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_data(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Zombie_info>>> data) {
+    fbb_.AddOffset(Zombie_Collection::VT_DATA, data);
+  }
+  explicit Zombie_CollectionBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  Zombie_CollectionBuilder &operator=(const Zombie_CollectionBuilder &);
+  flatbuffers::Offset<Zombie_Collection> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<Zombie_Collection>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Zombie_Collection> CreateZombie_Collection(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Zombie_info>>> data = 0) {
+  Zombie_CollectionBuilder builder_(_fbb);
+  builder_.add_data(data);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<Zombie_Collection> CreateZombie_CollectionDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<flatbuffers::Offset<Zombie_info>> *data = nullptr) {
+  return Game::TheLastOne::CreateZombie_Collection(
+      _fbb,
+      data ? _fbb.CreateVector<flatbuffers::Offset<Zombie_info>>(*data) : 0);
 }
 
 struct Zombie_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
