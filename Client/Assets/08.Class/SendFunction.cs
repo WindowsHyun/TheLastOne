@@ -46,28 +46,39 @@ namespace TheLastOne.SendFunction
             return real_packet;
         }
 
-        public Byte[] makeZombie_PacketInfo(Vector3 pos, Vector3 rotation, int zombieNum, int hp, Enum animation)
+        public Byte[] makeZombie_PacketInfo(Dictionary<int, Game_ZombieClass> zombie_data, int client_imei)
         {
-            //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.
-            fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
-            Zombie_info.StartZombie_info(fbb);
-            Zombie_info.AddId(fbb, zombieNum);
-            Zombie_info.AddHp(fbb, hp);
-            Zombie_info.AddAnimator(fbb, Convert.ToInt32(animation));
-            Zombie_info.AddPosition(fbb, Vec3.CreateVec3(fbb, pos.x, pos.y, pos.z));
-            Zombie_info.AddRotation(fbb, Vec3.CreateVec3(fbb, rotation.x, rotation.y, rotation.z));
-            var endOffset = Zombie_info.EndZombie_info(fbb);
+            fbb.Clear();
+            var target_zombie = new Offset<Zombie_info>[10];
+            int num = 0;
+            foreach (var key in zombie_data.Keys.ToList())
+            {
+               if (  zombie_data[key].get_target() == client_imei)
+                {
+                    // 좀비 Target과 Client_Imei가 같은경우에만 Vector에 넣는다.
+                    Zombie_info.StartZombie_info(fbb);
+                    Zombie_info.AddId(fbb, zombie_data[key].get_id());
+                    Zombie_info.AddHp(fbb, zombie_data[key].get_hp());
+                    Zombie_info.AddAnimator(fbb, zombie_data[key].get_animator());
+                    Zombie_info.AddTargetPlayer(fbb, zombie_data[key].get_target());
+                    Zombie_info.AddPosition(fbb, Vec3.CreateVec3(fbb, zombie_data[key].get_pos().x, zombie_data[key].get_pos().y, zombie_data[key].get_pos().z));
+                    Zombie_info.AddRotation(fbb, Vec3.CreateVec3(fbb, zombie_data[key].get_rot().x, zombie_data[key].get_rot().y, zombie_data[key].get_rot().z));
+                    target_zombie[num] = Zombie_info.EndZombie_info(fbb);
+                    ++num;
+                }
+            }
+            var endOffset = Zombie_Collection.CreateDataVector(fbb, target_zombie);
             fbb.Finish(endOffset.Value);
-
 
             byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
             byte[] packet_len = BitConverter.GetBytes(packet.Length);   // flatbuffers의 패킷 크기
             byte[] packet_type = BitConverter.GetBytes(CS_Zombie_info);
             byte[] real_packet = new byte[packet_len.Length + packet.Length];
-
+            Debug.Log(real_packet.Length);
             System.Buffer.BlockCopy(packet_len, 0, real_packet, 0, packet_len.Length);
             System.Buffer.BlockCopy(packet_type, 0, real_packet, 1, packet_type.Length);
             System.Buffer.BlockCopy(packet, 0, real_packet, 4, packet.Length);
+
             return real_packet;
         }
 

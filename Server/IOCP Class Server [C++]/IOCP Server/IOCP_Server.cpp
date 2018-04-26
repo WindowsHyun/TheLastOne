@@ -59,7 +59,7 @@ void IOCP_Server::initServer()
 	load_item_txt("./Game_Item_Collection.txt", &g_item);
 
 	// 좀비 캐릭터 생성하기
-	init_Zombie(10, &g_zombie);
+	init_Zombie(Create_Zombie, &g_zombie);
 
 	// 충돌체크 넣기
 	//load_CollisionCheck_txt("./Game_CollisionCheck.txt", &g_collision);
@@ -326,10 +326,14 @@ void IOCP_Server::DisconnectClient(int ci)
 void IOCP_Server::ProcessPacket(int ci, char * packet)
 {
 	int errnum = 0;
-	char get_packet[MAX_PACKET_SIZE];
+	char get_packet[MAX_PACKET_SIZE]{ 0, };
 	bool all_Client_Packet = false;	// 모든 클라이언트에게 보낼 때는 True
 	for (int i = 4; i < MAX_PACKET_SIZE; ++i)
 		get_packet[i - 4] = packet[i];
+	/*
+	Packet 사이즈를 확인한 후 받아야 한다.
+	그렇지 않으면 Packet 사이즈 초과를 하여 확인을 할 수가 없다.
+	*/
 
 	auto client = get_client_iter(ci);
 
@@ -389,15 +393,19 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 		break;
 		case CS_Zombie_info:
 		{
-			auto client_Check_info = getZombie_infoView(get_packet);
-			auto iter = get_zombie_iter(client_Check_info->id());
+			auto client_Check_info = getZombie_CollectionView(get_packet);
+			std::cout << sizeof(get_packet) << std::endl;
+			auto packet_zombie = client_Check_info->data();
 
-			iter->second.set_animator(client_Check_info->animator());
-			iter->second.set_hp(client_Check_info->hp());
-			xyz packet_position{ client_Check_info->position()->x() , client_Check_info->position()->y() , client_Check_info->position()->z() };
-			iter->second.set_zombie_position(packet_position);
-			xyz packet_rotation{ client_Check_info->rotation()->x() , client_Check_info->rotation()->y() , client_Check_info->rotation()->z() };
-			iter->second.set_zombie_rotation(packet_rotation);
+			for (unsigned int i = 0; i < packet_zombie->size(); ++i) {
+				auto iter = get_zombie_iter(packet_zombie->Get(i)->id());
+				iter->second.set_animator(packet_zombie->Get(i)->animator());
+				iter->second.set_hp(packet_zombie->Get(i)->hp());
+				xyz packet_position{ packet_zombie->Get(i)->position()->x() , packet_zombie->Get(i)->position()->y() , packet_zombie->Get(i)->position()->z() };
+				iter->second.set_zombie_position(packet_position);
+				xyz packet_rotation{ packet_zombie->Get(i)->rotation()->x() , packet_zombie->Get(i)->rotation()->y() , packet_zombie->Get(i)->rotation()->z() };
+				iter->second.set_zombie_rotation(packet_rotation);
+			}
 		}
 		break;
 		}

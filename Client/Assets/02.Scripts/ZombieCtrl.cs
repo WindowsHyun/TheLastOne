@@ -139,8 +139,7 @@ public class ZombieCtrl : MonoBehaviour
                 if (stopPos && zombieNum != -1)
                     playerCtrl.send_ZombieData(zombieTr.position, zombieTr.eulerAngles, zombieNum, hp, zombieState);
             }
-
-            yield return new WaitForSeconds(0.05f);
+            yield return new WaitForSeconds(0.2f);
         }
 
 

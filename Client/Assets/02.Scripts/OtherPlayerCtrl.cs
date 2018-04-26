@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 using System;
 
@@ -11,10 +12,7 @@ public class OtherPlayerCtrl : MonoBehaviour
     // 캐릭터의 상태 정보가 있는 Enumerable 변수 선언
     public enum PlayerState
     {
-        idle, idleGun, die,
-        runForword, runBack, runLeft, runRight,
-        runForwordGun, runBackGun, runLeftGun, runRightgun,
-        runForwordShot, runBackShot, runLeftShot, runRightShot
+        idle, die,
     };
 
     // 캐릭터의 현재 상태 정보를 저장할 Enum 변수
@@ -61,7 +59,7 @@ public class OtherPlayerCtrl : MonoBehaviour
 
     // 애니메이션, 총 상태 저장하는 변수
     private int animator_value = 0;
-    private int weapon_state = 0;
+    private int weapon_state = -1;
 
     // 혈흔 효과 프리팹
     public GameObject bloodEffect;
@@ -75,15 +73,31 @@ public class OtherPlayerCtrl : MonoBehaviour
     public GameObject m4;
     public GameObject ump;
 
+    // 총알 발사 사운드
+    private AudioClip[] soundCollection = new AudioClip[4];
+
+    // 무기 정보 저장
+    private GameObject[] weaponView = new GameObject[4];
+    public Sprite defalutEquipImage;
+    public Image weaponImage;
 
     // 캐릭터 캡슐 콜라이더 비활성화
     public CapsuleCollider collider_script;
 
     void Start()
     {
+        weaponView[0] = ak47;
+        weaponView[1] = m16;
+        weaponView[2] = m4;
+        weaponView[3] = ump;
+
+        soundCollection[0] = AK47Sound;
+        soundCollection[1] = M16A4Sound;
+        soundCollection[2] = M4A1Sound;
+        soundCollection[3] = UMP45Sound;
+
         // 스크립트 처음에 Transform 컴포넌트 할당
         tr = GetComponent<Transform>();
-        //tr.position = new Vector3(612, 30, 1096);
 
         // Animator 컴포넌트 할당
         animator = this.transform.GetChild(0).GetComponent<Animator>();
@@ -100,10 +114,8 @@ public class OtherPlayerCtrl : MonoBehaviour
         StartCoroutine(this.createPrefab());
 
         // 무기 비활성화 하여 보이지 않기
-        ak47.GetComponent<Renderer>().enabled = false;
-        m16.GetComponent<Renderer>().enabled = false;
-        m4.GetComponent<Renderer>().enabled = false;
-        ump.GetComponent<Renderer>().enabled = false;
+        for (int i = 0; i < 4; ++i)
+            weaponView[i].GetComponent<Renderer>().enabled = false;
 
         collider_script = gameObject.GetComponent<CapsuleCollider>();
     }
@@ -171,63 +183,26 @@ public class OtherPlayerCtrl : MonoBehaviour
         do
         {
 
-            switch (weapon_state)
-            {
-                case 0:
-                    //animator.SetBool("IsEquip", false);
-                    ak47.GetComponent<Renderer>().enabled = false;
-                    m16.GetComponent<Renderer>().enabled = false;
-                    m4.GetComponent<Renderer>().enabled = false;
-                    ump.GetComponent<Renderer>().enabled = false;
-                    break;
-                case 1:
-                    // m16 장착 상태
-                    animator.SetBool("IsEquip", true);
-                    m16.GetComponent<Renderer>().enabled = true;
-
-                    m4.GetComponent<Renderer>().enabled = false;
-                    ump.GetComponent<Renderer>().enabled = false;
-                    ak47.GetComponent<Renderer>().enabled = false;
-                    m16.GetComponent<Renderer>().enabled = true;
-                    break;
-                case 2:
-                    // ak47 장착 상태
-                    animator.SetBool("IsEquip", true);
-                    ak47.GetComponent<Renderer>().enabled = true;
-
-                    m16.GetComponent<Renderer>().enabled = false;
-                    m4.GetComponent<Renderer>().enabled = false;
-                    ump.GetComponent<Renderer>().enabled = false;
-                    break;
-                case 3:
-                    // m4 장착 상태
-                    animator.SetBool("IsEquip", true);
-                    m4.GetComponent<Renderer>().enabled = true;
-
-                    m16.GetComponent<Renderer>().enabled = false;
-                    ak47.GetComponent<Renderer>().enabled = false;
-                    ump.GetComponent<Renderer>().enabled = false;
-                    break;
-                case 4:
-                    // ump 장착 상태
-                    animator.SetBool("IsEquip", true);
-                    ump.GetComponent<Renderer>().enabled = true;
-
-                    m16.GetComponent<Renderer>().enabled = false;
-                    m4.GetComponent<Renderer>().enabled = false;
-                    ak47.GetComponent<Renderer>().enabled = false;
-                    break;
-            }
-
             animator.SetFloat("Vertical", Vertical);
             animator.SetFloat("Horizontal", Horizontal);
+            if (weapon_state != -1)
+            {
+                animator.SetBool("IsEquip", true);
+                for (int i = 0; i < 4; ++i)
+                {
+                    if (weapon_state == i)
+                        weaponView[weapon_state].GetComponent<Renderer>().enabled = true;
+                    else
+                        weaponView[i].GetComponent<Renderer>().enabled = false;
+                }
+            }
 
             if (createBullet_b == true)
             {
                 Instantiate(bullet, firePos.position, firePos.rotation);
 
                 // 사운드 발생 함수 ( 거리에 따른 소리를 다르게 하기 위하여 함수로 만듬)
-                //source.PlayOneShot(fireSfx, SoundsByStreet(DistanceToPoint(player_Pos, tr.position)));
+                source.PlayOneShot(soundCollection[weapon_state], SoundsByStreet(DistanceToPoint(player_Pos, tr.position)));
 
                 // 잠시 기다리는 루틴을 위해 코루틴 함수로 호출
                 StartCoroutine(this.ShowMuzzleFlash());
