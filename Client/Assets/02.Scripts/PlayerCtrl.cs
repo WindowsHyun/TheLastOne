@@ -213,12 +213,15 @@ public class PlayerCtrl : PlayerVehicleCtrl
                 // 1번 장착 m4, 2번 장착 m16일때
                 else if (weaponSlotNumber[0] == 2 && weaponSlotNumber[1] == 1)
                 {
+                    // m16의 토탈 불릿과 동일하게 m4 토탈 불릿을 개수 동기화
                     bulletCount[2] = bulletCount[1];
                 }
+
 
                 now_Weapon = weaponSlotNumber[0];
                 weaponImage.GetComponent<Image>().sprite = weaponIEquipImage[now_Weapon];
                 weaponText.text = reloadBulletCount[now_Weapon] + " / " + bulletCount[now_Weapon];
+
                 for (int i = 0; i < 4; ++i)
                 {
                     if (now_Weapon == i)
@@ -237,13 +240,15 @@ public class PlayerCtrl : PlayerVehicleCtrl
                 // 1번 장착 m16, 2번 장착 m4일때
                 if (weaponSlotNumber[0] == 1 && weaponSlotNumber[1] == 2)
                 {
+                    bulletCount[2] = bulletCount[1];
+
+                }
+                //1번 장착 m4, 2번 장착 m16일때
+                else if(weaponSlotNumber[0] == 2 && weaponSlotNumber[1] == 1)
+                { 
                     bulletCount[1] = bulletCount[2];
                 }
-                // 1번 장착 m4, 2번 장착 m16일때
-                else if (weaponSlotNumber[0] == 2 && weaponSlotNumber[1] == 1)
-                {
-                    bulletCount[2] = bulletCount[1];
-                }
+                
 
                 now_Weapon = weaponSlotNumber[1];
                 weaponImage.GetComponent<Image>().sprite = weaponIEquipImage[now_Weapon];
@@ -736,20 +741,34 @@ public class PlayerCtrl : PlayerVehicleCtrl
     // 총알 재장전 함수
     public void ReloadBullet()
     {
+        // 장전에서도 m4와 m16을 서로 장착헸을때는 5.56mm 총알의 동기화가 되어야한다.
+        if (weaponSlotNumber[0] == 2 && weaponSlotNumber[1] == 1)
+        {
+            if (now_Weapon == 1)
+            {
+                bulletCount[1] = bulletCount[2];
+            }
+            else if (now_Weapon == 2)
+            {
+                bulletCount[2] = bulletCount[1];
+            }
+        }else if (weaponSlotNumber[0] == 1 && weaponSlotNumber[1] == 2)
+        {
+            if (now_Weapon == 1)
+            {
+                bulletCount[1] = bulletCount[2];
+            }
+            else if (now_Weapon == 2)
+            {
+                bulletCount[2] = bulletCount[1];
+            }
+        }
+
         if (bulletCount[now_Weapon] >= (30 - reloadBulletCount[now_Weapon]))
         {
             bulletCount[now_Weapon] -= (30 - reloadBulletCount[now_Weapon]);
             reloadBulletCount[now_Weapon] = 30;
             weaponText.text = reloadBulletCount[now_Weapon] + " / " + bulletCount[now_Weapon];
-            if(now_Weapon ==1)
-            {
-                bulletCount[2] -= (30 - reloadBulletCount[2]);
-            }
-            else if (now_Weapon == 2)
-            {
-                bulletCount[1] -= (30 - reloadBulletCount[1]);
-            }
-
         }
     }
 }
