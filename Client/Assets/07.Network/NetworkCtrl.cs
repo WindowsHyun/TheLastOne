@@ -320,12 +320,21 @@ namespace TheLastOne.Game.Network
                         Car_Rotation.z = Player_Script.ridingCar.vehicle_tr.eulerAngles.z;
                     }
                     Enum get_int_enum = Player_Script.playerState;
-                    Enum get_weaponState = Player_Script.nowWeaponState;
 
-                    Sendbyte = sF.makeClient_PacketInfo(Player_Position, Convert.ToInt32(get_int_enum), Player_Script.h, Player_Script.v, Player_Rotation, Convert.ToInt32(get_weaponState), Player_Script.CarNum, Car_Rotation);
+                    // 플레이어 데이터 보내주기
+                    Sendbyte = sF.makeClient_PacketInfo(Player_Position, Convert.ToInt32(get_int_enum), Player_Script.h, Player_Script.v, Player_Rotation, Player_Script.now_Weapon, Player_Script.CarNum, Car_Rotation);
                     Send_Packet(Sendbyte);
-                    yield return new WaitForSeconds(0.05f);
-                    // 초당20번 패킷 전송으로 제한을 한다.
+
+                    //좀비 데이터 보내주기
+                    if (zombie_data.Count != 0)
+                    {
+                        Sendbyte = sF.makeZombie_PacketInfo(zombie_data, Client_imei);
+                        if (Sendbyte != null)
+                            Send_Packet(Sendbyte);
+                    }
+
+                    yield return new WaitForSeconds(0.04f);
+                    // 초당25번 패킷 전송으로 제한을 한다.
                 }
             } while (true);
             //yield return null;
@@ -523,10 +532,21 @@ namespace TheLastOne.Game.Network
                     {
                         // 이미 값이 들어가 있는 상태라면
                         Game_ZombieClass iter = zombie_data[Get_ServerData.Data(i).Value.Id];
-                        iter.set_pos(new Vector3(Get_ServerData.Data(i).Value.Position.Value.X, Get_ServerData.Data(i).Value.Position.Value.Y, Get_ServerData.Data(i).Value.Position.Value.Z));
-                        iter.set_rot(new Vector3(Get_ServerData.Data(i).Value.Rotation.Value.X, Get_ServerData.Data(i).Value.Rotation.Value.Y, Get_ServerData.Data(i).Value.Rotation.Value.Z));
-                        iter.set_hp(Get_ServerData.Data(i).Value.Hp);
-                        iter.set_animator(Get_ServerData.Data(i).Value.Animator);
+                        if (Get_ServerData.Data(i).Value.TargetPlayer != Client_imei)
+                        {
+                            // Target과 플레이어가 다를 경우에만 위치를 동기화 해준다.
+                            iter.set_pos(new Vector3(Get_ServerData.Data(i).Value.Position.Value.X, Get_ServerData.Data(i).Value.Position.Value.Y, Get_ServerData.Data(i).Value.Position.Value.Z));
+                            iter.set_rot(new Vector3(Get_ServerData.Data(i).Value.Rotation.Value.X, Get_ServerData.Data(i).Value.Rotation.Value.Y, Get_ServerData.Data(i).Value.Rotation.Value.Z));
+                            iter.set_hp(Get_ServerData.Data(i).Value.Hp);
+                            iter.set_animator(Get_ServerData.Data(i).Value.Animator);
+                        }
+                        else if (iter.get_pos().x == 0 && iter.get_pos().y == 0 && iter.get_pos().z == 0)
+                        {
+                            iter.set_pos(new Vector3(Get_ServerData.Data(i).Value.Position.Value.X, Get_ServerData.Data(i).Value.Position.Value.Y, Get_ServerData.Data(i).Value.Position.Value.Z));
+                            iter.set_rot(new Vector3(Get_ServerData.Data(i).Value.Rotation.Value.X, Get_ServerData.Data(i).Value.Rotation.Value.Y, Get_ServerData.Data(i).Value.Rotation.Value.Z));
+                            iter.set_hp(Get_ServerData.Data(i).Value.Hp);
+                            iter.set_animator(Get_ServerData.Data(i).Value.Animator);
+                        }
                         iter.set_target(Get_ServerData.Data(i).Value.TargetPlayer);
                         iter.set_activeZombie(true);
                     }
@@ -667,6 +687,7 @@ namespace TheLastOne.Game.Network
             {
                 try
                 {
+                    //Debug.Log(packet.Length);
                     m_Socket.Send(packet, packet.Length, 0);
                 }
                 catch (SocketException err)
@@ -684,9 +705,12 @@ namespace TheLastOne.Game.Network
 
         public void Zombie_Pos(Vector3 pos, Vector3 rotation, int zombieNum, int hp, Enum animation)
         {
-            Sendbyte = sF.makeZombie_PacketInfo(pos, rotation, zombieNum, hp, animation);
-            Send_Packet(Sendbyte);
-            //Send_Packet(Sendbyte);
+            // 좀비의 위치를 Zombie_Data에 넣어준다.
+            Game_ZombieClass iter = zombie_data[zombieNum];
+            iter.set_pos(pos);
+            iter.set_rot(rotation);
+            iter.set_hp(hp);
+            iter.set_animator(Convert.ToInt32(animation));
         }
 
         void OnApplicationQuit()

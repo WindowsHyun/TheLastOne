@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // NavMeshAgent 컴포넌트를 사용하기위해 추가해야하는 네임스페이스
+using System;
 using UnityEngine.AI;
 
 public class ZombieCtrl : MonoBehaviour
@@ -115,6 +116,8 @@ public class ZombieCtrl : MonoBehaviour
                         break;
                     case 3:
                         zombieState = ZombieState.die;
+                        animator.SetTrigger("IsDie");
+                        StopAllCoroutines();
                         break;
                 }
                 yield return new WaitForSeconds(0.2f);
@@ -139,8 +142,7 @@ public class ZombieCtrl : MonoBehaviour
                 if (stopPos && zombieNum != -1)
                     playerCtrl.send_ZombieData(zombieTr.position, zombieTr.eulerAngles, zombieNum, hp, zombieState);
             }
-
-            yield return new WaitForSeconds(0.05f);
+            yield return new WaitForSeconds(0.2f);
         }
 
 
@@ -228,9 +230,24 @@ public class ZombieCtrl : MonoBehaviour
         animator.SetBool("IsAttack", false);
     }
 
+    public float DistanceToPoint(Vector3 a, Vector3 b)
+    {
+        // 캐릭터 간의 거리 구하기.
+        return (float)Math.Sqrt(Math.Pow(a.x - b.x, 2) + Math.Pow(a.z - b.z, 2));
+    }
+
     public void MovePos(Vector3 pos)
     {
-        float moveSpeed = 6.0f;
-        zombieTr.position = Vector3.MoveTowards(zombieTr.position, pos, Time.deltaTime * moveSpeed);
+        float moveSpeed = 9.0f;
+
+        if (DistanceToPoint(zombieTr.position, pos) >= 20)
+        {
+            // 20이상 거리 차이가 날경우 움직여 주는것이 아닌 바로 동기화를 시켜 버린다.
+            zombieTr.position = pos;
+        }
+        else
+        {
+            zombieTr.position = Vector3.MoveTowards(zombieTr.position, pos, Time.deltaTime * moveSpeed);
+        }
     }
 }

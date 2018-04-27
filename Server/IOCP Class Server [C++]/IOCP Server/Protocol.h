@@ -46,7 +46,8 @@ enum Event_Type { E_DangerLine, E_RoundTime, E_Remove_Client, E_MoveDangerLine }
 
 // 좀비가 볼 수 있는 거리
 #define Zombie_Dist 200
-#define Limit_Zombie 2
+#define Limit_Zombie 10
+#define Create_Zombie 50
 
 // 아이템 종류
 #define Kind_Item 0

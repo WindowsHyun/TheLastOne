@@ -783,6 +783,10 @@ namespace Game {
 			return flatbuffers::GetRoot<Game::TheLastOne::Zombie_info>(buf);
 		}
 
+		inline const Game::TheLastOne::Zombie_Collection *getZombie_CollectionView(const void *buf) {
+			return flatbuffers::GetRoot<Game::TheLastOne::Zombie_Collection>(buf);
+		}
+
 	}  // namespace TheLastOne
 }  // namespace Game
 
