@@ -54,7 +54,7 @@ public class SlotCtrl : MonoBehaviour
 
         player = GameObject.Find("Player").GetComponent<PlayerCtrl>();
 
-        cooltime = GameObject.Find("PanelCoolTime").GetComponent<CoolTimeCtrl>();
+        //cooltime = GameObject.Find("PanelCoolTime").GetComponent<CoolTimeCtrl>();
     }
 
     public void AddItem(ItemCtrl item, bool same, SlotCtrl sameSlot)

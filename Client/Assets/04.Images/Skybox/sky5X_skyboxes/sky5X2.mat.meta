@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: e9705e00f62f62849b89fc9fd55aa0e3
+guid: dbf7d7c7556970a4298c79455f959379
 labels:
 - skybox
 - skycube
@@ -15,6 +15,7 @@ labels:
 - sunrise
 - dawn
 NativeFormatImporter:
+  externalObjects: {}
   mainObjectFileID: -1
   userData: 
   assetBundleName: 
