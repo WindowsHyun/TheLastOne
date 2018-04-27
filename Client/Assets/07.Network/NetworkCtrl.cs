@@ -333,8 +333,8 @@ namespace TheLastOne.Game.Network
                             Send_Packet(Sendbyte);
                     }
 
-                    yield return new WaitForSeconds(0.05f);
-                    // 초당20번 패킷 전송으로 제한을 한다.
+                    yield return new WaitForSeconds(0.04f);
+                    // 초당25번 패킷 전송으로 제한을 한다.
                 }
             } while (true);
             //yield return null;
@@ -687,6 +687,7 @@ namespace TheLastOne.Game.Network
             {
                 try
                 {
+                    //Debug.Log(packet.Length);
                     m_Socket.Send(packet, packet.Length, 0);
                 }
                 catch (SocketException err)

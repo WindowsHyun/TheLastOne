@@ -147,16 +147,26 @@ void IOCP_Server::Worker_Thread()
 
 			unsigned psize = client->second.get_curr_packet();
 			unsigned pr_size = client->second.get_prev_packet();
+			char packet_data[8]{ 0 };
 			while (io_size != 0) {
-				if (0 == psize) psize = buf[0] + 4;
+				if (0 == psize) {
+					for (int i = 0; i < 8; ++i) {
+						if (buf[i] != 124)
+							packet_data[i] = buf[i];
+						else
+							break;
+					}
+					psize = atoi(packet_data) + 8;
+				}
 				// 0일 경우[바로전 패킷이 처리가 끝나고 새피킷으로 시작해도 된다. / 처음 받는다] 강제로 정해준다.
 				if (io_size + pr_size >= psize) {
 					// 지금 패킷 완성이 가능하다.
-					char packet[MAX_PACKET_SIZE]{ 0 };
+					char packet[MAX_PACKET_SIZE];
 					memcpy(packet, client->second.packet_buf, pr_size);
 					memcpy(packet + pr_size, buf, psize - pr_size);
 
-					ProcessPacket(static_cast<int>(ci), packet);
+					if (psize > 30)
+						ProcessPacket(static_cast<int>(ci), packet);
 					io_size -= psize - pr_size;
 					buf += psize - pr_size;
 					psize = 0; pr_size = 0;
@@ -327,19 +337,35 @@ void IOCP_Server::DisconnectClient(int ci)
 void IOCP_Server::ProcessPacket(int ci, char * packet)
 {
 	int errnum = 0;
-	char get_packet[MAX_PACKET_SIZE]{ 0 };
+
+	// 패킷 사이즈를 찾아주자.
+	char packet_data[8]{ 0 };
+	int i = 0;
+	for (i = 0; i < 8; ++i) {
+		if (packet[i] != 124)
+			packet_data[i] = packet[i];
+		else
+			break;
+	}
+	int packet_size = atoi(packet_data) + 8;
+
+
+	//char get_packet[MAX_PACKET_SIZE];
+	char *get_packet = new char[packet_size] {0};
 	bool all_Client_Packet = false;	// 모든 클라이언트에게 보낼 때는 True
-	for (int i = 4; i < MAX_PACKET_SIZE; ++i)
-		get_packet[i - 4] = packet[i];
+	for (int i = 8; i < packet_size; ++i)
+		get_packet[i - 8] = packet[i];
 	/*
 	Packet 사이즈를 확인한 후 받아야 한다.
 	그렇지 않으면 Packet 사이즈 초과를 하여 확인을 할 수가 없다.
 	*/
 
+	//memcpy(real_packet, packet, sizeof(packet));
+
 	auto client = get_client_iter(ci);
 
 	try {
-		switch (packet[1]) {
+		switch (packet[i + 1]) {
 		case CS_Info:
 		{
 			auto client_View = GetClientView(get_packet);
@@ -395,7 +421,7 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 		case CS_Zombie_info:
 		{
 			auto client_Check_info = getZombie_CollectionView(get_packet);
-			std::cout << sizeof(get_packet) << std::endl;
+			//std::cout << sizeof(get_packet) << std::endl;
 			auto packet_zombie = client_Check_info->data();
 
 			for (unsigned int i = 0; i < packet_zombie->size(); ++i) {
@@ -403,6 +429,7 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 				iter->second.set_animator(packet_zombie->Get(i)->animator());
 				iter->second.set_hp(packet_zombie->Get(i)->hp());
 				xyz packet_position{ packet_zombie->Get(i)->position()->x() , packet_zombie->Get(i)->position()->y() , packet_zombie->Get(i)->position()->z() };
+				//std::cout << packet_zombie->Get(i)->id() << " : " << packet_zombie->Get(i)->position()->x() << ", " << packet_zombie->Get(i)->position()->y() << ", " << packet_zombie->Get(i)->position()->z() << std::endl;
 				iter->second.set_zombie_position(packet_position);
 				xyz packet_rotation{ packet_zombie->Get(i)->rotation()->x() , packet_zombie->Get(i)->rotation()->y() , packet_zombie->Get(i)->rotation()->z() };
 				iter->second.set_zombie_rotation(packet_rotation);

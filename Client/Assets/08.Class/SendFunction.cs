@@ -37,13 +37,11 @@ namespace TheLastOne.SendFunction
 
 
             byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
-            byte[] packet_len = BitConverter.GetBytes(packet.Length);   // flatbuffers의 패킷 크기
-            byte[] packet_type = BitConverter.GetBytes(CS_Info);
-            byte[] real_packet = new byte[packet_len.Length + packet.Length];
+            byte[] magic_packet = makePacketinfo(packet.Length, CS_Info);
+            byte[] real_packet = new byte[packet.Length + 8];
+            System.Buffer.BlockCopy(magic_packet, 0, real_packet, 0, magic_packet.Length);
+            System.Buffer.BlockCopy(packet, 0, real_packet, 8, packet.Length);
 
-            System.Buffer.BlockCopy(packet_len, 0, real_packet, 0, packet_len.Length);
-            System.Buffer.BlockCopy(packet_type, 0, real_packet, 1, packet_type.Length);
-            System.Buffer.BlockCopy(packet, 0, real_packet, 4, packet.Length);
             return real_packet;
         }
 
@@ -87,15 +85,12 @@ namespace TheLastOne.SendFunction
             fbb.Finish(endOffset.Value);
 
             byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
-            byte[] packet_len = BitConverter.GetBytes(20);   // flatbuffers의 패킷 크기
-            byte[] packet_type = BitConverter.GetBytes(CS_Zombie_info);
-            byte[] real_packet = new byte[packet_len.Length + packet.Length];
+            byte[] magic_packet = makePacketinfo(packet.Length, CS_Zombie_info);
+            byte[] real_packet = new byte[packet.Length + 8];   
+            System.Buffer.BlockCopy(magic_packet, 0, real_packet, 0, magic_packet.Length);
+            System.Buffer.BlockCopy(packet, 0, real_packet, 8, packet.Length);
 
-            System.Buffer.BlockCopy(packet_len, 0, real_packet, 0, packet_len.Length);
-            System.Buffer.BlockCopy(packet_type, 0, real_packet, 1, packet_type.Length);
-            System.Buffer.BlockCopy(packet, 0, real_packet, 4, packet.Length);
-
-            Debug.Log(real_packet.Length);
+            //Debug.Log(real_packet.Length);
 
             if (num != 0)
                 return real_packet;
@@ -113,15 +108,11 @@ namespace TheLastOne.SendFunction
             var endOffset = Client_Shot_info.EndClient_Shot_info(fbb);
             fbb.Finish(endOffset.Value);
 
-
             byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
-            byte[] packet_len = BitConverter.GetBytes(packet.Length);   // flatbuffers의 패킷 크기
-            byte[] packet_type = BitConverter.GetBytes(CS_Shot_info);
-            byte[] real_packet = new byte[packet_len.Length + packet.Length];
-
-            System.Buffer.BlockCopy(packet_len, 0, real_packet, 0, packet_len.Length);
-            System.Buffer.BlockCopy(packet_type, 0, real_packet, 1, packet_type.Length);
-            System.Buffer.BlockCopy(packet, 0, real_packet, 4, packet.Length);
+            byte[] magic_packet = makePacketinfo(packet.Length, CS_Shot_info);
+            byte[] real_packet = new byte[packet.Length + 8];
+            System.Buffer.BlockCopy(magic_packet, 0, real_packet, 0, magic_packet.Length);
+            System.Buffer.BlockCopy(packet, 0, real_packet, 8, packet.Length);
             return real_packet;
         }
 
@@ -134,15 +125,11 @@ namespace TheLastOne.SendFunction
             var endOffset = Client_id.EndClient_id(fbb);
             fbb.Finish(endOffset.Value);
 
-
             byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
-            byte[] packet_len = BitConverter.GetBytes(packet.Length);   // flatbuffers의 패킷 크기
-            byte[] packet_type = BitConverter.GetBytes(CS_Check_info);
-            byte[] real_packet = new byte[packet_len.Length + packet.Length];
-
-            System.Buffer.BlockCopy(packet_len, 0, real_packet, 0, packet_len.Length);
-            System.Buffer.BlockCopy(packet_type, 0, real_packet, 1, packet_type.Length);
-            System.Buffer.BlockCopy(packet, 0, real_packet, 4, packet.Length);
+            byte[] magic_packet = makePacketinfo(packet.Length, CS_Check_info);
+            byte[] real_packet = new byte[packet.Length + 8];
+            System.Buffer.BlockCopy(magic_packet, 0, real_packet, 0, magic_packet.Length);
+            System.Buffer.BlockCopy(packet, 0, real_packet, 8, packet.Length);
             return real_packet;
         }
 
@@ -155,16 +142,30 @@ namespace TheLastOne.SendFunction
             var endOffset = Client_id.EndClient_id(fbb);
             fbb.Finish(endOffset.Value);
 
-
             byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
-            byte[] packet_len = BitConverter.GetBytes(packet.Length);   // flatbuffers의 패킷 크기
-            byte[] packet_type = BitConverter.GetBytes(CS_Eat_Item);
-            byte[] real_packet = new byte[packet_len.Length + packet.Length];
-
-            System.Buffer.BlockCopy(packet_len, 0, real_packet, 0, packet_len.Length);
-            System.Buffer.BlockCopy(packet_type, 0, real_packet, 1, packet_type.Length);
-            System.Buffer.BlockCopy(packet, 0, real_packet, 4, packet.Length);
+            byte[] magic_packet = makePacketinfo(packet.Length, CS_Eat_Item);
+            byte[] real_packet = new byte[packet.Length + 8];
+            System.Buffer.BlockCopy(magic_packet, 0, real_packet, 0, magic_packet.Length);
+            System.Buffer.BlockCopy(packet, 0, real_packet, 8, packet.Length);
             return real_packet;
+        }
+
+        public Byte[] makePacketinfo(int p_size, int type)
+        {
+            byte[] intBytes = new byte[p_size.ToString().Length + 2];   // 숫자 길이 + | + type
+            byte[] cpy_size = Encoding.UTF8.GetBytes(p_size.ToString());
+            byte[] cpy_type = Encoding.UTF8.GetBytes(type.ToString());
+
+            for (int i = 0; i < p_size.ToString().Length; ++i) { 
+                intBytes[i] = cpy_size[i];
+                //intBytes[i] -= 48;
+            }
+            intBytes[p_size.ToString().Length] = 124;
+            intBytes[p_size.ToString().Length + 1] = cpy_type[0];
+            intBytes[p_size.ToString().Length + 1] -= 48;
+            // 48을 마이너스 해준 이유는 Server에서 packet[i]로 형 변환 없이 바로 값을 확인하기 위하여
+
+            return intBytes;
         }
 
     }
