@@ -329,7 +329,8 @@ namespace TheLastOne.Game.Network
                     if (zombie_data.Count != 0)
                     {
                         Sendbyte = sF.makeZombie_PacketInfo(zombie_data, Client_imei);
-                        Send_Packet(Sendbyte);
+                        if (Sendbyte != null)
+                            Send_Packet(Sendbyte);
                     }
 
                     yield return new WaitForSeconds(0.05f);
@@ -708,7 +709,7 @@ namespace TheLastOne.Game.Network
             iter.set_pos(pos);
             iter.set_rot(rotation);
             iter.set_hp(hp);
-            iter.set_animator(Int32.Parse(animation.ToString()));
+            iter.set_animator(Convert.ToInt32(animation));
         }
 
         void OnApplicationQuit()

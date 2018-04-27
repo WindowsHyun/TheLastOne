@@ -152,9 +152,10 @@ void IOCP_Server::Worker_Thread()
 				// 0일 경우[바로전 패킷이 처리가 끝나고 새피킷으로 시작해도 된다. / 처음 받는다] 강제로 정해준다.
 				if (io_size + pr_size >= psize) {
 					// 지금 패킷 완성이 가능하다.
-					char packet[MAX_PACKET_SIZE];
+					char packet[MAX_PACKET_SIZE]{ 0 };
 					memcpy(packet, client->second.packet_buf, pr_size);
 					memcpy(packet + pr_size, buf, psize - pr_size);
+
 					ProcessPacket(static_cast<int>(ci), packet);
 					io_size -= psize - pr_size;
 					buf += psize - pr_size;
@@ -326,7 +327,7 @@ void IOCP_Server::DisconnectClient(int ci)
 void IOCP_Server::ProcessPacket(int ci, char * packet)
 {
 	int errnum = 0;
-	char get_packet[MAX_PACKET_SIZE]{ 0, };
+	char get_packet[MAX_PACKET_SIZE]{ 0 };
 	bool all_Client_Packet = false;	// 모든 클라이언트에게 보낼 때는 True
 	for (int i = 4; i < MAX_PACKET_SIZE; ++i)
 		get_packet[i - 4] = packet[i];
@@ -500,7 +501,6 @@ void IOCP_Server::Send_All_Player(int client)
 	auto client_iter = get_client_iter(client);
 	flatbuffers::FlatBufferBuilder builder;
 	std::vector<flatbuffers::Offset<Client_info>> Individual_client;		// 개인 데이터
-
 	for (auto iter : g_clients) {
 		if (iter.second.get_Connect() != true || Distance(client_iter->second.get_client_id(), iter.second.get_client_id(), Player_Dist, Kind_Player) == false)
 			// 클라이언트가 연결 안되어 있으면 제외 한다.
