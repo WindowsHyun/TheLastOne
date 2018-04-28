@@ -336,7 +336,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
                     ridingCar.vehicleStop = true;
 
                     // 차량 하차 시 좌표 이동
-                    this.transform.position = new Vector3(ridingCar.transform.position.x - 1, 29.99451f, ridingCar.transform.position.z);
+                    this.transform.position = new Vector3(ridingCar.transform.position.x - 1, ridingCar.transform.position.y, ridingCar.transform.position.z);
 
                     // 캐릭터 캡슐 콜라이더 활성화
                     gameObject.GetComponent<CapsuleCollider>().enabled = true;
@@ -496,7 +496,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
             }
 
             // 탑승시 캐릭터를 차량 위치와 동기화
-            this.transform.position = new Vector3(ridingCar.transform.position.x, 29.99451f, ridingCar.transform.position.z);
+            this.transform.position = new Vector3(ridingCar.transform.position.x, ridingCar.transform.position.y, ridingCar.transform.position.z);
 
         }
     }
