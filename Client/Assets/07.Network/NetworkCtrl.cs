@@ -195,7 +195,6 @@ namespace TheLastOne.Game.Network
                             zombie_data[key].script.StartCoroutine(zombie_data[key].script.ZombieAction());
                             zombie_data[key].set_activeZombie(false);
                         }
-
                         if (zombie_data[key].script.targetPlayer == -1 || zombie_data[key].Zombie.transform.position.x == 0)
                         {
                             // 포지션이 서버위치와 다를경우 초기화를 해준다.
@@ -205,11 +204,13 @@ namespace TheLastOne.Game.Network
                         else if (zombie_data[key].script.targetPlayer != Client_imei)
                         {
                             // 좀비 Target과 내 IMEI가 다른경우 다른 클라이언트의 데이터를 동기화 해준다.
+                            //
                             zombie_data[key].script.MovePos(zombie_data[key].get_pos());
                             Vector3 rotation = zombie_data[key].get_rot();
                             zombie_data[key].Zombie.transform.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
                             zombie_data[key].script.animator_value = zombie_data[key].get_animator();
                         }
+                        zombie_data[key].script.set_hp(zombie_data[key].get_hp());      // HP는 서버에 있으므로 항상 동기화 시킨다.
                         zombie_data[key].script.targetPlayer = zombie_data[key].get_target();
                     }
                     if (zombie_data[key].get_removeZombie() == true)
@@ -359,7 +360,7 @@ namespace TheLastOne.Game.Network
                 byte[] t_buf = new byte[size + 1];
                 System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
                 ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
-                var Get_ServerData = Client_id.GetRootAsClient_id(revc_buf);
+                var Get_ServerData = Client_Packet.GetRootAsClient_Packet(revc_buf);
                 Client_imei = Int32.Parse(Get_ServerData.Id.ToString());
                 debugString = "Client ID :" + Client_imei;
                 //----------------------------------------------------------------
@@ -438,7 +439,7 @@ namespace TheLastOne.Game.Network
                 byte[] t_buf = new byte[size + 1];
                 System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
                 ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
-                var Get_ServerData = Client_id.GetRootAsClient_id(revc_buf);
+                var Get_ServerData = Client_Packet.GetRootAsClient_Packet(revc_buf);
 
                 Game_ClientClass iter = client_data[Get_ServerData.Id];
                 // 해당 클라이언트의 SetActive를 꺼준다.
@@ -495,7 +496,7 @@ namespace TheLastOne.Game.Network
                 byte[] t_buf = new byte[size + 1];
                 System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
                 ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
-                var Get_ServerData = Client_id.GetRootAsClient_id(revc_buf);
+                var Get_ServerData = Client_Packet.GetRootAsClient_Packet(revc_buf);
 
                 if (Get_ServerData.Id != Client_imei)
                 {
@@ -563,7 +564,7 @@ namespace TheLastOne.Game.Network
                 byte[] t_buf = new byte[size + 1];
                 System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
                 ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
-                var Get_ServerData = Client_id.GetRootAsClient_id(revc_buf);
+                var Get_ServerData = Client_Packet.GetRootAsClient_Packet(revc_buf);
 
                 Game_ZombieClass iter = zombie_data[Get_ServerData.Id];
                 // 해당 좀비의 SetActive를 꺼준다.
@@ -675,7 +676,7 @@ namespace TheLastOne.Game.Network
             }
             catch (Exception e)
             {
-                //Debug.Log(e.Message);
+                Debug.Log(e.Message);
                 NetworkMessage new_msg = new NetworkMessage();
                 m_Socket.BeginReceive(new_msg.Receivebyte, 0, new_msg.LimitReceivebyte, SocketFlags.None, new AsyncCallback(RecieveHeaderCallback), new_msg);
             }
@@ -700,17 +701,23 @@ namespace TheLastOne.Game.Network
         public void Player_Shot()
         {
             Sendbyte = sF.makeShot_PacketInfo(Client_imei);
+            Debug.Log(Sendbyte.Length);
             Send_Packet(Sendbyte);
         }
 
-        public void Zombie_Pos(Vector3 pos, Vector3 rotation, int zombieNum, int hp, Enum animation)
+        public void Zombie_Pos(Vector3 pos, Vector3 rotation, int zombieNum, Enum animation)
         {
             // 좀비의 위치를 Zombie_Data에 넣어준다.
             Game_ZombieClass iter = zombie_data[zombieNum];
             iter.set_pos(pos);
             iter.set_rot(rotation);
-            iter.set_hp(hp);
             iter.set_animator(Convert.ToInt32(animation));
+        }
+
+        public void Zombie_HP(int id, int hp)
+        {
+            Sendbyte = sF.makeHP_PacketInfo(id, hp, recv_protocol.Kind_Zombie);
+            Send_Packet(Sendbyte);
         }
 
         void OnApplicationQuit()

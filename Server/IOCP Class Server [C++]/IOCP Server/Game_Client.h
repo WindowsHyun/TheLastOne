@@ -69,6 +69,7 @@ public:
 	void set_vertical(float value) { this->vertical = (float)value; }
 	void set_horizontal(float value) {  this->horizontal = (float)value; }
 	void set_inCar(int value) { this->inCar = value; }												// 클라이언트 무슨 차량 탑승 값 저장
+	void set_hp(int value) { this->hp = value; };														// 클라이언트 체력 저장
 
 	Game_Client(const SOCKET sock, const int client_id, const char * game_id);
 	Game_Client(const Game_Client& g_cl);

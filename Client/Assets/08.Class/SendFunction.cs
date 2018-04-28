@@ -16,11 +16,12 @@ namespace TheLastOne.SendFunction
 {
     class Socket_SendFunction : Game_ProtocolClass
     {
-        FlatBufferBuilder fbb = new FlatBufferBuilder(1);
+        
 
         public Byte[] makeClient_PacketInfo(Vector3 Player, int Player_Animator, float horizontal, float vertical, Vector3 PlayerRotation, int Player_Weapone, int inCar, Vector3 CarRotation)
         {
             //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.
+            FlatBufferBuilder fbb = new FlatBufferBuilder(1);
             fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
             Client_info.StartClient_info(fbb);
             //Client.AddName(fbb, offset); // string 사용
@@ -47,6 +48,7 @@ namespace TheLastOne.SendFunction
 
         public Byte[] makeZombie_PacketInfo(Dictionary<int, Game_ZombieClass> zombie_data, int client_imei)
         {
+            FlatBufferBuilder fbb = new FlatBufferBuilder(1);
             fbb.Clear();
             //var target_zombie = new Offset<Zombie_info>[10];
             List<Offset<Zombie_info>> target_zombie = new List<Offset<Zombie_info>>();
@@ -101,11 +103,12 @@ namespace TheLastOne.SendFunction
 
         public Byte[] makeShot_PacketInfo(int client)
         {
+            FlatBufferBuilder fbb = new FlatBufferBuilder(1);
             //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.
             fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
-            Client_Shot_info.StartClient_Shot_info(fbb);
-            Client_Shot_info.AddId(fbb, client);
-            var endOffset = Client_Shot_info.EndClient_Shot_info(fbb);
+            Client_Packet.StartClient_Packet(fbb);
+            Client_Packet.AddId(fbb, client);
+            var endOffset = Client_Packet.EndClient_Packet(fbb);
             fbb.Finish(endOffset.Value);
 
             byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
@@ -118,11 +121,12 @@ namespace TheLastOne.SendFunction
 
         public Byte[] check_ClientIMEI(int client)
         {
+            FlatBufferBuilder fbb = new FlatBufferBuilder(1);
             //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.
             fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
-            Client_id.StartClient_id(fbb);
-            Client_id.AddId(fbb, client);
-            var endOffset = Client_id.EndClient_id(fbb);
+            Client_Packet.StartClient_Packet(fbb);
+            Client_Packet.AddId(fbb, client);
+            var endOffset = Client_Packet.EndClient_Packet(fbb);
             fbb.Finish(endOffset.Value);
 
             byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
@@ -135,15 +139,35 @@ namespace TheLastOne.SendFunction
 
         public Byte[] makeEatItem_PacketInfo(int item_num)
         {
+            FlatBufferBuilder fbb = new FlatBufferBuilder(1);
             //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.
             fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
-            Client_id.StartClient_id(fbb);
-            Client_id.AddId(fbb, item_num);
-            var endOffset = Client_id.EndClient_id(fbb);
+            Client_Packet.StartClient_Packet(fbb);
+            Client_Packet.AddId(fbb, item_num);
+            var endOffset = Client_Packet.EndClient_Packet(fbb);
             fbb.Finish(endOffset.Value);
 
             byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
             byte[] magic_packet = makePacketinfo(packet.Length, CS_Eat_Item);
+            byte[] real_packet = new byte[packet.Length + 8];
+            System.Buffer.BlockCopy(magic_packet, 0, real_packet, 0, magic_packet.Length);
+            System.Buffer.BlockCopy(packet, 0, real_packet, 8, packet.Length);
+            return real_packet;
+        }
+
+        public Byte[] makeHP_PacketInfo(int id, int hp, int kind)
+        {
+            FlatBufferBuilder fbb = new FlatBufferBuilder(1);
+            fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
+            Game_HP_Set.StartGame_HP_Set(fbb);
+            Game_HP_Set.AddId(fbb, id);
+            Game_HP_Set.AddHp(fbb, hp);
+            Game_HP_Set.AddKind(fbb, kind);
+            var endOffset = Game_HP_Set.EndGame_HP_Set(fbb);
+            fbb.Finish(endOffset.Value);
+
+            byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
+            byte[] magic_packet = makePacketinfo(packet.Length, CS_Object_HP);
             byte[] real_packet = new byte[packet.Length + 8];
             System.Buffer.BlockCopy(magic_packet, 0, real_packet, 0, magic_packet.Length);
             System.Buffer.BlockCopy(packet, 0, real_packet, 8, packet.Length);

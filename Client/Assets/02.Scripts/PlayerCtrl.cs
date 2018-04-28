@@ -733,9 +733,14 @@ public class PlayerCtrl : PlayerVehicleCtrl
         Destroy(blood1, 1.0f);
     }
 
-    public void send_ZombieData(Vector3 pos, Vector3 rotation, int zombieNum, int hp, Enum animation)
+    public void send_ZombieData(Vector3 pos, Vector3 rotation, int zombieNum, Enum animation)
     {
-        networkCtrl.Zombie_Pos(pos, rotation, zombieNum, hp, animation);
+        networkCtrl.Zombie_Pos(pos, rotation, zombieNum, animation);
+    }
+
+    public void send_ZombieHP(int id, int hp)
+    {
+        networkCtrl.Zombie_HP(id, hp);
     }
 
     // 총알 재장전 함수

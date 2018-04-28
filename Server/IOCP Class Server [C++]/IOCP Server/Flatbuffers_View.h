@@ -27,9 +27,9 @@ namespace Game {
 
 		struct Game_Timer;
 
-		struct Client_id;
+		struct Client_Packet;
 
-		struct Client_Shot_info;
+		struct Game_HP_Set;
 
 		MANUALLY_ALIGNED_STRUCT(4) Vec3 FLATBUFFERS_FINAL_CLASS {
 		private:
@@ -686,7 +686,7 @@ namespace Game {
 			return builder_.Finish();
 		}
 
-		struct Client_id FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+		struct Client_Packet FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 			enum {
 				VT_ID = 4
 			};
@@ -700,68 +700,88 @@ namespace Game {
 			}
 		};
 
-		struct Client_idBuilder {
+		struct Client_PacketBuilder {
 			flatbuffers::FlatBufferBuilder &fbb_;
 			flatbuffers::uoffset_t start_;
 			void add_id(int32_t id) {
-				fbb_.AddElement<int32_t>(Client_id::VT_ID, id, 0);
+				fbb_.AddElement<int32_t>(Client_Packet::VT_ID, id, 0);
 			}
-			explicit Client_idBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+			explicit Client_PacketBuilder(flatbuffers::FlatBufferBuilder &_fbb)
 				: fbb_(_fbb) {
 				start_ = fbb_.StartTable();
 			}
-			Client_idBuilder &operator=(const Client_idBuilder &);
-			flatbuffers::Offset<Client_id> Finish() {
+			Client_PacketBuilder &operator=(const Client_PacketBuilder &);
+			flatbuffers::Offset<Client_Packet> Finish() {
 				const auto end = fbb_.EndTable(start_);
-				auto o = flatbuffers::Offset<Client_id>(end);
+				auto o = flatbuffers::Offset<Client_Packet>(end);
 				return o;
 			}
 		};
 
-		inline flatbuffers::Offset<Client_id> CreateClient_id(
+		inline flatbuffers::Offset<Client_Packet> CreateClient_Packet(
 			flatbuffers::FlatBufferBuilder &_fbb,
 			int32_t id = 0) {
-			Client_idBuilder builder_(_fbb);
+			Client_PacketBuilder builder_(_fbb);
 			builder_.add_id(id);
 			return builder_.Finish();
 		}
 
-		struct Client_Shot_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+		struct Game_HP_Set FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 			enum {
-				VT_ID = 4
+				VT_ID = 4,
+				VT_HP = 6,
+				VT_KIND = 8
 			};
 			int32_t id() const {
 				return GetField<int32_t>(VT_ID, 0);
 			}
+			int32_t hp() const {
+				return GetField<int32_t>(VT_HP, 0);
+			}
+			int32_t kind() const {
+				return GetField<int32_t>(VT_KIND, 0);
+			}
 			bool Verify(flatbuffers::Verifier &verifier) const {
 				return VerifyTableStart(verifier) &&
 					VerifyField<int32_t>(verifier, VT_ID) &&
+					VerifyField<int32_t>(verifier, VT_HP) &&
+					VerifyField<int32_t>(verifier, VT_KIND) &&
 					verifier.EndTable();
 			}
 		};
 
-		struct Client_Shot_infoBuilder {
+		struct Game_HP_SetBuilder {
 			flatbuffers::FlatBufferBuilder &fbb_;
 			flatbuffers::uoffset_t start_;
 			void add_id(int32_t id) {
-				fbb_.AddElement<int32_t>(Client_Shot_info::VT_ID, id, 0);
+				fbb_.AddElement<int32_t>(Game_HP_Set::VT_ID, id, 0);
 			}
-			explicit Client_Shot_infoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+			void add_hp(int32_t hp) {
+				fbb_.AddElement<int32_t>(Game_HP_Set::VT_HP, hp, 0);
+			}
+			void add_kind(int32_t kind) {
+				fbb_.AddElement<int32_t>(Game_HP_Set::VT_KIND, kind, 0);
+			}
+			explicit Game_HP_SetBuilder(flatbuffers::FlatBufferBuilder &_fbb)
 				: fbb_(_fbb) {
 				start_ = fbb_.StartTable();
 			}
-			Client_Shot_infoBuilder &operator=(const Client_Shot_infoBuilder &);
-			flatbuffers::Offset<Client_Shot_info> Finish() {
+			Game_HP_SetBuilder &operator=(const Game_HP_SetBuilder &);
+			flatbuffers::Offset<Game_HP_Set> Finish() {
 				const auto end = fbb_.EndTable(start_);
-				auto o = flatbuffers::Offset<Client_Shot_info>(end);
+				auto o = flatbuffers::Offset<Game_HP_Set>(end);
 				return o;
 			}
 		};
 
-		inline flatbuffers::Offset<Client_Shot_info> CreateClient_Shot_info(
+		inline flatbuffers::Offset<Game_HP_Set> CreateGame_HP_Set(
 			flatbuffers::FlatBufferBuilder &_fbb,
-			int32_t id = 0) {
-			Client_Shot_infoBuilder builder_(_fbb);
+			int32_t id = 0,
+			int32_t hp = 0,
+			int32_t kind = 0) {
+			Game_HP_SetBuilder builder_(_fbb);
+			builder_.add_kind(kind);
+			builder_.add_hp(hp);
 			builder_.add_id(id);
 			return builder_.Finish();
 		}
@@ -771,12 +791,8 @@ namespace Game {
 			return flatbuffers::GetRoot<Game::TheLastOne::Client_info>(buf);
 		}
 
-		inline const Game::TheLastOne::Client_Shot_info *GetClient_Shot_infoView(const void *buf) {
-			return flatbuffers::GetRoot<Game::TheLastOne::Client_Shot_info>(buf);
-		}
-
-		inline const Game::TheLastOne::Client_id *GetClient_infoView(const void *buf) {
-			return flatbuffers::GetRoot<Game::TheLastOne::Client_id>(buf);
+		inline const Game::TheLastOne::Client_Packet *GetClient_packetView(const void *buf) {
+			return flatbuffers::GetRoot<Game::TheLastOne::Client_Packet>(buf);
 		}
 
 		inline const Game::TheLastOne::Zombie_info *getZombie_infoView(const void *buf) {
@@ -785,6 +801,10 @@ namespace Game {
 
 		inline const Game::TheLastOne::Zombie_Collection *getZombie_CollectionView(const void *buf) {
 			return flatbuffers::GetRoot<Game::TheLastOne::Zombie_Collection>(buf);
+		}
+
+		inline const Game::TheLastOne::Game_HP_Set *getGame_HP_SetView(const void *buf) {
+			return flatbuffers::GetRoot<Game::TheLastOne::Game_HP_Set>(buf);
 		}
 
 	}  // namespace TheLastOne

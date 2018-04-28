@@ -165,7 +165,7 @@ void IOCP_Server::Worker_Thread()
 					memcpy(packet, client->second.packet_buf, pr_size);
 					memcpy(packet + pr_size, buf, psize - pr_size);
 
-					if (psize > 30)
+					if (psize > 19)
 						ProcessPacket(static_cast<int>(ci), packet);
 					io_size -= psize - pr_size;
 					buf += psize - pr_size;
@@ -391,14 +391,14 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 
 		case CS_Shot_info:
 		{
-			auto client_Shot_View = GetClient_Shot_infoView(get_packet);
+			auto client_Shot_View = GetClient_packetView(get_packet);
 			auto client = get_client_iter(client_Shot_View->id());
 			Send_Client_Shot(client->first);
 		}
 		break;
 		case CS_Check_info:
 		{
-			auto client_Check_info = GetClient_infoView(get_packet);
+			auto client_Check_info = GetClient_packetView(get_packet);
 			if (ci != client_Check_info->id()) {
 				/*
 				클라이언트의 고유번호와 서버의 고유번호가 다를 경우
@@ -413,7 +413,7 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 		break;
 		case CS_Eat_Item:
 		{
-			auto client_Check_info = GetClient_infoView(get_packet);
+			auto client_Check_info = GetClient_packetView(get_packet);
 			auto iter = get_item_iter(client_Check_info->id());
 			iter->second.set_eat(true);
 		}
@@ -433,6 +433,19 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 				iter->second.set_zombie_position(packet_position);
 				xyz packet_rotation{ packet_zombie->Get(i)->rotation()->x() , packet_zombie->Get(i)->rotation()->y() , packet_zombie->Get(i)->rotation()->z() };
 				iter->second.set_zombie_rotation(packet_rotation);
+			}
+		}
+		break;
+		case CS_Object_HP:
+		{
+			auto client_Check_info = getGame_HP_SetView(get_packet);
+			if (client_Check_info->kind() == Kind_Player){
+				auto iter = get_client_iter(client_Check_info->id());
+				iter->second.set_hp(client_Check_info->hp());
+			}else if (client_Check_info->kind() == Kind_Zombie) {
+				auto iter = get_zombie_iter(client_Check_info->id());
+				iter->second.set_hp(client_Check_info->hp());
+				std::cout << iter->second.get_client_id() << " : " << iter->second.get_hp() << std::endl;
 			}
 		}
 		break;
@@ -503,7 +516,7 @@ void IOCP_Server::Send_Client_ID(int client_id, int value, bool allClient)
 		// value = 아이디를 추가 or 삭제 할때 사용.
 		flatbuffers::FlatBufferBuilder builder;
 		auto Client_id = client_id;
-		auto orc = CreateClient_id(builder, Client_id);
+		auto orc = CreateClient_Packet(builder, Client_id);
 		builder.Finish(orc); // Serialize the root of the object.
 
 		if (allClient == true) {
@@ -645,7 +658,7 @@ void IOCP_Server::Send_Client_Shot(int shot_client)
 	auto client_iter = get_client_iter(shot_client);
 	flatbuffers::FlatBufferBuilder builder;
 	auto id = shot_client;
-	auto orc = CreateClient_id(builder, id);
+	auto orc = CreateClient_Packet(builder, id);
 	builder.Finish(orc); // Serialize the root of the object.
 
 	for (auto iter : g_clients) {
@@ -686,7 +699,7 @@ void IOCP_Server::Send_Hide_Player(int client)
 
 		flatbuffers::FlatBufferBuilder builder;
 		auto Client_id = iter.second.get_client_id();
-		auto orc = CreateClient_id(builder, Client_id);
+		auto orc = CreateClient_Packet(builder, Client_id);
 		builder.Finish(orc); // Serialize the root of the object.
 
 		SendPacket(SC_REMOVE_PLAYER, client_iter->second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
@@ -703,7 +716,7 @@ void IOCP_Server::Send_Hide_Zombie(int client)
 
 		flatbuffers::FlatBufferBuilder builder;
 		auto Client_id = iter.second.get_client_id();
-		auto orc = CreateClient_id(builder, Client_id);
+		auto orc = CreateClient_Packet(builder, Client_id);
 		builder.Finish(orc); // Serialize the root of the object.
 
 		SendPacket(SC_Remove_Zombie, client_iter->second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());

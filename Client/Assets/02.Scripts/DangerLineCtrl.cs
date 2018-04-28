@@ -4,11 +4,18 @@ using UnityEngine;
 
 public class DangerLineCtrl : MonoBehaviour
 {
-    private bool start = false;
-    private int demage = 1;
+    private bool start;
+    private int demage;
     private Vector3 start_pos;
-    private Vector3 limit_scale = new Vector3(4500, 4500, 4500);
+    private Vector3 limit_scale;
     //private Vector3 limit_scale = new Vector3(2700, 2700, 2700);
+
+    private void Awake()
+    {
+        start = false;
+        demage = 1;
+        limit_scale = new Vector3(4500, 4500, 4500);
+    }
 
     public void set_start(bool value)
     {

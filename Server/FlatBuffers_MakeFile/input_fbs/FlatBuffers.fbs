@@ -63,10 +63,12 @@ table Game_Timer {
   time:int;
 }
 
-table Client_id {
+table Client_Packet {
   id:int;
 }
 
-table Client_Shot_info {
+table Game_HP_Set {
   id:int;
+  hp:int;
+  kind:int;
 }
