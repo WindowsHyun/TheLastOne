@@ -97,10 +97,12 @@ public class CoolTimeCtrl : MonoBehaviour
         if (player.hp <= 30)
         {
             player.hp += 70;
+            player.send_PlayerHP(player.hp, player.armour);
         }
         else if (player.hp > 30)
         {
             player.hp = 100;
+            player.send_PlayerHP(player.hp, player.armour);
         }
         player.imgHpBar.fillAmount = (float)player.hp / (float)player.initHp;
         gameObject.SetActive(false);

@@ -35,7 +35,7 @@ public class ZombieCtrl : MonoBehaviour
     public GameObject bloodEffect;
 
     // 좀비 체력 변수
-    private int hp = 100;
+    public int hp = 100;
 
     // 좀비 Nav 켜기
     private bool stopPos = false;    // NetworkCtrl Pos 고정을 멈추게 한다.
@@ -140,7 +140,7 @@ public class ZombieCtrl : MonoBehaviour
                     zombieState = ZombieState.idle;
                 }
                 if (stopPos && zombieNum != -1)
-                    playerCtrl.send_ZombieData(zombieTr.position, zombieTr.eulerAngles, zombieNum, hp, zombieState);
+                    playerCtrl.send_ZombieData(zombieTr.position, zombieTr.eulerAngles, zombieNum, zombieState);
             }
             yield return new WaitForSeconds(0.2f);
         }
@@ -190,23 +190,25 @@ public class ZombieCtrl : MonoBehaviour
 
             // 맞은 총알의 Damage를 추출해 Zombie HP 차감
             hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
+            playerCtrl.send_ZombieHP(zombieNum, hp);
+
             if (hp <= 0)
-            {
                 ZombieDie();
-            }
+
             // Bullet 삭제
             Destroy(coll.gameObject);
         }
     }
 
-    void ZombieDie()
+    public void ZombieDie()
     {
         // 모든 코루틴 종료
         zombieState = ZombieState.die;
         nvAgent.isStopped = true;
         animator.SetTrigger("IsDie");
         isDie = true;
-        playerCtrl.send_ZombieData(zombieTr.position, zombieTr.eulerAngles, zombieNum, 0, zombieState);
+        hp = 0;
+        playerCtrl.send_ZombieData(zombieTr.position, zombieTr.eulerAngles, zombieNum, zombieState);
         StopAllCoroutines();
 
         gameObject.GetComponentInChildren<SphereCollider>().enabled = false;
@@ -238,7 +240,7 @@ public class ZombieCtrl : MonoBehaviour
 
     public void MovePos(Vector3 pos)
     {
-        float moveSpeed = 9.0f;
+        float moveSpeed = 10.0f;
 
         if (DistanceToPoint(zombieTr.position, pos) >= 20)
         {

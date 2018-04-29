@@ -262,10 +262,10 @@
     <Compile Include="Assets\02.Scripts\WeaponSlotCtrl.cs" />
     <Compile Include="Assets\02.Scripts\ZombieCtrl.cs" />
     <Compile Include="Assets\07.Network\Client_Collection.cs" />
-    <Compile Include="Assets\07.Network\Client_id.cs" />
     <Compile Include="Assets\07.Network\Client_info.cs" />
-    <Compile Include="Assets\07.Network\Client_Shot_info.cs" />
+    <Compile Include="Assets\07.Network\Client_Packet.cs" />
     <Compile Include="Assets\07.Network\CollisionCheckCtrl.cs" />
+    <Compile Include="Assets\07.Network\Game_HP_Set.cs" />
     <Compile Include="Assets\07.Network\Game_Items.cs" />
     <Compile Include="Assets\07.Network\Game_Timer.cs" />
     <Compile Include="Assets\07.Network\GameDangerLine.cs" />

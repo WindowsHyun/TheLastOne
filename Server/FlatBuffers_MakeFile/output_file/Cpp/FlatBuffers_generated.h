@@ -27,9 +27,9 @@ struct GameDangerLine;
 
 struct Game_Timer;
 
-struct Client_id;
+struct Client_Packet;
 
-struct Client_Shot_info;
+struct Game_HP_Set;
 
 MANUALLY_ALIGNED_STRUCT(4) Vec3 FLATBUFFERS_FINAL_CLASS {
  private:
@@ -112,21 +112,25 @@ struct Client_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_ID = 4,
     VT_HP = 6,
-    VT_ANIMATOR = 8,
-    VT_HORIZONTAL = 10,
-    VT_VERTICAL = 12,
-    VT_INCAR = 14,
-    VT_NAME = 16,
-    VT_POSITION = 18,
-    VT_ROTATION = 20,
-    VT_CARROTATION = 22,
-    VT_NOWWEAPON = 24
+    VT_ARMOUR = 8,
+    VT_ANIMATOR = 10,
+    VT_HORIZONTAL = 12,
+    VT_VERTICAL = 14,
+    VT_INCAR = 16,
+    VT_NAME = 18,
+    VT_POSITION = 20,
+    VT_ROTATION = 22,
+    VT_CARROTATION = 24,
+    VT_NOWWEAPON = 26
   };
   int32_t id() const {
     return GetField<int32_t>(VT_ID, 0);
   }
   int32_t hp() const {
     return GetField<int32_t>(VT_HP, 0);
+  }
+  int32_t armour() const {
+    return GetField<int32_t>(VT_ARMOUR, 0);
   }
   int32_t animator() const {
     return GetField<int32_t>(VT_ANIMATOR, 0);
@@ -159,6 +163,7 @@ struct Client_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_ID) &&
            VerifyField<int32_t>(verifier, VT_HP) &&
+           VerifyField<int32_t>(verifier, VT_ARMOUR) &&
            VerifyField<int32_t>(verifier, VT_ANIMATOR) &&
            VerifyField<float>(verifier, VT_HORIZONTAL) &&
            VerifyField<float>(verifier, VT_VERTICAL) &&
@@ -181,6 +186,9 @@ struct Client_infoBuilder {
   }
   void add_hp(int32_t hp) {
     fbb_.AddElement<int32_t>(Client_info::VT_HP, hp, 0);
+  }
+  void add_armour(int32_t armour) {
+    fbb_.AddElement<int32_t>(Client_info::VT_ARMOUR, armour, 0);
   }
   void add_animator(int32_t animator) {
     fbb_.AddElement<int32_t>(Client_info::VT_ANIMATOR, animator, 0);
@@ -225,6 +233,7 @@ inline flatbuffers::Offset<Client_info> CreateClient_info(
     flatbuffers::FlatBufferBuilder &_fbb,
     int32_t id = 0,
     int32_t hp = 0,
+    int32_t armour = 0,
     int32_t animator = 0,
     float Horizontal = 0.0f,
     float Vertical = 0.0f,
@@ -244,6 +253,7 @@ inline flatbuffers::Offset<Client_info> CreateClient_info(
   builder_.add_Vertical(Vertical);
   builder_.add_Horizontal(Horizontal);
   builder_.add_animator(animator);
+  builder_.add_armour(armour);
   builder_.add_hp(hp);
   builder_.add_id(id);
   return builder_.Finish();
@@ -253,6 +263,7 @@ inline flatbuffers::Offset<Client_info> CreateClient_infoDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     int32_t id = 0,
     int32_t hp = 0,
+    int32_t armour = 0,
     int32_t animator = 0,
     float Horizontal = 0.0f,
     float Vertical = 0.0f,
@@ -266,6 +277,7 @@ inline flatbuffers::Offset<Client_info> CreateClient_infoDirect(
       _fbb,
       id,
       hp,
+      armour,
       animator,
       Horizontal,
       Vertical,
@@ -474,7 +486,9 @@ struct Gameitem FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_POSITION = 8,
     VT_ROTATION = 10,
     VT_EAT = 12,
-    VT_KIND = 14
+    VT_RIDING = 14,
+    VT_HP = 16,
+    VT_KIND = 18
   };
   int32_t id() const {
     return GetField<int32_t>(VT_ID, 0);
@@ -491,6 +505,12 @@ struct Gameitem FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool eat() const {
     return GetField<uint8_t>(VT_EAT, 0) != 0;
   }
+  bool riding() const {
+    return GetField<uint8_t>(VT_RIDING, 0) != 0;
+  }
+  int32_t hp() const {
+    return GetField<int32_t>(VT_HP, 0);
+  }
   int32_t kind() const {
     return GetField<int32_t>(VT_KIND, 0);
   }
@@ -502,6 +522,8 @@ struct Gameitem FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<Vec3>(verifier, VT_POSITION) &&
            VerifyField<Vec3>(verifier, VT_ROTATION) &&
            VerifyField<uint8_t>(verifier, VT_EAT) &&
+           VerifyField<uint8_t>(verifier, VT_RIDING) &&
+           VerifyField<int32_t>(verifier, VT_HP) &&
            VerifyField<int32_t>(verifier, VT_KIND) &&
            verifier.EndTable();
   }
@@ -525,6 +547,12 @@ struct GameitemBuilder {
   void add_eat(bool eat) {
     fbb_.AddElement<uint8_t>(Gameitem::VT_EAT, static_cast<uint8_t>(eat), 0);
   }
+  void add_riding(bool riding) {
+    fbb_.AddElement<uint8_t>(Gameitem::VT_RIDING, static_cast<uint8_t>(riding), 0);
+  }
+  void add_hp(int32_t hp) {
+    fbb_.AddElement<int32_t>(Gameitem::VT_HP, hp, 0);
+  }
   void add_kind(int32_t kind) {
     fbb_.AddElement<int32_t>(Gameitem::VT_KIND, kind, 0);
   }
@@ -547,13 +575,17 @@ inline flatbuffers::Offset<Gameitem> CreateGameitem(
     const Vec3 *position = 0,
     const Vec3 *rotation = 0,
     bool eat = false,
+    bool riding = false,
+    int32_t hp = 0,
     int32_t kind = 0) {
   GameitemBuilder builder_(_fbb);
   builder_.add_kind(kind);
+  builder_.add_hp(hp);
   builder_.add_rotation(rotation);
   builder_.add_position(position);
   builder_.add_name(name);
   builder_.add_id(id);
+  builder_.add_riding(riding);
   builder_.add_eat(eat);
   return builder_.Finish();
 }
@@ -565,6 +597,8 @@ inline flatbuffers::Offset<Gameitem> CreateGameitemDirect(
     const Vec3 *position = 0,
     const Vec3 *rotation = 0,
     bool eat = false,
+    bool riding = false,
+    int32_t hp = 0,
     int32_t kind = 0) {
   return Game::TheLastOne::CreateGameitem(
       _fbb,
@@ -573,6 +607,8 @@ inline flatbuffers::Offset<Gameitem> CreateGameitemDirect(
       position,
       rotation,
       eat,
+      riding,
+      hp,
       kind);
 }
 
@@ -686,7 +722,7 @@ inline flatbuffers::Offset<Game_Timer> CreateGame_Timer(
   return builder_.Finish();
 }
 
-struct Client_id FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+struct Client_Packet FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_ID = 4
   };
@@ -700,68 +736,98 @@ struct Client_id FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
 };
 
-struct Client_idBuilder {
+struct Client_PacketBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_id(int32_t id) {
-    fbb_.AddElement<int32_t>(Client_id::VT_ID, id, 0);
+    fbb_.AddElement<int32_t>(Client_Packet::VT_ID, id, 0);
   }
-  explicit Client_idBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  explicit Client_PacketBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  Client_idBuilder &operator=(const Client_idBuilder &);
-  flatbuffers::Offset<Client_id> Finish() {
+  Client_PacketBuilder &operator=(const Client_PacketBuilder &);
+  flatbuffers::Offset<Client_Packet> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<Client_id>(end);
+    auto o = flatbuffers::Offset<Client_Packet>(end);
     return o;
   }
 };
 
-inline flatbuffers::Offset<Client_id> CreateClient_id(
+inline flatbuffers::Offset<Client_Packet> CreateClient_Packet(
     flatbuffers::FlatBufferBuilder &_fbb,
     int32_t id = 0) {
-  Client_idBuilder builder_(_fbb);
+  Client_PacketBuilder builder_(_fbb);
   builder_.add_id(id);
   return builder_.Finish();
 }
 
-struct Client_Shot_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+struct Game_HP_Set FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_ID = 4
+    VT_ID = 4,
+    VT_HP = 6,
+    VT_ARMOUR = 8,
+    VT_KIND = 10
   };
   int32_t id() const {
     return GetField<int32_t>(VT_ID, 0);
   }
+  int32_t hp() const {
+    return GetField<int32_t>(VT_HP, 0);
+  }
+  int32_t armour() const {
+    return GetField<int32_t>(VT_ARMOUR, 0);
+  }
+  int32_t kind() const {
+    return GetField<int32_t>(VT_KIND, 0);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_ID) &&
+           VerifyField<int32_t>(verifier, VT_HP) &&
+           VerifyField<int32_t>(verifier, VT_ARMOUR) &&
+           VerifyField<int32_t>(verifier, VT_KIND) &&
            verifier.EndTable();
   }
 };
 
-struct Client_Shot_infoBuilder {
+struct Game_HP_SetBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
   void add_id(int32_t id) {
-    fbb_.AddElement<int32_t>(Client_Shot_info::VT_ID, id, 0);
+    fbb_.AddElement<int32_t>(Game_HP_Set::VT_ID, id, 0);
   }
-  explicit Client_Shot_infoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  void add_hp(int32_t hp) {
+    fbb_.AddElement<int32_t>(Game_HP_Set::VT_HP, hp, 0);
+  }
+  void add_armour(int32_t armour) {
+    fbb_.AddElement<int32_t>(Game_HP_Set::VT_ARMOUR, armour, 0);
+  }
+  void add_kind(int32_t kind) {
+    fbb_.AddElement<int32_t>(Game_HP_Set::VT_KIND, kind, 0);
+  }
+  explicit Game_HP_SetBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  Client_Shot_infoBuilder &operator=(const Client_Shot_infoBuilder &);
-  flatbuffers::Offset<Client_Shot_info> Finish() {
+  Game_HP_SetBuilder &operator=(const Game_HP_SetBuilder &);
+  flatbuffers::Offset<Game_HP_Set> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<Client_Shot_info>(end);
+    auto o = flatbuffers::Offset<Game_HP_Set>(end);
     return o;
   }
 };
 
-inline flatbuffers::Offset<Client_Shot_info> CreateClient_Shot_info(
+inline flatbuffers::Offset<Game_HP_Set> CreateGame_HP_Set(
     flatbuffers::FlatBufferBuilder &_fbb,
-    int32_t id = 0) {
-  Client_Shot_infoBuilder builder_(_fbb);
+    int32_t id = 0,
+    int32_t hp = 0,
+    int32_t armour = 0,
+    int32_t kind = 0) {
+  Game_HP_SetBuilder builder_(_fbb);
+  builder_.add_kind(kind);
+  builder_.add_armour(armour);
+  builder_.add_hp(hp);
   builder_.add_id(id);
   return builder_.Finish();
 }

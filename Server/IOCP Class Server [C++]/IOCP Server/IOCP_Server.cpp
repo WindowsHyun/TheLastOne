@@ -165,7 +165,7 @@ void IOCP_Server::Worker_Thread()
 					memcpy(packet, client->second.packet_buf, pr_size);
 					memcpy(packet + pr_size, buf, psize - pr_size);
 
-					if (psize > 30)
+					if (psize > 19)
 						ProcessPacket(static_cast<int>(ci), packet);
 					io_size -= psize - pr_size;
 					buf += psize - pr_size;
@@ -381,7 +381,7 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 			if (client_View->inCar() != -1) {
 				// 차량을 실제로 탑승 하고 있을 경우.
 				auto item = get_item_iter(client_View->inCar());
-				item->second.set_pos(client_View->position()->x(), client_View->position()->z());
+				item->second.set_pos(client_View->position()->x(), client_View->position()->y(), client_View->position()->z());
 				xyz car_rotation{ client_View->carrotation()->x() , client_View->carrotation()->y() , client_View->carrotation()->z() };
 				client->second.set_client_car_rotation(car_rotation);
 				item->second.set_rotation(client_View->carrotation()->x(), client_View->carrotation()->y(), client_View->carrotation()->z());
@@ -391,14 +391,14 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 
 		case CS_Shot_info:
 		{
-			auto client_Shot_View = GetClient_Shot_infoView(get_packet);
+			auto client_Shot_View = GetClient_packetView(get_packet);
 			auto client = get_client_iter(client_Shot_View->id());
 			Send_Client_Shot(client->first);
 		}
 		break;
 		case CS_Check_info:
 		{
-			auto client_Check_info = GetClient_infoView(get_packet);
+			auto client_Check_info = GetClient_packetView(get_packet);
 			if (ci != client_Check_info->id()) {
 				/*
 				클라이언트의 고유번호와 서버의 고유번호가 다를 경우
@@ -413,7 +413,7 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 		break;
 		case CS_Eat_Item:
 		{
-			auto client_Check_info = GetClient_infoView(get_packet);
+			auto client_Check_info = GetClient_packetView(get_packet);
 			auto iter = get_item_iter(client_Check_info->id());
 			iter->second.set_eat(true);
 		}
@@ -427,13 +427,45 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 			for (unsigned int i = 0; i < packet_zombie->size(); ++i) {
 				auto iter = get_zombie_iter(packet_zombie->Get(i)->id());
 				iter->second.set_animator(packet_zombie->Get(i)->animator());
-				iter->second.set_hp(packet_zombie->Get(i)->hp());
 				xyz packet_position{ packet_zombie->Get(i)->position()->x() , packet_zombie->Get(i)->position()->y() , packet_zombie->Get(i)->position()->z() };
 				//std::cout << packet_zombie->Get(i)->id() << " : " << packet_zombie->Get(i)->position()->x() << ", " << packet_zombie->Get(i)->position()->y() << ", " << packet_zombie->Get(i)->position()->z() << std::endl;
 				iter->second.set_zombie_position(packet_position);
 				xyz packet_rotation{ packet_zombie->Get(i)->rotation()->x() , packet_zombie->Get(i)->rotation()->y() , packet_zombie->Get(i)->rotation()->z() };
 				iter->second.set_zombie_rotation(packet_rotation);
 			}
+		}
+		break;
+		case CS_Object_HP:
+		{
+			auto client_Check_info = getGame_HP_SetView(get_packet);
+			if (client_Check_info->kind() == Kind_Player) {
+				auto iter = get_client_iter(client_Check_info->id());
+				iter->second.set_hp(client_Check_info->hp());
+				iter->second.set_armour(client_Check_info->armour());
+			}
+			else if (client_Check_info->kind() == Kind_Zombie) {
+				auto iter = get_zombie_iter(client_Check_info->id());
+				iter->second.set_hp(client_Check_info->hp());
+			}
+			else if (client_Check_info->kind() == Kind_Car) {
+				auto iter = get_item_iter(client_Check_info->id());
+				iter->second.set_hp(client_Check_info->hp());
+				std::cout << iter->second.get_hp() << std::endl;
+			}
+		}
+		break;
+		case CS_Car_Riding:
+		{
+			auto client_Check_info = GetClient_packetView(get_packet);
+			auto iter = get_item_iter(client_Check_info->id());
+			iter->second.set_riding(true);
+		}
+		break;
+		case CS_Car_Rode:
+		{
+			auto client_Check_info = GetClient_packetView(get_packet);
+			auto iter = get_item_iter(client_Check_info->id());
+			iter->second.set_riding(false);
 		}
 		break;
 		}
@@ -503,7 +535,7 @@ void IOCP_Server::Send_Client_ID(int client_id, int value, bool allClient)
 		// value = 아이디를 추가 or 삭제 할때 사용.
 		flatbuffers::FlatBufferBuilder builder;
 		auto Client_id = client_id;
-		auto orc = CreateClient_id(builder, Client_id);
+		auto orc = CreateClient_Packet(builder, Client_id);
 		builder.Finish(orc); // Serialize the root of the object.
 
 		if (allClient == true) {
@@ -536,6 +568,7 @@ void IOCP_Server::Send_All_Player(int client)
 		auto id = iter.second.get_client_id();
 		auto name = builder.CreateString(iter.second.nickName);
 		auto hp = iter.second.get_hp();
+		auto armour = iter.second.get_armour();
 		auto animator = iter.second.get_animator();
 		float horizontal = iter.second.get_horizontal();
 		float vertical = iter.second.get_vertical();
@@ -544,7 +577,7 @@ void IOCP_Server::Send_All_Player(int client)
 		auto weaponState = iter.second.get_weapon();
 		auto inCar = iter.second.get_inCar();
 		auto car_rotation = iter.second.get_car_rotation();
-		auto client_data = CreateClient_info(builder, id, hp, animator, horizontal, vertical, inCar, name, &xyz, &rotation, &car_rotation, weaponState);
+		auto client_data = CreateClient_info(builder, id, hp, armour, animator, horizontal, vertical, inCar, name, &xyz, &rotation, &car_rotation, weaponState);
 		// client_data 라는 테이블에 클라이언트 데이터가 들어가 있다.
 
 		Individual_client.push_back(client_data);	// Vector에 넣었다.
@@ -622,8 +655,10 @@ void IOCP_Server::Send_All_Item()
 		Vec3 pos = { iter.second.get_pos().x, iter.second.get_pos().y,  iter.second.get_pos().z };
 		Vec3 rotation = { iter.second.get_rotation().x, iter.second.get_rotation().y,  iter.second.get_rotation().z };
 		auto eat = iter.second.get_eat();
+		auto riding = iter.second.get_riding();
+		auto hp = iter.second.get_hp();
 		auto kind = iter.second.get_kind();
-		auto client_data = CreateGameitem(builder, id, name, &pos, &rotation, eat, kind);
+		auto client_data = CreateGameitem(builder, id, name, &pos, &rotation, eat, riding, hp, kind);
 
 		Individual_client.push_back(client_data);	// Vector에 넣었다.
 	}
@@ -645,7 +680,7 @@ void IOCP_Server::Send_Client_Shot(int shot_client)
 	auto client_iter = get_client_iter(shot_client);
 	flatbuffers::FlatBufferBuilder builder;
 	auto id = shot_client;
-	auto orc = CreateClient_id(builder, id);
+	auto orc = CreateClient_Packet(builder, id);
 	builder.Finish(orc); // Serialize the root of the object.
 
 	for (auto iter : g_clients) {
@@ -686,7 +721,7 @@ void IOCP_Server::Send_Hide_Player(int client)
 
 		flatbuffers::FlatBufferBuilder builder;
 		auto Client_id = iter.second.get_client_id();
-		auto orc = CreateClient_id(builder, Client_id);
+		auto orc = CreateClient_Packet(builder, Client_id);
 		builder.Finish(orc); // Serialize the root of the object.
 
 		SendPacket(SC_REMOVE_PLAYER, client_iter->second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
@@ -703,7 +738,7 @@ void IOCP_Server::Send_Hide_Zombie(int client)
 
 		flatbuffers::FlatBufferBuilder builder;
 		auto Client_id = iter.second.get_client_id();
-		auto orc = CreateClient_id(builder, Client_id);
+		auto orc = CreateClient_Packet(builder, Client_id);
 		builder.Finish(orc); // Serialize the root of the object.
 
 		SendPacket(SC_Remove_Zombie, client_iter->second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
@@ -752,6 +787,11 @@ void player_To_Zombie(std::unordered_map<int, Game_Zombie> &zombie, std::unorder
 			float check_dist = DistanceToPoint(iter->second.get_pos().x, iter->second.get_pos().z, z.second.get_pos().x, z.second.get_pos().z);
 			if (check_dist >= Zombie_Dist) {
 				// 플레이어가 존재하지만 거리가 멀어져 있을 경우 좀비 Target을 초기화
+				iter->second.set_limit_zombie(-1);
+				zombie.find(z.first)->second.set_target(-1);
+			}
+			if (iter->second.get_hp() <= 0) {
+				// 플레이어 체력이 0 이하일 경우
 				iter->second.set_limit_zombie(-1);
 				zombie.find(z.first)->second.set_target(-1);
 			}

@@ -6,7 +6,6 @@ using System.Text;
 using UnityEngine;
 using FlatBuffers;
 using Game.TheLastOne; // Client, Vec3 을 불러오기 위해
-using System.Collections.Generic;
 using TheLastOne.GameClass;
 //using TheLastOne.Game.Network;
 
@@ -16,11 +15,12 @@ namespace TheLastOne.SendFunction
 {
     class Socket_SendFunction : Game_ProtocolClass
     {
-        FlatBufferBuilder fbb = new FlatBufferBuilder(1);
+
 
         public Byte[] makeClient_PacketInfo(Vector3 Player, int Player_Animator, float horizontal, float vertical, Vector3 PlayerRotation, int Player_Weapone, int inCar, Vector3 CarRotation)
         {
             //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.
+            FlatBufferBuilder fbb = new FlatBufferBuilder(1);
             fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
             Client_info.StartClient_info(fbb);
             //Client.AddName(fbb, offset); // string 사용
@@ -47,6 +47,7 @@ namespace TheLastOne.SendFunction
 
         public Byte[] makeZombie_PacketInfo(Dictionary<int, Game_ZombieClass> zombie_data, int client_imei)
         {
+            FlatBufferBuilder fbb = new FlatBufferBuilder(1);
             fbb.Clear();
             //var target_zombie = new Offset<Zombie_info>[10];
             List<Offset<Zombie_info>> target_zombie = new List<Offset<Zombie_info>>();
@@ -54,12 +55,11 @@ namespace TheLastOne.SendFunction
             int num = 0;
             foreach (var key in zombie_data.Keys.ToList())
             {
-                if (zombie_data[key].get_target() == client_imei)
+                if (zombie_data[key].get_target() == client_imei && zombie_data[key].get_isDie() == false)
                 {
                     // 좀비 Target과 Client_Imei가 같은경우에만 Vector에 넣는다.
                     Zombie_info.StartZombie_info(fbb);
                     Zombie_info.AddId(fbb, zombie_data[key].get_id());
-                    Zombie_info.AddHp(fbb, zombie_data[key].get_hp());
                     Zombie_info.AddAnimator(fbb, zombie_data[key].get_animator());
                     Zombie_info.AddTargetPlayer(fbb, zombie_data[key].get_target());
                     Zombie_info.AddPosition(fbb, Vec3.CreateVec3(fbb, zombie_data[key].get_pos().x, zombie_data[key].get_pos().y, zombie_data[key].get_pos().z));
@@ -86,7 +86,7 @@ namespace TheLastOne.SendFunction
 
             byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
             byte[] magic_packet = makePacketinfo(packet.Length, CS_Zombie_info);
-            byte[] real_packet = new byte[packet.Length + 8];   
+            byte[] real_packet = new byte[packet.Length + 8];
             System.Buffer.BlockCopy(magic_packet, 0, real_packet, 0, magic_packet.Length);
             System.Buffer.BlockCopy(packet, 0, real_packet, 8, packet.Length);
 
@@ -101,11 +101,12 @@ namespace TheLastOne.SendFunction
 
         public Byte[] makeShot_PacketInfo(int client)
         {
+            FlatBufferBuilder fbb = new FlatBufferBuilder(1);
             //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.
             fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
-            Client_Shot_info.StartClient_Shot_info(fbb);
-            Client_Shot_info.AddId(fbb, client);
-            var endOffset = Client_Shot_info.EndClient_Shot_info(fbb);
+            Client_Packet.StartClient_Packet(fbb);
+            Client_Packet.AddId(fbb, client);
+            var endOffset = Client_Packet.EndClient_Packet(fbb);
             fbb.Finish(endOffset.Value);
 
             byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
@@ -118,11 +119,12 @@ namespace TheLastOne.SendFunction
 
         public Byte[] check_ClientIMEI(int client)
         {
+            FlatBufferBuilder fbb = new FlatBufferBuilder(1);
             //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.
             fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
-            Client_id.StartClient_id(fbb);
-            Client_id.AddId(fbb, client);
-            var endOffset = Client_id.EndClient_id(fbb);
+            Client_Packet.StartClient_Packet(fbb);
+            Client_Packet.AddId(fbb, client);
+            var endOffset = Client_Packet.EndClient_Packet(fbb);
             fbb.Finish(endOffset.Value);
 
             byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
@@ -135,15 +137,58 @@ namespace TheLastOne.SendFunction
 
         public Byte[] makeEatItem_PacketInfo(int item_num)
         {
+            FlatBufferBuilder fbb = new FlatBufferBuilder(1);
             //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.
             fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
-            Client_id.StartClient_id(fbb);
-            Client_id.AddId(fbb, item_num);
-            var endOffset = Client_id.EndClient_id(fbb);
+            Client_Packet.StartClient_Packet(fbb);
+            Client_Packet.AddId(fbb, item_num);
+            var endOffset = Client_Packet.EndClient_Packet(fbb);
             fbb.Finish(endOffset.Value);
 
             byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
             byte[] magic_packet = makePacketinfo(packet.Length, CS_Eat_Item);
+            byte[] real_packet = new byte[packet.Length + 8];
+            System.Buffer.BlockCopy(magic_packet, 0, real_packet, 0, magic_packet.Length);
+            System.Buffer.BlockCopy(packet, 0, real_packet, 8, packet.Length);
+            return real_packet;
+        }
+
+        public Byte[] makeHP_PacketInfo(int id, int hp, int armour, int kind)
+        {
+            FlatBufferBuilder fbb = new FlatBufferBuilder(1);
+            fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
+            Game_HP_Set.StartGame_HP_Set(fbb);
+            Game_HP_Set.AddId(fbb, id);
+            Game_HP_Set.AddHp(fbb, hp);
+            Game_HP_Set.AddArmour(fbb, armour);
+            Game_HP_Set.AddKind(fbb, kind);
+            var endOffset = Game_HP_Set.EndGame_HP_Set(fbb);
+            fbb.Finish(endOffset.Value);
+
+            byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
+            byte[] magic_packet = makePacketinfo(packet.Length, CS_Object_HP);
+            byte[] real_packet = new byte[packet.Length + 8];
+            System.Buffer.BlockCopy(magic_packet, 0, real_packet, 0, magic_packet.Length);
+            System.Buffer.BlockCopy(packet, 0, real_packet, 8, packet.Length);
+            return real_packet;
+        }
+
+        public Byte[] makeCar_Status(int id, bool value)
+        {
+            FlatBufferBuilder fbb = new FlatBufferBuilder(1);
+            fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
+            Client_Packet.StartClient_Packet(fbb);
+            Client_Packet.AddId(fbb, id);
+            var endOffset = Client_Packet.EndClient_Packet(fbb);
+            fbb.Finish(endOffset.Value);
+
+            byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
+            int sc_type;
+            if (value)
+                sc_type = CS_Car_Riding;    // 차량 탑습
+            else
+                sc_type = CS_Car_Rode;      // 차량 하차
+            byte[] magic_packet = makePacketinfo(packet.Length, sc_type);
             byte[] real_packet = new byte[packet.Length + 8];
             System.Buffer.BlockCopy(magic_packet, 0, real_packet, 0, magic_packet.Length);
             System.Buffer.BlockCopy(packet, 0, real_packet, 8, packet.Length);
@@ -156,7 +201,8 @@ namespace TheLastOne.SendFunction
             byte[] cpy_size = Encoding.UTF8.GetBytes(p_size.ToString());
             byte[] cpy_type = Encoding.UTF8.GetBytes(type.ToString());
 
-            for (int i = 0; i < p_size.ToString().Length; ++i) { 
+            for (int i = 0; i < p_size.ToString().Length; ++i)
+            {
                 intBytes[i] = cpy_size[i];
                 //intBytes[i] -= 48;
             }

@@ -119,7 +119,13 @@ namespace TheLastOne.Game.Network
                 foreach (var key in client_data.Keys.ToList())
                 {
                     if (client_data[key].get_id() == Client_imei)
+                    {
+                        Player_Script.hp = client_data[key].get_hp();
+                        Player_Script.armour = client_data[key].get_armour();
+                        Player_Script.imgHpBar.fillAmount = (float)Player_Script.hp / (float)Player_Script.initHp;
+                        Player_Script.imgArmourBar.fillAmount = (float)Player_Script.armour / (float)Player_Script.initArmour;
                         continue;
+                    }
                     if (client_data[key].get_connect() == true && client_data[key].get_prefab() == false)
                     {
                         // 플레이어가 연결된 상태에서 프리팹 생성이 안되 었을 경우.
@@ -127,6 +133,7 @@ namespace TheLastOne.Game.Network
                         client_data[key].Player.transform.SetParent(OtherPlayerCollection.transform);
 
                         client_data[key].script = client_data[key].Player.GetComponent<OtherPlayerCtrl>();
+                        client_data[key].script.otherPlayer_id = client_data[key].get_id();
                         client_data[key].set_prefab(true);
 
                         // 처음 위치를 넣어 줘야 한다. 그러지 않을경우 다른 클라이언트 에서는 0,0 에서부터 천천히 올라오게 보인다
@@ -143,6 +150,13 @@ namespace TheLastOne.Game.Network
                             client_data[key].set_activePlayer(false);
                         }
 
+                        if (client_data[key].get_hp() <= 0 && client_data[key].get_isDie() == false && client_data[key].get_pos().x != 0)
+                        {
+                            // 서버에서의 체력은 이미 0인데 클라가 0인 아닌경우를 대비하여
+                            client_data[key].set_isDie(true);
+                            client_data[key].script.OtherPlayerDie();
+                        }
+
                         if (client_data[key].get_inCar() != -1)
                         {
                             // 차량의 탑승 할 경우 캐릭터 콜라이더 비활성화 및 움직임 보간이 아닌 바로바로 이동
@@ -152,9 +166,10 @@ namespace TheLastOne.Game.Network
                         else
                         {
                             // 실제로 캐릭터를 움직이는 것은 코루틴 여기서 움직임을 진행 한다.
+                            client_data[key].script.set_hp(client_data[key].get_hp());
+                            client_data[key].script.set_armour(client_data[key].get_armour());
                             client_data[key].script.MovePos(client_data[key].get_pos());
                             client_data[key].script.collider_script.enabled = true;
-
                             Vector3 rotation = client_data[key].get_rot();
                             client_data[key].Player.transform.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
                         }
@@ -195,7 +210,6 @@ namespace TheLastOne.Game.Network
                             zombie_data[key].script.StartCoroutine(zombie_data[key].script.ZombieAction());
                             zombie_data[key].set_activeZombie(false);
                         }
-
                         if (zombie_data[key].script.targetPlayer == -1 || zombie_data[key].Zombie.transform.position.x == 0)
                         {
                             // 포지션이 서버위치와 다를경우 초기화를 해준다.
@@ -210,6 +224,18 @@ namespace TheLastOne.Game.Network
                             zombie_data[key].Zombie.transform.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
                             zombie_data[key].script.animator_value = zombie_data[key].get_animator();
                         }
+
+                        if (zombie_data[key].get_hp() <= 0 && zombie_data[key].get_isDie() == false && zombie_data[key].get_pos().x != 0)
+                        {
+                            // 서버에서의 체력은 이미 0인데 클라가 0인 아닌경우를 대비하여
+                            zombie_data[key].set_isDie(true);
+                            zombie_data[key].script.ZombieDie();
+                        }
+                        else
+                        {
+                            zombie_data[key].script.hp = zombie_data[key].get_hp();      // HP는 서버에 있으므로 항상 동기화 시킨다.
+                        }
+
                         zombie_data[key].script.targetPlayer = zombie_data[key].get_target();
                     }
                     if (zombie_data[key].get_removeZombie() == true)
@@ -270,7 +296,10 @@ namespace TheLastOne.Game.Network
                             else if (iter.Value.get_name() == "UAZ")
                             {
                                 iter.Value.item = Instantiate(Car_UAZ, iter.Value.get_pos(), Quaternion.identity);
-                                iter.Value.item.GetComponent<VehicleCtrl>().carNum = iter.Key;  // 해당 차량이 몇번째 차량인지 알려주자.
+                                iter.Value.item.transform.SetParent(ItemCollection.transform);
+
+                                iter.Value.car = iter.Value.item.GetComponent<VehicleCtrl>();
+                                iter.Value.car.carNum = iter.Key;  // 해당 차량이 몇번째 차량인지 알려주자.
                                 iter.Value.item.transform.SetParent(ItemCollection.transform);
                                 iter.Value.set_draw(true);
                             }
@@ -287,6 +316,18 @@ namespace TheLastOne.Game.Network
                             // Item이 정상적으로 나왔다가 다른 사람이 먹었을 경우에 대한 처리
                             iter.Value.item.SetActive(false);
                         }
+                        if (iter.Value.get_name() == "UAZ")
+                        {
+                            // 차량의 탑승 상태를 전달해 준다.
+                            iter.Value.car.Car_Status = iter.Value.get_riding();
+                            iter.Value.car.vehicleHp = iter.Value.get_hp();
+                            if (iter.Value.get_hp() <= 0 && iter.Value.get_explosion() == false)
+                            {
+                                iter.Value.set_explosion(true);
+                                iter.Value.car.ExpCar();
+                            }
+
+                        }
                         if (iter.Value.get_kind() == recv_protocol.Kind_Car && Player_Script.CarNum != iter.Key)
                         {
                             // 차량의 경우 지속적으로 위치를 갱신 해준다.
@@ -296,7 +337,7 @@ namespace TheLastOne.Game.Network
                         }
                     }
                 }
-                yield return new WaitForSeconds(0.1f);
+                yield return new WaitForSeconds(0.06f);
             } while (true);
             //yield return null;
         }
@@ -359,7 +400,7 @@ namespace TheLastOne.Game.Network
                 byte[] t_buf = new byte[size + 1];
                 System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
                 ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
-                var Get_ServerData = Client_id.GetRootAsClient_id(revc_buf);
+                var Get_ServerData = Client_Packet.GetRootAsClient_Packet(revc_buf);
                 Client_imei = Int32.Parse(Get_ServerData.Id.ToString());
                 debugString = "Client ID :" + Client_imei;
                 //----------------------------------------------------------------
@@ -390,7 +431,7 @@ namespace TheLastOne.Game.Network
                 else
                 {
                     // 클라이언트가 자기 자신이 아닐경우에만 추가해준다.
-                    client_data.Add(Get_ServerData.Id, new Game_ClientClass(Get_ServerData.Id, Get_ServerData.Name.ToString(), new Vector3(Get_ServerData.Position.Value.X, Get_ServerData.Position.Value.Y, Get_ServerData.Position.Value.Z), new Vector3(Get_ServerData.Rotation.Value.X, Get_ServerData.Rotation.Value.Y, Get_ServerData.Rotation.Value.Z)));
+                    client_data.Add(Get_ServerData.Id, new Game_ClientClass(Get_ServerData.Id, Get_ServerData.Hp, Get_ServerData.Name.ToString(), new Vector3(Get_ServerData.Position.Value.X, Get_ServerData.Position.Value.Y, Get_ServerData.Position.Value.Z), new Vector3(Get_ServerData.Rotation.Value.X, Get_ServerData.Rotation.Value.Y, Get_ServerData.Rotation.Value.Z)));
                 }
             }
             else if (type == recv_protocol.SC_Client_Data)
@@ -411,6 +452,8 @@ namespace TheLastOne.Game.Network
                         iter.set_pos(new Vector3(Get_ServerData.Data(i).Value.Position.Value.X, Get_ServerData.Data(i).Value.Position.Value.Y, Get_ServerData.Data(i).Value.Position.Value.Z));
                         iter.set_rot(new Vector3(Get_ServerData.Data(i).Value.Rotation.Value.X, Get_ServerData.Data(i).Value.Rotation.Value.Y, Get_ServerData.Data(i).Value.Rotation.Value.Z));
                         iter.set_weapon(Get_ServerData.Data(i).Value.NowWeapon);
+                        iter.set_hp(Get_ServerData.Data(i).Value.Hp);
+                        iter.set_armour(Get_ServerData.Data(i).Value.Armour);
                         iter.set_horizontal(Get_ServerData.Data(i).Value.Horizontal);
                         iter.set_vertical(Get_ServerData.Data(i).Value.Vertical);
                         iter.set_inCar(Get_ServerData.Data(i).Value.InCar);
@@ -428,7 +471,7 @@ namespace TheLastOne.Game.Network
                     else
                     {
                         // 클라이언트가 자기 자신이 아닐경우에만 추가해준다.
-                        client_data.Add(Get_ServerData.Data(i).Value.Id, new Game_ClientClass(Get_ServerData.Data(i).Value.Id, Get_ServerData.Data(i).Value.Name.ToString(), new Vector3(Get_ServerData.Data(i).Value.Position.Value.X, Get_ServerData.Data(i).Value.Position.Value.Y, Get_ServerData.Data(i).Value.Position.Value.Z), new Vector3(Get_ServerData.Data(i).Value.Rotation.Value.X, Get_ServerData.Data(i).Value.Rotation.Value.Y, Get_ServerData.Data(i).Value.Rotation.Value.Z)));
+                        client_data.Add(Get_ServerData.Data(i).Value.Id, new Game_ClientClass(Get_ServerData.Data(i).Value.Id, Get_ServerData.Data(i).Value.Hp, Get_ServerData.Data(i).Value.Name.ToString(), new Vector3(Get_ServerData.Data(i).Value.Position.Value.X, Get_ServerData.Data(i).Value.Position.Value.Y, Get_ServerData.Data(i).Value.Position.Value.Z), new Vector3(Get_ServerData.Data(i).Value.Rotation.Value.X, Get_ServerData.Data(i).Value.Rotation.Value.Y, Get_ServerData.Data(i).Value.Rotation.Value.Z)));
                     }
                 }
             }
@@ -438,7 +481,7 @@ namespace TheLastOne.Game.Network
                 byte[] t_buf = new byte[size + 1];
                 System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
                 ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
-                var Get_ServerData = Client_id.GetRootAsClient_id(revc_buf);
+                var Get_ServerData = Client_Packet.GetRootAsClient_Packet(revc_buf);
 
                 Game_ClientClass iter = client_data[Get_ServerData.Id];
                 // 해당 클라이언트의 SetActive를 꺼준다.
@@ -467,7 +510,7 @@ namespace TheLastOne.Game.Network
 
                     Vector3 pos;
                     pos.x = Get_ServerData.Data(i).Value.Position.Value.X;
-                    pos.y = 29.99451f;
+                    pos.y = Get_ServerData.Data(i).Value.Position.Value.Y;
                     pos.z = Get_ServerData.Data(i).Value.Position.Value.Z;
                     Vector3 rotation;
                     rotation.x = Get_ServerData.Data(i).Value.Rotation.Value.X;
@@ -481,10 +524,12 @@ namespace TheLastOne.Game.Network
                         iter.set_pos(pos);
                         iter.set_rotation(rotation);
                         iter.set_eat(Get_ServerData.Data(i).Value.Eat);
+                        iter.set_hp(Get_ServerData.Data(i).Value.Hp);
+                        iter.set_riding(Get_ServerData.Data(i).Value.Riding);
                     }
                     else
                     {
-                        item_Collection.Add(Get_ServerData.Data(i).Value.Id, new Game_ItemClass(Get_ServerData.Data(i).Value.Id, Get_ServerData.Data(i).Value.Name.ToString(), pos, rotation, Get_ServerData.Data(i).Value.Eat, Get_ServerData.Data(i).Value.Kind));
+                        item_Collection.Add(Get_ServerData.Data(i).Value.Id, new Game_ItemClass(Get_ServerData.Data(i).Value.Id, Get_ServerData.Data(i).Value.Name.ToString(), pos, rotation, Get_ServerData.Data(i).Value.Eat, Get_ServerData.Data(i).Value.Hp, Get_ServerData.Data(i).Value.Kind));
                     }
                 }
 
@@ -495,7 +540,7 @@ namespace TheLastOne.Game.Network
                 byte[] t_buf = new byte[size + 1];
                 System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
                 ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
-                var Get_ServerData = Client_id.GetRootAsClient_id(revc_buf);
+                var Get_ServerData = Client_Packet.GetRootAsClient_Packet(revc_buf);
 
                 if (Get_ServerData.Id != Client_imei)
                 {
@@ -537,16 +582,16 @@ namespace TheLastOne.Game.Network
                             // Target과 플레이어가 다를 경우에만 위치를 동기화 해준다.
                             iter.set_pos(new Vector3(Get_ServerData.Data(i).Value.Position.Value.X, Get_ServerData.Data(i).Value.Position.Value.Y, Get_ServerData.Data(i).Value.Position.Value.Z));
                             iter.set_rot(new Vector3(Get_ServerData.Data(i).Value.Rotation.Value.X, Get_ServerData.Data(i).Value.Rotation.Value.Y, Get_ServerData.Data(i).Value.Rotation.Value.Z));
-                            iter.set_hp(Get_ServerData.Data(i).Value.Hp);
                             iter.set_animator(Get_ServerData.Data(i).Value.Animator);
                         }
                         else if (iter.get_pos().x == 0 && iter.get_pos().y == 0 && iter.get_pos().z == 0)
                         {
                             iter.set_pos(new Vector3(Get_ServerData.Data(i).Value.Position.Value.X, Get_ServerData.Data(i).Value.Position.Value.Y, Get_ServerData.Data(i).Value.Position.Value.Z));
                             iter.set_rot(new Vector3(Get_ServerData.Data(i).Value.Rotation.Value.X, Get_ServerData.Data(i).Value.Rotation.Value.Y, Get_ServerData.Data(i).Value.Rotation.Value.Z));
-                            iter.set_hp(Get_ServerData.Data(i).Value.Hp);
                             iter.set_animator(Get_ServerData.Data(i).Value.Animator);
                         }
+
+                        iter.set_hp(Get_ServerData.Data(i).Value.Hp);
                         iter.set_target(Get_ServerData.Data(i).Value.TargetPlayer);
                         iter.set_activeZombie(true);
                     }
@@ -563,7 +608,7 @@ namespace TheLastOne.Game.Network
                 byte[] t_buf = new byte[size + 1];
                 System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
                 ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
-                var Get_ServerData = Client_id.GetRootAsClient_id(revc_buf);
+                var Get_ServerData = Client_Packet.GetRootAsClient_Packet(revc_buf);
 
                 Game_ZombieClass iter = zombie_data[Get_ServerData.Id];
                 // 해당 좀비의 SetActive를 꺼준다.
@@ -675,7 +720,7 @@ namespace TheLastOne.Game.Network
             }
             catch (Exception e)
             {
-                //Debug.Log(e.Message);
+                Debug.Log(e.Message);
                 NetworkMessage new_msg = new NetworkMessage();
                 m_Socket.BeginReceive(new_msg.Receivebyte, 0, new_msg.LimitReceivebyte, SocketFlags.None, new AsyncCallback(RecieveHeaderCallback), new_msg);
             }
@@ -700,17 +745,54 @@ namespace TheLastOne.Game.Network
         public void Player_Shot()
         {
             Sendbyte = sF.makeShot_PacketInfo(Client_imei);
+            Debug.Log(Sendbyte.Length);
             Send_Packet(Sendbyte);
         }
 
-        public void Zombie_Pos(Vector3 pos, Vector3 rotation, int zombieNum, int hp, Enum animation)
+        public void Zombie_Pos(Vector3 pos, Vector3 rotation, int zombieNum, Enum animation)
         {
             // 좀비의 위치를 Zombie_Data에 넣어준다.
             Game_ZombieClass iter = zombie_data[zombieNum];
             iter.set_pos(pos);
             iter.set_rot(rotation);
-            iter.set_hp(hp);
             iter.set_animator(Convert.ToInt32(animation));
+        }
+
+        public void Zombie_HP(int id, int hp)
+        {
+            if (id != -1)
+            {
+                // 좀비 id 가 -1인 경우는 오프라인 Zombie뿐이다.
+                Sendbyte = sF.makeHP_PacketInfo(id, hp, 0, recv_protocol.Kind_Zombie);
+                Send_Packet(Sendbyte);
+            }
+        }
+
+        public void Car_HP(int id, int hp)
+        {
+            if (id != -1)
+            {
+                // 차량 id 가 -1인 경우는 오프라인 이다.
+                Sendbyte = sF.makeHP_PacketInfo(id, hp, 0, recv_protocol.Kind_Car);
+                Send_Packet(Sendbyte);
+            }
+        }
+
+        public void Car_Status(int id, bool value)
+        {
+            if (id != -1)
+            {
+                // 차량 id 가 -1인 경우는 오프라인 이다.
+                Sendbyte = sF.makeCar_Status(id, value);
+                Send_Packet(Sendbyte);
+            }
+        }
+
+        public void Player_HP(int id, int hp, int armour)
+        {
+            if (id == -1) id = Client_imei; // -1의 경우 좀비에게 맞을경우 이다.
+            Sendbyte = sF.makeHP_PacketInfo(id, hp, armour, recv_protocol.Kind_Player);
+            Send_Packet(Sendbyte);
         }
 
         void OnApplicationQuit()

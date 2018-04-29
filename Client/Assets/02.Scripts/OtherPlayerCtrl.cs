@@ -31,8 +31,12 @@ public class OtherPlayerCtrl : MonoBehaviour
     public float rotSpeed = 100.0f;
     // 캐릭터 체력
     private int hp = 100;
-
     public int armour = 0;
+
+    public int otherPlayer_id = -1;
+
+    public void set_hp(int value) { hp = value; }
+    public void set_armour(int value) { armour = value; }
 
     // 캐릭터의 사망 여부
     private bool isDie = false;
@@ -276,7 +280,7 @@ public class OtherPlayerCtrl : MonoBehaviour
     }
 
     // 적 플레이어 죽을때 실행되는 함수
-    void OtherPlayerDie()
+    public void OtherPlayerDie()
     {
         // 모든 코루틴 종료
         StopAllCoroutines();

@@ -23,15 +23,19 @@ public struct Gameitem : IFlatbufferObject
   public Vec3? Position { get { int o = __p.__offset(8); return o != 0 ? (Vec3?)(new Vec3()).__assign(o + __p.bb_pos, __p.bb) : null; } }
   public Vec3? Rotation { get { int o = __p.__offset(10); return o != 0 ? (Vec3?)(new Vec3()).__assign(o + __p.bb_pos, __p.bb) : null; } }
   public bool Eat { get { int o = __p.__offset(12); return o != 0 ? 0!=__p.bb.Get(o + __p.bb_pos) : (bool)false; } }
-  public int Kind { get { int o = __p.__offset(14); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+  public bool Riding { get { int o = __p.__offset(14); return o != 0 ? 0!=__p.bb.Get(o + __p.bb_pos) : (bool)false; } }
+  public int Hp { get { int o = __p.__offset(16); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+  public int Kind { get { int o = __p.__offset(18); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
 
-  public static void StartGameitem(FlatBufferBuilder builder) { builder.StartObject(6); }
+  public static void StartGameitem(FlatBufferBuilder builder) { builder.StartObject(8); }
   public static void AddId(FlatBufferBuilder builder, int id) { builder.AddInt(0, id, 0); }
   public static void AddName(FlatBufferBuilder builder, StringOffset nameOffset) { builder.AddOffset(1, nameOffset.Value, 0); }
   public static void AddPosition(FlatBufferBuilder builder, Offset<Vec3> positionOffset) { builder.AddStruct(2, positionOffset.Value, 0); }
   public static void AddRotation(FlatBufferBuilder builder, Offset<Vec3> rotationOffset) { builder.AddStruct(3, rotationOffset.Value, 0); }
   public static void AddEat(FlatBufferBuilder builder, bool eat) { builder.AddBool(4, eat, false); }
-  public static void AddKind(FlatBufferBuilder builder, int kind) { builder.AddInt(5, kind, 0); }
+  public static void AddRiding(FlatBufferBuilder builder, bool riding) { builder.AddBool(5, riding, false); }
+  public static void AddHp(FlatBufferBuilder builder, int hp) { builder.AddInt(6, hp, 0); }
+  public static void AddKind(FlatBufferBuilder builder, int kind) { builder.AddInt(7, kind, 0); }
   public static Offset<Gameitem> EndGameitem(FlatBufferBuilder builder) {
     int o = builder.EndObject();
     return new Offset<Gameitem>(o);

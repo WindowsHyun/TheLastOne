@@ -33,6 +33,9 @@ enum Event_Type { E_DangerLine, E_RoundTime, E_Remove_Client, E_MoveDangerLine }
 #define CS_Check_info  3					// 클라이언트가 서버에게 자신의 정보가 맞는지 확인해 준다.
 #define CS_Eat_Item	   4					// 클라이언트가 서버에게 먹은 아이템 정보를 보내준다.
 #define CS_Zombie_info 5					// 클라이언트가 서버에게 좀비 데이터를 전달해 준다.
+#define CS_Object_HP 6						// 클라이언트가 서버에게 HP 데이터를 전달해 준다.
+#define CS_Car_Riding 7						// 클라이언트가 서버에게 차량에 탑승했다고 전달해 준다.
+#define CS_Car_Rode 8						// 클라이언트가 서버에게 차량에 하차했다고 전달해 준다.
 
 // 자기장 시간
 #define DangerLine_Level4 240
@@ -46,15 +49,18 @@ enum Event_Type { E_DangerLine, E_RoundTime, E_Remove_Client, E_MoveDangerLine }
 
 // 좀비가 볼 수 있는 거리
 #define Zombie_Dist 200
-#define Limit_Zombie 10
-#define Create_Zombie 50
+#define Limit_Zombie 1
+#define Create_Zombie 1
 
-// 아이템 종류
+// 아이템, 플레이어 종류
 #define Kind_Item 0
 #define Kind_Car 1
+#define Kind_Player 2
+#define Kind_Zombie 3
 
-// 플레이어 종류
-#define Kind_Player 0
-#define Kind_Zombie 1
+// 체력 설정
+#define Car_HP 200
+#define Player_HP 100
+#define Zombie_HP 100
 
 #endif
