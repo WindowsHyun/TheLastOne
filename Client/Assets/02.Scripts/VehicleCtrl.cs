@@ -101,17 +101,8 @@ public class VehicleCtrl : PlayerVehicleCtrl
         {
             // 맞은 총알의 Damage를 추출해 Player HP 차감
             vehicleHp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
-<<<<<<< HEAD
-=======
+
             playerCtrl.send_CarHP(carNum, vehicleHp);
-
->>>>>>> Server
-            //if (GetTheCar == true)
-            //{
-            //    vehicleHpBar.fillAmount = (float)vehicleHp / (float)vehicleInitHp;
-            //}
-            //    player.imgHpBar.fillAmount = (float)player.hp / (float)player.initHp;
-
 
             if (vehicleHp <= 0 && carDestroy == false)
             {

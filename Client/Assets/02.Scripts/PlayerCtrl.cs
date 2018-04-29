@@ -506,17 +506,11 @@ public class PlayerCtrl : PlayerVehicleCtrl
             // 탑승시 캐릭터를 차량 위치와 동기화
             this.transform.position = new Vector3(ridingCar.transform.position.x, ridingCar.transform.position.y, ridingCar.transform.position.z);
 
-<<<<<<< HEAD
-
             vehicleHpBar.fillAmount = (float)ridingCar.vehicleHp / (float)ridingCar.vehicleInitHp;
 
             //carSpeedText.text = (ridingCar.wheelColliders[0].motorTorque * Time.deltaTime).ToString();
 
             //carSpeedText.text = ((int)(ridingCar.m_rigidbody.velocity.magnitude * 3.6)).ToString();
-=======
-            vehicleHpBar.fillAmount = (float)ridingCar.vehicleHp / (float)ridingCar.vehicleInitHp;
->>>>>>> Server
-
         }
     }
 
