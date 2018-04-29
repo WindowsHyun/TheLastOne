@@ -112,21 +112,25 @@ namespace Game {
 			enum {
 				VT_ID = 4,
 				VT_HP = 6,
-				VT_ANIMATOR = 8,
-				VT_HORIZONTAL = 10,
-				VT_VERTICAL = 12,
-				VT_INCAR = 14,
-				VT_NAME = 16,
-				VT_POSITION = 18,
-				VT_ROTATION = 20,
-				VT_CARROTATION = 22,
-				VT_NOWWEAPON = 24
+				VT_ARMOUR = 8,
+				VT_ANIMATOR = 10,
+				VT_HORIZONTAL = 12,
+				VT_VERTICAL = 14,
+				VT_INCAR = 16,
+				VT_NAME = 18,
+				VT_POSITION = 20,
+				VT_ROTATION = 22,
+				VT_CARROTATION = 24,
+				VT_NOWWEAPON = 26
 			};
 			int32_t id() const {
 				return GetField<int32_t>(VT_ID, 0);
 			}
 			int32_t hp() const {
 				return GetField<int32_t>(VT_HP, 0);
+			}
+			int32_t armour() const {
+				return GetField<int32_t>(VT_ARMOUR, 0);
 			}
 			int32_t animator() const {
 				return GetField<int32_t>(VT_ANIMATOR, 0);
@@ -159,6 +163,7 @@ namespace Game {
 				return VerifyTableStart(verifier) &&
 					VerifyField<int32_t>(verifier, VT_ID) &&
 					VerifyField<int32_t>(verifier, VT_HP) &&
+					VerifyField<int32_t>(verifier, VT_ARMOUR) &&
 					VerifyField<int32_t>(verifier, VT_ANIMATOR) &&
 					VerifyField<float>(verifier, VT_HORIZONTAL) &&
 					VerifyField<float>(verifier, VT_VERTICAL) &&
@@ -181,6 +186,9 @@ namespace Game {
 			}
 			void add_hp(int32_t hp) {
 				fbb_.AddElement<int32_t>(Client_info::VT_HP, hp, 0);
+			}
+			void add_armour(int32_t armour) {
+				fbb_.AddElement<int32_t>(Client_info::VT_ARMOUR, armour, 0);
 			}
 			void add_animator(int32_t animator) {
 				fbb_.AddElement<int32_t>(Client_info::VT_ANIMATOR, animator, 0);
@@ -225,6 +233,7 @@ namespace Game {
 			flatbuffers::FlatBufferBuilder &_fbb,
 			int32_t id = 0,
 			int32_t hp = 0,
+			int32_t armour = 0,
 			int32_t animator = 0,
 			float Horizontal = 0.0f,
 			float Vertical = 0.0f,
@@ -244,6 +253,7 @@ namespace Game {
 			builder_.add_Vertical(Vertical);
 			builder_.add_Horizontal(Horizontal);
 			builder_.add_animator(animator);
+			builder_.add_armour(armour);
 			builder_.add_hp(hp);
 			builder_.add_id(id);
 			return builder_.Finish();
@@ -253,6 +263,7 @@ namespace Game {
 			flatbuffers::FlatBufferBuilder &_fbb,
 			int32_t id = 0,
 			int32_t hp = 0,
+			int32_t armour = 0,
 			int32_t animator = 0,
 			float Horizontal = 0.0f,
 			float Vertical = 0.0f,
@@ -266,6 +277,7 @@ namespace Game {
 				_fbb,
 				id,
 				hp,
+				armour,
 				animator,
 				Horizontal,
 				Vertical,
@@ -754,13 +766,17 @@ namespace Game {
 			enum {
 				VT_ID = 4,
 				VT_HP = 6,
-				VT_KIND = 8
+				VT_ARMOUR = 8,
+				VT_KIND = 10
 			};
 			int32_t id() const {
 				return GetField<int32_t>(VT_ID, 0);
 			}
 			int32_t hp() const {
 				return GetField<int32_t>(VT_HP, 0);
+			}
+			int32_t armour() const {
+				return GetField<int32_t>(VT_ARMOUR, 0);
 			}
 			int32_t kind() const {
 				return GetField<int32_t>(VT_KIND, 0);
@@ -769,6 +785,7 @@ namespace Game {
 				return VerifyTableStart(verifier) &&
 					VerifyField<int32_t>(verifier, VT_ID) &&
 					VerifyField<int32_t>(verifier, VT_HP) &&
+					VerifyField<int32_t>(verifier, VT_ARMOUR) &&
 					VerifyField<int32_t>(verifier, VT_KIND) &&
 					verifier.EndTable();
 			}
@@ -782,6 +799,9 @@ namespace Game {
 			}
 			void add_hp(int32_t hp) {
 				fbb_.AddElement<int32_t>(Game_HP_Set::VT_HP, hp, 0);
+			}
+			void add_armour(int32_t armour) {
+				fbb_.AddElement<int32_t>(Game_HP_Set::VT_ARMOUR, armour, 0);
 			}
 			void add_kind(int32_t kind) {
 				fbb_.AddElement<int32_t>(Game_HP_Set::VT_KIND, kind, 0);
@@ -802,9 +822,11 @@ namespace Game {
 			flatbuffers::FlatBufferBuilder &_fbb,
 			int32_t id = 0,
 			int32_t hp = 0,
+			int32_t armour = 0,
 			int32_t kind = 0) {
 			Game_HP_SetBuilder builder_(_fbb);
 			builder_.add_kind(kind);
+			builder_.add_armour(armour);
 			builder_.add_hp(hp);
 			builder_.add_id(id);
 			return builder_.Finish();

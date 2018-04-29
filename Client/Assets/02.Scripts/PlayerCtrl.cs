@@ -166,19 +166,12 @@ public class PlayerCtrl : PlayerVehicleCtrl
             if (dangerLineIn == false)
             {
                 // 범위 밖에 있을 경우 HP 감소
-                hp -= 1;
-
+                //hp -= 0;
                 // Image UI 항목의 fillAmount 속성을 조절해 생명 게이지 값 조절
                 imgHpBar.fillAmount = (float)hp / (float)initHp;
 
-                //Debug.Log("Player H{: " + hp.ToString());
                 if (hp <= 0)
-                {
-                    // 마우스 잠겨 있을경우 푼다.
-                    Cursor.lockState = CursorLockMode.None;//마우스 커서 고정 해제
-                    Cursor.visible = true;//마우스 커서 보이기
                     PlayerDie();
-                }
             }
 
             // 총이 장착이 되었을때만 발사 가능
@@ -299,8 +292,6 @@ public class PlayerCtrl : PlayerVehicleCtrl
             {
                 //차량이 탑승 중에 차가 터진 경우
                 this.transform.position = new Vector3(ridingCar.transform.position.x - 1, ridingCar.transform.position.y, ridingCar.transform.position.z);
-                Cursor.lockState = CursorLockMode.None;//마우스 커서 고정 해제
-                Cursor.visible = true;//마우스 커서 보이기
                 PlayerDie();
             }
 
@@ -412,7 +403,6 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
         // 생명 초기값 설정
         initHp = hp;
-        hp -= 70;
         imgHpBar.fillAmount = (float)hp / (float)initHp;
 
         // 방어력 초기값 설정
@@ -494,6 +484,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
             // 블랜드 트리에서 v값과 h 값을 계산해서 애니메이션 실행된다.
             animator.SetFloat("Vertical", v);
             animator.SetFloat("Horizontal", h);
+
         }
         else if (GetTheCar == true)
         {
@@ -587,6 +578,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
             {
                 // 맞은 총알의 Damage를 추출해 Player HP 차감
                 hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
+                networkCtrl.Player_HP(-1, hp, armour);
                 // Image UI 항목의 fillAmount 속성을 조절해 생명 게이지 값 조절
                 imgHpBar.fillAmount = (float)hp / (float)initHp;
             }
@@ -594,6 +586,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
             {
                 // 방어력 차감
                 armour -= coll.gameObject.GetComponent<BulletCtrl>().damage;
+                networkCtrl.Player_HP(-1, hp, armour);
                 // Image UI 항목의 fillAmount 속성을 조절해 방어력 게이지 값 조절
                 imgArmourBar.fillAmount = (float)armour / (float)initArmour;
 
@@ -630,11 +623,11 @@ public class PlayerCtrl : PlayerVehicleCtrl
         {
             CreateBloodEffect(coll.transform.position);
 
-
             if (armour <= 0)
             {
                 // 체력 차감
                 hp -= 20;
+                networkCtrl.Player_HP(-1, hp, armour);
                 //Image UI 항목의 fillAmount 속성을 조절해 생명 게이지 값 조절
                 imgHpBar.fillAmount = (float)hp / (float)initHp;
             }
@@ -642,6 +635,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
             {
                 // 방어력 차감
                 armour -= 20;
+                networkCtrl.Player_HP(-1, hp, armour);
                 // Image UI 항목의 fillAmount 속성을 조절해 방어력 게이지 값 조절
                 imgArmourBar.fillAmount = (float)armour / (float)initArmour;
 
@@ -719,6 +713,9 @@ public class PlayerCtrl : PlayerVehicleCtrl
         // 이벤트 발생 시킴
         OnPlayerDie();
 
+        Cursor.lockState = CursorLockMode.None;//마우스 커서 고정 해제
+        Cursor.visible = true;//마우스 커서 보이기
+
         // 체력 초기화
         hp = 0;
         imgHpBar.fillAmount = (float)hp / (float)initHp;
@@ -770,6 +767,11 @@ public class PlayerCtrl : PlayerVehicleCtrl
     public void send_CarHP(int id, int hp)
     {
         networkCtrl.Car_HP(id, hp);
+    }
+
+    public void send_PlayerHP(int hp, int armour)
+    {
+        networkCtrl.Player_HP(-1, hp, armour);
     }
 
     // 총알 재장전 함수

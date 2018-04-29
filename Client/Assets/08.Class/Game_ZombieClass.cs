@@ -18,7 +18,7 @@ namespace TheLastOne.GameClass
         private bool prefab;    // 좀비 프리팹이 만들어졌는지 확인
         private bool removeZombie;   // 좀비를 지울경우 true
         private bool activeZombie;  // 좀비 활성화
-        private bool isDie;
+        private bool isDie;             // 좀비가 여러번 죽는 것을 방지.
         public GameObject Zombie;   // 프리팹을 위한 게임 오브젝트
         public ZombieCtrl script;  // 프리팹 오브젝트 안의 함수를 호출하기 위한 스크립트
 

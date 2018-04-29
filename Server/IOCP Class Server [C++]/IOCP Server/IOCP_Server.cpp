@@ -441,6 +441,7 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 			if (client_Check_info->kind() == Kind_Player) {
 				auto iter = get_client_iter(client_Check_info->id());
 				iter->second.set_hp(client_Check_info->hp());
+				iter->second.set_armour(client_Check_info->armour());
 			}
 			else if (client_Check_info->kind() == Kind_Zombie) {
 				auto iter = get_zombie_iter(client_Check_info->id());
@@ -567,6 +568,7 @@ void IOCP_Server::Send_All_Player(int client)
 		auto id = iter.second.get_client_id();
 		auto name = builder.CreateString(iter.second.nickName);
 		auto hp = iter.second.get_hp();
+		auto armour = iter.second.get_armour();
 		auto animator = iter.second.get_animator();
 		float horizontal = iter.second.get_horizontal();
 		float vertical = iter.second.get_vertical();
@@ -575,7 +577,7 @@ void IOCP_Server::Send_All_Player(int client)
 		auto weaponState = iter.second.get_weapon();
 		auto inCar = iter.second.get_inCar();
 		auto car_rotation = iter.second.get_car_rotation();
-		auto client_data = CreateClient_info(builder, id, hp, animator, horizontal, vertical, inCar, name, &xyz, &rotation, &car_rotation, weaponState);
+		auto client_data = CreateClient_info(builder, id, hp, armour, animator, horizontal, vertical, inCar, name, &xyz, &rotation, &car_rotation, weaponState);
 		// client_data 라는 테이블에 클라이언트 데이터가 들어가 있다.
 
 		Individual_client.push_back(client_data);	// Vector에 넣었다.
@@ -785,6 +787,11 @@ void player_To_Zombie(std::unordered_map<int, Game_Zombie> &zombie, std::unorder
 			float check_dist = DistanceToPoint(iter->second.get_pos().x, iter->second.get_pos().z, z.second.get_pos().x, z.second.get_pos().z);
 			if (check_dist >= Zombie_Dist) {
 				// 플레이어가 존재하지만 거리가 멀어져 있을 경우 좀비 Target을 초기화
+				iter->second.set_limit_zombie(-1);
+				zombie.find(z.first)->second.set_target(-1);
+			}
+			if (iter->second.get_hp() <= 0) {
+				// 플레이어 체력이 0 이하일 경우
 				iter->second.set_limit_zombie(-1);
 				zombie.find(z.first)->second.set_target(-1);
 			}

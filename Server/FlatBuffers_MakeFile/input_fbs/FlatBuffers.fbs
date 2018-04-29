@@ -15,6 +15,7 @@ table Client_Collection{
 table Client_info {
   id:int;
   hp:int;
+  armour:int;
   animator:int;
   Horizontal:float;
   Vertical:float;
@@ -72,5 +73,6 @@ table Client_Packet {
 table Game_HP_Set {
   id:int;
   hp:int;
+  armour:int;
   kind:int;
 }

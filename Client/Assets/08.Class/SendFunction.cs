@@ -153,13 +153,14 @@ namespace TheLastOne.SendFunction
             return real_packet;
         }
 
-        public Byte[] makeHP_PacketInfo(int id, int hp, int kind)
+        public Byte[] makeHP_PacketInfo(int id, int hp, int armour, int kind)
         {
             FlatBufferBuilder fbb = new FlatBufferBuilder(1);
             fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
             Game_HP_Set.StartGame_HP_Set(fbb);
             Game_HP_Set.AddId(fbb, id);
             Game_HP_Set.AddHp(fbb, hp);
+            Game_HP_Set.AddArmour(fbb, armour);
             Game_HP_Set.AddKind(fbb, kind);
             var endOffset = Game_HP_Set.EndGame_HP_Set(fbb);
             fbb.Finish(endOffset.Value);

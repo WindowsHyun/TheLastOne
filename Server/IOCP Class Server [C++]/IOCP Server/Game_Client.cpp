@@ -57,6 +57,7 @@ Game_Client::Game_Client(const SOCKET sock, const int client_id, const char * ga
 	this->vertical = 0.0f;
 	this->inCar = -1;
 	this->hp = Player_HP;
+	this->armour = 100;
 	this->animator = 0;
 	this->weaponState = 0;
 	ZeroMemory(&this->recv_over, sizeof(this->recv_over));
@@ -88,6 +89,7 @@ Game_Client::Game_Client(const Game_Client & g_cl)
 	this->vertical = g_cl.vertical;
 	this->inCar = g_cl.inCar;
 	this->hp = g_cl.hp;
+	this->armour = g_cl.armour;
 	this->animator = g_cl.animator;
 	this->weaponState = g_cl.weaponState;
 	ZeroMemory(&this->recv_over, sizeof(this->recv_over));
