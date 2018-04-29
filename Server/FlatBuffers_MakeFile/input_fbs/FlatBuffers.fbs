@@ -49,6 +49,8 @@ table Gameitem{
   position:Vec3;
   rotation:Vec3;
   eat:bool;
+  riding:bool;
+  hp:int;
   kind:int;
 }
 

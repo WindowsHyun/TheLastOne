@@ -18,6 +18,7 @@ namespace TheLastOne.GameClass
         private bool prefab;    // 좀비 프리팹이 만들어졌는지 확인
         private bool removeZombie;   // 좀비를 지울경우 true
         private bool activeZombie;  // 좀비 활성화
+        private bool isDie;
         public GameObject Zombie;   // 프리팹을 위한 게임 오브젝트
         public ZombieCtrl script;  // 프리팹 오브젝트 안의 함수를 호출하기 위한 스크립트
 
@@ -30,6 +31,7 @@ namespace TheLastOne.GameClass
         public bool get_prefab() { return this.prefab; }
         public bool get_removeZombie() { return this.removeZombie; }
         public bool get_activeZombie() { return this.activeZombie; }
+        public bool get_isDie() { return this.isDie; }
 
         public void set_id(int value) { this.id = value; }
         public void set_hp(int value) { this.hp = value; }
@@ -40,6 +42,7 @@ namespace TheLastOne.GameClass
         public void set_prefab(bool value) { this.prefab = value; }
         public void set_removeZombie(bool value) { this.removeZombie = value; }
         public void set_activeZombie(bool value) { this.activeZombie = value; }
+        public void set_isDie(bool value) { this.isDie = value; }
 
         public Game_ZombieClass(int id, int target, Vector3 pos, Vector3 rot)
         {
@@ -52,6 +55,7 @@ namespace TheLastOne.GameClass
             this.prefab = false;
             this.removeZombie = false;
             this.activeZombie = true;
+            this.isDie = false;
         }
     }
 }

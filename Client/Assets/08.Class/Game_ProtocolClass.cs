@@ -25,6 +25,8 @@ namespace TheLastOne.GameClass
         public int CS_Eat_Item;					// 클라이언트가 서버에게 먹은 아이템 정보를 보내준다.
         public int CS_Zombie_info;      // 클라이언트가 서버에게 좀비 데이터를 전달해 준다.
         public int CS_Object_HP;        // 클라이언트가 서버에게 HP 데이터를 전달해 준다.
+        public int CS_Car_Riding; 		// 클라이언트가 서버에게 차량에 탑승했다고 전달해 준다.
+        public int CS_Car_Rode; 			// 클라이언트가 서버에게 차량에 하차했다고 전달해 준다.
 
         public int Kind_Item;           // 아이템
         public int Kind_Car;            // 자동차
@@ -54,12 +56,14 @@ namespace TheLastOne.GameClass
             CS_Eat_Item = 4;
             CS_Zombie_info = 5;
             CS_Object_HP = 6;
+            CS_Car_Riding = 7;
+            CS_Car_Rode = 8;
             //----------------------------------
             // 아이템 종류
             Kind_Item = 0;
             Kind_Car = 1;
-            Kind_Player = 0;
-            Kind_Zombie = 1;
+            Kind_Player = 2;
+            Kind_Zombie = 3;
             //----------------------------------
         }
     }

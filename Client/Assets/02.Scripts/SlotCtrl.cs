@@ -31,9 +31,9 @@ public class SlotCtrl : MonoBehaviour
         player = GameObject.Find("Player").GetComponent<PlayerCtrl>();
 
         cooltime = GameObject.Find("PanelCoolTime").GetComponent<CoolTimeCtrl>();
-    }
-    void Start()
-    {
+
+        ItemImg = transform.GetChild(0).GetComponent<Image>();
+
         // 스택 메모리 할당.
         slot = new Stack<ItemCtrl>();
 
@@ -50,9 +50,6 @@ public class SlotCtrl : MonoBehaviour
         // 텍스트 컴포넌트의 RectTransform을 가져온다.
         // 텍스트 객체의 부모 객체의 x지름을 가져온다.
         // 폰트의 크기를 부모 객체의 x지름 / 2 만큼으로 지정해준다.
-        ItemImg = transform.GetChild(0).GetComponent<Image>();
-
-        player = GameObject.Find("Player").GetComponent<PlayerCtrl>();
 
         //cooltime = GameObject.Find("PanelCoolTime").GetComponent<CoolTimeCtrl>();
     }

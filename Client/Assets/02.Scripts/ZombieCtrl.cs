@@ -35,9 +35,7 @@ public class ZombieCtrl : MonoBehaviour
     public GameObject bloodEffect;
 
     // 좀비 체력 변수
-    private static int hp = 100;
-
-    public void set_hp(int value) { hp = value; }
+    public int hp = 100;
 
     // 좀비 Nav 켜기
     private bool stopPos = false;    // NetworkCtrl Pos 고정을 멈추게 한다.
@@ -202,13 +200,14 @@ public class ZombieCtrl : MonoBehaviour
         }
     }
 
-    void ZombieDie()
+    public void ZombieDie()
     {
         // 모든 코루틴 종료
         zombieState = ZombieState.die;
         nvAgent.isStopped = true;
         animator.SetTrigger("IsDie");
         isDie = true;
+        hp = 0;
         playerCtrl.send_ZombieData(zombieTr.position, zombieTr.eulerAngles, zombieNum, zombieState);
         StopAllCoroutines();
 
@@ -241,7 +240,7 @@ public class ZombieCtrl : MonoBehaviour
 
     public void MovePos(Vector3 pos)
     {
-        float moveSpeed = 9.0f;
+        float moveSpeed = 10.0f;
 
         if (DistanceToPoint(zombieTr.position, pos) >= 20)
         {

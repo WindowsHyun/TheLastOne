@@ -9,7 +9,7 @@ void Game_Client::init()
 	this->rotation.x = 0;
 	this->rotation.y = 0;
 	this->rotation.z = 0;
-	this->hp = 100;
+	this->hp = Player_HP;
 	this->animator = 0;
 	this->connect = false;
 	this->weaponState = 0;
@@ -56,7 +56,7 @@ Game_Client::Game_Client(const SOCKET sock, const int client_id, const char * ga
 	this->horizontal = 0.0f;
 	this->vertical = 0.0f;
 	this->inCar = -1;
-	this->hp = 100;
+	this->hp = Player_HP;
 	this->animator = 0;
 	this->weaponState = 0;
 	ZeroMemory(&this->recv_over, sizeof(this->recv_over));

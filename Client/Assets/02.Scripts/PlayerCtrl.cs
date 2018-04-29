@@ -188,7 +188,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
                 {
                     if (now_Weapon >= 3)
                         bulletFinding = GetItem(2);
-                    else if(now_Weapon == 2)
+                    else if (now_Weapon == 2)
                         bulletFinding = GetItem(1);
                     else
                         bulletFinding = GetItem(now_Weapon);
@@ -244,11 +244,11 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
                 }
                 //1번 장착 m4, 2번 장착 m16일때
-                else if(weaponSlotNumber[0] == 2 && weaponSlotNumber[1] == 1)
-                { 
+                else if (weaponSlotNumber[0] == 2 && weaponSlotNumber[1] == 1)
+                {
                     bulletCount[1] = bulletCount[2];
                 }
-                
+
 
                 now_Weapon = weaponSlotNumber[1];
                 weaponImage.GetComponent<Image>().sprite = weaponIEquipImage[now_Weapon];
@@ -295,9 +295,18 @@ public class PlayerCtrl : PlayerVehicleCtrl
                 }
             }
 
+            if (rideCar == true && GetTheCar == true && ridingCar.Car_Status == true && ridingCar.player_die == true)
+            {
+                //차량이 탑승 중에 차가 터진 경우
+                this.transform.position = new Vector3(ridingCar.transform.position.x - 1, ridingCar.transform.position.y, ridingCar.transform.position.z);
+                Cursor.lockState = CursorLockMode.None;//마우스 커서 고정 해제
+                Cursor.visible = true;//마우스 커서 보이기
+                PlayerDie();
+            }
+
             if (Input.GetKeyDown(KeyCode.G))
             {
-                if (rideCar == true && GetTheCar == false)
+                if (rideCar == true && GetTheCar == false && ridingCar.Car_Status == false)
                 {
                     // 차량 탑승 여부를 나타냄 (탑승)
                     GetTheCar = true;
@@ -306,6 +315,8 @@ public class PlayerCtrl : PlayerVehicleCtrl
                     shotable = false;
                     ridingCar.vehicleStop = false;
                     CarNum = ridingCar.carNum;  // 차량의 번호를 가지고 온다.
+                    ridingCar.Car_Status = true;
+                    networkCtrl.Car_Status(CarNum, true);     // 차량 탑승했다고 서버에게 알린다.
 
                     // 캐릭터 캡슐 콜라이더 비활성화
                     gameObject.GetComponent<CapsuleCollider>().enabled = false;
@@ -318,10 +329,14 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
                     vehicleHpBar.fillAmount = (float)ridingCar.vehicleHp / (float)ridingCar.vehicleInitHp;
                 }
-                else if (rideCar == true && GetTheCar == true)
+                else if (rideCar == true && GetTheCar == true && ridingCar.Car_Status == true)
                 {
+                    // 차량 탑승 여부를 나타냄 (하차)
                     // 차량 탑승 가능한지 여부를 나타냄
                     rideCar = false;
+                    // 차량 하차했다고 서버에게 알린다.
+                    networkCtrl.Car_Status(CarNum, false);
+                    ridingCar.Car_Status = false;
 
                     // 차량을 내렸을 경우 차량 번호를 지운다.
                     CarNum = -1;
@@ -336,7 +351,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
                     ridingCar.vehicleStop = true;
 
                     // 차량 하차 시 좌표 이동
-                    this.transform.position = new Vector3(ridingCar.transform.position.x - 1, 29.99451f, ridingCar.transform.position.z);
+                    this.transform.position = new Vector3(ridingCar.transform.position.x - 1, ridingCar.transform.position.y, ridingCar.transform.position.z);
 
                     // 캐릭터 캡슐 콜라이더 활성화
                     gameObject.GetComponent<CapsuleCollider>().enabled = true;
@@ -496,7 +511,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
             }
 
             // 탑승시 캐릭터를 차량 위치와 동기화
-            this.transform.position = new Vector3(ridingCar.transform.position.x, 29.99451f, ridingCar.transform.position.z);
+            this.transform.position = new Vector3(ridingCar.transform.position.x, ridingCar.transform.position.y, ridingCar.transform.position.z);
 
         }
     }
@@ -702,8 +717,10 @@ public class PlayerCtrl : PlayerVehicleCtrl
         // 이벤트 발생 시킴
         OnPlayerDie();
 
-        // 모든 코루틴을 종료
-        StopAllCoroutines();
+        // 체력 초기화
+        hp = 0;
+        armour = 0;
+
         // DIe 애니메이션 실행
         animator.SetTrigger("IsDie");
         playerState = PlayerState.die;
@@ -713,6 +730,9 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
         // 총구 앞 캡슐 콜라이더 비활성화
         firePos.GetComponent<CapsuleCollider>().enabled = false;
+
+        // 모든 코루틴을 종료
+        StopAllCoroutines();
     }
 
     public void WeaponDisPlay()
@@ -743,6 +763,11 @@ public class PlayerCtrl : PlayerVehicleCtrl
         networkCtrl.Zombie_HP(id, hp);
     }
 
+    public void send_CarHP(int id, int hp)
+    {
+        networkCtrl.Car_HP(id, hp);
+    }
+
     // 총알 재장전 함수
     public void ReloadBullet()
     {
@@ -757,7 +782,8 @@ public class PlayerCtrl : PlayerVehicleCtrl
             {
                 bulletCount[2] = bulletCount[1];
             }
-        }else if (weaponSlotNumber[0] == 1 && weaponSlotNumber[1] == 2)
+        }
+        else if (weaponSlotNumber[0] == 1 && weaponSlotNumber[1] == 2)
         {
             if (now_Weapon == 1)
             {

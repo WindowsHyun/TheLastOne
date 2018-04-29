@@ -381,7 +381,7 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 			if (client_View->inCar() != -1) {
 				// 차량을 실제로 탑승 하고 있을 경우.
 				auto item = get_item_iter(client_View->inCar());
-				item->second.set_pos(client_View->position()->x(), client_View->position()->z());
+				item->second.set_pos(client_View->position()->x(), client_View->position()->y(), client_View->position()->z());
 				xyz car_rotation{ client_View->carrotation()->x() , client_View->carrotation()->y() , client_View->carrotation()->z() };
 				client->second.set_client_car_rotation(car_rotation);
 				item->second.set_rotation(client_View->carrotation()->x(), client_View->carrotation()->y(), client_View->carrotation()->z());
@@ -427,7 +427,6 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 			for (unsigned int i = 0; i < packet_zombie->size(); ++i) {
 				auto iter = get_zombie_iter(packet_zombie->Get(i)->id());
 				iter->second.set_animator(packet_zombie->Get(i)->animator());
-				iter->second.set_hp(packet_zombie->Get(i)->hp());
 				xyz packet_position{ packet_zombie->Get(i)->position()->x() , packet_zombie->Get(i)->position()->y() , packet_zombie->Get(i)->position()->z() };
 				//std::cout << packet_zombie->Get(i)->id() << " : " << packet_zombie->Get(i)->position()->x() << ", " << packet_zombie->Get(i)->position()->y() << ", " << packet_zombie->Get(i)->position()->z() << std::endl;
 				iter->second.set_zombie_position(packet_position);
@@ -439,14 +438,33 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 		case CS_Object_HP:
 		{
 			auto client_Check_info = getGame_HP_SetView(get_packet);
-			if (client_Check_info->kind() == Kind_Player){
+			if (client_Check_info->kind() == Kind_Player) {
 				auto iter = get_client_iter(client_Check_info->id());
 				iter->second.set_hp(client_Check_info->hp());
-			}else if (client_Check_info->kind() == Kind_Zombie) {
+			}
+			else if (client_Check_info->kind() == Kind_Zombie) {
 				auto iter = get_zombie_iter(client_Check_info->id());
 				iter->second.set_hp(client_Check_info->hp());
-				std::cout << iter->second.get_client_id() << " : " << iter->second.get_hp() << std::endl;
 			}
+			else if (client_Check_info->kind() == Kind_Car) {
+				auto iter = get_item_iter(client_Check_info->id());
+				iter->second.set_hp(client_Check_info->hp());
+				std::cout << iter->second.get_hp() << std::endl;
+			}
+		}
+		break;
+		case CS_Car_Riding:
+		{
+			auto client_Check_info = GetClient_packetView(get_packet);
+			auto iter = get_item_iter(client_Check_info->id());
+			iter->second.set_riding(true);
+		}
+		break;
+		case CS_Car_Rode:
+		{
+			auto client_Check_info = GetClient_packetView(get_packet);
+			auto iter = get_item_iter(client_Check_info->id());
+			iter->second.set_riding(false);
 		}
 		break;
 		}
@@ -635,8 +653,10 @@ void IOCP_Server::Send_All_Item()
 		Vec3 pos = { iter.second.get_pos().x, iter.second.get_pos().y,  iter.second.get_pos().z };
 		Vec3 rotation = { iter.second.get_rotation().x, iter.second.get_rotation().y,  iter.second.get_rotation().z };
 		auto eat = iter.second.get_eat();
+		auto riding = iter.second.get_riding();
+		auto hp = iter.second.get_hp();
 		auto kind = iter.second.get_kind();
-		auto client_data = CreateGameitem(builder, id, name, &pos, &rotation, eat, kind);
+		auto client_data = CreateGameitem(builder, id, name, &pos, &rotation, eat, riding, hp, kind);
 
 		Individual_client.push_back(client_data);	// Vector에 넣었다.
 	}

@@ -474,7 +474,9 @@ struct Gameitem FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_POSITION = 8,
     VT_ROTATION = 10,
     VT_EAT = 12,
-    VT_KIND = 14
+    VT_RIDING = 14,
+    VT_HP = 16,
+    VT_KIND = 18
   };
   int32_t id() const {
     return GetField<int32_t>(VT_ID, 0);
@@ -491,6 +493,12 @@ struct Gameitem FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool eat() const {
     return GetField<uint8_t>(VT_EAT, 0) != 0;
   }
+  bool riding() const {
+    return GetField<uint8_t>(VT_RIDING, 0) != 0;
+  }
+  int32_t hp() const {
+    return GetField<int32_t>(VT_HP, 0);
+  }
   int32_t kind() const {
     return GetField<int32_t>(VT_KIND, 0);
   }
@@ -502,6 +510,8 @@ struct Gameitem FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<Vec3>(verifier, VT_POSITION) &&
            VerifyField<Vec3>(verifier, VT_ROTATION) &&
            VerifyField<uint8_t>(verifier, VT_EAT) &&
+           VerifyField<uint8_t>(verifier, VT_RIDING) &&
+           VerifyField<int32_t>(verifier, VT_HP) &&
            VerifyField<int32_t>(verifier, VT_KIND) &&
            verifier.EndTable();
   }
@@ -525,6 +535,12 @@ struct GameitemBuilder {
   void add_eat(bool eat) {
     fbb_.AddElement<uint8_t>(Gameitem::VT_EAT, static_cast<uint8_t>(eat), 0);
   }
+  void add_riding(bool riding) {
+    fbb_.AddElement<uint8_t>(Gameitem::VT_RIDING, static_cast<uint8_t>(riding), 0);
+  }
+  void add_hp(int32_t hp) {
+    fbb_.AddElement<int32_t>(Gameitem::VT_HP, hp, 0);
+  }
   void add_kind(int32_t kind) {
     fbb_.AddElement<int32_t>(Gameitem::VT_KIND, kind, 0);
   }
@@ -547,13 +563,17 @@ inline flatbuffers::Offset<Gameitem> CreateGameitem(
     const Vec3 *position = 0,
     const Vec3 *rotation = 0,
     bool eat = false,
+    bool riding = false,
+    int32_t hp = 0,
     int32_t kind = 0) {
   GameitemBuilder builder_(_fbb);
   builder_.add_kind(kind);
+  builder_.add_hp(hp);
   builder_.add_rotation(rotation);
   builder_.add_position(position);
   builder_.add_name(name);
   builder_.add_id(id);
+  builder_.add_riding(riding);
   builder_.add_eat(eat);
   return builder_.Finish();
 }
@@ -565,6 +585,8 @@ inline flatbuffers::Offset<Gameitem> CreateGameitemDirect(
     const Vec3 *position = 0,
     const Vec3 *rotation = 0,
     bool eat = false,
+    bool riding = false,
+    int32_t hp = 0,
     int32_t kind = 0) {
   return Game::TheLastOne::CreateGameitem(
       _fbb,
@@ -573,6 +595,8 @@ inline flatbuffers::Offset<Gameitem> CreateGameitemDirect(
       position,
       rotation,
       eat,
+      riding,
+      hp,
       kind);
 }
 
@@ -785,6 +809,27 @@ inline flatbuffers::Offset<Game_HP_Set> CreateGame_HP_Set(
   builder_.add_id(id);
   return builder_.Finish();
 }
+
+/* 왜인지 모르겠지만 Get이 없어서 샘플에서 가져왔다..! */
+		inline const Game::TheLastOne::Client_info *GetClientView(const void *buf) {
+			return flatbuffers::GetRoot<Game::TheLastOne::Client_info>(buf);
+		}
+
+		inline const Game::TheLastOne::Client_Packet *GetClient_packetView(const void *buf) {
+			return flatbuffers::GetRoot<Game::TheLastOne::Client_Packet>(buf);
+		}
+
+		inline const Game::TheLastOne::Zombie_info *getZombie_infoView(const void *buf) {
+			return flatbuffers::GetRoot<Game::TheLastOne::Zombie_info>(buf);
+		}
+
+		inline const Game::TheLastOne::Zombie_Collection *getZombie_CollectionView(const void *buf) {
+			return flatbuffers::GetRoot<Game::TheLastOne::Zombie_Collection>(buf);
+		}
+
+		inline const Game::TheLastOne::Game_HP_Set *getGame_HP_SetView(const void *buf) {
+			return flatbuffers::GetRoot<Game::TheLastOne::Game_HP_Set>(buf);
+		}
 
 }  // namespace TheLastOne
 }  // namespace Game

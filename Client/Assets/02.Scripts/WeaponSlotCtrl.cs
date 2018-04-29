@@ -25,7 +25,7 @@ public class WeaponSlotCtrl : MonoBehaviour
 
     public PlayerCtrl player;
 
-    void Start()
+    void Awake()
     {
         // 스택 메모리 할당.
         weaponSlot = new Stack<WeaponCtrl>();
