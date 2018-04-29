@@ -103,10 +103,10 @@ public class VehicleCtrl : PlayerVehicleCtrl
             vehicleHp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
             playerCtrl.send_CarHP(carNum, vehicleHp);
 
-            if (GetTheCar == true)
-            {
-                vehicleHpBar.fillAmount = (float)vehicleHp / (float)vehicleInitHp;
-            }
+            //if (GetTheCar == true)
+            //{
+            //    vehicleHpBar.fillAmount = (float)vehicleHp / (float)vehicleInitHp;
+            //}
             //    player.imgHpBar.fillAmount = (float)player.hp / (float)player.initHp;
 
 

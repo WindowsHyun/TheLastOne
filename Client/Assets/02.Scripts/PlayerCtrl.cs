@@ -513,6 +513,8 @@ public class PlayerCtrl : PlayerVehicleCtrl
             // 탑승시 캐릭터를 차량 위치와 동기화
             this.transform.position = new Vector3(ridingCar.transform.position.x, ridingCar.transform.position.y, ridingCar.transform.position.z);
 
+            vehicleHpBar.fillAmount = (float)ridingCar.vehicleHp / (float)ridingCar.vehicleInitHp;
+
         }
     }
 
@@ -719,7 +721,9 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
         // 체력 초기화
         hp = 0;
+        imgHpBar.fillAmount = (float)hp / (float)initHp;
         armour = 0;
+        imgArmourBar.fillAmount = (float)armour / (float)initArmour;
 
         // DIe 애니메이션 실행
         animator.SetTrigger("IsDie");
