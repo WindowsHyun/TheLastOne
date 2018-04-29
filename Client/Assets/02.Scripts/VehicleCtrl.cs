@@ -21,7 +21,7 @@ public class VehicleCtrl : PlayerVehicleCtrl
     public Transform[] tireMeshs = new Transform[4];
 
     // 리지드바디 변수
-    private Rigidbody m_rigidbody;
+    public Rigidbody m_rigidbody;
     public Transform vehicle_tr;
 
     public bool carDestroy = false;
@@ -96,10 +96,10 @@ public class VehicleCtrl : PlayerVehicleCtrl
         {
             // 맞은 총알의 Damage를 추출해 Player HP 차감
             vehicleHp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
-            if (GetTheCar == true)
-            {
-                vehicleHpBar.fillAmount = (float)vehicleHp / (float)vehicleInitHp;
-            }
+            //if (GetTheCar == true)
+            //{
+            //    vehicleHpBar.fillAmount = (float)vehicleHp / (float)vehicleInitHp;
+            //}
             //    player.imgHpBar.fillAmount = (float)player.hp / (float)player.initHp;
 
 

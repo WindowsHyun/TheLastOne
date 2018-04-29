@@ -23,7 +23,7 @@ public class ZombieCtrl : MonoBehaviour
     // 추적 사정거리
     public float traceDist = 50.0f;
     // 공격 사정거리
-    public float attackDist = 3.0f;
+    public float attackDist = 4.0f;
 
     // 좀비 공격력
     public int damage = 20;
