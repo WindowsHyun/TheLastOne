@@ -392,9 +392,13 @@ public class InventoryCtrl : MonoBehaviour
 
     public void swapType()
     {
-        string tmp = player.weaponSlotType[0];
-        player.weaponSlotType[0] = player.weaponSlotType[1];
-        player.weaponSlotType[1] = tmp;
+        //string tmp = player.weaponSlotType[0];
+        //player.weaponSlotType[0] = player.weaponSlotType[1];
+        //player.weaponSlotType[1] = tmp;
+
+        int tmp = player.weaponSlotNumber[0];
+        player.weaponSlotNumber[0] = player.weaponSlotNumber[1];
+        player.weaponSlotNumber[1] = tmp;
     }
 
 }

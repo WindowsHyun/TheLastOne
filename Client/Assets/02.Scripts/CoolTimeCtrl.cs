@@ -18,7 +18,7 @@ public class CoolTimeCtrl : MonoBehaviour
 
     public PlayerCtrl player;
 
-    void start()
+    void Start()
     {
         player = GameObject.Find("Player").GetComponent<PlayerCtrl>();
 

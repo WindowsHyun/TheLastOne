@@ -107,7 +107,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
     public int CarNum = -1;
 
     // 무기 슬롯 타입
-    public string[] weaponSlotType = new string[2];
+    //public string[] weaponSlotType = new string[2];
     public int[] weaponSlotNumber = new int[2];
 
 
@@ -158,8 +158,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
     // 0번 AK47, 1번 M16, 2번 M4, 3번 UMP
     private Sprite[] weaponIEquipImage = new Sprite[4];
 
-    public Text carSpeedText;
-
+ 
 
     IEnumerator StartKeyInput()
     {
@@ -507,10 +506,6 @@ public class PlayerCtrl : PlayerVehicleCtrl
             this.transform.position = new Vector3(ridingCar.transform.position.x, ridingCar.transform.position.y, ridingCar.transform.position.z);
 
             vehicleHpBar.fillAmount = (float)ridingCar.vehicleHp / (float)ridingCar.vehicleInitHp;
-
-            //carSpeedText.text = (ridingCar.wheelColliders[0].motorTorque * Time.deltaTime).ToString();
-
-            //carSpeedText.text = ((int)(ridingCar.m_rigidbody.velocity.magnitude * 3.6)).ToString();
         }
     }
 

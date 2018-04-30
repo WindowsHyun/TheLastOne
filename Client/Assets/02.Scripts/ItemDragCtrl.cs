@@ -13,18 +13,20 @@ public class ItemDragCtrl : MonoBehaviour {
 
 
     // 인벤토리에 접근하기 위한 변수.
-    private InventoryCtrl Iv;
+    public InventoryCtrl Iv;
 
     void Awake()
     {
+        Iv = GameObject.FindGameObjectWithTag("Inventory").GetComponent<InventoryCtrl>();
         // 태그명이 "Inventory"인 객체의 GameObject를 반환한다.
         // 반환된 객체가 가지고 있는 스크립트를 GetComponent를 통해 가져온다.
-        Iv = GameObject.FindGameObjectWithTag("Inventory").GetComponent<InventoryCtrl>();
+
 
     }
 
     void Start()
     {
+       
         // 현재 슬롯의 스크립트를 가져온다.
         slot = GetComponent<SlotCtrl>();
         // 빈 이미지 객체를 태그를 이용하여 가져온다.
