@@ -141,7 +141,8 @@ namespace TheLastOne.SendFunction
             //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.
             fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
             Client_Packet.StartClient_Packet(fbb);
-            Client_Packet.AddId(fbb, item_num);
+            // 아이템 뿌리기 테스트를 위하여 먹어도 안먹었다고 보내기로 한다./
+            //Client_Packet.AddId(fbb, item_num);
             var endOffset = Client_Packet.EndClient_Packet(fbb);
             fbb.Finish(endOffset.Value);
 

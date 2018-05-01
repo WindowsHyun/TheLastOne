@@ -65,6 +65,10 @@ namespace TheLastOne.Game.Network
         public GameObject item_556;
         public GameObject item_762;
         public GameObject item_AidKit;
+        public GameObject item_M4A1;
+        public GameObject item_UMP;
+        public GameObject item_9mm;
+        public GameObject iterm_Armor;
         // 게임 차량 Object
         public GameObject Car_UAZ;
         //------------------------------------------
@@ -99,6 +103,7 @@ namespace TheLastOne.Game.Network
 
         IEnumerator SocketCheck()
         {
+            StartCoroutine(DrawDebugText());
             if (m_Socket.Connected == true)
             {
                 // 서버가 정상적으로 연결 되었을경우
@@ -303,6 +308,33 @@ namespace TheLastOne.Game.Network
                                 iter.Value.item.transform.SetParent(ItemCollection.transform);
                                 iter.Value.set_draw(true);
                             }
+                            else if (iter.Value.get_name() == "M4A1")
+                            {
+                                iter.Value.item = Instantiate(item_M4A1, iter.Value.get_pos(), Quaternion.Euler(0, 0, 90));
+                                iter.Value.item.transform.SetParent(ItemCollection.transform);
+
+                                iter.Value.car = iter.Value.item.GetComponent<VehicleCtrl>();
+                                iter.Value.item.transform.SetParent(ItemCollection.transform);
+                                iter.Value.set_draw(true);
+                            }
+                            else if (iter.Value.get_name() == "UMP")
+                            {
+                                iter.Value.item = Instantiate(item_UMP, iter.Value.get_pos(), Quaternion.Euler(0, 0, 90));
+                                iter.Value.item.transform.SetParent(ItemCollection.transform);
+                                iter.Value.set_draw(true);
+                            }
+                            else if (iter.Value.get_name() == "9mm")
+                            {
+                                iter.Value.item = Instantiate(item_9mm, iter.Value.get_pos(), Quaternion.Euler(-90, 0, 0));
+                                iter.Value.item.transform.SetParent(ItemCollection.transform);
+                                iter.Value.set_draw(true);
+                            }
+                            else if (iter.Value.get_name() == "Armor")
+                            {
+                                iter.Value.item = Instantiate(iterm_Armor, iter.Value.get_pos(), Quaternion.identity);
+                                iter.Value.item.transform.SetParent(ItemCollection.transform);
+                                iter.Value.set_draw(true);
+                            }
                         }
                         else if (iter.Value.get_draw() == true && iter.Value.item.activeInHierarchy == false && iter.Value.get_sendPacket() == false && iter.Value.get_kind() != recv_protocol.Kind_Car)
                         {
@@ -385,7 +417,7 @@ namespace TheLastOne.Game.Network
         {
             do
             {
-
+                debugString = "1. M16, 2. 556, 3. AK, 4. 762, 5. M4A1, 6. UMP, 7. 9mm, 8. AidKit, 9. Armor, 0. UAZ";
                 DebugText.text = debugString.ToString();
                 yield return null;
             } while (true);
