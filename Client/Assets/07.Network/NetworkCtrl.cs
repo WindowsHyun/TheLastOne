@@ -305,7 +305,7 @@ namespace TheLastOne.Game.Network
 
                                 iter.Value.car = iter.Value.item.GetComponent<VehicleCtrl>();
                                 iter.Value.car.carNum = iter.Key;  // 해당 차량이 몇번째 차량인지 알려주자.
-                                iter.Value.item.transform.SetParent(ItemCollection.transform);
+                                iter.Value.item.name = "UAZ_" + iter.Key;
                                 iter.Value.set_draw(true);
                             }
                             else if (iter.Value.get_name() == "M4A1")
@@ -395,7 +395,7 @@ namespace TheLastOne.Game.Network
                     Enum get_int_enum = Player_Script.playerState;
 
                     // 플레이어 데이터 보내주기
-                    Sendbyte = sF.makeClient_PacketInfo(Player_Position, Convert.ToInt32(get_int_enum), Player_Script.h, Player_Script.v, Player_Rotation, Player_Script.now_Weapon, Player_Script.CarNum, Car_Rotation);
+                    Sendbyte = sF.makeClient_PacketInfo(Player_Position, Convert.ToInt32(get_int_enum), Player_Script.h, Player_Script.v, Player_Rotation, Player_Script.now_Weapon, Player_Script.CarNum, Player_Script.dangerLineIn, Car_Rotation);
                     Send_Packet(Sendbyte);
 
                     //좀비 데이터 보내주기
@@ -417,7 +417,7 @@ namespace TheLastOne.Game.Network
         {
             do
             {
-                debugString = "1. M16, 2. 556, 3. AK, 4. 762, 5. M4A1, 6. UMP, 7. 9mm, 8. AidKit, 9. Armor, 0. UAZ";
+                //debugString = "1. M16, 2. 556, 3. AK, 4. 762, 5. M4A1, 6. UMP, 7. 9mm, 8. AidKit, 9. Armor, 0. UAZ";
                 DebugText.text = debugString.ToString();
                 yield return null;
             } while (true);
