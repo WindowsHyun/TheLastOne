@@ -45,15 +45,13 @@ public class WeaponSlotCtrl : MonoBehaviour
 
         if (slotNumber == 1)
         {
-            //player.weaponSlotType[0] = weaponSlot.Peek().type.ToString();
             player.weaponSlotNumber[0] = (int)weaponSlot.Peek().type;
             player.now_Weapon = (int)weaponSlot.Peek().type;
             player.WeaponDisPlay();
         }
         else
         {
-            // 두번째의 경우 무기 슬롯 데이터를 넣어준다.
-            //player.weaponSlotType[1] = weaponSlot.Peek().type.ToString();
+            // 두번째의 경우 무기 슬롯 데이터를 넣어준다.           
             player.weaponSlotNumber[1] = (int)weapon.type;
         }
     }
@@ -72,13 +70,21 @@ public class WeaponSlotCtrl : MonoBehaviour
             // ㅄ 같은 코드 바꿔야 한다. = 난 안바꿈~
            for (int i=0; i < 2; ++i)
             {
-                //if (weaponSlot.Peek().type.ToString() == player.weaponSlotType[i].ToString())
-                //{
-                //    player.weaponSlotType[i] = "";
-                //}
+                
                 if ((int)weaponSlot.Peek().type == player.weaponSlotNumber[i])
                 {
                     player.weaponSlotNumber[i] = -1;
+                    player.animator.SetBool("IsEquip", false);
+                    player.weaponView[(int)weaponSlot.Peek().type].GetComponent<Renderer>().enabled = false;
+                    player.weaponImage.GetComponent<Image>().sprite = player.defalutEquipImage;
+                    player.weaponText.text = "";
+                    player.bulletCount[(int)weaponSlot.Peek().type] += player.reloadBulletCount[(int)weaponSlot.Peek().type];
+                    player.reloadBulletCount[(int)weaponSlot.Peek().type] = 0;
+                }
+
+                if((int)weaponSlot.Peek().type == player.now_Weapon)
+                {
+                    player.now_Weapon = -1;
                 }
             }
 

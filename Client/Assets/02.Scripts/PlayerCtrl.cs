@@ -56,7 +56,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
     // 접근해야 하는 컴포넌트는 반드시 변수에 할당한 후 사용
     public Transform tr;
-    private Animator animator;
+    public Animator animator;
 
     // 캐릭터 이동 속도 변수
     public float moveSpeed = 23.0f;
@@ -119,7 +119,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
     public int[] reloadBulletCount = new int[4];
 
     // 무기 정보 저장
-    private GameObject[] weaponView = new GameObject[4];
+    public GameObject[] weaponView = new GameObject[4];
     public GameObject ak47;
     public GameObject m16;
     public GameObject m4;
@@ -198,6 +198,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
             // 1번 , 2번 키 입력시 총 랜더링과 어떤 총인지 판별한다. 
             if (Input.GetKeyDown(KeyCode.Alpha1) && weaponSlotNumber[0] != -1)
             {
+                animator.SetBool("IsEquip", true);
                 // 아래의 if else if문은 M4와 M16으로 총을 장착하였을 때 5.56mm의 종합적인 개수의 동기화를 위함.
                 // 1번 장착 m16, 2번 장착 m4일때
                 if (weaponSlotNumber[0] == 1 && weaponSlotNumber[1] == 2)
@@ -230,6 +231,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
             }
             else if (Input.GetKeyDown(KeyCode.Alpha2) && weaponSlotNumber[1] != -1)
             {
+                animator.SetBool("IsEquip", true);
                 // 아래의 if else if문은 M4와 M16으로 총을 장착하였을 때 5.56mm의 종합적인 개수의 동기화를 위함.
                 // 1번 장착 m16, 2번 장착 m4일때
                 if (weaponSlotNumber[0] == 1 && weaponSlotNumber[1] == 2)
