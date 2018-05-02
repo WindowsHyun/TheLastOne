@@ -300,7 +300,7 @@ namespace TheLastOne.Game.Network
                             }
                             else if (iter.Value.get_name() == "UAZ")
                             {
-                                iter.Value.item = Instantiate(Car_UAZ, iter.Value.get_pos(), Quaternion.identity);
+                                iter.Value.item = Instantiate(Car_UAZ, iter.Value.get_pos(), Quaternion.Euler(iter.Value.get_rotation().x, iter.Value.get_rotation().y, iter.Value.get_rotation().z));
                                 iter.Value.item.transform.SetParent(ItemCollection.transform);
 
                                 iter.Value.car = iter.Value.item.GetComponent<VehicleCtrl>();
