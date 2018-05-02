@@ -158,7 +158,10 @@ public class PlayerCtrl : PlayerVehicleCtrl
     // 0번 AK47, 1번 M16, 2번 M4, 3번 UMP
     private Sprite[] weaponIEquipImage = new Sprite[4];
 
- 
+    public GameObject realMap;
+    private bool realView;
+    public RectTransform playerPositionImage;
+
 
     IEnumerator StartKeyInput()
     {
@@ -364,6 +367,25 @@ public class PlayerCtrl : PlayerVehicleCtrl
                 if (now_Weapon != -1 && bulletCount[now_Weapon] != 0)
                     cooltimeCtrl.ReloadCollTime();
             }
+
+            if (Input.GetKeyDown(KeyCode.M))
+            {
+                if (realView == false)
+                { 
+                    realMap.SetActive(true);
+                    realView = true;
+                }
+                else if (realView == true)
+                {
+                    realMap.SetActive(false);
+                    realView = false;
+                }
+            }
+
+            if (realView == true)
+            {
+                playerPositionImage.localPosition = new Vector3(-gameObject.transform.position.z * 0.5f, gameObject.transform.position.x * 0.5f);
+            }
             yield return null;
         } while (true);
         //yield return null;
@@ -430,6 +452,9 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
         // 현재 발사 가능
         shotable = false;
+
+        // 지도창을 위한 변수
+        realView = false;
 
         // 클라이언트 고유번호 가져오기.
         Client_imei = networkCtrl.get_imei();
@@ -509,6 +534,8 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
             vehicleHpBar.fillAmount = (float)ridingCar.vehicleHp / (float)ridingCar.vehicleInitHp;
         }
+
+        
     }
 
     void Fire(SlotCtrl slot)
