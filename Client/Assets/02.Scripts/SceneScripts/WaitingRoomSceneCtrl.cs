@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class WaitingRoomSceneCtrl : MonoBehaviour {
 
-    private float gameStartTime = 10.0f;
+    public float gameStartTime = 1.0f;
 
     public Text gameStartTimeText;
 

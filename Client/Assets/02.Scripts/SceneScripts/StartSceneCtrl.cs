@@ -40,7 +40,7 @@ public class StartSceneCtrl: MonoBehaviour {
 
     public void NextLobbyScene()
     {
-        if (idCehck == true && pwdCehck == true)  // 모두 입력 하였는지 확인
+        if (idCehck == true /*&& pwdCehck == true*/)  // 모두 입력 하였는지 확인
         {
             SceneManager.LoadScene("LobbyGameScene"); // 다음씬으로 넘어감
         }

@@ -367,7 +367,6 @@ public class PlayerCtrl : PlayerVehicleCtrl
                 if (now_Weapon != -1 && bulletCount[now_Weapon] != 0)
                     cooltimeCtrl.ReloadCollTime();
             }
-<<<<<<< HEAD
 
             if (Input.GetKeyDown(KeyCode.M))
             {
@@ -387,9 +386,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
             {
                 playerPositionImage.localPosition = new Vector3(-gameObject.transform.position.z * 0.5f, gameObject.transform.position.x * 0.5f);
             }
-=======
-            
->>>>>>> Ser
+
             yield return null;
         } while (true);
         //yield return null;
