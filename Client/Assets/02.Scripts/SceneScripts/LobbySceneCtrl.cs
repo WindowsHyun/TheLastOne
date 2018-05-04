@@ -4,23 +4,23 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class LobbySceneCtrl : MonoBehaviour {
+using TheLastOne.GameClass;
 
-    private int modeCheck = 0;
-
+public class LobbySceneCtrl : MonoBehaviour
+{
+    Game_ProtocolClass recv_protocol = new Game_ProtocolClass();
     public float gameStartTime = 1.0f;
     public Text gameStartTimeText;
+    public Image readyBtn;
+    private bool readyStatus = false;
 
     // 추후 개발 업데이트 내용
     // 상점 - 커스텀 BOX 구매 및 개봉
     // 인벤토리 - 커스텀 아이템 장착 및 탈착
-
-
-    //void Start()
-    //{
-    //    StartCoroutine("StartGameCount"); // 대기방 씬 시작 -> 코루틴 시작
-    //    //UseItemCollTime();
-    //}
+    private void Awake()
+    {
+        SingletonCtrl.Instance_S.PlayerStatus = recv_protocol.LobbyStatus;
+    }
 
     public void NextInGameScene()
     {
@@ -36,13 +36,25 @@ public class LobbySceneCtrl : MonoBehaviour {
             yield return new WaitForSeconds(1.0f); // 1초 딜레이
 
             gameStartTime -= 1.0f;  // 1초 감소
-            gameStartTimeText.text = "Start the game in " + gameStartTime; // text 출력
+            //gameStartTimeText.text = "Start the game in " + gameStartTime; // text 출력
+            gameStartTimeText.text = "Offline Game Play..!"; // text 출력
 
         }
         if (gameStartTime == 0)
         {
             NextInGameScene();
         }
+        yield break;
+    }
+
+    IEnumerator ReadyStatus()
+    {
+        while (readyStatus)  // 0 초가 될때까지 while문 진행
+        {
+            gameStartTimeText.text = "Game is Ready..!"; // text 출력
+            yield return new WaitForSeconds(0.3f); // 1초 딜레이
+        }
+        gameStartTimeText.text = "";
         yield break;
     }
 
@@ -63,6 +75,32 @@ public class LobbySceneCtrl : MonoBehaviour {
 
     public void PlayerButtonCheck()
     {
-        StartCoroutine("StartGameCount"); // 대기방 씬 시작 -> 코루틴 시작
+        // 레디 상태가 아닐 경우
+        if (SingletonCtrl.Instance_S.PlayerSocket.Connected == false)
+        {
+            // 서버와 연결이 되어있지 않을 경우...
+            StartCoroutine("StartGameCount"); // 대기방 씬 시작 -> 코루틴 시작
+        }
+        else
+        {
+            // 서버와 연결이 되어있지 않을경우 레디 상태로 전환한다.
+            if (readyStatus == false)
+            {
+                // 레디 상태가 아닐 경우
+                SingletonCtrl.Instance_S.PlayerStatus = recv_protocol.ReadyStatus;
+                readyBtn.color = new Color32(235, 235, 235, 255);
+                readyStatus = true;
+                StartCoroutine("ReadyStatus");
+            }
+            else
+            {
+                SingletonCtrl.Instance_S.PlayerStatus = recv_protocol.LobbyStatus;
+                readyBtn.color = new Color32(255, 144, 0, 255);
+                readyStatus = false;
+            }
+
+
+
+        }
     }
 }

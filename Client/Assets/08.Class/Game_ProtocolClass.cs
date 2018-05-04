@@ -26,12 +26,18 @@ namespace TheLastOne.GameClass
         public int CS_Zombie_info;      // 클라이언트가 서버에게 좀비 데이터를 전달해 준다.
         public int CS_Object_HP;        // 클라이언트가 서버에게 HP 데이터를 전달해 준다.
         public int CS_Car_Riding; 		// 클라이언트가 서버에게 차량에 탑승했다고 전달해 준다.
-        public int CS_Car_Rode; 			// 클라이언트가 서버에게 차량에 하차했다고 전달해 준다.
+        public int CS_Car_Rode;             // 클라이언트가 서버에게 차량에 하차했다고 전달해 준다.
+        public int CS_Player_Status;			// 클라이언트가 서버에게 자신의 상태를 전달한다.
 
         public int Kind_Item;           // 아이템
         public int Kind_Car;            // 자동차
         public int Kind_Zombie;     // 좀비
         public int Kind_Player;     // 플레이어
+
+        public int LoginStatus;     // 로그인 상태
+        public int LobbyStatus;     // 로비 상태
+        public int ReadyStatus;     // 로비에서 Reday 상태
+        public int inGameStatus;    // 게임 상태
 
 
         public Game_ProtocolClass()
@@ -58,6 +64,7 @@ namespace TheLastOne.GameClass
             CS_Object_HP = 6;
             CS_Car_Riding = 7;
             CS_Car_Rode = 8;
+            CS_Player_Status = 9;
             //----------------------------------
             // 아이템 종류
             Kind_Item = 0;
@@ -65,6 +72,10 @@ namespace TheLastOne.GameClass
             Kind_Player = 2;
             Kind_Zombie = 3;
             //----------------------------------
+            LoginStatus = 0;
+            LobbyStatus = 1;
+            ReadyStatus = 2;
+            inGameStatus = 3;
         }
     }
 }

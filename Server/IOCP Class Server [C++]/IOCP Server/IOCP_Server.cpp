@@ -475,6 +475,13 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 			iter->second.set_riding(false);
 		}
 		break;
+		case CS_Player_Status:
+		{
+			auto client_Check_info = GetClient_packetView(get_packet);
+			client->second.set_playerStatus(client_Check_info->id());
+			std::cout << client->first << " : " << client->second.get_playerStatus() << std::endl;
+		}
+		break;
 		}
 
 

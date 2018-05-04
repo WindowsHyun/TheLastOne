@@ -36,6 +36,7 @@ enum Event_Type { E_DangerLine, E_RoundTime, E_Remove_Client, E_MoveDangerLine, 
 #define CS_Object_HP 6						// 클라이언트가 서버에게 HP 데이터를 전달해 준다.
 #define CS_Car_Riding 7						// 클라이언트가 서버에게 차량에 탑승했다고 전달해 준다.
 #define CS_Car_Rode 8						// 클라이언트가 서버에게 차량에 하차했다고 전달해 준다.
+#define CS_Player_Status 9					// 클라이언트가 서버에게 자신의 상태를 전달한다.
 
 // 자기장 시간
 #define DangerLine_init 10
@@ -63,5 +64,11 @@ enum Event_Type { E_DangerLine, E_RoundTime, E_Remove_Client, E_MoveDangerLine, 
 #define Car_HP 200
 #define Player_HP 100
 #define Zombie_HP 100
+
+// 게임 상태 설정
+#define LoginStatus 0
+#define LobbyStatus 1
+#define ReadyStatus 2
+#define inGameStatus 3
 
 #endif

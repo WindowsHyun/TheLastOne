@@ -14,6 +14,7 @@ public class SingletonCtrl : MonoBehaviour
 {
 
     private int nowModeNumber = 0;
+    private int playerStatus = 0;       // 플레이어 게임 상태
     private int playerMoney = 0;    // 플레이어 돈
     private string playerID = "";   // 플레이어 아이디
     private string playerPWD = "";  // 플레이어 패스워드
@@ -27,7 +28,6 @@ public class SingletonCtrl : MonoBehaviour
     //-------------------------------------------------------------------------------------------
 
     private static SingletonCtrl instance_S = null; // 정적 변수
-
 
     public static SingletonCtrl Instance_S  // 인스턴스 접근 프로퍼티
     {
@@ -46,6 +46,21 @@ public class SingletonCtrl : MonoBehaviour
         set
         {
             nowModeNumber = value;
+        }
+    }
+
+    public int PlayerStatus                  // 플레이어 게임 상태 접근 프로퍼티
+    {
+        get
+        {
+            return playerStatus;
+        }
+        set
+        {
+            playerStatus = value;
+            // 상태가 변경 되면 바로 패킷을 보내주자.
+            // 인게임 Socket이 열려있지 않으므로, 싱글톤에서 패킷을 보내주자.
+            Send_Packet(networkCtrl.Player_Status(playerStatus));
         }
     }
 
@@ -176,6 +191,21 @@ public class SingletonCtrl : MonoBehaviour
         }
     }
 
+    public void Send_Packet(byte[] packet)
+    {
+        if (m_Socket.Connected == true)
+        {
+            try
+            {
+                m_Socket.Send(packet, packet.Length, 0);
+            }
+            catch (SocketException err)
+            {
+                Debug.Log("Singleton Socket send or receive error! : " + err.ToString());
+            }
+        }
+    }
+
     private void Awake()
     {
         if (instance_S)                     // 인스턴스가 이미 생성 되었는가?
@@ -192,7 +222,6 @@ public class SingletonCtrl : MonoBehaviour
         m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, 1);
         m_Socket.NoDelay = true;
         m_Socket.BeginConnect(iPAdress, kPort, new AsyncCallback(ConnectCallback), m_Socket);
-
     }
 
 

@@ -23,6 +23,7 @@ private:
 	int weaponState = 0;
 	int limit_Zombie = 0;
 	int inCar = -1;
+	int playerStatus = 0;
 	float horizontal = 0.0f;
 	float vertical = 0.0f;
 	bool connect;
@@ -53,6 +54,7 @@ public:
 	bool get_DangerLine() { return this->dangerLineIn; };			// 클라이언트 자기장 여부
 	int get_curr_packet() { return this->curr_packet_size; };		// 클라이언트 패킷 사이즈 전달
 	int get_prev_packet() { return this->prev_packet_data; };		// 클라이언트 패킷 사이즈 전달
+	int get_playerStatus() { return this->playerStatus; };		// 클라이언트 게임 상태 전달
 	xyz get_pos() { return this->position; };
 	Vec3 get_position();													// 클라이언트 포지션 전달
 	Vec3 get_rotation();													// 클라이언트 로테이션 전달
@@ -71,6 +73,7 @@ public:
 	void set_client_Remove(const bool value) { this->remove_client = value; };				// 클라이언트 Remove 저장
 	void set_client_DangerLine(const bool value) { this->dangerLineIn = value; };				// 클라이언트 자기장 값 저장
 	void set_limit_zombie(const int value) { this->limit_Zombie += value; }				// 클라이언트 좀비 최대치 저장
+	void set_playerStatus(const int value) { this->playerStatus = value; }				// 클라이언트 게임 상태 저장
 	void set_vertical(float value) { this->vertical = (float)value; }
 	void set_horizontal(float value) {  this->horizontal = (float)value; }
 	void set_inCar(int value) { this->inCar = value; }												// 클라이언트 무슨 차량 탑승 값 저장
