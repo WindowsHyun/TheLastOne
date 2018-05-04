@@ -27,6 +27,7 @@ private:
 	float vertical = 0.0f;
 	bool connect;
 	bool remove_client;
+	bool dangerLineIn;
 	SOCKET client_socket;
 	int prev_packet_data; // 이전 처리되지 않는 패킷이 얼마냐
 	int curr_packet_size; // 지금 처리하고 있는 패킷이 얼마냐
@@ -49,6 +50,7 @@ public:
 	int get_weapon() { return this->weaponState; };				// 클라이언트 WeaponState 전달
 	bool get_Connect() { return this->connect; };					// 클라이언트 연결 여부 전달
 	bool get_Remove() { return this->remove_client; };			// 클라이언트 삭제 여부 전달
+	bool get_DangerLine() { return this->dangerLineIn; };			// 클라이언트 자기장 여부
 	int get_curr_packet() { return this->curr_packet_size; };		// 클라이언트 패킷 사이즈 전달
 	int get_prev_packet() { return this->prev_packet_data; };		// 클라이언트 패킷 사이즈 전달
 	xyz get_pos() { return this->position; };
@@ -67,6 +69,7 @@ public:
 	void set_client_weapon(const int value) { this->weaponState = value; };				// 클라이언트 WeaponState 저장
 	void set_client_Connect(const bool value) { this->connect = value; };				// 클라이언트 Connect 저장
 	void set_client_Remove(const bool value) { this->remove_client = value; };				// 클라이언트 Remove 저장
+	void set_client_DangerLine(const bool value) { this->dangerLineIn = value; };				// 클라이언트 자기장 값 저장
 	void set_limit_zombie(const int value) { this->limit_Zombie += value; }				// 클라이언트 좀비 최대치 저장
 	void set_vertical(float value) { this->vertical = (float)value; }
 	void set_horizontal(float value) {  this->horizontal = (float)value; }

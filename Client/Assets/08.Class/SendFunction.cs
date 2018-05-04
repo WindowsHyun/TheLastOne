@@ -17,7 +17,7 @@ namespace TheLastOne.SendFunction
     {
 
 
-        public Byte[] makeClient_PacketInfo(Vector3 Player, int Player_Animator, float horizontal, float vertical, Vector3 PlayerRotation, int Player_Weapone, int inCar, Vector3 CarRotation)
+        public Byte[] makeClient_PacketInfo(Vector3 Player, int Player_Animator, float horizontal, float vertical, Vector3 PlayerRotation, int Player_Weapone, int inCar, bool dangerLineIn, Vector3 CarRotation)
         {
             //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.
             FlatBufferBuilder fbb = new FlatBufferBuilder(1);
@@ -31,6 +31,7 @@ namespace TheLastOne.SendFunction
             Client_info.AddCarrotation(fbb, Vec3.CreateVec3(fbb, CarRotation.x, CarRotation.y, CarRotation.z));
             Client_info.AddPosition(fbb, Vec3.CreateVec3(fbb, Player.x, Player.y, Player.z));
             Client_info.AddRotation(fbb, Vec3.CreateVec3(fbb, PlayerRotation.x, PlayerRotation.y, PlayerRotation.z));
+            Client_info.AddDangerLineIn(fbb, dangerLineIn);
             Client_info.AddNowWeapon(fbb, Player_Weapone);
             var endOffset = Client_info.EndClient_info(fbb);
             fbb.Finish(endOffset.Value);
@@ -141,6 +142,7 @@ namespace TheLastOne.SendFunction
             //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.
             fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
             Client_Packet.StartClient_Packet(fbb);
+            // 아이템 뿌리기 테스트를 위하여 먹어도 안먹었다고 보내기로 한다./
             Client_Packet.AddId(fbb, item_num);
             var endOffset = Client_Packet.EndClient_Packet(fbb);
             fbb.Finish(endOffset.Value);

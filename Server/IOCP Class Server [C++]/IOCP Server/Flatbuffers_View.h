@@ -121,7 +121,8 @@ namespace Game {
 				VT_POSITION = 20,
 				VT_ROTATION = 22,
 				VT_CARROTATION = 24,
-				VT_NOWWEAPON = 26
+				VT_DANGERLINEIN = 26,
+				VT_NOWWEAPON = 28
 			};
 			int32_t id() const {
 				return GetField<int32_t>(VT_ID, 0);
@@ -156,6 +157,9 @@ namespace Game {
 			const Vec3 *carrotation() const {
 				return GetStruct<const Vec3 *>(VT_CARROTATION);
 			}
+			bool dangerLineIn() const {
+				return GetField<uint8_t>(VT_DANGERLINEIN, 0) != 0;
+			}
 			int32_t nowWeapon() const {
 				return GetField<int32_t>(VT_NOWWEAPON, 0);
 			}
@@ -173,6 +177,7 @@ namespace Game {
 					VerifyField<Vec3>(verifier, VT_POSITION) &&
 					VerifyField<Vec3>(verifier, VT_ROTATION) &&
 					VerifyField<Vec3>(verifier, VT_CARROTATION) &&
+					VerifyField<uint8_t>(verifier, VT_DANGERLINEIN) &&
 					VerifyField<int32_t>(verifier, VT_NOWWEAPON) &&
 					verifier.EndTable();
 			}
@@ -214,6 +219,9 @@ namespace Game {
 			void add_carrotation(const Vec3 *carrotation) {
 				fbb_.AddStruct(Client_info::VT_CARROTATION, carrotation);
 			}
+			void add_dangerLineIn(bool dangerLineIn) {
+				fbb_.AddElement<uint8_t>(Client_info::VT_DANGERLINEIN, static_cast<uint8_t>(dangerLineIn), 0);
+			}
 			void add_nowWeapon(int32_t nowWeapon) {
 				fbb_.AddElement<int32_t>(Client_info::VT_NOWWEAPON, nowWeapon, 0);
 			}
@@ -242,6 +250,7 @@ namespace Game {
 			const Vec3 *position = 0,
 			const Vec3 *rotation = 0,
 			const Vec3 *carrotation = 0,
+			bool dangerLineIn = false,
 			int32_t nowWeapon = 0) {
 			Client_infoBuilder builder_(_fbb);
 			builder_.add_nowWeapon(nowWeapon);
@@ -256,6 +265,7 @@ namespace Game {
 			builder_.add_armour(armour);
 			builder_.add_hp(hp);
 			builder_.add_id(id);
+			builder_.add_dangerLineIn(dangerLineIn);
 			return builder_.Finish();
 		}
 
@@ -272,6 +282,7 @@ namespace Game {
 			const Vec3 *position = 0,
 			const Vec3 *rotation = 0,
 			const Vec3 *carrotation = 0,
+			bool dangerLineIn = false,
 			int32_t nowWeapon = 0) {
 			return Game::TheLastOne::CreateClient_info(
 				_fbb,
@@ -286,6 +297,7 @@ namespace Game {
 				position,
 				rotation,
 				carrotation,
+				dangerLineIn,
 				nowWeapon);
 		}
 

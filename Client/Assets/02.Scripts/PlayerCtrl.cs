@@ -42,9 +42,9 @@ public class PlayerCtrl : PlayerVehicleCtrl
         None, M16, AK47, M4, UMP
     };
 
-    // 델리게이트 및 이벤트 선언
-    public delegate void PlayerDieHandler();
-    public static event PlayerDieHandler OnPlayerDie;
+    //// 델리게이트 및 이벤트 선언
+    //public delegate void PlayerDieHandler();
+    //public static event PlayerDieHandler OnPlayerDie;
 
     // 캐릭터의 현재 상태 정보를 저장할 Enum 변수
     public PlayerState playerState = PlayerState.idle;
@@ -146,7 +146,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
     // 모든 무기 슬롯의 데이터를 받기 위함
     private WeaponSlotCtrl[] weaponSlotCtrl;
 
-    public bool dangerLineIn = false;
+    public bool dangerLineIn = true;
 
     public GameObject cooltime;
     public CoolTimeCtrl cooltimeCtrl;
@@ -367,6 +367,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
                 if (now_Weapon != -1 && bulletCount[now_Weapon] != 0)
                     cooltimeCtrl.ReloadCollTime();
             }
+<<<<<<< HEAD
 
             if (Input.GetKeyDown(KeyCode.M))
             {
@@ -386,6 +387,9 @@ public class PlayerCtrl : PlayerVehicleCtrl
             {
                 playerPositionImage.localPosition = new Vector3(-gameObject.transform.position.z * 0.5f, gameObject.transform.position.x * 0.5f);
             }
+=======
+            
+>>>>>>> Ser
             yield return null;
         } while (true);
         //yield return null;
@@ -415,15 +419,13 @@ public class PlayerCtrl : PlayerVehicleCtrl
             weaponView[i].GetComponent<Renderer>().enabled = false;
         }
 
-        // 쿨타임 스크립트 할당
-        cooltimeCtrl = GameObject.Find("PanelCoolTime").GetComponent<CoolTimeCtrl>();
 
-        // 게임 시작후 차량 하차 시 인벤토리 창을 끈다.
-        inventory.SetActive(false);
-        // 게임 시작후 차량 하차 시 쿨타임 창을 끈다.
-        cooltime.SetActive(false);
+        //// 게임 시작후 차량 하차 시 인벤토리 창을 끈다.
+        //inventory.SetActive(false);
+        //// 게임 시작후 차량 하차 시 쿨타임 창을 끈다.
+        //cooltime.SetActive(false);
 
-        VehicleUI.SetActive(false);
+        //VehicleUI.SetActive(false);
 
 
         // 생명 초기값 설정
@@ -739,9 +741,6 @@ public class PlayerCtrl : PlayerVehicleCtrl
     // 플레이어 죽을 때 실행되는 함수
     public void PlayerDie()
     {
-        // 이벤트 발생 시킴
-        OnPlayerDie();
-
         Cursor.lockState = CursorLockMode.None;//마우스 커서 고정 해제
         Cursor.visible = true;//마우스 커서 보이기
 

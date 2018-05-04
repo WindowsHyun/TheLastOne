@@ -2,8 +2,8 @@
 #define __PROTOCOL_H__
 
 enum TimerType { T_DangerLine };
-enum OPTYPE { OP_SEND, OP_RECV, OP_DangerLine, OP_RemoveClient, OP_MoveDangerLine };
-enum Event_Type { E_DangerLine, E_RoundTime, E_Remove_Client, E_MoveDangerLine };
+enum OPTYPE { OP_SEND, OP_RECV, OP_DangerLine, OP_RemoveClient, OP_MoveDangerLine, OP_DangerLineDamage };
+enum Event_Type { E_DangerLine, E_RoundTime, E_Remove_Client, E_MoveDangerLine, E_DangerLineDamage };
 
 // 소켓 설정
 #define SERVERPORT 9000
@@ -38,6 +38,7 @@ enum Event_Type { E_DangerLine, E_RoundTime, E_Remove_Client, E_MoveDangerLine }
 #define CS_Car_Rode 8						// 클라이언트가 서버에게 차량에 하차했다고 전달해 준다.
 
 // 자기장 시간
+#define DangerLine_init 10
 #define DangerLine_Level4 240
 #define DangerLine_Level3 240
 #define DangerLine_Level2 240

@@ -65,6 +65,10 @@ namespace TheLastOne.Game.Network
         public GameObject item_556;
         public GameObject item_762;
         public GameObject item_AidKit;
+        public GameObject item_M4A1;
+        public GameObject item_UMP;
+        public GameObject item_9mm;
+        public GameObject iterm_Armor;
         // 게임 차량 Object
         public GameObject Car_UAZ;
         //------------------------------------------
@@ -99,6 +103,7 @@ namespace TheLastOne.Game.Network
 
         IEnumerator SocketCheck()
         {
+            StartCoroutine(DrawDebugText());
             if (m_Socket.Connected == true)
             {
                 // 서버가 정상적으로 연결 되었을경우
@@ -295,11 +300,38 @@ namespace TheLastOne.Game.Network
                             }
                             else if (iter.Value.get_name() == "UAZ")
                             {
-                                iter.Value.item = Instantiate(Car_UAZ, iter.Value.get_pos(), Quaternion.identity);
+                                iter.Value.item = Instantiate(Car_UAZ, iter.Value.get_pos(), Quaternion.Euler(iter.Value.get_rotation().x, iter.Value.get_rotation().y, iter.Value.get_rotation().z));
                                 iter.Value.item.transform.SetParent(ItemCollection.transform);
 
                                 iter.Value.car = iter.Value.item.GetComponent<VehicleCtrl>();
                                 iter.Value.car.carNum = iter.Key;  // 해당 차량이 몇번째 차량인지 알려주자.
+                                iter.Value.item.name = "UAZ_" + iter.Key;
+                                iter.Value.set_draw(true);
+                            }
+                            else if (iter.Value.get_name() == "M4A1")
+                            {
+                                iter.Value.item = Instantiate(item_M4A1, iter.Value.get_pos(), Quaternion.Euler(0, 0, 90));
+                                iter.Value.item.transform.SetParent(ItemCollection.transform);
+
+                                iter.Value.car = iter.Value.item.GetComponent<VehicleCtrl>();
+                                iter.Value.item.transform.SetParent(ItemCollection.transform);
+                                iter.Value.set_draw(true);
+                            }
+                            else if (iter.Value.get_name() == "UMP")
+                            {
+                                iter.Value.item = Instantiate(item_UMP, iter.Value.get_pos(), Quaternion.Euler(0, 0, 90));
+                                iter.Value.item.transform.SetParent(ItemCollection.transform);
+                                iter.Value.set_draw(true);
+                            }
+                            else if (iter.Value.get_name() == "9mm")
+                            {
+                                iter.Value.item = Instantiate(item_9mm, iter.Value.get_pos(), Quaternion.Euler(-90, 0, 0));
+                                iter.Value.item.transform.SetParent(ItemCollection.transform);
+                                iter.Value.set_draw(true);
+                            }
+                            else if (iter.Value.get_name() == "Armor")
+                            {
+                                iter.Value.item = Instantiate(iterm_Armor, iter.Value.get_pos(), Quaternion.identity);
                                 iter.Value.item.transform.SetParent(ItemCollection.transform);
                                 iter.Value.set_draw(true);
                             }
@@ -363,7 +395,7 @@ namespace TheLastOne.Game.Network
                     Enum get_int_enum = Player_Script.playerState;
 
                     // 플레이어 데이터 보내주기
-                    Sendbyte = sF.makeClient_PacketInfo(Player_Position, Convert.ToInt32(get_int_enum), Player_Script.h, Player_Script.v, Player_Rotation, Player_Script.now_Weapon, Player_Script.CarNum, Car_Rotation);
+                    Sendbyte = sF.makeClient_PacketInfo(Player_Position, Convert.ToInt32(get_int_enum), Player_Script.h, Player_Script.v, Player_Rotation, Player_Script.now_Weapon, Player_Script.CarNum, Player_Script.dangerLineIn, Car_Rotation);
                     Send_Packet(Sendbyte);
 
                     //좀비 데이터 보내주기
@@ -385,7 +417,7 @@ namespace TheLastOne.Game.Network
         {
             do
             {
-
+                //debugString = "1. M16, 2. 556, 3. AK, 4. 762, 5. M4A1, 6. UMP, 7. 9mm, 8. AidKit, 9. Armor, 0. UAZ";
                 DebugText.text = debugString.ToString();
                 yield return null;
             } while (true);
@@ -619,6 +651,7 @@ namespace TheLastOne.Game.Network
 
         void Awake()
         {
+            debugString = "";
             Application.runInBackground = true; // 백그라운드에서도 Network는 작동해야한다.
             DangerLineCtrl = GameObject.FindGameObjectWithTag("DangerLine").GetComponent<DangerLineCtrl>();
             //=======================================================
@@ -718,9 +751,9 @@ namespace TheLastOne.Game.Network
                     m_Socket.BeginReceive(msg.Receivebyte, 0, msg.LimitReceivebyte, SocketFlags.None, new AsyncCallback(RecieveHeaderCallback), msg);
                 }
             }
-            catch (Exception e)
+            catch
             {
-                Debug.Log(e.Message);
+                //Debug.Log(e.Message);
                 NetworkMessage new_msg = new NetworkMessage();
                 m_Socket.BeginReceive(new_msg.Receivebyte, 0, new_msg.LimitReceivebyte, SocketFlags.None, new AsyncCallback(RecieveHeaderCallback), new_msg);
             }
@@ -745,7 +778,6 @@ namespace TheLastOne.Game.Network
         public void Player_Shot()
         {
             Sendbyte = sF.makeShot_PacketInfo(Client_imei);
-            Debug.Log(Sendbyte.Length);
             Send_Packet(Sendbyte);
         }
 

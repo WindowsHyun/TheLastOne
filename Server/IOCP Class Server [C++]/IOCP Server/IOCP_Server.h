@@ -58,11 +58,12 @@ private:
 	void Send_All_Player(int client);					// 클라이언트에게 모든 클라이언트 위치 보내기
 	void Send_All_Zombie(int client);							// 클라이언트에게 모든 좀비 위치 보내기
 	void Send_All_Time(int kind, int time, int client_id, bool allClient);					// 클라이언트에게 시간을 보내준다.
-	void Send_All_Item();		// 클라이언트에게 시간정보를 보내준다.
+	void Send_All_Item(int ci);		// 클라이언트에게 시간정보를 보내준다.
 	void Send_Client_Shot(int shot_client);		// 클라이언트들에게 Shot 정보를 보내준다.
 	void Send_DangerLine_info(int demage, xyz pos, xyz scale);
 	void Send_Hide_Player(int client);		// 클라이언트 범위를 벗어날 경우 지워준다.
 	void Send_Hide_Zombie(int client);		// 클라이언트 범위를 벗어날 경우 지워준다.
+	void Attack_DangerLine_Damge();			// 자기장 데미지를 플레이어에게 준다.
 
 public:
 	HANDLE getHandle() { return g_hiocp; }

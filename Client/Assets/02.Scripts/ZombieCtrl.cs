@@ -69,16 +69,16 @@ public class ZombieCtrl : MonoBehaviour
         StartCoroutine(this.CheckZombieNav());
     }
 
-    void OnEnable()
-    {
-        PlayerCtrl.OnPlayerDie += this.OnPlayerDie;
-    }
+    //void OnEnable()
+    //{
+    //    PlayerCtrl.OnPlayerDie += this.OnPlayerDie;
+    //}
 
-    // 이벤트 발생 시 연결된 함수 해제
-    void OnDisable()
-    {
-        PlayerCtrl.OnPlayerDie -= this.OnPlayerDie;
-    }
+    //// 이벤트 발생 시 연결된 함수 해제
+    //void OnDisable()
+    //{
+    //    PlayerCtrl.OnPlayerDie -= this.OnPlayerDie;
+    //}
 
     public IEnumerator CheckZombieNav()
     {

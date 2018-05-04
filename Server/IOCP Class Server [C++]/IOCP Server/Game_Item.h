@@ -34,7 +34,7 @@ public:
 	void set_riding(bool value) { this->riding_car = value; }
 	void set_pos(float x, float y, float z) { this->item_position.x = x;  this->item_position.y = y; this->item_position.z = z; }
 	void set_rotation(float x, float y, float z);
-	Game_Item(const float x, const float z, const std::string item_name);
+	Game_Item(const float x, const float y, const float z, const std::string item_name);
 	~Game_Item();
 };
 

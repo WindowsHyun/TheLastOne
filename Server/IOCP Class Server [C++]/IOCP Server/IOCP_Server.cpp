@@ -233,6 +233,12 @@ void IOCP_Server::Worker_Thread()
 			Timer_Event t = { 1, high_resolution_clock::now() + 1s, E_Remove_Client };
 			Timer.setTimerEvent(t);
 		}
+		else if (OP_DangerLineDamage == over->event_type) {
+			// 자기장 데미지는 1초마다 한번씩 데미지를 준다.
+			Attack_DangerLine_Damge();
+			Timer_Event t = { 1, high_resolution_clock::now() + 1s, E_DangerLineDamage };
+			Timer.setTimerEvent(t);
+		}
 		else {
 #if (DebugMod == TRUE )
 			std::cout << "Unknown GQCS event!" << std::endl;
@@ -378,6 +384,7 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 			client->second.set_horizontal(client_View->Horizontal());
 			client->second.set_vertical(client_View->Vertical());
 			client->second.set_inCar(client_View->inCar());
+			client->second.set_client_DangerLine(client_View->dangerLineIn());
 			if (client_View->inCar() != -1) {
 				// 차량을 실제로 탑승 하고 있을 경우.
 				auto item = get_item_iter(client_View->inCar());
@@ -479,7 +486,7 @@ void IOCP_Server::ProcessPacket(int ci, char * packet)
 
 		player_To_Zombie(g_zombie, g_clients);
 
-		Send_All_Item();
+		Send_All_Item(ci);
 
 	}
 	catch (DWORD dwError) {
@@ -577,7 +584,7 @@ void IOCP_Server::Send_All_Player(int client)
 		auto weaponState = iter.second.get_weapon();
 		auto inCar = iter.second.get_inCar();
 		auto car_rotation = iter.second.get_car_rotation();
-		auto client_data = CreateClient_info(builder, id, hp, armour, animator, horizontal, vertical, inCar, name, &xyz, &rotation, &car_rotation, weaponState);
+		auto client_data = CreateClient_info(builder, id, hp, armour, animator, horizontal, vertical, inCar, name, &xyz, &rotation, &car_rotation, false, weaponState);
 		// client_data 라는 테이블에 클라이언트 데이터가 들어가 있다.
 
 		Individual_client.push_back(client_data);	// Vector에 넣었다.
@@ -642,7 +649,7 @@ void IOCP_Server::Send_All_Time(int kind, int time, int client_id, bool allClien
 	}
 }
 
-void IOCP_Server::Send_All_Item()
+void IOCP_Server::Send_All_Item(int ci)
 {
 	flatbuffers::FlatBufferBuilder builder;
 	std::vector<flatbuffers::Offset<Gameitem>> Individual_client;		// 개인 데이터
@@ -650,6 +657,9 @@ void IOCP_Server::Send_All_Item()
 	for (auto iter : g_item) {
 		//if (iter.second.get_eat() == true)	// 아이템을 이미 먹은경우 패스 한다.
 		//	continue;
+		if (Distance(ci, iter.first, Player_Dist, Kind_Item) == false && iter.second.get_name() != "UAZ")
+			continue;
+
 		auto id = iter.first;
 		auto name = builder.CreateString(iter.second.get_name());
 		Vec3 pos = { iter.second.get_pos().x, iter.second.get_pos().y,  iter.second.get_pos().z };
@@ -745,6 +755,21 @@ void IOCP_Server::Send_Hide_Zombie(int client)
 	}
 }
 
+void IOCP_Server::Attack_DangerLine_Damge()
+{
+	for (auto iter : g_clients) {
+		if (iter.second.get_Connect() != true)
+			continue;
+		if (iter.second.get_DangerLine() == false) {
+			// 자기장 밖에 있을 경우.
+			auto client_iter = get_client_iter(iter.first);
+			int my_hp = client_iter->second.get_hp();
+			client_iter->second.set_hp(my_hp - DangerLine.get_demage());
+		}
+	}
+
+}
+
 std::unordered_map< int, Game_Client>::iterator get_client_iter(int ci) {
 	return g_clients.find(ci);
 }
@@ -762,13 +787,19 @@ bool Distance(int me, int  you, int Radius, int kind) {
 	auto iter_me = g_clients.find(me);
 	auto iter_you = g_clients.find(you);
 	auto iter_zombie = g_zombie.find(you);
+	auto iter_item = g_item.find(you);
 
 	if (kind == Kind_Player)
 		return (iter_me->second.get_pos().x - iter_you->second.get_pos().x) * (iter_me->second.get_pos().x - iter_you->second.get_pos().x) +
 		(iter_me->second.get_pos().z - iter_you->second.get_pos().z) * (iter_me->second.get_pos().z - iter_you->second.get_pos().z) <= Radius * Radius;
-	else
+	else if (kind == Kind_Zombie)
 		return (iter_me->second.get_pos().x - iter_zombie->second.get_pos().x) * (iter_me->second.get_pos().x - iter_zombie->second.get_pos().x) +
 		(iter_me->second.get_pos().z - iter_zombie->second.get_pos().z) * (iter_me->second.get_pos().z - iter_zombie->second.get_pos().z) <= Radius * Radius;
+	else if (kind == Kind_Item)
+		return (iter_me->second.get_pos().x - iter_item->second.get_pos().x) * (iter_me->second.get_pos().x - iter_item->second.get_pos().x) +
+		(iter_me->second.get_pos().z - iter_item->second.get_pos().z) * (iter_me->second.get_pos().z - iter_item->second.get_pos().z) <= Radius * Radius;
+
+	return false;
 }
 
 float DistanceToPoint(float player_x, float player_z, float zombie_x, float zombie_z)

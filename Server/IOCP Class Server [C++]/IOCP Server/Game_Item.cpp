@@ -2,15 +2,14 @@
 
 void Game_Item::set_rotation(float x, float y, float z)
 {
-	this->item_rotation.x = x; 
-	this->item_rotation.y = y; 
+	this->item_rotation.x = x;
+	this->item_rotation.y = y;
 	this->item_rotation.z = z;
 }
 
-Game_Item::Game_Item(const float x, const float z, const std::string item_name) {
-
+Game_Item::Game_Item(const float x, const float y, const float z, const std::string item_name) {
 	this->item_position.x = x;
-	this->item_position.y = 29.99451f;
+	this->item_position.y = y;
 	this->item_position.z = z;
 
 	this->item_rotation.x = 0;
@@ -50,7 +49,12 @@ void load_item_txt(std::string filepath, std::unordered_map<int, Game_Item>* ite
 		while (!openFile.eof()) {
 			// 한줄 씩 읽는다.
 			getline(openFile, line);
-			item->insert(std::pair<int, Game_Item>(item_num, { (float)atof(splitParsing(line, "x:", "|").c_str()) , (float)atof(splitParsing(line, "z:", "|").c_str()),  splitParsing(line, "name:", "|") }));
+			item->insert(std::pair<int, Game_Item>(item_num, { (float)atof(splitParsing(line, "x:", "|").c_str()), (float)atof(splitParsing(line, "y:", "|").c_str()) , (float)atof(splitParsing(line, "z:", "|").c_str()),  splitParsing(line, "name:", "|") }));
+			if (splitParsing(line, "name:", "|") == "UAZ") {
+				// UAZ의 경우 rotation값을 추가로 넣어준다.
+				auto iter = item->find(item_num);
+				iter->second.set_rotation((float)atof(splitParsing(line, "rx:", "|").c_str()), (float)atof(splitParsing(line, "ry:", "|").c_str()), (float)atof(splitParsing(line, "rz:", "|").c_str()));
+			}
 			++item_num;
 		}
 	}
