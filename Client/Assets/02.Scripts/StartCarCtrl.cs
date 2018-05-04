@@ -9,6 +9,7 @@ public class StartCarCtrl : MonoBehaviour
     public float speed = 3000.0f;
 
     public GameObject player;
+    private PlayerCtrl Player_Script;
 
     //private bool getOff = false;
     private bool startSet = false;
@@ -17,8 +18,18 @@ public class StartCarCtrl : MonoBehaviour
     void Start()
     {
         player.GetComponent<PlayerCtrl>().enabled = false;
+        Player_Script = GameObject.FindWithTag("Player").GetComponent<PlayerCtrl>();
         // 수송 차량에 앞으로 가도록 힘을 가함
         GetComponent<Rigidbody>().AddForce(transform.forward * speed);
+
+
+        // 게임 시작후 차량 하차 시 인벤토리 창을 끈다.
+        // 쿨타임 스크립트 할당
+        Player_Script.cooltimeCtrl = GameObject.Find("PanelCoolTime").GetComponent<CoolTimeCtrl>();
+        Player_Script.inventory.SetActive(false);
+        Player_Script.cooltime.SetActive(false);
+        Player_Script.VehicleUI.SetActive(false);
+
 
         // 안에 있는 플레이어도 같이 가도록 힘을 가함
         //player.GetComponent<Rigidbody>().AddForce(transform.forward * speed);
@@ -26,6 +37,10 @@ public class StartCarCtrl : MonoBehaviour
 
     void Update()
     {
+        if (startSet != true)
+        {
+            player.transform.position = new Vector3(this.transform.position.x, 30.0f, this.transform.position.z);
+        }
         // F키 입력 시
         if (Input.GetKeyDown(KeyCode.F) && startSet == false)
         {

@@ -651,6 +651,7 @@ namespace TheLastOne.Game.Network
 
         void Awake()
         {
+            debugString = "";
             Application.runInBackground = true; // 백그라운드에서도 Network는 작동해야한다.
             DangerLineCtrl = GameObject.FindGameObjectWithTag("DangerLine").GetComponent<DangerLineCtrl>();
             //=======================================================
@@ -750,9 +751,9 @@ namespace TheLastOne.Game.Network
                     m_Socket.BeginReceive(msg.Receivebyte, 0, msg.LimitReceivebyte, SocketFlags.None, new AsyncCallback(RecieveHeaderCallback), msg);
                 }
             }
-            catch (Exception e)
+            catch
             {
-                Debug.Log(e.Message);
+                //Debug.Log(e.Message);
                 NetworkMessage new_msg = new NetworkMessage();
                 m_Socket.BeginReceive(new_msg.Receivebyte, 0, new_msg.LimitReceivebyte, SocketFlags.None, new AsyncCallback(RecieveHeaderCallback), new_msg);
             }
@@ -777,7 +778,6 @@ namespace TheLastOne.Game.Network
         public void Player_Shot()
         {
             Sendbyte = sF.makeShot_PacketInfo(Client_imei);
-            Debug.Log(Sendbyte.Length);
             Send_Packet(Sendbyte);
         }
 
