@@ -8,9 +8,44 @@ public class LobbySceneCtrl : MonoBehaviour {
 
     private int modeCheck = 0;
 
+    public float gameStartTime = 1.0f;
+    public Text gameStartTimeText;
+
     // 추후 개발 업데이트 내용
     // 상점 - 커스텀 BOX 구매 및 개봉
-    // 인벤토리 - 커스텀 아이템 장착 및 탈착 
+    // 인벤토리 - 커스텀 아이템 장착 및 탈착
+
+
+    //void Start()
+    //{
+    //    StartCoroutine("StartGameCount"); // 대기방 씬 시작 -> 코루틴 시작
+    //    //UseItemCollTime();
+    //}
+
+    public void NextInGameScene()
+    {
+        SceneManager.LoadScene("InGameScene");
+    }
+
+
+    //남은 쿨타임을 계산할 코르틴을 만들어줍니다.
+    IEnumerator StartGameCount()
+    {
+        while (gameStartTime > 0)  // 0 초가 될때까지 while문 진행
+        {
+            yield return new WaitForSeconds(1.0f); // 1초 딜레이
+
+            gameStartTime -= 1.0f;  // 1초 감소
+            gameStartTimeText.text = "Start the game in " + gameStartTime; // text 출력
+
+        }
+        if (gameStartTime == 0)
+        {
+            NextInGameScene();
+        }
+        yield break;
+    }
+
 
     public void StandardModeCheck()
     {
@@ -26,11 +61,8 @@ public class LobbySceneCtrl : MonoBehaviour {
         Debug.Log("현재 Zombie Mode를 선택하셨습니다 = " + SingletonCtrl.Instance_S.NowModeNumber);
     }
 
-    public void NextWaitingRoomScene()
+    public void PlayerButtonCheck()
     {
-        //waitScene = true;
-        // 스탠다드 모드인지 좀비모드인지 구별해야 될 것이다.
-        // 지금은 두개의 버튼 모두다 대기방씬으로 넘어간다.
-        SceneManager.LoadScene("WaitingRoomScene");
+        StartCoroutine("StartGameCount"); // 대기방 씬 시작 -> 코루틴 시작
     }
 }
