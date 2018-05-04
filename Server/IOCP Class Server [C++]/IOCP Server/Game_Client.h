@@ -34,7 +34,7 @@ private:
 	
 
 public:
-	char nickName[10];																							// 클라이언트 닉네임
+	std::string nickName;																					// 클라이언트 닉네임
 	OverlappedEx recv_over;
 	unsigned char packet_buf[MAX_PACKET_SIZE];
 

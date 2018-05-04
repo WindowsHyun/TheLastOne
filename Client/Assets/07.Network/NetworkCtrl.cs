@@ -97,17 +97,18 @@ namespace TheLastOne.Game.Network
 
         private static int Client_imei = -1;         // 자신의 클라이언트 아이디
         public int get_imei() { return Client_imei; }
-        private string debugString;        // Debug 출력을 위한 string
+        private static string debugString;        // Debug 출력을 위한 string
         private static bool serverConnect = false;  // 서버 연결을 했는지 체크
 
 
         IEnumerator SocketCheck()
         {
-            StartCoroutine(DrawDebugText());
+            //StartCoroutine(DrawDebugText());
             if (m_Socket.Connected == true)
             {
                 // 서버가 정상적으로 연결 되었을경우
                 serverConnect = true;
+                Player_Script = GameObject.FindWithTag("Player").GetComponent<PlayerCtrl>();
                 StartCoroutine(startPrefab());
                 StartCoroutine(playerLocation_Packet());
                 StartCoroutine(DrawDebugText());
@@ -424,7 +425,7 @@ namespace TheLastOne.Game.Network
             //yield return null;
         }
 
-        void ProcessPacket(int size, int type, byte[] recvPacket)
+        public void ProcessPacket(int size, int type, byte[] recvPacket)
         {
             if (type == recv_protocol.SC_ID)
             {
@@ -654,27 +655,29 @@ namespace TheLastOne.Game.Network
             debugString = "";
             Application.runInBackground = true; // 백그라운드에서도 Network는 작동해야한다.
             DangerLineCtrl = GameObject.FindGameObjectWithTag("DangerLine").GetComponent<DangerLineCtrl>();
-            //=======================================================
-            // Socket create.
-            m_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, 1);
-            //m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendTimeout, 10000);
-            //m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 10000);
-            m_Socket.NoDelay = true;
-            //=======================================================
-            // Socket connect.
-            try
-            {
-                m_Socket.BeginConnect(iPAdress, kPort, new AsyncCallback(ConnectCallback), m_Socket);
-                connectDone.WaitOne();
-                Player_Script = GameObject.FindWithTag("Player").GetComponent<PlayerCtrl>();
-                StartCoroutine(SocketCheck());
-            }
-            catch (SocketException SCE)
-            {
-                debugString = "Socket connect error! : " + SCE.ToString();
-                return;
-            }
+            m_Socket = SingletonCtrl.Instance_S.PlayerSocket;
+            StartCoroutine(SocketCheck());
+            ////=======================================================
+            //// Socket create.
+            //m_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            //m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, 1);
+            ////m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendTimeout, 10000);
+            ////m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 10000);
+            //m_Socket.NoDelay = true;
+            ////=======================================================
+            //// Socket connect.
+            //try
+            //{
+            //    m_Socket.BeginConnect(iPAdress, kPort, new AsyncCallback(ConnectCallback), m_Socket);
+            //    connectDone.WaitOne();
+            //    Player_Script = GameObject.FindWithTag("Player").GetComponent<PlayerCtrl>();
+            //    StartCoroutine(SocketCheck());
+            //}
+            //catch (SocketException SCE)
+            //{
+            //    debugString = "Socket connect error! : " + SCE.ToString();
+            //    return;
+            //}
 
             //=======================================================
         }

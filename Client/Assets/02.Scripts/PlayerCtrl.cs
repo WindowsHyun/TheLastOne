@@ -368,7 +368,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
                     cooltimeCtrl.ReloadCollTime();
             }
 
-            if (Input.GetKeyDown(KeyCode.M))
+            if (Input.GetKeyDown(KeyCode.CapsLock))
             {
                 if (realView == false)
                 { 

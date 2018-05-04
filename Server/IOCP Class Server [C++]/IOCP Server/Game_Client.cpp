@@ -44,7 +44,8 @@ Game_Client::Game_Client(const SOCKET sock, const int client_id, const char * ga
 	this->remove_client = false;
 	this->client_socket = sock;
 	this->client_id = client_id;
-	strncpy(this->nickName, game_id, 10);
+	this->nickName = game_id;
+	/*strncpy(this->nickName, game_id, 10);*/
 	this->position.x = 0;
 	this->position.y = 0;
 	this->position.z = 0;
@@ -76,7 +77,8 @@ Game_Client::Game_Client(const Game_Client & g_cl)
 	this->connect = true;
 	this->client_socket = g_cl.client_socket;
 	this->client_id = g_cl.client_id;
-	strncpy(this->nickName, g_cl.nickName, 10);
+	this->nickName = g_cl.nickName;
+	//strncpy(this->nickName, g_cl.nickName, 10);
 	this->remove_client = g_cl.remove_client;
 	this->position.x = g_cl.position.x;
 	this->position.y = g_cl.position.y;
