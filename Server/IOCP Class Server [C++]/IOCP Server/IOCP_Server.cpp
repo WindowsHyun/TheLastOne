@@ -230,20 +230,41 @@ void IOCP_Server::Worker_Thread()
 		}
 		else if (OP_LobbyWait == over->event_type) {
 			// 룸에 대기인원이 몇명인지 확인을 한다.
-			if (GameRoom[over->room_id].get_room().check_ReadyClients() >= Minimum_Players) {
+			if (GameRoom[over->room_id].get_room().check_ReadyClients() >= Minimum_Players && GameRoom[over->room_id].get_status() == LobbyStatus) {
 				// 레디한 인원이 최소 인원 보다 많아졌을 경우.
+				GameRoom[over->room_id].set_status(ReadyStatus);
+				// 게임 레디 단계로 넘어간다.
+				Timer_Event t = { over->room_id, GamePlayWait, high_resolution_clock::now() + 1s, E_LobbyReday };
+				Timer.setTimerEvent(t);
+				t = { over->room_id, 1, high_resolution_clock::now() + 1s, E_LobbyWait };
+				Timer.setTimerEvent(t);
+			}
+			else if (GameRoom[over->room_id].get_room().get_client().size() <= 0 && GameRoom[over->room_id].get_room().get_playGame() == true) {
+				// 룸 안에 클라이언트가 한명도 없을경우 방을 다시 대기 모드로 변경한다.
+				std::cout << "Room (" << over->room_id << ") init..!" << std::endl;
+				GameRoom[over->room_id].get_room().room_init();
+				GameRoom[over->room_id].set_status(LobbyStatus);
+				Timer_Event t = { over->room_id, 1, high_resolution_clock::now() + 1s, E_LobbyWait };
+				Timer.setTimerEvent(t);
+			}
+			else {
+				Timer_Event t = { over->room_id, 1, high_resolution_clock::now() + 1s, E_LobbyWait };
+				Timer.setTimerEvent(t);
+			}
+		}
+		else if (OP_LobbyReday == over->event_type) {
+			// 로비에서 게임 진행까지 카운트 다운.
+			//Remove_Client();
+			Send_All_Time(over->room_id, SC_Lobby_Time, T_LobbyReday, (int)ci, noPlayer, true);
+			if (ci <= 0) {
+				// 카운트 다운이 모두 끝난 경우.
 				GameRoom[over->room_id].get_room().set_playGame(true);
 				GameRoom[over->room_id].set_status(inGameStatus);
 			}
-			else if (GameRoom[over->room_id].get_room().get_client().size() <= 0 && GameRoom[over->room_id].get_room().get_playGame() == true ) {
-				// 룸 안에 클라이언트가 한명도 없을경우 방을 다시 대기 모드로 변경한다.
-				std::cout << "Room (" << over->room_id  << ") init..!" << std::endl;
-				GameRoom[over->room_id].get_room().room_init();
-				GameRoom[over->room_id].set_status(LobbyStatus);
-
+			else {
+				Timer_Event t = { over->room_id, (int)ci - 1, high_resolution_clock::now() + 1s, E_LobbyReday };
+				Timer.setTimerEvent(t);
 			}
-			Timer_Event t = { over->room_id, 1, high_resolution_clock::now() + 1s, E_LobbyWait };
-			Timer.setTimerEvent(t);
 		}
 		else {
 #if (DebugMod == TRUE )
@@ -284,7 +305,7 @@ void IOCP_Server::Accept_Thread()
 		// 방중에서 현재 시작이 안된 방을 찾는다.
 		int room_id = -1;
 		for (auto iter : GameRoom) {
-			if (iter.get_status() == LobbyStatus && iter.get_room().get_client().size() <= MAX_Client) {
+			if ((iter.get_status() == LobbyStatus || iter.get_status() == ReadyStatus ) && iter.get_room().get_client().size() <= MAX_Client) {
 				room_id = iter.get_id();
 #if (DebugMod == TRUE )
 				std::cout << "Connect to Room " << iter.get_id() << std::endl;
@@ -516,12 +537,12 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *pac
 
 		Send_All_Player(room_id, ci);
 		Send_Hide_Player(room_id, ci);
-		
+
 		Send_All_Zombie(room_id, ci);
 		Send_Hide_Zombie(room_id, ci);
-		
+
 		GameRoom[room_id].get_room().player_To_Zombie();
-		
+
 		Send_All_Item(room_id, ci);
 
 	}
@@ -665,8 +686,7 @@ void IOCP_Server::Send_All_Zombie(const int room_id, const int client)
 	SendPacket(SC_Zombie_Info, room_id, client, builder.GetBufferPointer(), builder.GetSize());
 }
 
-/*
-void IOCP_Server::Send_All_Time(int kind, int time, int client_id, bool allClient)
+void IOCP_Server::Send_All_Time(const int room_id, const int type, const int kind, const int time, const int client_id, const bool allClient)
 {
 	flatbuffers::FlatBufferBuilder builder;
 	auto f_kind = kind;
@@ -676,17 +696,17 @@ void IOCP_Server::Send_All_Time(int kind, int time, int client_id, bool allClien
 
 	if (allClient == true) {
 		// 모든 클라이언트 에게 나갔다는 것을 보내준다..!
-		for (auto iter : g_clients) {
+		for (auto iter : GameRoom[room_id].get_room().get_client()) {
 			if (iter.second.get_Connect() != true)
 				continue;
-			SendPacket(SC_Server_Time, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
+			SendPacket(type, room_id, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
 		}
 	}
 	else {
-		SendPacket(SC_Server_Time, client_id, builder.GetBufferPointer(), builder.GetSize());
+		SendPacket(type, room_id, client_id, builder.GetBufferPointer(), builder.GetSize());
 	}
 }
-*/
+
 
 void IOCP_Server::Send_All_Item(const int room_id, const int ci)
 {
@@ -719,7 +739,7 @@ void IOCP_Server::Send_All_Item(const int room_id, const int ci)
 	for (auto iter : GameRoom[room_id].get_room().get_client()) {
 		if (iter.second.get_Connect() != true)
 			continue;
-		SendPacket( SC_Server_Item, room_id, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
+		SendPacket(SC_Server_Item, room_id, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
 	}
 
 }

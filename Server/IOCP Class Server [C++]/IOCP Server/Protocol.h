@@ -1,51 +1,53 @@
 #ifndef __PROTOCOL_H__
 #define __PROTOCOL_H__
 
-enum TimerType { T_DangerLine };
+enum TimerType { T_DangerLine, T_LobbyReday };
 enum OPTYPE { OP_SEND, OP_RECV, OP_DangerLine, OP_RemoveClient, 
-	OP_MoveDangerLine, OP_DangerLineDamage, OP_LobbyWait };
+	OP_MoveDangerLine, OP_DangerLineDamage, OP_LobbyWait, OP_LobbyReday};
 enum Event_Type { E_DangerLine, E_RoundTime, E_Remove_Client, E_MoveDangerLine, 
-	E_DangerLineDamage, E_LobbyWait };
+	E_DangerLineDamage, E_LobbyWait, E_LobbyReday };
 
-// ¼ÒÄÏ ¼³Á¤
+// ì†Œì¼“ ì„¤ì •
 #define SERVERPORT 9000
 #define BUFSIZE    1024
 #define MAX_BUFF_SIZE   4000
 #define MAX_PACKET_SIZE  4000
 #define MAX_Client 50
 
-
-// °ÔÀÓ ¼³Á¤
+// ê²Œì„ ì„¤ì •
 #define DebugMod TRUE
-#define GameRoomLimit 2		// ÃÖ´ë ¹æ °³¼ö
-#define Total_Max_Client MAX_Client * GameRoomLimit		// ¸ğµç ¹æ¿¡ ÃÖ´ë µé¾î ¿Ã ¼ö ÀÖ´Â ÀÎ¿ø
-#define Minimum_Players 1		// ÃÖ¼Ò ·¹µğ ÀÎ¿ø
-#define GamePlayWait 5			// °ÔÀÓ ½ÃÀÛÀü ´ë±â ½Ã°£
+#define GameRoomLimit 2		// ìµœëŒ€ ë°© ê°œìˆ˜
+#define Total_Max_Client MAX_Client * GameRoomLimit		// ëª¨ë“  ë°©ì— ìµœëŒ€ ë“¤ì–´ ì˜¬ ìˆ˜ ìˆëŠ” ì¸ì›
+#define Minimum_Players 2		// ìµœì†Œ ë ˆë”” ì¸ì›
+#define GamePlayWait 10			// ê²Œì„ ì‹œì‘ì „ ëŒ€ê¸° ì‹œê°„
+#define noPlayer -1				// í”Œë ˆì´ì–´ ë²ˆí˜¸ê°€ í•„ìš” ì—†ì„ ê²½ìš°
 
-// ¼­¹ö¿¡¼­ Å¬¶óÀÌ¾ğÆ®¿¡°Ô º¸³»´Â ÆĞÅ¶
-#define SC_ID           1					// Å¬¶óÀÌ¾ğÆ® ¾ÆÀÌµğ¸¦ º¸³½´Ù.
-#define SC_PUT_PLAYER    2			// Å¬¶óÀÌ¾ğÆ® Ãß°¡
-#define SC_REMOVE_PLAYER 3		// Å¬¶óÀÌ¾ğÆ® »èÁ¦
-#define SC_Client_Data	4				// Å¬¶óÀÌ¾ğÆ® ¸ğµç µ¥ÀÌÅÍ
-#define SC_Server_Time	5				// ¼­¹ö Å¸ÀÌ¸Ó
-#define SC_Server_Item	6				// ¼­¹ö ¾ÆÀÌÅÛ
-#define SC_Shot_Client	7				// Å¬¶óÀÌ¾ğÆ® Shot Á¤º¸
-#define SC_DangerLine	8				// Å¬¶óÀÌ¾ğÆ® DangerLine Á¤º¸ Àü¼Û
-#define SC_Zombie_Info 9				// Å¬¶óÀÌ¾ğÆ®¿¡°Ô Á»ºñ À§Ä¡¸¦ Àü´ŞÇØ ÁØ´Ù.
-#define SC_Remove_Zombie 10		// Á»ºñ »èÁ¦
+// ì„œë²„ì—ì„œ í´ë¼ì´ì–¸íŠ¸ì—ê²Œ ë³´ë‚´ëŠ” íŒ¨í‚·
+#define SC_ID           1					// í´ë¼ì´ì–¸íŠ¸ ì•„ì´ë””ë¥¼ ë³´ë‚¸ë‹¤.
+#define SC_PUT_PLAYER    2			// í´ë¼ì´ì–¸íŠ¸ ì¶”ê°€
+#define SC_REMOVE_PLAYER 3		// í´ë¼ì´ì–¸íŠ¸ ì‚­ì œ
+#define SC_Client_Data	4				// í´ë¼ì´ì–¸íŠ¸ ëª¨ë“  ë°ì´í„°
+#define SC_Server_Time	5				// ì„œë²„ íƒ€ì´ë¨¸
+#define SC_Server_Item	6				// ì„œë²„ ì•„ì´í…œ
+#define SC_Shot_Client	7				// í´ë¼ì´ì–¸íŠ¸ Shot ì •ë³´
+#define SC_DangerLine	8				// í´ë¼ì´ì–¸íŠ¸ DangerLine ì •ë³´ ì „ì†¡
+#define SC_Zombie_Info 9				// í´ë¼ì´ì–¸íŠ¸ì—ê²Œ ì¢€ë¹„ ìœ„ì¹˜ë¥¼ ì „ë‹¬í•´ ì¤€ë‹¤.
+#define SC_Remove_Zombie 10		// ì¢€ë¹„ ì‚­ì œ
+#define SC_Lobby_Time 11				// í´ë¼ì´ì–¸íŠ¸ ì—ê²Œ ë¡œë¹„ ëŒ€ê¸°ì‹œê°„ì„ ë³´ë‚´ì¤€ë‹¤.
 
-// Å¬¶óÀÌ¾ğÆ®°¡ ¼­¹ö¿¡°Ô º¸³»´Â ÆĞÅ¶
-#define CS_Info           1					// Å¬¶óÀÌ¾ğÆ®°¡ ¼­¹ö¿¡°Ô ÀÚ½ÅÀÇ À§Ä¡Á¤º¸¸¦ º¸³»ÁØ´Ù.
-#define CS_Shot_info    2					// Å¬¶óÀÌ¾ğÆ®°¡ ¼­¹ö¿¡°Ô Shot Á¤º¸¸¦ º¸³»ÁØ´Ù.
-#define CS_Check_info  3					// Å¬¶óÀÌ¾ğÆ®°¡ ¼­¹ö¿¡°Ô ÀÚ½ÅÀÇ Á¤º¸°¡ ¸Â´ÂÁö È®ÀÎÇØ ÁØ´Ù.
-#define CS_Eat_Item	   4					// Å¬¶óÀÌ¾ğÆ®°¡ ¼­¹ö¿¡°Ô ¸ÔÀº ¾ÆÀÌÅÛ Á¤º¸¸¦ º¸³»ÁØ´Ù.
-#define CS_Zombie_info 5					// Å¬¶óÀÌ¾ğÆ®°¡ ¼­¹ö¿¡°Ô Á»ºñ µ¥ÀÌÅÍ¸¦ Àü´ŞÇØ ÁØ´Ù.
-#define CS_Object_HP 6						// Å¬¶óÀÌ¾ğÆ®°¡ ¼­¹ö¿¡°Ô HP µ¥ÀÌÅÍ¸¦ Àü´ŞÇØ ÁØ´Ù.
-#define CS_Car_Riding 7						// Å¬¶óÀÌ¾ğÆ®°¡ ¼­¹ö¿¡°Ô Â÷·®¿¡ Å¾½ÂÇß´Ù°í Àü´ŞÇØ ÁØ´Ù.
-#define CS_Car_Rode 8						// Å¬¶óÀÌ¾ğÆ®°¡ ¼­¹ö¿¡°Ô Â÷·®¿¡ ÇÏÂ÷Çß´Ù°í Àü´ŞÇØ ÁØ´Ù.
-#define CS_Player_Status 9					// Å¬¶óÀÌ¾ğÆ®°¡ ¼­¹ö¿¡°Ô ÀÚ½ÅÀÇ »óÅÂ¸¦ Àü´ŞÇÑ´Ù.
 
-// ÀÚ±âÀå ½Ã°£
+// í´ë¼ì´ì–¸íŠ¸ê°€ ì„œë²„ì—ê²Œ ë³´ë‚´ëŠ” íŒ¨í‚·
+#define CS_Info           1					// í´ë¼ì´ì–¸íŠ¸ê°€ ì„œë²„ì—ê²Œ ìì‹ ì˜ ìœ„ì¹˜ì •ë³´ë¥¼ ë³´ë‚´ì¤€ë‹¤.
+#define CS_Shot_info    2					// í´ë¼ì´ì–¸íŠ¸ê°€ ì„œë²„ì—ê²Œ Shot ì •ë³´ë¥¼ ë³´ë‚´ì¤€ë‹¤.
+#define CS_Check_info  3					// í´ë¼ì´ì–¸íŠ¸ê°€ ì„œë²„ì—ê²Œ ìì‹ ì˜ ì •ë³´ê°€ ë§ëŠ”ì§€ í™•ì¸í•´ ì¤€ë‹¤.
+#define CS_Eat_Item	   4					// í´ë¼ì´ì–¸íŠ¸ê°€ ì„œë²„ì—ê²Œ ë¨¹ì€ ì•„ì´í…œ ì •ë³´ë¥¼ ë³´ë‚´ì¤€ë‹¤.
+#define CS_Zombie_info 5					// í´ë¼ì´ì–¸íŠ¸ê°€ ì„œë²„ì—ê²Œ ì¢€ë¹„ ë°ì´í„°ë¥¼ ì „ë‹¬í•´ ì¤€ë‹¤.
+#define CS_Object_HP 6						// í´ë¼ì´ì–¸íŠ¸ê°€ ì„œë²„ì—ê²Œ HP ë°ì´í„°ë¥¼ ì „ë‹¬í•´ ì¤€ë‹¤.
+#define CS_Car_Riding 7						// í´ë¼ì´ì–¸íŠ¸ê°€ ì„œë²„ì—ê²Œ ì°¨ëŸ‰ì— íƒ‘ìŠ¹í–ˆë‹¤ê³  ì „ë‹¬í•´ ì¤€ë‹¤.
+#define CS_Car_Rode 8						// í´ë¼ì´ì–¸íŠ¸ê°€ ì„œë²„ì—ê²Œ ì°¨ëŸ‰ì— í•˜ì°¨í–ˆë‹¤ê³  ì „ë‹¬í•´ ì¤€ë‹¤.
+#define CS_Player_Status 9					// í´ë¼ì´ì–¸íŠ¸ê°€ ì„œë²„ì—ê²Œ ìì‹ ì˜ ìƒíƒœë¥¼ ì „ë‹¬í•œë‹¤.
+
+// ìê¸°ì¥ ì‹œê°„
 #define DangerLine_init 10
 #define DangerLine_Level4 240
 #define DangerLine_Level3 240
@@ -53,26 +55,26 @@ enum Event_Type { E_DangerLine, E_RoundTime, E_Remove_Client, E_MoveDangerLine,
 #define DangerLine_Level1 240
 #define DangerLine_Level0 240
 
-// ÇÃ·¹ÀÌ¾î º¼ ¼ö ÀÖ´Â °Å¸®
+// í”Œë ˆì´ì–´ ë³¼ ìˆ˜ ìˆëŠ” ê±°ë¦¬
 #define Player_Dist 300
 
-// Á»ºñ°¡ º¼ ¼ö ÀÖ´Â °Å¸®
+// ì¢€ë¹„ê°€ ë³¼ ìˆ˜ ìˆëŠ” ê±°ë¦¬
 #define Zombie_Dist 200
 #define Limit_Zombie 5
-#define Create_Zombie 5
+#define Create_Zombie 0
 
-// ¾ÆÀÌÅÛ, ÇÃ·¹ÀÌ¾î Á¾·ù
+// ì•„ì´í…œ, í”Œë ˆì´ì–´ ì¢…ë¥˜
 #define Kind_Item 0
 #define Kind_Car 1
 #define Kind_Player 2
 #define Kind_Zombie 3
 
-// Ã¼·Â ¼³Á¤
+// ì²´ë ¥ ì„¤ì •
 #define Car_HP 200
 #define Player_HP 100
 #define Zombie_HP 100
 
-// °ÔÀÓ »óÅÂ ¼³Á¤
+// ê²Œì„ ìƒíƒœ ì„¤ì •
 #define LoginStatus 0
 #define LobbyStatus 1
 #define ReadyStatus 2

@@ -51,9 +51,18 @@ public class LobbySceneCtrl : MonoBehaviour
     {
         while (readyStatus)  // 0 초가 될때까지 while문 진행
         {
-            gameStartTimeText.text = "Game is Ready..!"; // text 출력
-            yield return new WaitForSeconds(0.3f); // 1초 딜레이
-            NextInGameScene();
+            if (SingletonCtrl.Instance_S.LobbyWaitTime == -1) { 
+                gameStartTimeText.text = "Please wait.."; // text 출력
+            }
+            else
+            {
+                gameStartTimeText.text = "Start the game in " + SingletonCtrl.Instance_S.LobbyWaitTime + ".";
+            }
+            if (SingletonCtrl.Instance_S.LobbyWaitTime == 0)
+            {
+                NextInGameScene();
+            }
+            yield return new WaitForSeconds(0.2f); // 1초 딜레이
         }
         gameStartTimeText.text = "";
         yield break;

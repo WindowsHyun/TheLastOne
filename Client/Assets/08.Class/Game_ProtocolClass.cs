@@ -17,7 +17,8 @@ namespace TheLastOne.GameClass
         public int SC_Shot_Client;              // 클라이언트 Shot 정보
         public int SC_DangerLine;				// 클라이언트 DangerLine 정보 전송
         public int SC_Zombie_Info;               // 클라이언트에게 좀비 위치를 전달해 준다.
-        public int SC_Remove_Zombie;		    // 좀비 삭제
+        public int SC_Remove_Zombie;            // 좀비 삭제
+        public int SC_Lobby_Time;				// 클라이언트 에게 로비 대기시간을 보내준다.
 
         public int CS_Info;              // 클라이언트가 서버에게 자신의 위치정보를 보내준다.
         public int CS_Shot_info;       // 클라이언트가 서버에게 Shot 정보를 보내준다.
@@ -54,6 +55,7 @@ namespace TheLastOne.GameClass
             SC_DangerLine = 8;
             SC_Zombie_Info = 9;
             SC_Remove_Zombie = 10;
+            SC_Lobby_Time = 11;
             //----------------------------------
             // 클라이언트에서 서버로
             CS_Info = 1;

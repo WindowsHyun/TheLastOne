@@ -643,6 +643,16 @@ namespace TheLastOne.Game.Network
                 // 해당 좀비의 SetActive를 꺼준다.
                 iter.set_removeZombie(true);
             }
+            else if (type == recv_protocol.SC_Lobby_Time)
+            {
+                // 서버에서 내보낸 클라이언트를 가져 온다.
+                byte[] t_buf = new byte[size + 1];
+                System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
+                ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
+                var Get_ServerData = Game_Timer.GetRootAsGame_Timer(revc_buf);
+
+                SingletonCtrl.Instance_S.LobbyWaitTime = Get_ServerData.Time;
+            }
 
         }
 

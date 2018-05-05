@@ -38,6 +38,10 @@ void Server_Timer::Timer_Thread()
 				over->room_id = t.room_id;
 				over->event_type = OP_LobbyWait;
 			}
+			else if (E_LobbyReday == t.event) {
+				over->room_id = t.room_id;
+				over->event_type = OP_LobbyReday;
+			}
 			
 			PostQueuedCompletionStatus(g_hiocp, 1, t.object_id, &over->over);
 		}
