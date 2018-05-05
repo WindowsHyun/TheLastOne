@@ -128,7 +128,7 @@ public class VehicleCtrl : PlayerVehicleCtrl
     {
         // 폭팔 효과 파티클 생성
         Instantiate(expEffect, vehicle_tr.position, Quaternion.identity);
-        Instantiate(expCar, vehicle_tr.position, Quaternion.identity);
+        Instantiate(expCar, vehicle_tr.position, this.transform.localRotation);
 
         if (Car_Status == true) // 차량이 폭파하는데 사람이 타있다고 나올경우
             player_die = true;

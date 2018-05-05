@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class DangerLineCtrl : MonoBehaviour
 {
@@ -8,13 +9,22 @@ public class DangerLineCtrl : MonoBehaviour
     private int demage;
     private Vector3 start_pos;
     private Vector3 limit_scale;
+
+    public Image dangerLineImage;
+
+    public Transform minimapDangerLine;
     //private Vector3 limit_scale = new Vector3(2700, 2700, 2700);
 
     private void Awake()
     {
         start = false;
         demage = 1;
-        limit_scale = new Vector3(4500, 4500, 4500);
+        //limit_scale = new Vector3(4500, 4500, 4500);
+
+        // 지도 위의 자기장 이미지를 DangerLineBall 위치와 동기화
+        dangerLineImage.GetComponent<RectTransform>().localPosition = new Vector2(-this.transform.position.z * 0.5f, this.transform.position.x * 0.5f);
+        // 지도 위의 자기장 이미지를 DangerLineBall의 크기의 비율에 맞게 설정
+        dangerLineImage.GetComponent<RectTransform>().sizeDelta = new Vector2(this.transform.localScale.x * 0.5f, this.transform.localScale.y * 0.5f);
     }
 
     public void set_start(bool value)
@@ -40,7 +50,12 @@ public class DangerLineCtrl : MonoBehaviour
 
     void FixedUpdate()
     {
-        this.transform.localScale = limit_scale;
+        //this.transform.localScale = limit_scale;
+
+        this.transform.localScale -= new Vector3(1.0f, 1.0f, 1.0f);
+        dangerLineImage.GetComponent<RectTransform>().sizeDelta -= new Vector2(0.5f, 0.5f);
+        minimapDangerLine.localScale -= new Vector3(1.0f, 0.0f, 1.0f);
+
     }
 
 
