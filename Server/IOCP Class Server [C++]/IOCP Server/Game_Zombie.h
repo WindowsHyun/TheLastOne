@@ -1,7 +1,7 @@
 #ifndef __GAMEZOMBIE_H__
 #define __GAMEZOMBIE_H__
 
-#include "IOCP_Server.h"
+#include "Core_Header.h"
 
 class Game_Zombie {
 private:
@@ -20,8 +20,8 @@ public:
 	int get_animator() { return this->animator; };															// 좀비 애니메이션 전달
 	int get_target() { return this->target_Player; };															// 좀비 타켓 플레이어 전달
 	xyz get_pos() { return this->position; };
-	Vec3 get_position() { return Vec3(this->position.x, this->position.y, this->position.z); };		// 좀비 포지션 전달
-	Vec3 get_rotation() { return Vec3(this->rotation.x, this->rotation.y, this->rotation.z); };		// 좀비 로테이션 전달
+	xyz get_position() { return xyz(this->position.x, this->position.y, this->position.z); };		// 좀비 포지션 전달
+	xyz get_rotation() { return xyz(this->rotation.x, this->rotation.y, this->rotation.z); };		// 좀비 로테이션 전달
 
 
 	void set_live(const bool value) { this->live = value; };										// 좀비 생사 여부 저장

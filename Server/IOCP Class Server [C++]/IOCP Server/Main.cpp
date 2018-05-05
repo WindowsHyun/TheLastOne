@@ -2,4 +2,5 @@
 
 int main() {
 	IOCP_Server Server;
+	return 0;
 }

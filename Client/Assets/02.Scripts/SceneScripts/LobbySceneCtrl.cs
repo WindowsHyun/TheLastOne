@@ -53,6 +53,7 @@ public class LobbySceneCtrl : MonoBehaviour
         {
             gameStartTimeText.text = "Game is Ready..!"; // text 출력
             yield return new WaitForSeconds(0.3f); // 1초 딜레이
+            NextInGameScene();
         }
         gameStartTimeText.text = "";
         yield break;

@@ -2,8 +2,10 @@
 #define __PROTOCOL_H__
 
 enum TimerType { T_DangerLine };
-enum OPTYPE { OP_SEND, OP_RECV, OP_DangerLine, OP_RemoveClient, OP_MoveDangerLine, OP_DangerLineDamage };
-enum Event_Type { E_DangerLine, E_RoundTime, E_Remove_Client, E_MoveDangerLine, E_DangerLineDamage };
+enum OPTYPE { OP_SEND, OP_RECV, OP_DangerLine, OP_RemoveClient, 
+	OP_MoveDangerLine, OP_DangerLineDamage, OP_LobbyWait };
+enum Event_Type { E_DangerLine, E_RoundTime, E_Remove_Client, E_MoveDangerLine, 
+	E_DangerLineDamage, E_LobbyWait };
 
 // 소켓 설정
 #define SERVERPORT 9000
@@ -12,8 +14,13 @@ enum Event_Type { E_DangerLine, E_RoundTime, E_Remove_Client, E_MoveDangerLine, 
 #define MAX_PACKET_SIZE  4000
 #define MAX_Client 50
 
+
 // 게임 설정
 #define DebugMod TRUE
+#define GameRoomLimit 2		// 최대 방 개수
+#define Total_Max_Client MAX_Client * GameRoomLimit		// 모든 방에 최대 들어 올 수 있는 인원
+#define Minimum_Players 1		// 최소 레디 인원
+#define GamePlayWait 5			// 게임 시작전 대기 시간
 
 // 서버에서 클라이언트에게 보내는 패킷
 #define SC_ID           1					// 클라이언트 아이디를 보낸다.
@@ -51,8 +58,8 @@ enum Event_Type { E_DangerLine, E_RoundTime, E_Remove_Client, E_MoveDangerLine, 
 
 // 좀비가 볼 수 있는 거리
 #define Zombie_Dist 200
-#define Limit_Zombie 1
-#define Create_Zombie 1
+#define Limit_Zombie 5
+#define Create_Zombie 5
 
 // 아이템, 플레이어 종류
 #define Kind_Item 0
