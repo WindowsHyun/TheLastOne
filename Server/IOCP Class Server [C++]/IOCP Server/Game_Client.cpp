@@ -26,12 +26,12 @@ void Game_Client::init()
 
 xyz Game_Client::get_position()
 {
-	 return xyz(this->position.x, this->position.y, this->position.z);
+	return this->position;
 }
 
 xyz Game_Client::get_rotation()
 {
-	return xyz(this->rotation.x, this->rotation.y, this->rotation.z);
+	return this->rotation;
 }
 
 xyz Game_Client::get_car_rotation()

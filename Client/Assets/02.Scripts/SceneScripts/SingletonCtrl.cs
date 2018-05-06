@@ -19,6 +19,7 @@ public class SingletonCtrl : MonoBehaviour
     private int playerMoney = 0;    // 플레이어 돈
     private string playerID = "";   // 플레이어 아이디
     private string playerPWD = "";  // 플레이어 패스워드
+    private bool startCarRun = false;  // 수송차량 출발 대기
     //-------------------------------------------------------------------------------------------
     // 네트워크 관련한 부분
     private Socket m_Socket;
@@ -110,6 +111,18 @@ public class SingletonCtrl : MonoBehaviour
         set
         {
             waitTime = value;
+        }
+    }
+
+    public bool startCarStatus           // 로비 대기시간
+    {
+        get
+        {
+            return startCarRun;
+        }
+        set
+        {
+            startCarRun = value;
         }
     }
 

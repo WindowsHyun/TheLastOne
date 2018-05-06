@@ -49,7 +49,7 @@ public:
 	int get_curr_packet() { return this->curr_packet_size; };		// 클라이언트 패킷 사이즈 전달
 	int get_prev_packet() { return this->prev_packet_data; };		// 클라이언트 패킷 사이즈 전달
 	int get_playerStatus() { return this->playerStatus; };		// 클라이언트 게임 상태 전달
-	xyz get_pos() { return this->position; };
+	//xyz get_pos() { return this->position; };
 	xyz get_position();													// 클라이언트 포지션 전달
 	xyz get_rotation();													// 클라이언트 로테이션 전달
 	xyz get_car_rotation();												// 클라이언트 로테이션 전달

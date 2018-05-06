@@ -181,41 +181,43 @@ void IOCP_Server::Worker_Thread()
 			}
 			delete over;
 		}
-		/*
 		else if (OP_DangerLine == over->event_type) {
-			Send_All_Time(T_DangerLine, (int)ci, -1, true);
+			Send_All_Time(over->room_id, SC_Server_Time, T_DangerLine, (int)ci, -1, true);
 			if (ci <= 0) {
 				// 초기 대기시간이 만료 되었을 경우
-				DangerLine.set_level(DangerLine.get_level() - 1);
-				Send_DangerLine_info(DangerLine.get_demage(), DangerLine.get_pos(), DangerLine.get_scale());
-				if (DangerLine.get_level() != -1) {
-					Timer_Event t = { (int)DangerLine.get_scale_x() , high_resolution_clock::now() + 100ms, E_MoveDangerLine };
-					std::cout << DangerLine.get_scale_x() << std::endl;
-					Timer.setTimerEvent(t);
+				GameRoom[over->room_id].get_room().get_dangerLine().set_level(GameRoom[over->room_id].get_room().get_dangerLine().get_level() - 1);
+				Send_DangerLine_info(over->room_id, GameRoom[over->room_id].get_room().get_dangerLine().get_demage(), GameRoom[over->room_id].get_room().get_dangerLine().get_pos(), GameRoom[over->room_id].get_room().get_dangerLine().get_scale());
+				if (GameRoom[over->room_id].get_room().get_dangerLine().get_level() != -1) {
+					Timer_Event t = { over->room_id, (int)GameRoom[over->room_id].get_room().get_dangerLine().get_scale_x() , high_resolution_clock::now() + 100ms, E_MoveDangerLine };
+					if (GameRoom[over->room_id].get_status() == inGameStatus)
+						Timer.setTimerEvent(t);
 				}
 
 			}
 			else {
 				// ci-1 을 한 이유는 1초씩 내리기 위하여.
-				Send_DangerLine_info(DangerLine.get_demage(), DangerLine.get_pos(), DangerLine.get_scale());
-				Timer_Event t = { (int)ci - 1, high_resolution_clock::now() + 1s, E_DangerLine };
-				Timer.setTimerEvent(t);
+				Send_DangerLine_info(over->room_id, GameRoom[over->room_id].get_room().get_dangerLine().get_demage(), GameRoom[over->room_id].get_room().get_dangerLine().get_pos(), GameRoom[over->room_id].get_room().get_dangerLine().get_scale());
+				Timer_Event t = { over->room_id, (int)ci - 1, high_resolution_clock::now() + 1s, E_DangerLine };
+				if (GameRoom[over->room_id].get_status() == inGameStatus)
+					Timer.setTimerEvent(t);
 			}
 		}
 		else if (OP_MoveDangerLine == over->event_type) {
-			DangerLine.set_scale(10);
-			Send_DangerLine_info(DangerLine.get_demage(), DangerLine.get_pos(), DangerLine.get_scale());
+			GameRoom[over->room_id].get_room().get_dangerLine().set_scale(10);
+			Send_DangerLine_info(over->room_id, GameRoom[over->room_id].get_room().get_dangerLine().get_demage(), GameRoom[over->room_id].get_room().get_dangerLine().get_pos(), GameRoom[over->room_id].get_room().get_dangerLine().get_scale());
 
-			if (DangerLine.get_now_scale_x() <= ci) {
-				Timer_Event t = { DangerLine.get_time() , high_resolution_clock::now() + 1s, E_DangerLine };	// 자기장 시작 전 대기시간
-				Timer.setTimerEvent(t);
+			if (GameRoom[over->room_id].get_room().get_dangerLine().get_now_scale_x() <= ci) {
+				Timer_Event t = { over->room_id, GameRoom[over->room_id].get_room().get_dangerLine().get_time() , high_resolution_clock::now() + 1s, E_DangerLine };	// 자기장 시작 전 대기시간
+				if (GameRoom[over->room_id].get_status() == inGameStatus)
+					Timer.setTimerEvent(t);
 			}
 			else {
-				Timer_Event t = { (int)ci , high_resolution_clock::now() + 100ms, E_MoveDangerLine };
-				Timer.setTimerEvent(t);
+				Timer_Event t = { over->room_id, (int)ci , high_resolution_clock::now() + 100ms, E_MoveDangerLine };
+				if (GameRoom[over->room_id].get_status() == inGameStatus)
+					Timer.setTimerEvent(t);
 			}
 
-		}*/
+		}
 		else if (OP_RemoveClient == over->event_type) {
 			// 1초마다 한번씩 종료된 클라이언트를 지워 준다.
 			Remove_Client();
@@ -224,9 +226,9 @@ void IOCP_Server::Worker_Thread()
 		}
 		else if (OP_DangerLineDamage == over->event_type) {
 			// 자기장 데미지는 1초마다 한번씩 데미지를 준다.
-			//Attack_DangerLine_Damge();
-			//Timer_Event t = { 1, high_resolution_clock::now() + 1s, E_DangerLineDamage };
-			//Timer.setTimerEvent(t);
+			Attack_DangerLine_Damge(over->room_id);
+			Timer_Event t = { over->room_id, 1, high_resolution_clock::now() + 1s, E_DangerLineDamage };
+			Timer.setTimerEvent(t);
 		}
 		else if (OP_LobbyWait == over->event_type) {
 			// 룸에 대기인원이 몇명인지 확인을 한다.
@@ -254,17 +256,29 @@ void IOCP_Server::Worker_Thread()
 		}
 		else if (OP_LobbyReday == over->event_type) {
 			// 로비에서 게임 진행까지 카운트 다운.
-			//Remove_Client();
 			Send_All_Time(over->room_id, SC_Lobby_Time, T_LobbyReday, (int)ci, noPlayer, true);
 			if (ci <= 0) {
 				// 카운트 다운이 모두 끝난 경우.
 				GameRoom[over->room_id].get_room().set_playGame(true);
 				GameRoom[over->room_id].set_status(inGameStatus);
+				// 게임이 시작 되었으므로 자기장 타이머도 시작이 된다.
+				Timer_Event t = { over->room_id, DangerLine_init, high_resolution_clock::now() + 1s, E_DangerLine };
+				Timer.setTimerEvent(t);
+				// 자기장 밖의 경우 데미지를 잃게 수정을 한다.
+				t = { over->room_id, 1, high_resolution_clock::now() + 1s, E_DangerLineDamage };
+				Timer.setTimerEvent(t);
+				// 모든 플레이어들이 인게임에 들어와 있는지 타이머를 돌려 확인한다.
+				t = { over->room_id, 1, high_resolution_clock::now() + 100ms, E_StartCarWait };
+				Timer.setTimerEvent(t);
 			}
 			else {
 				Timer_Event t = { over->room_id, (int)ci - 1, high_resolution_clock::now() + 1s, E_LobbyReday };
 				Timer.setTimerEvent(t);
 			}
+		}
+		else if (OP_StartCarWait == over->event_type) {
+			// 모든 플레이어가 인게임에 들어왔는지 확인을 한다.
+			Check_InGamePlayer(over->room_id);
 		}
 		else {
 #if (DebugMod == TRUE )
@@ -305,7 +319,7 @@ void IOCP_Server::Accept_Thread()
 		// 방중에서 현재 시작이 안된 방을 찾는다.
 		int room_id = -1;
 		for (auto iter : GameRoom) {
-			if ((iter.get_status() == LobbyStatus || iter.get_status() == ReadyStatus ) && iter.get_room().get_client().size() <= MAX_Client) {
+			if ((iter.get_status() == LobbyStatus || iter.get_status() == ReadyStatus) && iter.get_room().get_client().size() <= MAX_Client) {
 				room_id = iter.get_id();
 #if (DebugMod == TRUE )
 				std::cout << "Connect to Room " << iter.get_id() << std::endl;
@@ -367,15 +381,14 @@ void IOCP_Server::Remove_Client()
 				Send_Client_ID(client_iter->second.get_room_id(), client_iter->second.get_client_id(), SC_REMOVE_PLAYER, true);
 				closesocket(client_iter->second.get_Socket());
 				remove_client_id.push(client_iter->second.get_client_id());	// 종료된 클라이언트 번호를 스택에 넣어준다.
-				room_iter.get_room().get_client().erase(client_iter++);		// Map 에서 해당 클라이언트를 삭제한다.
+				client_iter = client.erase(client_iter);		// Map 에서 해당 클라이언트를 삭제한다.
 			}
 			else {
-				++client_iter;
+				client_iter++;
 			}
 
 		}
 	}
-
 }
 
 void IOCP_Server::Shutdown_Server()
@@ -529,22 +542,23 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *pac
 		{
 			auto client_Check_info = GetClient_packetView(get_packet);
 			client->second.set_playerStatus(client_Check_info->id());
-			//std::cout << client->first << " : " << client->second.get_playerStatus() << std::endl;
 		}
 		break;
 		}
 
 
-		Send_All_Player(room_id, ci);
-		Send_Hide_Player(room_id, ci);
+		if (GameRoom[room_id].get_status() == inGameStatus) {
+			// 인게임에 들어가기 전까지는 패킷 전송을 하지 않는다.
+			Send_All_Player(room_id, ci);
+			Send_Hide_Player(room_id, ci);
 
-		Send_All_Zombie(room_id, ci);
-		Send_Hide_Zombie(room_id, ci);
+			Send_All_Zombie(room_id, ci);
+			Send_Hide_Zombie(room_id, ci);
 
-		GameRoom[room_id].get_room().player_To_Zombie();
+			GameRoom[room_id].get_room().player_To_Zombie();
 
-		Send_All_Item(room_id, ci);
-
+			//Send_All_Item(room_id, ci);
+		}
 	}
 	catch (DWORD dwError) {
 		errnum++;
@@ -721,7 +735,7 @@ void IOCP_Server::Send_All_Item(const int room_id, const int ci)
 
 		auto id = iter.first;
 		auto name = builder.CreateString(iter.second.get_name());
-		Vec3 pos = { iter.second.get_pos().x, iter.second.get_pos().y,  iter.second.get_pos().z };
+		Vec3 pos = { iter.second.get_position().x, iter.second.get_position().y,  iter.second.get_position().z };
 		Vec3 rotation = { iter.second.get_rotation().x, iter.second.get_rotation().y,  iter.second.get_rotation().z };
 		auto eat = iter.second.get_eat();
 		auto riding = iter.second.get_riding();
@@ -760,23 +774,23 @@ void IOCP_Server::Send_Client_Shot(const int room_id, const int shot_client)
 
 }
 
-//void IOCP_Server::Send_DangerLine_info(int demage, xyz pos, xyz scale)
-//{
-//	flatbuffers::FlatBufferBuilder builder;
-//	auto dem = demage;
-//	auto position = new Vec3(pos.x, pos.y, pos.z);
-//	auto sscale = new Vec3(scale.x, scale.y, scale.z);
-//	auto orc = CreateGameDangerLine(builder, dem, position, sscale);
-//	builder.Finish(orc); // Serialize the root of the object.
-//
-//	for (auto iter : g_clients) {
-//		if (iter.second.get_Connect() != true)
-//			continue;
-//		SendPacket(SC_DangerLine, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
-//	}
-//
-//
-//}
+void IOCP_Server::Send_DangerLine_info(const int room_id, const int demage, const xyz pos, const xyz scale)
+{
+	flatbuffers::FlatBufferBuilder builder;
+	auto dem = demage;
+	auto position = new Vec3(pos.x, pos.y, pos.z);
+	auto sscale = new Vec3(scale.x, scale.y, scale.z);
+	auto orc = CreateGameDangerLine(builder, dem, position, sscale);
+	builder.Finish(orc); // Serialize the root of the object.
+
+	if (GameRoom[room_id].get_status() == inGameStatus) {
+		for (auto iter : GameRoom[room_id].get_room().get_client()) {
+			if (iter.second.get_Connect() != true)
+				continue;
+			SendPacket(SC_DangerLine, room_id, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
+		}
+	}
+}
 
 void IOCP_Server::Send_Hide_Player(const int room_id, const int client)
 {
@@ -822,32 +836,59 @@ bool IOCP_Server::Distance(const int room_id, const int me, const int you, const
 	auto iter_item = GameRoom[room_id].get_room().get_item().find(you);
 
 	if (kind == Kind_Player)
-		return (iter_me->second.get_pos().x - iter_you->second.get_pos().x) * (iter_me->second.get_pos().x - iter_you->second.get_pos().x) +
-		(iter_me->second.get_pos().z - iter_you->second.get_pos().z) * (iter_me->second.get_pos().z - iter_you->second.get_pos().z) <= Radius * Radius;
+		return (iter_me->second.get_position().x - iter_you->second.get_position().x) * (iter_me->second.get_position().x - iter_you->second.get_position().x) +
+		(iter_me->second.get_position().z - iter_you->second.get_position().z) * (iter_me->second.get_position().z - iter_you->second.get_position().z) <= Radius * Radius;
 	else if (kind == Kind_Zombie)
-		return (iter_me->second.get_pos().x - iter_zombie->second.get_pos().x) * (iter_me->second.get_pos().x - iter_zombie->second.get_pos().x) +
-		(iter_me->second.get_pos().z - iter_zombie->second.get_pos().z) * (iter_me->second.get_pos().z - iter_zombie->second.get_pos().z) <= Radius * Radius;
+		return (iter_me->second.get_position().x - iter_zombie->second.get_position().x) * (iter_me->second.get_position().x - iter_zombie->second.get_position().x) +
+		(iter_me->second.get_position().z - iter_zombie->second.get_position().z) * (iter_me->second.get_position().z - iter_zombie->second.get_position().z) <= Radius * Radius;
 	else if (kind == Kind_Item)
-		return (iter_me->second.get_pos().x - iter_item->second.get_pos().x) * (iter_me->second.get_pos().x - iter_item->second.get_pos().x) +
-		(iter_me->second.get_pos().z - iter_item->second.get_pos().z) * (iter_me->second.get_pos().z - iter_item->second.get_pos().z) <= Radius * Radius;
+		return (iter_me->second.get_position().x - iter_item->second.get_position().x) * (iter_me->second.get_position().x - iter_item->second.get_position().x) +
+		(iter_me->second.get_position().z - iter_item->second.get_position().z) * (iter_me->second.get_position().z - iter_item->second.get_position().z) <= Radius * Radius;
 
 	return false;
 }
 
+void IOCP_Server::Check_InGamePlayer(const int room_id)
+{
+	int ingamePlayer = 0;
 
-//void IOCP_Server::Attack_DangerLine_Damge()
-//{
-//	for (auto iter : g_clients) {
-//		if (iter.second.get_Connect() != true)
-//			continue;
-//		if (iter.second.get_DangerLine() == false) {
-//			// 자기장 밖에 있을 경우.
-//			auto client_iter = get_client_iter(iter.first);
-//			int my_hp = client_iter->second.get_hp();
-//			client_iter->second.set_hp(my_hp - DangerLine.get_demage());
-//		}
-//	}
-//
-//}
+	for (auto player : GameRoom[room_id].get_room().get_client()) {
+		if (player.second.get_playerStatus() == playGameStatus) {
+			ingamePlayer++;
+		}
+	}
 
+	if (GameRoom[room_id].get_room().get_client().size() == ingamePlayer) {
+		// 모두 인게임 상태일 경우 패킷을 전송해 준다.
+		flatbuffers::FlatBufferBuilder builder;
+		auto id = 616;		// 패킷 값만 보내면 되므로 아무런 숫자나 입력 해준다.
+		auto orc = CreateClient_Packet(builder, id);
+		builder.Finish(orc); // Serialize the root of the object.
 
+		for (auto iter : GameRoom[room_id].get_room().get_client()) {
+			if (iter.second.get_Connect() != true)
+				continue;
+			SendPacket(SC_StartCar_Play, room_id, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
+		}
+
+	}
+	else {
+		Timer_Event t = { room_id, 1, high_resolution_clock::now() + 100ms, E_StartCarWait };
+		Timer.setTimerEvent(t);
+	}
+}
+
+void IOCP_Server::Attack_DangerLine_Damge(const int room_id)
+{
+	for (auto iter : GameRoom[room_id].get_room().get_client()) {
+		if (iter.second.get_Connect() != true)
+			continue;
+		if (iter.second.get_DangerLine() == false) {
+			// 자기장 밖에 있을 경우.
+			auto client_iter = GameRoom[room_id].get_room().get_client_iter(iter.first);
+			int my_hp = client_iter->second.get_hp();
+			client_iter->second.set_hp(my_hp - GameRoom[room_id].get_room().get_dangerLine().get_demage());
+		}
+	}
+
+}

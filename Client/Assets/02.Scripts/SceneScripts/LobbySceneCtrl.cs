@@ -56,7 +56,7 @@ public class LobbySceneCtrl : MonoBehaviour
             }
             else
             {
-                gameStartTimeText.text = "Start the game in " + SingletonCtrl.Instance_S.LobbyWaitTime + ".";
+                gameStartTimeText.text = "Start the game in " + SingletonCtrl.Instance_S.LobbyWaitTime;
             }
             if (SingletonCtrl.Instance_S.LobbyWaitTime == 0)
             {

@@ -22,7 +22,7 @@ private:
 	int item_Kinds;
 
 public:
-	xyz get_pos() { return item_position; }
+	xyz get_position() { return item_position; }
 	xyz get_rotation() { return item_rotation; }
 	bool get_eat() { return item_eat; }
 	bool get_riding() { return riding_car; }

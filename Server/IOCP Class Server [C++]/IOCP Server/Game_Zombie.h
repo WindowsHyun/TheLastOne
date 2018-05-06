@@ -12,18 +12,21 @@ private:
 	int animator = 0;
 	int target_Player = -1;
 	bool live = false;
+	float distance;
 
 public:
+	float get_distance() { return this->distance; }															// 좀비와 플레이어 거리 전달
 	bool get_live() { return this->live; }																		// 좀비 생사 여부 전달
 	int get_client_id() { return this->client_id; }																// 좀비 아이디 전달
 	int get_hp() { return this->hp; };																			// 좀비 체력 전달
 	int get_animator() { return this->animator; };															// 좀비 애니메이션 전달
 	int get_target() { return this->target_Player; };															// 좀비 타켓 플레이어 전달
-	xyz get_pos() { return this->position; };
-	xyz get_position() { return xyz(this->position.x, this->position.y, this->position.z); };		// 좀비 포지션 전달
-	xyz get_rotation() { return xyz(this->rotation.x, this->rotation.y, this->rotation.z); };		// 좀비 로테이션 전달
+	//xyz get_pos() { return this->position; };
+	xyz get_position() { return this->position; };		// 좀비 포지션 전달
+	xyz get_rotation() { return this->rotation; };		// 좀비 로테이션 전달
 
 
+	void set_distance(const float value) { this->distance = value; }							// 좀비와 플레이어 거리 저장
 	void set_live(const bool value) { this->live = value; };										// 좀비 생사 여부 저장
 	void set_target(const int value) { this->target_Player = value; };						// 좀비 타켓 플레이어 저장
 	void set_animator(const int value) { this->animator = value; };							// 좀비 애니메이션 저장

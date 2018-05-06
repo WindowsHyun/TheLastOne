@@ -42,6 +42,10 @@ void Server_Timer::Timer_Thread()
 				over->room_id = t.room_id;
 				over->event_type = OP_LobbyReday;
 			}
+			else if (E_StartCarWait == t.event) {
+				over->room_id = t.room_id;
+				over->event_type = OP_StartCarWait;
+			}
 			
 			PostQueuedCompletionStatus(g_hiocp, 1, t.object_id, &over->over);
 		}
@@ -59,14 +63,10 @@ void Server_Timer::initTimer(HANDLE handle)
 {
 	g_hiocp = handle;
 
-	//Timer_Event t = { DangerLine_init, high_resolution_clock::now() + 1s, E_DangerLine };	// 자기장 시작 전 대기시간
-	////setTimerEvent(t);
-
 	//t = { 1, high_resolution_clock::now() + 1s, E_Remove_Client };
 	//setTimerEvent(t);
 
-	//t = { 1, high_resolution_clock::now() + 1s, E_DangerLineDamage };
-	//setTimerEvent(t);
+
 
 	
 	timer_tread = std::thread(&Server_Timer::Timer_Thread, this);

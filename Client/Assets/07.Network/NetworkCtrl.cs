@@ -89,7 +89,7 @@ namespace TheLastOne.Game.Network
 
         Game_ProtocolClass recv_protocol = new Game_ProtocolClass();
         Socket_SendFunction sF = new Socket_SendFunction();
-        DangerLineCtrl DangerLineCtrl;
+        static DangerLineCtrl DangerLineCtrl;
 
 
         private static int Client_imei = -1;         // 자신의 클라이언트 아이디
@@ -105,6 +105,7 @@ namespace TheLastOne.Game.Network
                 // 서버가 정상적으로 연결 되었을경우
                 serverConnect = true;
                 Player_Script = GameObject.FindWithTag("Player").GetComponent<PlayerCtrl>();
+                StartCoroutine(GetDangerLine());
                 StartCoroutine(startPrefab());
                 StartCoroutine(playerLocation_Packet());
                 StartCoroutine(DrawDebugText());
@@ -212,7 +213,7 @@ namespace TheLastOne.Game.Network
                             zombie_data[key].script.StartCoroutine(zombie_data[key].script.ZombieAction());
                             zombie_data[key].set_activeZombie(false);
                         }
-                        if (zombie_data[key].script.targetPlayer == -1 || zombie_data[key].Zombie.transform.position.x == 0)
+                        if (zombie_data[key].script.targetPlayer == -1 || zombie_data[key].Zombie.transform.position.x <= 0 || zombie_data[key].Zombie.transform.position.z <= 0)
                         {
                             // 포지션이 서버위치와 다를경우 초기화를 해준다.
                             zombie_data[key].Zombie.transform.position = zombie_data[key].get_pos();
@@ -226,6 +227,13 @@ namespace TheLastOne.Game.Network
                             zombie_data[key].Zombie.transform.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
                             zombie_data[key].script.animator_value = zombie_data[key].get_animator();
                         }
+
+                        if (zombie_data[key].Zombie.transform.position.x != 0 && zombie_data[key].script.zombieNum != -1 && zombie_data[key].get_pos().y <= 25)
+                        {
+                            zombie_data[key].Zombie.transform.position = new Vector3(zombie_data[key].get_pos().x, 70, zombie_data[key].get_pos().z);
+                        }
+
+
 
                         if (zombie_data[key].get_hp() <= 0 && zombie_data[key].get_isDie() == false && zombie_data[key].get_pos().x != 0)
                         {
@@ -403,8 +411,8 @@ namespace TheLastOne.Game.Network
                             Send_Packet(Sendbyte);
                     }
 
-                    yield return new WaitForSeconds(0.04f);
-                    // 초당25번 패킷 전송으로 제한을 한다.
+                    yield return new WaitForSeconds(0.03f);
+                    // 초당 30번 패킷 전송으로 제한을 한다.
                 }
             } while (true);
             //yield return null;
@@ -419,6 +427,17 @@ namespace TheLastOne.Game.Network
                 yield return null;
             } while (true);
             //yield return null;
+        }
+
+        IEnumerator GetDangerLine()
+        {
+            do
+            {
+                DangerLineCtrl = GameObject.FindGameObjectWithTag("DangerLine").GetComponent<DangerLineCtrl>();
+                if (DangerLineCtrl != null)
+                    DangerLineCtrl.getDangerLine = false;
+                yield return null;
+            } while (DangerLineCtrl.getDangerLine);
         }
 
         public void ProcessPacket(int size, int type, byte[] recvPacket)
@@ -653,6 +672,12 @@ namespace TheLastOne.Game.Network
 
                 SingletonCtrl.Instance_S.LobbyWaitTime = Get_ServerData.Time;
             }
+            else if (type == recv_protocol.SC_StartCar_Play)
+            {
+                // 서버에서 받은 패킷 자체를 읽을 필요가 없다.
+                // 차량을 움직이라고 전달을 해준다.
+                SingletonCtrl.Instance_S.startCarStatus = true;
+            }
 
         }
 
@@ -660,7 +685,6 @@ namespace TheLastOne.Game.Network
         {
             debugString = "";
             Application.runInBackground = true; // 백그라운드에서도 Network는 작동해야한다.
-            DangerLineCtrl = GameObject.FindGameObjectWithTag("DangerLine").GetComponent<DangerLineCtrl>();
             m_Socket = SingletonCtrl.Instance_S.PlayerSocket;
             StartCoroutine(SocketCheck());
         }

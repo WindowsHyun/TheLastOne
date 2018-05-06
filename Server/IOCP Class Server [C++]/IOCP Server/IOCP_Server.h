@@ -58,10 +58,10 @@ private:
 	void Send_All_Item(const int room_id, const int ci);		// 클라이언트에게 시간정보를 보내준다.
 	void Send_Client_Shot(const int room_id, const int shot_client);		// 클라이언트들에게 Shot 정보를 보내준다.
 	void Send_All_Time(const int room_id, const int type, const int kind, const int time, const int client_id, const bool allClient);	 // 클라이언트에게 시간을 보내준다.
-	//void Send_DangerLine_info(int demage, xyz pos, xyz scale);
-	//void Attack_DangerLine_Damge();			// 자기장 데미지를 플레이어에게 준다.
-
+	void Send_DangerLine_info(const int room_id, const int demage, const xyz pos, const xyz scale);
+	void Attack_DangerLine_Damge(const int room_id);			// 자기장 데미지를 플레이어에게 준다.
 	bool Distance(const int room_id, const int me, const int  you, const int Radius, const int kind);
+	void Check_InGamePlayer(const int room_id);
 public:
 	HANDLE getHandle() { return g_hiocp; }
 	IOCP_Server();

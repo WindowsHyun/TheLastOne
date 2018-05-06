@@ -15,60 +15,50 @@ std::unordered_map<int, Game_Zombie>::iterator Game_Room::get_zombie_iter(int ci
 	return g_zombie.find(ci);
 }
 
-float DistanceToPoint(float player_x, float player_z, float zombie_x, float zombie_z)
+float DistanceToPoint(const xyz player, const xyz zombie)
 {
-	// 캐릭터 간의 거리 구하기.
-	return (float)sqrt(pow(player_x - zombie_x, 2) + pow(player_z - zombie_z, 2));
+	// 플레이어와 좀비간의 거리 구하기.
+	return (float)sqrt(pow(player.x - zombie.x, 2) + pow(player.z - zombie.z, 2));
 }
 
 
 void Game_Room::player_To_Zombie()
 {
-	for (auto z : g_zombie) {
-		// TargetPlayer가 실제 서버에 존재하는지 확인하자.
-		if (g_clients.find(z.second.get_target()) != g_clients.end()) {
-			// 플레이어가 존재한다.
-			auto iter = g_clients.find(z.second.get_target());
-			float check_dist = DistanceToPoint(iter->second.get_pos().x, iter->second.get_pos().z, z.second.get_pos().x, z.second.get_pos().z);
-			if (check_dist >= Zombie_Dist) {
+	float dist = 0.0f;
+	for (auto zombie : g_zombie) {
+
+		if (zombie.second.get_target() != -1 && g_clients.find(zombie.second.get_target()) == g_clients.end() ) {
+			// 플레이어가 강제 종료 할 경우 좀비 초기화
+			zombie.second.set_distance(Zombie_Dist);
+			zombie.second.set_target(-1);
+		}else if (zombie.second.get_target() != -1 && g_clients.find(zombie.second.get_target()) != g_clients.end() && g_clients.find(zombie.second.get_target())->second.get_hp() <= 0) {
+			// 플레이어 체력이 0 이하일 경우
+			zombie.second.set_distance(Zombie_Dist);
+			zombie.second.set_target(-1);
+		}
+		if (zombie.second.get_hp() <= 0 && zombie.second.get_live() != false) {
+			// 좀비의 체력이 0일경우
+			g_zombie.find(zombie.first)->second.set_live(false);
+			g_zombie.find(zombie.first)->second.set_target(-1);
+		}
+
+		for (auto player : g_clients) {
+			dist = DistanceToPoint(player.second.get_position(), zombie.second.get_position());
+
+			if (dist <= zombie.second.get_distance() && dist <= Zombie_Dist) {
+				// 최근 측정한 거리가 더 멀경우 가까운 거리를 지정해준다.
+				g_zombie.find(zombie.first)->second.set_distance(dist);
+				g_zombie.find(zombie.first)->second.set_target(player.second.get_client_id());
+			}
+
+			if (dist >= Zombie_Dist) {
 				// 플레이어가 존재하지만 거리가 멀어져 있을 경우 좀비 Target을 초기화
-				iter->second.set_limit_zombie(-1);
-				g_zombie.find(z.first)->second.set_target(-1);
-			}
-			if (iter->second.get_hp() <= 0) {
-				// 플레이어 체력이 0 이하일 경우
-				iter->second.set_limit_zombie(-1);
-				g_zombie.find(z.first)->second.set_target(-1);
-			}
-			if (z.second.get_hp() <= 0 && z.second.get_live() != false) {
-				// 좀비의 체력이 0일경우
-				g_zombie.find(z.first)->second.set_live(false);
-				iter->second.set_limit_zombie(-1);
-				//std::cout << iter->first << ", " << iter->second.get_limit_zombie() << std::endl;
-				g_zombie.find(z.first)->second.set_target(-1);
-			}
-			else {
-				// 아직 근처일 경우 넘긴다.
-				continue;
+				zombie.second.set_distance(Zombie_Dist);
+				g_zombie.find(zombie.first)->second.set_target(-1);
 			}
 		}
-		else {
-			int player_num = -1;
-			float dist = Zombie_Dist;
-			for (auto p : g_clients) {
-				float check_dist = DistanceToPoint(p.second.get_pos().x, p.second.get_pos().z, z.second.get_pos().x, z.second.get_pos().z);
-				if (dist >= check_dist) {
-					dist = check_dist;
-					player_num = p.first;
-				}
-			}
-			if (player_num == -1)
-				continue;
-			if (g_clients.find(player_num)->second.get_limit_zombie() < Limit_Zombie) {
-				g_clients.find(player_num)->second.set_limit_zombie(1);
-				g_zombie.find(z.first)->second.set_target(player_num);
-			}
-		}
+		// 플레이어를 모두 확인한 이후 zombie dist는 초기화 해준다.
+		zombie.second.set_distance(Zombie_Dist);
 	}
 }
 
