@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+
 
 using System;
 
@@ -57,6 +59,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
     // 접근해야 하는 컴포넌트는 반드시 변수에 할당한 후 사용
     public Transform tr;
     public Animator animator;
+    private Rigidbody player_rigidbody;
 
     // 캐릭터 이동 속도 변수
     public float moveSpeed = 23.0f;
@@ -161,6 +164,8 @@ public class PlayerCtrl : PlayerVehicleCtrl
     public GameObject realMap;
     private bool realView;
     public RectTransform playerPositionImage;
+
+    public Image youDieImage;
 
 
     IEnumerator StartKeyInput()
@@ -387,6 +392,21 @@ public class PlayerCtrl : PlayerVehicleCtrl
                 playerPositionImage.localPosition = new Vector3(-gameObject.transform.position.z * 0.5f, gameObject.transform.position.x * 0.5f);
             }
 
+            if(playerState == PlayerState.die)
+            {
+                youDieImage.color += new Color(0f, 0f, 0f, 0.003f);
+
+                if(youDieImage.color.a >= 1.0f)
+                {
+                    Debug.Log("씬 넘어 가기전");
+                    // 플레이어 모든 코루틴 종료
+                    SceneManager.LoadScene("DieGameScene"); // 다음씬으로 넘어감
+                    Debug.Log("씬 넘어감");
+                    //StopAllCoroutines();
+                }
+            }
+
+
             yield return null;
         } while (true);
         //yield return null;
@@ -394,6 +414,9 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
     void Start()
     {
+        player_rigidbody = this.GetComponent<Rigidbody>();
+
+
         weaponIEquipImage[0] = Resources.Load<Sprite>("AK47_White");
         weaponIEquipImage[1] = Resources.Load<Sprite>("M16_White");
         weaponIEquipImage[2] = Resources.Load<Sprite>("M4A1_White");
@@ -534,7 +557,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
             vehicleHpBar.fillAmount = (float)ridingCar.vehicleHp / (float)ridingCar.vehicleInitHp;
         }
 
-        
+
     }
 
     void Fire(SlotCtrl slot)
@@ -654,7 +677,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
             if (armour <= 0)
             {
                 // 체력 차감
-                hp -= 20;
+                hp -= 50;
                 networkCtrl.Player_HP(-1, hp, armour);
                 //Image UI 항목의 fillAmount 속성을 조절해 생명 게이지 값 조절
                 imgHpBar.fillAmount = (float)hp / (float)initHp;
@@ -662,7 +685,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
             else if (armour > 0)
             {
                 // 방어력 차감
-                armour -= 20;
+                armour -= 50;
                 networkCtrl.Player_HP(-1, hp, armour);
                 // Image UI 항목의 fillAmount 속성을 조절해 방어력 게이지 값 조절
                 imgArmourBar.fillAmount = (float)armour / (float)initArmour;
@@ -758,7 +781,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
         firePos.GetComponent<CapsuleCollider>().enabled = false;
 
         // 모든 코루틴을 종료
-        StopAllCoroutines();
+        //StopAllCoroutines();
     }
 
     public void WeaponDisPlay()

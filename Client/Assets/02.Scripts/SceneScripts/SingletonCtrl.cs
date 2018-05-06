@@ -17,6 +17,7 @@ public class SingletonCtrl : MonoBehaviour
     private int playerMoney = 0;    // 플레이어 돈
     private string playerID = "";   // 플레이어 아이디
     private string playerPWD = "";  // 플레이어 패스워드
+    private string playerIP = "";   // 플레이어 아이피
     //-------------------------------------------------------------------------------------------
     // 네트워크 관련한 부분
     private Socket m_Socket;
@@ -84,6 +85,20 @@ public class SingletonCtrl : MonoBehaviour
             playerPWD = value;
         }
     }
+
+    public string PlayerIP                 // 플레이어 패스워드 접근 프로퍼티
+    {
+        get
+        {
+            return playerIP;
+        }
+        set
+        {
+            playerIP = value;
+        }
+    }
+
+
 
     public Socket PlayerSocket
     {

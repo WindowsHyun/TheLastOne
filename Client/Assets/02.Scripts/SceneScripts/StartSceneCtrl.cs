@@ -7,13 +7,20 @@ using UnityEngine.UI;
 public class StartSceneCtrl: MonoBehaviour {
 
     private bool idCehck = false;               // 아이디 입력 확인을 위함
-    private bool pwdCehck = false;              // 패스워드 입력 확인을 위함
+    //private bool pwdCehck = false;              // 패스워드 입력 확인을 위함
+    private bool ipCehck = false;              // 패스워드 입력 확인을 위함
 
+    public Image buttonimage;
 
     //// Update is called once per frame
     //void Update () {
 
     //}
+
+    public void FixedUpdate()
+    {
+        buttonimage.color += new Color(0f, 0f, 0f, -0.01f);
+    }
 
     public void InputTextID(InputField id)
     {
@@ -26,14 +33,14 @@ public class StartSceneCtrl: MonoBehaviour {
         }
     }
 
-    public void InputTextPWD(InputField pwd)
+    public void InputTextPWD(InputField ip)
     {
-        if (pwd.text != "" && pwd.text != " ")
+        if (ip.text != "" && ip.text != " ")
         {
-            Debug.Log("당신의 PWD는 " + pwd.text + " 입니다"); // 아이디 확인을 위한 로그
-            SingletonCtrl.Instance_S.PlayerPWD = pwd.text; // 싱글톤 PlayerPWD에 pwd.text를 넘겨준다
-            Debug.Log(SingletonCtrl.Instance_S.PlayerPWD); // 싱글톤 PlayerPWD에 값이 정확하게 왔는지 체크 
-            pwdCehck = true; // 입력 확인이 되었으므로 true로 변경
+            Debug.Log("당신의 IP는 " + ip.text + " 입니다"); // 아이디 확인을 위한 로그
+            SingletonCtrl.Instance_S.PlayerIP = ip.text; // 싱글톤 PlayerPWD에 pwd.text를 넘겨준다
+            Debug.Log(SingletonCtrl.Instance_S.PlayerIP); // 싱글톤 PlayerPWD에 값이 정확하게 왔는지 체크 
+            ipCehck = true; // 입력 확인이 되었으므로 true로 변경
         }
     }
 
@@ -44,6 +51,11 @@ public class StartSceneCtrl: MonoBehaviour {
         {
             SceneManager.LoadScene("LobbyGameScene"); // 다음씬으로 넘어감
         }
+    }
+
+    public void ExitGame()
+    {
+        Application.Quit();
     }
 
 
