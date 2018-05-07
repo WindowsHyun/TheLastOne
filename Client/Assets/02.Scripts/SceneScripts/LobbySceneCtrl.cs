@@ -20,6 +20,10 @@ public class LobbySceneCtrl : MonoBehaviour
     private void Awake()
     {
         SingletonCtrl.Instance_S.PlayerStatus = recv_protocol.LobbyStatus;
+        if (SingletonCtrl.Instance_S.PlayerSocket.Connected == false)
+        {
+            gameStartTimeText.text = "Offline Game Mode..!"; // text 출력
+        }
     }
 
     public void NextInGameScene()
@@ -51,7 +55,8 @@ public class LobbySceneCtrl : MonoBehaviour
     {
         while (readyStatus)  // 0 초가 될때까지 while문 진행
         {
-            if (SingletonCtrl.Instance_S.LobbyWaitTime == -1) { 
+            if (SingletonCtrl.Instance_S.LobbyWaitTime == -1)
+            {
                 gameStartTimeText.text = "Please wait.."; // text 출력
             }
             else

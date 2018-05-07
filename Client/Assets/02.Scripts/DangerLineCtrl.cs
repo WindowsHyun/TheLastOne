@@ -11,6 +11,7 @@ public class DangerLineCtrl : MonoBehaviour
     private Vector3 limit_scale;
     public Image dangerLineImage;
     public Transform minimapDangerLine;
+    public bool getDangerLine = true;
 
     //private Vector3 limit_scale = new Vector3(2700, 2700, 2700);
 
@@ -41,7 +42,6 @@ public class DangerLineCtrl : MonoBehaviour
         this.start_pos = pos;
     }
 
-    
     public void set_scale(Vector3 scale)
     {
         this.limit_scale = scale;
@@ -49,12 +49,9 @@ public class DangerLineCtrl : MonoBehaviour
 
     void FixedUpdate()
     {
-        //this.transform.localScale = limit_scale;
-
-        this.transform.localScale -= new Vector3(1.0f, 1.0f, 1.0f);
-        dangerLineImage.GetComponent<RectTransform>().sizeDelta -= new Vector2(0.5f, 0.5f);
-        minimapDangerLine.localScale -= new Vector3(1.0f, 0.0f, 1.0f);
-
+        this.transform.localScale = limit_scale;
+        dangerLineImage.GetComponent<RectTransform>().sizeDelta = new Vector2(limit_scale.x / 2, limit_scale.z / 2);
+        minimapDangerLine.localScale = new Vector3(limit_scale.x, 250, limit_scale.z);
     }
 
 

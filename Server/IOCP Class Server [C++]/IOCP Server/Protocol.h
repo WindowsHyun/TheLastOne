@@ -24,7 +24,7 @@ enum Event_Type {
 #define DebugMod TRUE
 #define GameRoomLimit 2		// 최대 방 개수
 #define Total_Max_Client MAX_Client * GameRoomLimit		// 모든 방에 최대 들어 올 수 있는 인원
-#define Minimum_Players 2		// 최소 레디 인원
+#define Minimum_Players 1	// 최소 레디 인원
 #define GamePlayWait 5			// 게임 시작전 대기 시간
 #define noPlayer -1				// 플레이어 번호가 필요 없을 경우
 
@@ -78,7 +78,7 @@ enum Event_Type {
 
 // 체력 설정
 #define Car_HP 200
-#define Player_HP 100000
+#define Player_HP 100
 #define Zombie_HP 100
 
 // 게임 상태 설정

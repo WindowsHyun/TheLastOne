@@ -13,18 +13,18 @@ using TheLastOne.Game.Network;
 public class SingletonCtrl : MonoBehaviour
 {
 
-    private int nowModeNumber = 0;
+    private int nowModeNumber = -1;     // -1로 한 이유는 로그인 눌렀을시 0으로 변경하기 위하여.
     private int waitTime = -1;
     private int playerStatus = 0;       // 플레이어 게임 상태
     private int playerMoney = 0;    // 플레이어 돈
     private string playerID = "";   // 플레이어 아이디
-    //private string playerPWD = "";  // 플레이어 패스워드
     private string playerIP = "";   // 플레이어 아이피
     private bool startCarRun = false;  // 수송차량 출발 대기
+    private bool corutinSocket = true;     // 커넥트 하기전 까지 대기
     //-------------------------------------------------------------------------------------------
     // 네트워크 관련한 부분
     private Socket m_Socket;
-    private const string iPAdress = "127.0.0.1";
+    private const string default_iPAdress = "127.0.0.1";
     private const int kPort = 9000;
     private static ManualResetEvent connectDone = new ManualResetEvent(false);
     NetworkCtrl networkCtrl = new NetworkCtrl();
@@ -91,19 +91,6 @@ public class SingletonCtrl : MonoBehaviour
         }
     }
 
-    public string PlayerPWD                 // 플레이어 패스워드 접근 프로퍼티
-    {
-        get
-        {
-            return playerPWD;
-        }
-        set
-        {
-            playerPWD = value;
-        }
-    }
-
-<<<<<<< HEAD
     public string PlayerIP                 // 플레이어 패스워드 접근 프로퍼티
     {
         get
@@ -116,8 +103,6 @@ public class SingletonCtrl : MonoBehaviour
         }
     }
 
-
-=======
     public int LobbyWaitTime           // 로비 대기시간
     {
         get
@@ -141,7 +126,6 @@ public class SingletonCtrl : MonoBehaviour
             startCarRun = value;
         }
     }
->>>>>>> Server
 
     public Socket PlayerSocket
     {
@@ -250,6 +234,27 @@ public class SingletonCtrl : MonoBehaviour
         }
     }
 
+    IEnumerator connectSocket()
+    {
+        do
+        {
+            if (nowModeNumber == 0)
+            {
+                // Mode가 0이 될 경우 = 플레이어가 로그인 한 이후
+                m_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, 1);
+                m_Socket.NoDelay = true;
+                if (playerIP == "")
+                    m_Socket.BeginConnect(default_iPAdress, kPort, new AsyncCallback(ConnectCallback), m_Socket);
+                else
+                    m_Socket.BeginConnect(playerIP, kPort, new AsyncCallback(ConnectCallback), m_Socket);
+
+                corutinSocket = false;
+            }
+            yield return null;
+        } while (corutinSocket);
+    }
+
     private void Awake()
     {
         if (instance_S)                     // 인스턴스가 이미 생성 되었는가?
@@ -260,12 +265,7 @@ public class SingletonCtrl : MonoBehaviour
         instance_S = this;                  // 유일한 인스턴스로 만듬
         DontDestroyOnLoad(gameObject);      // 씬이 바뀌어도 계속 유지 시킨다
         Application.runInBackground = true;
-        //---------------------------------------------------------------------------------------
-        //Network작업
-        m_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, 1);
-        m_Socket.NoDelay = true;
-        m_Socket.BeginConnect(iPAdress, kPort, new AsyncCallback(ConnectCallback), m_Socket);
+        StartCoroutine(connectSocket());
     }
 
 

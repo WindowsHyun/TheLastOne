@@ -557,7 +557,7 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *pac
 
 			GameRoom[room_id].get_room().player_To_Zombie();
 
-			//Send_All_Item(room_id, ci);
+			Send_All_Item(room_id, ci);
 		}
 	}
 	catch (DWORD dwError) {
