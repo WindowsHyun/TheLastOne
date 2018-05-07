@@ -284,7 +284,7 @@ void IOCP_Server::Worker_Thread()
 #if (DebugMod == TRUE )
 			std::cout << "Unknown GQCS event!\n" << "Type : " << over->event_type << std::endl;
 #endif
-			exit(-1);
+			//exit(-1);
 		}
 
 
