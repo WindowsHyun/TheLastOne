@@ -859,5 +859,11 @@ public class PlayerCtrl : PlayerVehicleCtrl
             reloadBulletCount[now_Weapon] = 30;
             weaponText.text = reloadBulletCount[now_Weapon] + " / " + bulletCount[now_Weapon];
         }
+        else if (bulletCount[now_Weapon] < (30 - reloadBulletCount[now_Weapon]))
+        {
+            reloadBulletCount[now_Weapon] = bulletCount[now_Weapon];
+            bulletCount[now_Weapon] = 0;
+            weaponText.text = reloadBulletCount[now_Weapon] + " / " + bulletCount[now_Weapon];
+        }
     }
 }
