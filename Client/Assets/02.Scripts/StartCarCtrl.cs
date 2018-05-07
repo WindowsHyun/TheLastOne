@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using TheLastOne.GameClass;
+
 public class StartCarCtrl : MonoBehaviour
 {
 
@@ -11,17 +13,34 @@ public class StartCarCtrl : MonoBehaviour
     public GameObject player;
     private PlayerCtrl Player_Script;
 
-    //private bool getOff = false;
     private bool startSet = false;
+    private bool dontStart = true;
+    Game_ProtocolClass recv_protocol = new Game_ProtocolClass();
+
+    IEnumerator waitStartCar()
+    {
+        do
+        {
+            if (SingletonCtrl.Instance_S.startCarStatus == true)
+            {
+                // 모든 플레이어가 인게임 상태일 경우
+                GetComponent<Rigidbody>().AddForce(transform.forward * speed);
+                dontStart = false;
+            }
+            yield return null;
+        } while (dontStart);
+        //yield return null;
+    }
+
 
     // Use this for initialization
     void Start()
     {
         player.GetComponent<PlayerCtrl>().enabled = false;
         Player_Script = GameObject.FindWithTag("Player").GetComponent<PlayerCtrl>();
-        // 수송 차량에 앞으로 가도록 힘을 가함
-        GetComponent<Rigidbody>().AddForce(transform.forward * speed);
 
+        // 플레이어는 인게임 상태로 들어왔다.
+        SingletonCtrl.Instance_S.PlayerStatus = recv_protocol.playGameStatus;
 
         // 게임 시작후 차량 하차 시 인벤토리 창을 끈다.
         // 쿨타임 스크립트 할당
@@ -30,39 +49,50 @@ public class StartCarCtrl : MonoBehaviour
         Player_Script.cooltime.SetActive(false);
         Player_Script.VehicleUI.SetActive(false);
 
-
-        // 안에 있는 플레이어도 같이 가도록 힘을 가함
-        //player.GetComponent<Rigidbody>().AddForce(transform.forward * speed);
+        
+        if (SingletonCtrl.Instance_S.PlayerSocket.Connected == false)
+        {
+            // 서버와 연결이 되어있지 않을경우 바로 출발한다.
+            GetComponent<Rigidbody>().AddForce(transform.forward * speed);
+            dontStart = false;
+        }
+        else
+        {
+            // 서버와 연결이 되어있을 경우 출발 대기를 한다.
+            StartCoroutine(waitStartCar());
+        }
     }
 
     void Update()
     {
-        if (startSet != true)
+        if (dontStart == false)
         {
-            player.transform.position = new Vector3(this.transform.position.x, 30.0f, this.transform.position.z);
-        }
-        // F키 입력 시
-        if (Input.GetKeyDown(KeyCode.F) && startSet == false)
-        {
-            // 플레이어에 가해진 힘을 0으로 만든다. - > 차량 하차
-            //player.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            // 서버에서 시작차량을 출발하라고 한 뒤 부터 F를 누를 수 있다.
+            if (startSet != true)
+            {
+                player.transform.position = new Vector3(this.transform.position.x, 30.0f, this.transform.position.z);
+            }
+            // F키 입력 시
+            if (Input.GetKeyDown(KeyCode.F) && startSet == false)
+            {
+                // 플레이어에 가해진 힘을 0으로 만든다. - > 차량 하차
+                //player.GetComponent<Rigidbody>().velocity = Vector3.zero;
 
-            // 플레이어 스크립트 사용 (이동 때문)
-            player.GetComponent<PlayerCtrl>().enabled = true;
+                // 플레이어 스크립트 사용 (이동 때문)
+                player.GetComponent<PlayerCtrl>().enabled = true;
 
-            // 카메라 전환
-            FollowCam followCam = GameObject.Find("Main Camera").GetComponent<FollowCam>();
-            followCam.getOff = true;
-            followCam.height = 35.0f;
-            followCam.dist = 25.0f;
+                // 카메라 전환
+                FollowCam followCam = GameObject.Find("Main Camera").GetComponent<FollowCam>();
+                followCam.getOff = true;
+                followCam.height = 35.0f;
+                followCam.dist = 25.0f;
 
-            // 차량에 하차 할때 차량의 위치로 플레이어를 이동시킨다.
-            player.transform.position = new Vector3(this.transform.position.x, 30.0f, this.transform.position.z);
+                // 차량에 하차 할때 차량의 위치로 플레이어를 이동시킨다.
+                player.transform.position = new Vector3(this.transform.position.x, 30.0f, this.transform.position.z);
 
-            // 차량 하차 후 true로 F키 입력 시 재하차 불가능하게 만듬
-            startSet = true;
-
-            //bug.Log("차량 하차 -> 게임 시작");
+                // 차량 하차 후 true로 F키 입력 시 재하차 불가능하게 만듬
+                startSet = true;
+            }
         }
     }
 

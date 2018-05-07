@@ -1,13 +1,15 @@
 #ifndef __GAMETIMER_H__
 #define __GAMETIMER_H__
 
-#include "IOCP_Server.h"
-#include "Game_Client.h"
+#include "Core_Header.h"
 
 #include <chrono>
 #include <queue>
 
+using namespace std::chrono;
+
 struct Timer_Event {
+	int room_id;		// 방 정보를 넣는다.
 	int object_id;	// 특정 대상 혹은 시간을 넣는다.
 	high_resolution_clock::time_point exec_time; // 이 이벤트가 언제 실행되야 하는가
 	Event_Type event; // 여러 이벤트가 있다.

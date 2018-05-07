@@ -3,6 +3,7 @@
 void Game_Client::init()
 {
 	this->client_id = -1;
+	this->room_id = -1;
 	this->position.x = 0;
 	this->position.y = 0;
 	this->position.z = 0;
@@ -23,27 +24,28 @@ void Game_Client::init()
 	this->curr_packet_size = 0;
 }
 
-Vec3 Game_Client::get_position()
+xyz Game_Client::get_position()
 {
-	 return Vec3(this->position.x, this->position.y, this->position.z); 
+	return this->position;
 }
 
-Vec3 Game_Client::get_rotation()
+xyz Game_Client::get_rotation()
 {
-	return Vec3(this->rotation.x, this->rotation.y, this->rotation.z);
+	return this->rotation;
 }
 
-Vec3 Game_Client::get_car_rotation()
+xyz Game_Client::get_car_rotation()
 {
-	return Vec3(this->car_rotation.x, this->car_rotation.y, this->car_rotation.z);
+	return xyz(this->car_rotation.x, this->car_rotation.y, this->car_rotation.z);
 }
 
-Game_Client::Game_Client(const SOCKET sock, const int client_id, const char * game_id)
+Game_Client::Game_Client(const SOCKET sock, const int client_id, const char * game_id , const int room_id)
 {
 	this->connect = true;
 	this->remove_client = false;
 	this->client_socket = sock;
 	this->client_id = client_id;
+	this->room_id = room_id;
 	this->nickName = game_id;
 	/*strncpy(this->nickName, game_id, 10);*/
 	this->position.x = 0;
@@ -63,9 +65,11 @@ Game_Client::Game_Client(const SOCKET sock, const int client_id, const char * ga
 	this->animator = 0;
 	this->weaponState = 0;
 	this->dangerLineIn = true;
+	this->playerStatus = 0;
 	ZeroMemory(&this->recv_over, sizeof(this->recv_over));
 	ZeroMemory(&this->packet_buf, sizeof(this->packet_buf));
 	this->recv_over.event_type = OP_RECV;
+	this->recv_over.room_id = this->room_id;
 	this->recv_over.wsabuf.buf = reinterpret_cast<CHAR *>(this->recv_over.IOCP_buf);
 	this->recv_over.wsabuf.len = sizeof(this->recv_over.IOCP_buf);
 	this->prev_packet_data = 0;
@@ -77,6 +81,7 @@ Game_Client::Game_Client(const Game_Client & g_cl)
 	this->connect = true;
 	this->client_socket = g_cl.client_socket;
 	this->client_id = g_cl.client_id;
+	this->room_id = g_cl.room_id;
 	this->nickName = g_cl.nickName;
 	//strncpy(this->nickName, g_cl.nickName, 10);
 	this->remove_client = g_cl.remove_client;
@@ -97,9 +102,11 @@ Game_Client::Game_Client(const Game_Client & g_cl)
 	this->animator = g_cl.animator;
 	this->weaponState = g_cl.weaponState;
 	this->dangerLineIn = g_cl.dangerLineIn;
+	this->playerStatus = g_cl.playerStatus;
 	ZeroMemory(&this->recv_over, sizeof(this->recv_over));
 	ZeroMemory(&this->packet_buf, sizeof(this->packet_buf));
 	this->recv_over.event_type = OP_RECV;
+	this->recv_over.room_id = g_cl.room_id;
 	this->recv_over.wsabuf.buf = reinterpret_cast<CHAR *>(this->recv_over.IOCP_buf);
 	this->recv_over.wsabuf.len = sizeof(this->recv_over.IOCP_buf);
 	this->prev_packet_data = 0;

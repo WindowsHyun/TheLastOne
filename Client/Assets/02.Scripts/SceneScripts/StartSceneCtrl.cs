@@ -28,7 +28,7 @@ public class StartSceneCtrl: MonoBehaviour {
         {
             Debug.Log("당신의 ID는 " + id.text + " 입니다"); // 아이디 확인을 위한 로그
             SingletonCtrl.Instance_S.PlayerID = id.text; // 싱글톤 PlayerID에 id.text를 넘겨준다.
-            Debug.Log(SingletonCtrl.Instance_S.PlayerID); // 싱글톤 PlayerID에 값이 정확하게 왔는지 체크 
+            //Debug.Log(SingletonCtrl.Instance_S.PlayerID); // 싱글톤 PlayerID에 값이 정확하게 왔는지 체크 
             idCehck = true; // 입력 확인이 되었으므로 true로 변경
         }
     }

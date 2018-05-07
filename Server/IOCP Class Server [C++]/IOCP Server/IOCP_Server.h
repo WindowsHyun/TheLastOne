@@ -2,9 +2,9 @@
 #define __IOCPSERVER_H__
 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
-#define _CRT_SECURE_NO_WARNINGS						// scanf ºôµå ¿À·ù
-#define _CRT_NONSTDC_NO_DEPRECATE					// itoa ºôµå ¿À·ù
-/* flatbuffers ¿¡¼­ÀÇ min, max ¿À·ù ÇØ°á ¹æ¹ı */
+#define _CRT_SECURE_NO_WARNINGS						// scanf ë¹Œë“œ ì˜¤ë¥˜
+#define _CRT_NONSTDC_NO_DEPRECATE					// itoa ë¹Œë“œ ì˜¤ë¥˜
+/* flatbuffers ì—ì„œì˜ min, max ì˜¤ë¥˜ í•´ê²° ë°©ë²• */
 #define _WIN32_WINNT _WIN32_WINNT_XP
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
@@ -14,57 +14,54 @@
 #include <winsock2.h>
 #include <iostream>
 #include <vector>
-#include <unordered_map>
 #include <queue>
-#include <thread>
 #include <random>
 #include <windows.h>
-#include <unordered_set> // ¼º´ÉÀÌ ´õ ÁÁ¾ÆÁø´Ù. [¼ø¼­°¡ »ó°ü¾øÀ»°æ¿ì]
-#include <mutex>
 #include <string>
 #include <cmath>
 
+
 #include "Protocol.h"
 #include "Flatbuffers_View.h"
-#include "Game_Item.h"
+#include "Room_Manager.h"
+#include "Timer.h"
 
-using namespace std::chrono;
-using namespace Game::TheLastOne; // Flatbuffers¸¦ ÀĞ¾î¿ÀÀÚ.
 
-struct xyz {
-	float x;
-	float y;
-	float z;
-};
+using namespace Game::TheLastOne; // Flatbuffersë¥¼ ì½ì–´ì˜¤ì.
 
 class IOCP_Server {
 private:
 	SOCKET g_socket;
 	std::chrono::high_resolution_clock::time_point serverTimer;
 	HANDLE g_hiocp;
+	std::vector<Room_Manager> GameRoom;		// ê²Œì„ ë£¸ì„ Vectorë¡œ ì„ ì–¸
+	std::queue<int> remove_client_id;					// í´ë¼ì´ì–¸íŠ¸ ì•„ì´ë””ë¥¼	Queueì— ë„£ëŠ”ë‹¤.
+	//std::unordered_map< int, int> ci_room;			// í´ë¼ì´ì–¸íŠ¸ ì•„ì´ë””ì™€ ë£¸ ì •ë³´ë¥¼ ê°€ì§€ê³  ìˆëŠ”ë‹¤. [ì•„ì´ë””, ë£¸ì •ë³´]
+	Server_Timer Timer;									// ì„œë²„ íƒ€ì´ë¨¸
 
 	void initServer();
-	void err_quit(char *msg);							// Error ³ª¿Ã °æ¿ì Á¾·á
-	void err_display(char *msg, int err_no);		// Error Ç¥½Ã ÇØÁÖ±â
-	void makeThread();								// ½º·¹µå ¸¸µé±â
-	void Worker_Thread();							// ½ÇÁ¦ µ¿ÀÛ ½º·¹µå
-	void Accept_Thread();								// Å¬¶óÀÌ¾ğÆ® ¹Ş´Â ½º·¹µå
-	void Remove_Client();							// Å¬¶óÀÌ¾ğÆ®°¡ Á¾·á½Ã Áö¿ì´Â ½º·¹µå
-	void Shutdown_Server();							// ¼­¹ö Á¾·á
-	void DisconnectClient(int ci);					// Å¬¶óÀÌ¾ğÆ® Á¾·á
-	void ProcessPacket(int ci, char *packet);		// ÆĞÅ¶ Ã³¸®
-	void SendPacket(int type, int cl, void *packet, int psize);		// ÆĞÅ¶ º¸³»±â
-	void Send_Client_ID(int client_id, int value, bool allClient);	// Å¬¶óÀÌ¾ğÆ® ¿¡°Ô ÆĞÅ¶ ¾ÆÀÌµğ º¸³»±â
-	void Send_All_Player(int client);					// Å¬¶óÀÌ¾ğÆ®¿¡°Ô ¸ğµç Å¬¶óÀÌ¾ğÆ® À§Ä¡ º¸³»±â
-	void Send_All_Zombie(int client);							// Å¬¶óÀÌ¾ğÆ®¿¡°Ô ¸ğµç Á»ºñ À§Ä¡ º¸³»±â
-	void Send_All_Time(int kind, int time, int client_id, bool allClient);					// Å¬¶óÀÌ¾ğÆ®¿¡°Ô ½Ã°£À» º¸³»ÁØ´Ù.
-	void Send_All_Item(int ci);		// Å¬¶óÀÌ¾ğÆ®¿¡°Ô ½Ã°£Á¤º¸¸¦ º¸³»ÁØ´Ù.
-	void Send_Client_Shot(int shot_client);		// Å¬¶óÀÌ¾ğÆ®µé¿¡°Ô Shot Á¤º¸¸¦ º¸³»ÁØ´Ù.
-	void Send_DangerLine_info(int demage, xyz pos, xyz scale);
-	void Send_Hide_Player(int client);		// Å¬¶óÀÌ¾ğÆ® ¹üÀ§¸¦ ¹ş¾î³¯ °æ¿ì Áö¿öÁØ´Ù.
-	void Send_Hide_Zombie(int client);		// Å¬¶óÀÌ¾ğÆ® ¹üÀ§¸¦ ¹ş¾î³¯ °æ¿ì Áö¿öÁØ´Ù.
-	void Attack_DangerLine_Damge();			// ÀÚ±âÀå µ¥¹ÌÁö¸¦ ÇÃ·¹ÀÌ¾î¿¡°Ô ÁØ´Ù.
-
+	void err_quit(char *msg);							// Error ë‚˜ì˜¬ ê²½ìš° ì¢…ë£Œ
+	void err_display(char *msg, int err_no);		// Error í‘œì‹œ í•´ì£¼ê¸°
+	void makeThread();								// ìŠ¤ë ˆë“œ ë§Œë“¤ê¸°
+	void Worker_Thread();							// ì‹¤ì œ ë™ì‘ ìŠ¤ë ˆë“œ
+	void Accept_Thread();								// í´ë¼ì´ì–¸íŠ¸ ë°›ëŠ” ìŠ¤ë ˆë“œ
+	void Remove_Client();								// í´ë¼ì´ì–¸íŠ¸ê°€ ì¢…ë£Œì‹œ ë°ì´í„° ì§€ìš°ê¸°
+	void Shutdown_Server();							// ì„œë²„ ì¢…ë£Œ
+	void DisconnectClient(const int room_id, const int ci);					// í´ë¼ì´ì–¸íŠ¸ ì¢…ë£Œ
+	void ProcessPacket(const int room_id, const int ci, const char *packet);		// íŒ¨í‚· ì²˜ë¦¬
+	void SendPacket(const int type, const int room_id, const int ci, const void *packet, const int psize);		// íŒ¨í‚· ë³´ë‚´ê¸°
+	void Send_Client_ID(const int room_id, const int client_id, const int value, const bool allClient);	// í´ë¼ì´ì–¸íŠ¸ ì—ê²Œ íŒ¨í‚· ì•„ì´ë”” ë³´ë‚´ê¸°
+	void Send_All_Player(const int room_id, const int client);					// í´ë¼ì´ì–¸íŠ¸ì—ê²Œ ëª¨ë“  í´ë¼ì´ì–¸íŠ¸ ìœ„ì¹˜ ë³´ë‚´ê¸°
+	void Send_Hide_Player(const int room_id, const int client);		// í´ë¼ì´ì–¸íŠ¸ ë²”ìœ„ë¥¼ ë²—ì–´ë‚  ê²½ìš° ì§€ì›Œì¤€ë‹¤.
+	void Send_All_Zombie(const int room_id, const int client);							// í´ë¼ì´ì–¸íŠ¸ì—ê²Œ ëª¨ë“  ì¢€ë¹„ ìœ„ì¹˜ ë³´ë‚´ê¸°
+	void Send_Hide_Zombie(const int room_id, const int client);		// í´ë¼ì´ì–¸íŠ¸ ë²”ìœ„ë¥¼ ë²—ì–´ë‚  ê²½ìš° ì§€ì›Œì¤€ë‹¤.
+	void Send_All_Item(const int room_id, const int ci);		// í´ë¼ì´ì–¸íŠ¸ì—ê²Œ ì‹œê°„ì •ë³´ë¥¼ ë³´ë‚´ì¤€ë‹¤.
+	void Send_Client_Shot(const int room_id, const int shot_client);		// í´ë¼ì´ì–¸íŠ¸ë“¤ì—ê²Œ Shot ì •ë³´ë¥¼ ë³´ë‚´ì¤€ë‹¤.
+	void Send_All_Time(const int room_id, const int type, const int kind, const int time, const int client_id, const bool allClient);	 // í´ë¼ì´ì–¸íŠ¸ì—ê²Œ ì‹œê°„ì„ ë³´ë‚´ì¤€ë‹¤.
+	void Send_DangerLine_info(const int room_id, const int demage, const xyz pos, const xyz scale);
+	void Attack_DangerLine_Damge(const int room_id);			// ìê¸°ì¥ ë°ë¯¸ì§€ë¥¼ í”Œë ˆì´ì–´ì—ê²Œ ì¤€ë‹¤.
+	bool Distance(const int room_id, const int me, const int  you, const int Radius, const int kind);
+	void Check_InGamePlayer(const int room_id);
 public:
 	HANDLE getHandle() { return g_hiocp; }
 	IOCP_Server();

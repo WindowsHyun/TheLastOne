@@ -9,10 +9,9 @@ public class DangerLineCtrl : MonoBehaviour
     private int demage;
     private Vector3 start_pos;
     private Vector3 limit_scale;
-
     public Image dangerLineImage;
-
     public Transform minimapDangerLine;
+
     //private Vector3 limit_scale = new Vector3(2700, 2700, 2700);
 
     private void Awake()

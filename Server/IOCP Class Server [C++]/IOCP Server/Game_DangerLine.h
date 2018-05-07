@@ -1,7 +1,7 @@
 #ifndef __GAMEDANGERLINE_H__
 #define __GAMEDANGERLINE_H__
 
-#include "IOCP_Server.h"
+#include "Core_Header.h"
 
 class Game_DangerLine {
 private:
@@ -22,6 +22,8 @@ public:
 	float get_now_scale_x() { return this->now_scale.x; }
 	xyz get_pos() { return this->position; }
 	xyz get_scale() { return this->now_scale; }
+
+	void init();
 	Game_DangerLine();
 	~Game_DangerLine();
 };

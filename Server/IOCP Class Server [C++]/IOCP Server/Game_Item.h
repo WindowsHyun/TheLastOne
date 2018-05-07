@@ -1,28 +1,29 @@
 #ifndef __GAMEITEM_H__
 #define __GAMEITEM_H__
 
-#include "IOCP_Server.h"
+#include "Core_Header.h"
 #include <fstream>
 
-struct xz {
-	float x;
-	float y;
-	float z;
-};
+//
+//struct xz {
+//	float x;
+//	float y;
+//	float z;
+//};
 
 class Game_Item {
 private:
 	std::string item_name;
-	xz item_position;
-	xz item_rotation;
+	xyz item_position;
+	xyz item_rotation;
 	bool item_eat;
 	bool riding_car;
 	int hp;
 	int item_Kinds;
 
 public:
-	xz get_pos() { return item_position; }
-	xz get_rotation() { return item_rotation; }
+	xyz get_position() { return item_position; }
+	xyz get_rotation() { return item_rotation; }
 	bool get_eat() { return item_eat; }
 	bool get_riding() { return riding_car; }
 	int get_kind() { return item_Kinds; }

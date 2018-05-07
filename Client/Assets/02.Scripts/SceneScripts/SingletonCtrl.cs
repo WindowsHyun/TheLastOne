@@ -14,10 +14,13 @@ public class SingletonCtrl : MonoBehaviour
 {
 
     private int nowModeNumber = 0;
+    private int waitTime = -1;
+    private int playerStatus = 0;       // 플레이어 게임 상태
     private int playerMoney = 0;    // 플레이어 돈
     private string playerID = "";   // 플레이어 아이디
-    private string playerPWD = "";  // 플레이어 패스워드
+    //private string playerPWD = "";  // 플레이어 패스워드
     private string playerIP = "";   // 플레이어 아이피
+    private bool startCarRun = false;  // 수송차량 출발 대기
     //-------------------------------------------------------------------------------------------
     // 네트워크 관련한 부분
     private Socket m_Socket;
@@ -28,7 +31,6 @@ public class SingletonCtrl : MonoBehaviour
     //-------------------------------------------------------------------------------------------
 
     private static SingletonCtrl instance_S = null; // 정적 변수
-
 
     public static SingletonCtrl Instance_S  // 인스턴스 접근 프로퍼티
     {
@@ -47,6 +49,21 @@ public class SingletonCtrl : MonoBehaviour
         set
         {
             nowModeNumber = value;
+        }
+    }
+
+    public int PlayerStatus                  // 플레이어 게임 상태 접근 프로퍼티
+    {
+        get
+        {
+            return playerStatus;
+        }
+        set
+        {
+            playerStatus = value;
+            // 상태가 변경 되면 바로 패킷을 보내주자.
+            // 인게임 Socket이 열려있지 않으므로, 싱글톤에서 패킷을 보내주자.
+            Send_Packet(networkCtrl.Player_Status(playerStatus));
         }
     }
 
@@ -86,6 +103,7 @@ public class SingletonCtrl : MonoBehaviour
         }
     }
 
+<<<<<<< HEAD
     public string PlayerIP                 // 플레이어 패스워드 접근 프로퍼티
     {
         get
@@ -99,6 +117,31 @@ public class SingletonCtrl : MonoBehaviour
     }
 
 
+=======
+    public int LobbyWaitTime           // 로비 대기시간
+    {
+        get
+        {
+            return waitTime;
+        }
+        set
+        {
+            waitTime = value;
+        }
+    }
+
+    public bool startCarStatus           // 로비 대기시간
+    {
+        get
+        {
+            return startCarRun;
+        }
+        set
+        {
+            startCarRun = value;
+        }
+    }
+>>>>>>> Server
 
     public Socket PlayerSocket
     {
@@ -161,6 +204,7 @@ public class SingletonCtrl : MonoBehaviour
             {
                 // 소켓에서 받은 데이터와 실제 패킷 사이즈가 같을 경우
                 networkCtrl.ProcessPacket(psize, ptype, msg.Receivebyte);
+
                 // 패킷 처리가 완료 되었으니 다시 리시브 상태로 돌아간다.
                 NetworkMessage new_msg = new NetworkMessage();
                 m_Socket.BeginReceive(new_msg.Receivebyte, 0, new_msg.LimitReceivebyte, SocketFlags.None, new AsyncCallback(RecieveHeaderCallback), new_msg);
@@ -191,6 +235,21 @@ public class SingletonCtrl : MonoBehaviour
         }
     }
 
+    public void Send_Packet(byte[] packet)
+    {
+        if (m_Socket.Connected == true)
+        {
+            try
+            {
+                m_Socket.Send(packet, packet.Length, 0);
+            }
+            catch (SocketException err)
+            {
+                Debug.Log("Singleton Socket send or receive error! : " + err.ToString());
+            }
+        }
+    }
+
     private void Awake()
     {
         if (instance_S)                     // 인스턴스가 이미 생성 되었는가?
@@ -200,14 +259,13 @@ public class SingletonCtrl : MonoBehaviour
         }
         instance_S = this;                  // 유일한 인스턴스로 만듬
         DontDestroyOnLoad(gameObject);      // 씬이 바뀌어도 계속 유지 시킨다
-
+        Application.runInBackground = true;
         //---------------------------------------------------------------------------------------
         //Network작업
         m_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, 1);
         m_Socket.NoDelay = true;
         m_Socket.BeginConnect(iPAdress, kPort, new AsyncCallback(ConnectCallback), m_Socket);
-
     }
 
 

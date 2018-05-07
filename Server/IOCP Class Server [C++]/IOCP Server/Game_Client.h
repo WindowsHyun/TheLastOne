@@ -1,19 +1,12 @@
 #ifndef __GAMECLIENT_H__
 #define __GAMECLIENT_H__
 
-#include "IOCP_Server.h"
-
-struct OverlappedEx {
-	WSAOVERLAPPED over;
-	WSABUF wsabuf;
-	unsigned char IOCP_buf[MAX_BUFF_SIZE];
-	OPTYPE event_type;
-	int target_id;
-};
+#include "Core_Header.h"
 
 class Game_Client {
 private:
 	int client_id = -1;
+	int room_id = -1;
 	xyz position;
 	xyz rotation;
 	xyz car_rotation;
@@ -23,6 +16,7 @@ private:
 	int weaponState = 0;
 	int limit_Zombie = 0;
 	int inCar = -1;
+	int playerStatus = 0;
 	float horizontal = 0.0f;
 	float vertical = 0.0f;
 	bool connect;
@@ -39,6 +33,7 @@ public:
 	unsigned char packet_buf[MAX_PACKET_SIZE];
 
 	void init();
+	int get_room_id() { return this->room_id; }						// 클라이언트 방 정보 전달
 	int get_inCar() { return this->inCar; }								// 클라이언트 무슨 차량 탑승 값 전달
 	float get_vertical() { return (float)this->vertical; }				// 클라이언트 애니메이션 값 전달
 	float get_horizontal() { return (float)this->horizontal; }		// 클라이언트 애니메이션 값 전달
@@ -53,10 +48,11 @@ public:
 	bool get_DangerLine() { return this->dangerLineIn; };			// 클라이언트 자기장 여부
 	int get_curr_packet() { return this->curr_packet_size; };		// 클라이언트 패킷 사이즈 전달
 	int get_prev_packet() { return this->prev_packet_data; };		// 클라이언트 패킷 사이즈 전달
-	xyz get_pos() { return this->position; };
-	Vec3 get_position();													// 클라이언트 포지션 전달
-	Vec3 get_rotation();													// 클라이언트 로테이션 전달
-	Vec3 get_car_rotation();												// 클라이언트 로테이션 전달
+	int get_playerStatus() { return this->playerStatus; };		// 클라이언트 게임 상태 전달
+	//xyz get_pos() { return this->position; };
+	xyz get_position();													// 클라이언트 포지션 전달
+	xyz get_rotation();													// 클라이언트 로테이션 전달
+	xyz get_car_rotation();												// 클라이언트 로테이션 전달
 	SOCKET get_Socket() { return this->client_socket; };			// 클라이언트 소켓 전달
 	OverlappedEx get_over() { return this->recv_over; };			// Overlapped 구조체 전달
 
@@ -71,17 +67,17 @@ public:
 	void set_client_Remove(const bool value) { this->remove_client = value; };				// 클라이언트 Remove 저장
 	void set_client_DangerLine(const bool value) { this->dangerLineIn = value; };				// 클라이언트 자기장 값 저장
 	void set_limit_zombie(const int value) { this->limit_Zombie += value; }				// 클라이언트 좀비 최대치 저장
+	void set_playerStatus(const int value) { this->playerStatus = value; }				// 클라이언트 게임 상태 저장
 	void set_vertical(float value) { this->vertical = (float)value; }
 	void set_horizontal(float value) {  this->horizontal = (float)value; }
 	void set_inCar(int value) { this->inCar = value; }												// 클라이언트 무슨 차량 탑승 값 저장
 	void set_hp(int value) { this->hp = value; };														// 클라이언트 체력 저장
 	void set_armour(int value) { this->armour = value; };											// 클라이언트 아머 저장
+	void set_room_id(int value) { this->room_id = value; }										// 클라이언트 룸 아이디 저장
 
-	Game_Client(const SOCKET sock, const int client_id, const char * game_id);
+	Game_Client(const SOCKET sock, const int client_id, const char * game_id, const int room_id);
 	Game_Client(const Game_Client& g_cl);
 	~Game_Client();
 };
-
-bool Distance(int me, int  you, int Radius, int kind);
 
 #endif

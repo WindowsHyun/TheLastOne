@@ -78,10 +78,7 @@ namespace TheLastOne.Game.Network
         Vector3 Player_Rotation;
         Vector3 Car_Rotation;
 
-        public string iPAdress = "127.0.0.1";
-        public const int kPort = 9000;
         private byte[] Sendbyte = new byte[4000];
-        private static ManualResetEvent connectDone = new ManualResetEvent(false);
 
         public static Dictionary<int, Game_ClientClass> client_data = new Dictionary<int, Game_ClientClass>();
         // 클라이언트 데이터 저장할 컨테이너
@@ -92,7 +89,7 @@ namespace TheLastOne.Game.Network
 
         Game_ProtocolClass recv_protocol = new Game_ProtocolClass();
         Socket_SendFunction sF = new Socket_SendFunction();
-        DangerLineCtrl DangerLineCtrl;
+        static DangerLineCtrl DangerLineCtrl;
 
 
         private static int Client_imei = -1;         // 자신의 클라이언트 아이디
@@ -103,12 +100,12 @@ namespace TheLastOne.Game.Network
 
         IEnumerator SocketCheck()
         {
-            //StartCoroutine(DrawDebugText());
             if (m_Socket.Connected == true)
             {
                 // 서버가 정상적으로 연결 되었을경우
                 serverConnect = true;
                 Player_Script = GameObject.FindWithTag("Player").GetComponent<PlayerCtrl>();
+                StartCoroutine(GetDangerLine());
                 StartCoroutine(startPrefab());
                 StartCoroutine(playerLocation_Packet());
                 StartCoroutine(DrawDebugText());
@@ -216,7 +213,7 @@ namespace TheLastOne.Game.Network
                             zombie_data[key].script.StartCoroutine(zombie_data[key].script.ZombieAction());
                             zombie_data[key].set_activeZombie(false);
                         }
-                        if (zombie_data[key].script.targetPlayer == -1 || zombie_data[key].Zombie.transform.position.x == 0)
+                        if (zombie_data[key].script.targetPlayer == -1 || zombie_data[key].Zombie.transform.position.x <= 0 || zombie_data[key].Zombie.transform.position.z <= 0)
                         {
                             // 포지션이 서버위치와 다를경우 초기화를 해준다.
                             zombie_data[key].Zombie.transform.position = zombie_data[key].get_pos();
@@ -230,6 +227,13 @@ namespace TheLastOne.Game.Network
                             zombie_data[key].Zombie.transform.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
                             zombie_data[key].script.animator_value = zombie_data[key].get_animator();
                         }
+
+                        if (zombie_data[key].Zombie.transform.position.x != 0 && zombie_data[key].script.zombieNum != -1 && zombie_data[key].get_pos().y <= 25)
+                        {
+                            zombie_data[key].Zombie.transform.position = new Vector3(zombie_data[key].get_pos().x, 70, zombie_data[key].get_pos().z);
+                        }
+
+
 
                         if (zombie_data[key].get_hp() <= 0 && zombie_data[key].get_isDie() == false && zombie_data[key].get_pos().x != 0)
                         {
@@ -407,8 +411,8 @@ namespace TheLastOne.Game.Network
                             Send_Packet(Sendbyte);
                     }
 
-                    yield return new WaitForSeconds(0.04f);
-                    // 초당25번 패킷 전송으로 제한을 한다.
+                    yield return new WaitForSeconds(0.03f);
+                    // 초당 30번 패킷 전송으로 제한을 한다.
                 }
             } while (true);
             //yield return null;
@@ -423,6 +427,17 @@ namespace TheLastOne.Game.Network
                 yield return null;
             } while (true);
             //yield return null;
+        }
+
+        IEnumerator GetDangerLine()
+        {
+            do
+            {
+                DangerLineCtrl = GameObject.FindGameObjectWithTag("DangerLine").GetComponent<DangerLineCtrl>();
+                if (DangerLineCtrl != null)
+                    DangerLineCtrl.getDangerLine = false;
+                yield return null;
+            } while (DangerLineCtrl.getDangerLine);
         }
 
         public void ProcessPacket(int size, int type, byte[] recvPacket)
@@ -647,6 +662,22 @@ namespace TheLastOne.Game.Network
                 // 해당 좀비의 SetActive를 꺼준다.
                 iter.set_removeZombie(true);
             }
+            else if (type == recv_protocol.SC_Lobby_Time)
+            {
+                // 서버에서 내보낸 클라이언트를 가져 온다.
+                byte[] t_buf = new byte[size + 1];
+                System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
+                ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
+                var Get_ServerData = Game_Timer.GetRootAsGame_Timer(revc_buf);
+
+                SingletonCtrl.Instance_S.LobbyWaitTime = Get_ServerData.Time;
+            }
+            else if (type == recv_protocol.SC_StartCar_Play)
+            {
+                // 서버에서 받은 패킷 자체를 읽을 필요가 없다.
+                // 차량을 움직이라고 전달을 해준다.
+                SingletonCtrl.Instance_S.startCarStatus = true;
+            }
 
         }
 
@@ -654,112 +685,8 @@ namespace TheLastOne.Game.Network
         {
             debugString = "";
             Application.runInBackground = true; // 백그라운드에서도 Network는 작동해야한다.
-            DangerLineCtrl = GameObject.FindGameObjectWithTag("DangerLine").GetComponent<DangerLineCtrl>();
             m_Socket = SingletonCtrl.Instance_S.PlayerSocket;
             StartCoroutine(SocketCheck());
-            ////=======================================================
-            //// Socket create.
-            //m_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            //m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, 1);
-            ////m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendTimeout, 10000);
-            ////m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 10000);
-            //m_Socket.NoDelay = true;
-            ////=======================================================
-            //// Socket connect.
-            //try
-            //{
-            //    m_Socket.BeginConnect(iPAdress, kPort, new AsyncCallback(ConnectCallback), m_Socket);
-            //    connectDone.WaitOne();
-            //    Player_Script = GameObject.FindWithTag("Player").GetComponent<PlayerCtrl>();
-            //    StartCoroutine(SocketCheck());
-            //}
-            //catch (SocketException SCE)
-            //{
-            //    debugString = "Socket connect error! : " + SCE.ToString();
-            //    return;
-            //}
-
-            //=======================================================
-        }
-
-        void ConnectCallback(IAsyncResult ar)
-        {
-            try
-            {
-                // 서버가 정상적으로 연결이 되었을 경우.
-
-                connectDone.Set();
-                if (m_Socket.Connected == true)
-                {
-                    Debug.Log("Connected to server, start recieve data");
-                    RecieveHeader();//start recieve header
-                }
-            }
-            catch (Exception e)
-            {
-                connectDone.Set();
-                Console.WriteLine(e.ToString());
-            }
-        }
-
-        void RecieveHeader()
-        {
-            try
-            {
-                NetworkMessage msg = new NetworkMessage();
-                m_Socket.BeginReceive(msg.Receivebyte, 0, msg.LimitReceivebyte, SocketFlags.None, new AsyncCallback(RecieveHeaderCallback), msg);
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e.Message);
-            }
-        }
-
-        void RecieveHeaderCallback(IAsyncResult ar)
-        {
-            try
-            {
-                NetworkMessage msg = (NetworkMessage)ar.AsyncState;     // Recieve된 Packet을 받아온다.
-                int bytesRead = m_Socket.EndReceive(ar);        // 소켓에서 받아온 사이즈를 확인한다.
-
-                PacketData size_data = Get_packet_size(msg.Receivebyte);
-
-                int psize = size_data.p_size;
-                int ptype = msg.Receivebyte[size_data.type_Pos + 1]; // 패킷 타입
-
-                if (psize == bytesRead)
-                {
-                    // 소켓에서 받은 데이터와 실제 패킷 사이즈가 같을 경우
-                    ProcessPacket(psize, ptype, msg.Receivebyte);
-                    // 패킷 처리가 완료 되었으니 다시 리시브 상태로 돌아간다.
-                    NetworkMessage new_msg = new NetworkMessage();
-                    m_Socket.BeginReceive(new_msg.Receivebyte, 0, new_msg.LimitReceivebyte, SocketFlags.None, new AsyncCallback(RecieveHeaderCallback), new_msg);
-                }
-                else
-                {
-                    // 소켓에서 받은 데이터와 실제 패킷 사이즈가 다를 경우
-                    msg.sb.Append(Encoding.ASCII.GetString(msg.Receivebyte, 0, bytesRead));
-                    msg.set_prev(bytesRead);
-                    // 소켓에서 받은 데이터가 안맞는 경우 패킷이 뒤에 붙어서 오는거 같은 느낌이 든다...
-                    size_data = Get_packet_size(msg.Receivebyte);
-                    byte[] recv_byte = new byte[size_data.p_size + 9];
-
-                    for (int i = 0; i < size_data.p_size; ++i)
-                    {
-                        recv_byte[i] = msg.Receivebyte[i];
-                    }
-
-                    ProcessPacket(psize, ptype, recv_byte);
-
-                    m_Socket.BeginReceive(msg.Receivebyte, 0, msg.LimitReceivebyte, SocketFlags.None, new AsyncCallback(RecieveHeaderCallback), msg);
-                }
-            }
-            catch
-            {
-                //Debug.Log(e.Message);
-                NetworkMessage new_msg = new NetworkMessage();
-                m_Socket.BeginReceive(new_msg.Receivebyte, 0, new_msg.LimitReceivebyte, SocketFlags.None, new AsyncCallback(RecieveHeaderCallback), new_msg);
-            }
         }
 
         public void Send_Packet(byte[] packet)
@@ -828,6 +755,11 @@ namespace TheLastOne.Game.Network
             if (id == -1) id = Client_imei; // -1의 경우 좀비에게 맞을경우 이다.
             Sendbyte = sF.makeHP_PacketInfo(id, hp, armour, recv_protocol.Kind_Player);
             Send_Packet(Sendbyte);
+        }
+
+        public byte[] Player_Status(int status)
+        {
+            return sF.makePlayer_Status(status);
         }
 
         void OnApplicationQuit()
