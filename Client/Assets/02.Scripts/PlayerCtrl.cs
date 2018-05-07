@@ -319,6 +319,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
                     CarNum = ridingCar.carNum;  // 차량의 번호를 가지고 온다.
                     ridingCar.Car_Status = true;
                     networkCtrl.Car_Status(CarNum, true);     // 차량 탑승했다고 서버에게 알린다.
+                    ridingCar.GetComponent<Rigidbody>().isKinematic = false;
 
                     // 캐릭터 캡슐 콜라이더 비활성화
                     gameObject.GetComponent<CapsuleCollider>().enabled = false;
@@ -351,6 +352,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
                     // 하차 후 차량 브레이크 작동
                     ridingCar.vehicleStop = true;
+                    ridingCar.GetComponent<Rigidbody>().isKinematic = true;
 
                     // 차량 하차 시 좌표 이동
                     this.transform.position = new Vector3(ridingCar.transform.position.x - 1, ridingCar.transform.position.y, ridingCar.transform.position.z);
