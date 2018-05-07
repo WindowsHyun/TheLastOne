@@ -774,6 +774,8 @@ public class PlayerCtrl : PlayerVehicleCtrl
         animator.SetTrigger("IsDie");
         playerState = PlayerState.die;
 
+        youDieImage.gameObject.SetActive(true);
+
         // 캐릭터 캡슐 콜라이더 비활성화
         gameObject.GetComponent<CapsuleCollider>().enabled = false;
 
