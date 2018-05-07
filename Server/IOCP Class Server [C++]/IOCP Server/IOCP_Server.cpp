@@ -520,7 +520,6 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *pac
 			else if (client_Check_info->kind() == Kind_Car) {
 				auto iter = GameRoom[room_id].get_room().get_item_iter(client_Check_info->id());
 				iter->second.set_hp(client_Check_info->hp());
-				std::cout << iter->second.get_hp() << std::endl;
 			}
 		}
 		break;

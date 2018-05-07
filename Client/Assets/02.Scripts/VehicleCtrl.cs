@@ -94,8 +94,10 @@ public class VehicleCtrl : PlayerVehicleCtrl
         }
     }
 
+
     void OnTriggerEnter(Collider coll)
     {
+
         // 충돌한 게임오브젝트의 태그값 비교
         if (coll.gameObject.tag == "BULLET")
         {

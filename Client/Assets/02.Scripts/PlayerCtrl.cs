@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
+using UnityEngine.UI;       // NavMeshAgent
 
 
 using System;
 
 using TheLastOne.Game.Network;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(AudioSource))]
 
@@ -167,6 +168,8 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
     public Image youDieImage;
 
+    // NavMeshAgent 키고 끌 수 있게.
+    private NavMeshAgent navagent;
 
     IEnumerator StartKeyInput()
     {
@@ -321,11 +324,18 @@ public class PlayerCtrl : PlayerVehicleCtrl
                     networkCtrl.Car_Status(CarNum, true);     // 차량 탑승했다고 서버에게 알린다.
                     ridingCar.GetComponent<Rigidbody>().isKinematic = false;
 
+
+                    // 차량 탑승시 플레이어 y값을 차량 y값으로 변경해준다.
+                    //tr.position = new Vector3(tr.position.x, ridingCar.transform.position.y, tr.position.z);
+
+                    // 차량 탑승 하였으니 NavMesh Off
+                    navagent.enabled = false;
+
                     // 캐릭터 캡슐 콜라이더 비활성화
                     gameObject.GetComponent<CapsuleCollider>().enabled = false;
 
                     // 총구 앞 캡슐 콜라이더 비활성화
-                    firePos.GetComponent<CapsuleCollider>().enabled = false;
+                    //firePos.GetComponent<CapsuleCollider>().enabled = false;
 
                     // 차량 UI 활성화
                     VehicleUI.SetActive(true);
@@ -340,6 +350,9 @@ public class PlayerCtrl : PlayerVehicleCtrl
                     // 차량 하차했다고 서버에게 알린다.
                     networkCtrl.Car_Status(CarNum, false);
                     ridingCar.Car_Status = false;
+
+                    // 차량 하차 하였으니 NavMesh On
+                    navagent.enabled = true;
 
                     // 차량을 내렸을 경우 차량 번호를 지운다.
                     CarNum = -1;
@@ -361,7 +374,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
                     gameObject.GetComponent<CapsuleCollider>().enabled = true;
 
                     // 총구 앞 캡슐 콜라이더 활성화
-                    firePos.GetComponent<CapsuleCollider>().enabled = true;
+                    //firePos.GetComponent<CapsuleCollider>().enabled = true;
 
                     // 차량 UI 활성화
                     VehicleUI.SetActive(false);
@@ -417,7 +430,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
     void Start()
     {
         player_rigidbody = this.GetComponent<Rigidbody>();
-
+        navagent = this.GetComponent<NavMeshAgent>();
 
         weaponIEquipImage[0] = Resources.Load<Sprite>("AK47_White");
         weaponIEquipImage[1] = Resources.Load<Sprite>("M16_White");
@@ -440,15 +453,6 @@ public class PlayerCtrl : PlayerVehicleCtrl
         {
             weaponView[i].GetComponent<Renderer>().enabled = false;
         }
-
-
-        //// 게임 시작후 차량 하차 시 인벤토리 창을 끈다.
-        //inventory.SetActive(false);
-        //// 게임 시작후 차량 하차 시 쿨타임 창을 끈다.
-        //cooltime.SetActive(false);
-
-        //VehicleUI.SetActive(false);
-
 
         // 생명 초기값 설정
         initHp = hp;
@@ -554,7 +558,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
             }
 
             // 탑승시 캐릭터를 차량 위치와 동기화
-            this.transform.position = new Vector3(ridingCar.transform.position.x, ridingCar.transform.position.y, ridingCar.transform.position.z);
+            tr.transform.position = new Vector3(ridingCar.transform.position.x, ridingCar.transform.position.y, ridingCar.transform.position.z);
 
             vehicleHpBar.fillAmount = (float)ridingCar.vehicleHp / (float)ridingCar.vehicleInitHp;
         }
