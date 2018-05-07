@@ -5,8 +5,8 @@ Game_Zombie::Game_Zombie(const int client_id)
 	//< 1단계. 시드 설정
 	std::random_device rn;
 	std::mt19937_64 rnd(rn());
-	std::uniform_int_distribution<int> xRange(250, 1920);
-	std::uniform_int_distribution<int> zRange(250, 2500);
+	std::uniform_int_distribution<int> xRange(300, 1700);
+	std::uniform_int_distribution<int> zRange(260, 2750);
 
 	this->client_id = client_id;
 	this->hp = Zombie_HP;
