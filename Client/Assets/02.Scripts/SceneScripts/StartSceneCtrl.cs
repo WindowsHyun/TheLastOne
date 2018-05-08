@@ -12,12 +12,6 @@ public class StartSceneCtrl: MonoBehaviour {
 
     public Image buttonimage;
 
-    private void Start()
-    {
-        Screen.SetResolution(1024, 576, false);
-    }
-
-
     public void InputTextID(InputField id)
     {
         if (id.text != "" && id.text != " ")
