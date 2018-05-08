@@ -16,7 +16,7 @@ using FlatBuffers;
 using Game.TheLastOne; // Client, Vec3 을 불러오기 위해
 using TheLastOne.SendFunction;
 using TheLastOne.GameClass;
-using UnityEngine.UI;   // DebugText를 쓰기 위하여
+using UnityEngine.UI;   // TimeText를 쓰기 위하여
                         //---------------------------------------------------------------
 
 public class NetworkMessage
@@ -71,9 +71,17 @@ namespace TheLastOne.Game.Network
         public GameObject iterm_Armor;
         // 게임 차량 Object
         public GameObject Car_UAZ;
+        public GameObject Car_JEEP;
         //------------------------------------------
-        public Text DebugText;
-
+        public Text TimeText;
+        public Text FPSText;
+        public Text SurvivalCount;
+        //------------------------------------------
+        float deltaTime = 0.0f;     // FPS 측정
+        float msec;
+        float fps;
+        string FPSstring;
+        //------------------------------------------
         Vector3 Player_Position;
         Vector3 Player_Rotation;
         Vector3 Car_Rotation;
@@ -100,6 +108,7 @@ namespace TheLastOne.Game.Network
 
         IEnumerator SocketCheck()
         {
+            StartCoroutine(DrawAllText());
             if (m_Socket.Connected == true)
             {
                 // 서버가 정상적으로 연결 되었을경우
@@ -108,7 +117,6 @@ namespace TheLastOne.Game.Network
                 StartCoroutine(GetDangerLine());
                 StartCoroutine(startPrefab());
                 StartCoroutine(playerLocation_Packet());
-                StartCoroutine(DrawDebugText());
                 StartCoroutine(drawItems());
             }
             yield return null;
@@ -313,6 +321,16 @@ namespace TheLastOne.Game.Network
                                 iter.Value.item.name = "UAZ_" + iter.Key;
                                 iter.Value.set_draw(true);
                             }
+                            else if (iter.Value.get_name() == "JEEP")
+                            {
+                                iter.Value.item = Instantiate(Car_JEEP, iter.Value.get_pos(), Quaternion.Euler(iter.Value.get_rotation().x, iter.Value.get_rotation().y, iter.Value.get_rotation().z));
+                                iter.Value.item.transform.SetParent(ItemCollection.transform);
+
+                                iter.Value.car = iter.Value.item.GetComponent<VehicleCtrl>();
+                                iter.Value.car.carNum = iter.Key;  // 해당 차량이 몇번째 차량인지 알려주자.
+                                iter.Value.item.name = "JEEP_" + iter.Key;
+                                iter.Value.set_draw(true);
+                            }
                             else if (iter.Value.get_name() == "M4A1")
                             {
                                 iter.Value.item = Instantiate(item_M4A1, iter.Value.get_pos(), Quaternion.Euler(0, 0, 90));
@@ -353,7 +371,7 @@ namespace TheLastOne.Game.Network
                             // Item이 정상적으로 나왔다가 다른 사람이 먹었을 경우에 대한 처리
                             iter.Value.item.SetActive(false);
                         }
-                        if (iter.Value.get_name() == "UAZ")
+                        if (iter.Value.get_name() == "UAZ" || iter.Value.get_name() == "JEEP")
                         {
                             // 차량의 탑승 상태를 전달해 준다.
                             iter.Value.car.Car_Status = iter.Value.get_riding();
@@ -363,7 +381,6 @@ namespace TheLastOne.Game.Network
                                 iter.Value.set_explosion(true);
                                 iter.Value.car.ExpCar();
                             }
-
                         }
                         if (iter.Value.get_kind() == recv_protocol.Kind_Car && Player_Script.CarNum != iter.Key)
                         {
@@ -418,15 +435,18 @@ namespace TheLastOne.Game.Network
             //yield return null;
         }
 
-        IEnumerator DrawDebugText()
+        IEnumerator DrawAllText()
         {
             do
             {
                 //debugString = "1. M16, 2. 556, 3. AK, 4. 762, 5. M4A1, 6. UMP, 7. 9mm, 8. AidKit, 9. Armor, 0. UAZ";
-                DebugText.text = debugString.ToString();
+                TimeText.text = debugString.ToString();
+                msec = deltaTime * 1000.0f;
+                fps = 1.0f / deltaTime;
+                FPSstring = string.Format("{0:0.0} ms ({1:0.} fps)", msec, fps);
+                FPSText.text = FPSstring;
                 yield return null;
             } while (true);
-            //yield return null;
         }
 
         IEnumerator GetDangerLine()
@@ -790,6 +810,11 @@ namespace TheLastOne.Game.Network
 
             //Write the coords to a file
             System.IO.File.WriteAllText(filePath, coordinates);
+        }
+
+        private void Update()
+        {
+            deltaTime += (Time.deltaTime - deltaTime) * 0.1f;
         }
 
         public PacketData Get_packet_size(byte[] Receivebyte)

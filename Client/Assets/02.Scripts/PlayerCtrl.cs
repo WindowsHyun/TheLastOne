@@ -324,10 +324,6 @@ public class PlayerCtrl : PlayerVehicleCtrl
                     networkCtrl.Car_Status(CarNum, true);     // 차량 탑승했다고 서버에게 알린다.
                     ridingCar.GetComponent<Rigidbody>().isKinematic = false;
 
-
-                    // 차량 탑승시 플레이어 y값을 차량 y값으로 변경해준다.
-                    //tr.position = new Vector3(tr.position.x, ridingCar.transform.position.y, tr.position.z);
-
                     // 차량 탑승 하였으니 NavMesh Off
                     navagent.enabled = false;
 
@@ -407,7 +403,58 @@ public class PlayerCtrl : PlayerVehicleCtrl
                 playerPositionImage.localPosition = new Vector3(-gameObject.transform.position.z * 0.5f, gameObject.transform.position.x * 0.5f);
             }
 
-            if(playerState == PlayerState.die)
+            //------------------------------------------------------------------------------
+            // 위치 이동 치트.
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                navagent.enabled = false;
+                tr.transform.position = new Vector3(776.9319f, 30.00061f, 441.4027f);
+                navagent.enabled = true;
+            }else if (Input.GetKeyDown(KeyCode.Alpha4))
+            {
+                navagent.enabled = false;
+                tr.transform.position = new Vector3(718.0281f, 50.0f, 1235.498f);
+                navagent.enabled = true;
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha5))
+            {
+                navagent.enabled = false;
+                tr.transform.position = new Vector3(484.5258f, 30.00061f, 2534.864f);
+                navagent.enabled = true;
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha6))
+            {
+                navagent.enabled = false;
+                tr.transform.position = new Vector3(1407.026f, 50.0f, 2190.113f);
+                navagent.enabled = true;
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha7))
+            {
+                navagent.enabled = false;
+                tr.transform.position = new Vector3(1651.698f, 30.00061f, 1714.017f);
+                navagent.enabled = true;
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha7))
+            {
+                navagent.enabled = false;
+                tr.transform.position = new Vector3(1523.183f, 60.00122f, 940.6536f);
+                navagent.enabled = true;
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha0))
+            {
+                // Navmesh ON/OFF
+                if (navagent.enabled == true)
+                {
+                    navagent.enabled = false;
+                }
+                else
+                {
+                    navagent.enabled = true;
+                }
+            }
+            //------------------------------------------------------------------------------
+
+            if (playerState == PlayerState.die)
             {
                 ScreenSceneOFF.color += new Color(0f, 0f, 0f, 0.003f);
 
@@ -574,8 +621,6 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
             vehicleHpBar.fillAmount = (float)ridingCar.vehicleHp / (float)ridingCar.vehicleInitHp;
         }
-
-
     }
 
     void Fire(SlotCtrl slot)
