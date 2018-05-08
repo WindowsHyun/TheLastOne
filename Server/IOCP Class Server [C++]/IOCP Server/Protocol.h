@@ -16,8 +16,8 @@ enum Event_Type {
 // 소켓 설정
 #define SERVERPORT 9000
 #define BUFSIZE    1024
-#define MAX_BUFF_SIZE   4000
-#define MAX_PACKET_SIZE  4000
+#define MAX_BUFF_SIZE   7000
+#define MAX_PACKET_SIZE  7000
 #define MAX_Client 50
 
 // 게임 설정

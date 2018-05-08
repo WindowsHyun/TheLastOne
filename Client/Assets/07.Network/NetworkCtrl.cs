@@ -370,8 +370,6 @@ namespace TheLastOne.Game.Network
                             // 차량의 경우 지속적으로 위치를 갱신 해준다.
                             iter.Value.item.transform.position = Vector3.MoveTowards(iter.Value.item.transform.position, iter.Value.get_pos(), Time.deltaTime * 4000.0f);
 
-                            //iter.Value.item.GetComponent<Rigidbody>().isKinematic = false;
-
                             iter.Value.item.transform.rotation = Quaternion.Euler(iter.Value.get_rotation().x, iter.Value.get_rotation().y, iter.Value.get_rotation().z);
                         }
                     }

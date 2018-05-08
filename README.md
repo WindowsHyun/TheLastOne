@@ -76,5 +76,13 @@
 ---------
 인게임 화면
 ---------
-![Image05](https://i.imgur.com/MtpC3hQ.png)
-![Image06](https://i.imgur.com/fsuuPMu.png)
+![Image05](https://github.com/WindowsHyun/TheLastOne/raw/Server/Document/InGameImage/inGame.png)
+![Image06](https://github.com/WindowsHyun/TheLastOne/raw/Server/Document/InGameImage/ingame1.png)
+![Image07](https://github.com/WindowsHyun/TheLastOne/raw/Server/Document/InGameImage/ingame2.png)
+![Image08](https://github.com/WindowsHyun/TheLastOne/raw/Server/Document/InGameImage/ingame3.png)
+![Image09](https://github.com/WindowsHyun/TheLastOne/raw/Server/Document/InGameImage/ingame4.png)
+![Image10](https://github.com/WindowsHyun/TheLastOne/raw/Server/Document/InGameImage/ingame5.png)
+![Image11](https://github.com/WindowsHyun/TheLastOne/raw/Server/Document/InGameImage/inventory.png)
+![Image12](https://github.com/WindowsHyun/TheLastOne/raw/Server/Document/InGameImage/Car.png)
+![Image13](https://github.com/WindowsHyun/TheLastOne/raw/Server/Document/InGameImage/map.png)
+
