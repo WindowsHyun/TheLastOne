@@ -16,7 +16,7 @@ using FlatBuffers;
 using Game.TheLastOne; // Client, Vec3 을 불러오기 위해
 using TheLastOne.SendFunction;
 using TheLastOne.GameClass;
-using UnityEngine.UI;   // DebugText를 쓰기 위하여
+using UnityEngine.UI;   // TimeText를 쓰기 위하여
                         //---------------------------------------------------------------
 
 public class NetworkMessage
@@ -72,8 +72,14 @@ namespace TheLastOne.Game.Network
         // 게임 차량 Object
         public GameObject Car_UAZ;
         //------------------------------------------
-        public Text DebugText;
-
+        public Text TimeText;
+        public Text FPSText;
+        //------------------------------------------
+        float deltaTime = 0.0f;     // FPS 측정
+        float msec;
+        float fps;
+        string FPSstring;
+        //------------------------------------------
         Vector3 Player_Position;
         Vector3 Player_Rotation;
         Vector3 Car_Rotation;
@@ -100,6 +106,7 @@ namespace TheLastOne.Game.Network
 
         IEnumerator SocketCheck()
         {
+            StartCoroutine(DrawAllText());
             if (m_Socket.Connected == true)
             {
                 // 서버가 정상적으로 연결 되었을경우
@@ -108,7 +115,6 @@ namespace TheLastOne.Game.Network
                 StartCoroutine(GetDangerLine());
                 StartCoroutine(startPrefab());
                 StartCoroutine(playerLocation_Packet());
-                StartCoroutine(DrawDebugText());
                 StartCoroutine(drawItems());
             }
             yield return null;
@@ -418,15 +424,18 @@ namespace TheLastOne.Game.Network
             //yield return null;
         }
 
-        IEnumerator DrawDebugText()
+        IEnumerator DrawAllText()
         {
             do
             {
                 //debugString = "1. M16, 2. 556, 3. AK, 4. 762, 5. M4A1, 6. UMP, 7. 9mm, 8. AidKit, 9. Armor, 0. UAZ";
-                DebugText.text = debugString.ToString();
+                TimeText.text = debugString.ToString();
+                msec = deltaTime * 1000.0f;
+                fps = 1.0f / deltaTime;
+                FPSstring = string.Format("{0:0.0} ms ({1:0.} fps)", msec, fps);
+                FPSText.text = FPSstring;
                 yield return null;
             } while (true);
-            //yield return null;
         }
 
         IEnumerator GetDangerLine()
@@ -790,6 +799,11 @@ namespace TheLastOne.Game.Network
 
             //Write the coords to a file
             System.IO.File.WriteAllText(filePath, coordinates);
+        }
+
+        private void Update()
+        {
+            deltaTime += (Time.deltaTime - deltaTime) * 0.1f;
         }
 
         public PacketData Get_packet_size(byte[] Receivebyte)

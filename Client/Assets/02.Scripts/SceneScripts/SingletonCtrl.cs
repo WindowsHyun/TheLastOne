@@ -268,5 +268,4 @@ public class SingletonCtrl : MonoBehaviour
         StartCoroutine(connectSocket());
     }
 
-
 }
