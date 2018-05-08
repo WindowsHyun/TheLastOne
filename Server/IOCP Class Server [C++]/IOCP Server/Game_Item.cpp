@@ -19,8 +19,13 @@ Game_Item::Game_Item(const float x, const float y, const float z, const std::str
 	this->item_name = item_name;
 	this->item_eat = false;
 	this->riding_car = false;
-	this->hp = Car_HP;
 	if (item_name == "UAZ")
+		this->hp = UAZ_HP;
+	else if (item_name == "JEEP")
+		this->hp = JEEP_HP;
+	else
+		this->hp = 0;
+	if (item_name == "UAZ" || item_name == "JEEP")
 		this->item_Kinds = Kind_Car;
 	else
 		this->item_Kinds = Kind_Item;
@@ -50,7 +55,7 @@ void load_item_txt(std::string filepath, std::unordered_map<int, Game_Item>* ite
 			// 한줄 씩 읽는다.
 			getline(openFile, line);
 			item->insert(std::pair<int, Game_Item>(item_num, { (float)atof(splitParsing(line, "x:", "|").c_str()), (float)atof(splitParsing(line, "y:", "|").c_str()) , (float)atof(splitParsing(line, "z:", "|").c_str()),  splitParsing(line, "name:", "|") }));
-			if (splitParsing(line, "name:", "|") == "UAZ") {
+			if (splitParsing(line, "name:", "|") == "UAZ" || splitParsing(line, "name:", "|") == "JEEP") {
 				// UAZ의 경우 rotation값을 추가로 넣어준다.
 				auto iter = item->find(item_num);
 				iter->second.set_rotation((float)atof(splitParsing(line, "rx:", "|").c_str()), (float)atof(splitParsing(line, "ry:", "|").c_str()), (float)atof(splitParsing(line, "rz:", "|").c_str()));

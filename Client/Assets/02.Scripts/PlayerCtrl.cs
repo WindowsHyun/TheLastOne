@@ -324,10 +324,6 @@ public class PlayerCtrl : PlayerVehicleCtrl
                     networkCtrl.Car_Status(CarNum, true);     // 차량 탑승했다고 서버에게 알린다.
                     ridingCar.GetComponent<Rigidbody>().isKinematic = false;
 
-
-                    // 차량 탑승시 플레이어 y값을 차량 y값으로 변경해준다.
-                    //tr.position = new Vector3(tr.position.x, ridingCar.transform.position.y, tr.position.z);
-
                     // 차량 탑승 하였으니 NavMesh Off
                     navagent.enabled = false;
 

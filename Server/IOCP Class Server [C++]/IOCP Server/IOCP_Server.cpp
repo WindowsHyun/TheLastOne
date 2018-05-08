@@ -135,9 +135,9 @@ void IOCP_Server::Worker_Thread()
 			char packet_data[8]{ 0 };
 			while (io_size != 0) {
 				if (0 == psize) {
-					for (int i = 0; i < 8; ++i) {
-						if (buf[i] != 124)
-							packet_data[i] = buf[i];
+					for (int packet_i = 0; packet_i < 8; ++packet_i) {
+						if (buf[packet_i] != 124)
+							packet_data[packet_i] = buf[packet_i];
 						else
 							break;
 					}
@@ -371,6 +371,9 @@ void IOCP_Server::Remove_Client()
 
 		std::unordered_map< int, Game_Client> &client = room_iter.get_room().get_client();
 
+		if (client.size() == 0)
+			continue;
+
 		for (auto client_iter = client.begin(); client_iter != client.end();) {
 			// 해당 방에서 Client를 시작부터 끝까지 확인 한다.
 			if (client_iter->second.get_Connect() == false && client_iter->second.get_Remove() == true) {
@@ -411,10 +414,10 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *pac
 
 	// 패킷 사이즈를 찾아주자.
 	char packet_data[8]{ 0 };
-	int i = 0;
-	for (i = 0; i < 8; ++i) {
-		if (packet[i] != 124)
-			packet_data[i] = packet[i];
+	int packet_i = 0;
+	for (packet_i = 0; packet_i < 8; ++packet_i) {
+		if (packet[packet_i] != 124)
+			packet_data[packet_i] = packet[packet_i];
 		else
 			break;
 	}
@@ -433,8 +436,7 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *pac
 
 	auto client = GameRoom[room_id].get_room().get_client_iter(ci);
 
-	try {
-		switch (packet[i + 1]) {
+		switch (packet[packet_i + 1]) {
 		case CS_Info:
 		{
 			auto client_View = GetClientView(get_packet);
@@ -494,6 +496,9 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *pac
 			//std::cout << sizeof(get_packet) << std::endl;
 			auto packet_zombie = client_Check_info->data();
 
+			if (packet_zombie == NULL)
+				break;
+
 			for (unsigned int i = 0; i < packet_zombie->size(); ++i) {
 				auto iter = GameRoom[room_id].get_room().get_zombie_iter(packet_zombie->Get(i)->id());
 				iter->second.set_animator(packet_zombie->Get(i)->animator());
@@ -545,25 +550,18 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *pac
 		break;
 		}
 
+	if (GameRoom[room_id].get_status() == inGameStatus) {
+		// 인게임에 들어가기 전까지는 패킷 전송을 하지 않는다.
+		Send_All_Player(room_id, ci);
+		Send_Hide_Player(room_id, ci);
 
-		if (GameRoom[room_id].get_status() == inGameStatus) {
-			// 인게임에 들어가기 전까지는 패킷 전송을 하지 않는다.
-			Send_All_Player(room_id, ci);
-			Send_Hide_Player(room_id, ci);
+		Send_All_Zombie(room_id, ci);
+		Send_Hide_Zombie(room_id, ci);
 
-			Send_All_Zombie(room_id, ci);
-			Send_Hide_Zombie(room_id, ci);
+		GameRoom[room_id].get_room().player_To_Zombie();
 
-			GameRoom[room_id].get_room().player_To_Zombie();
-
-			Send_All_Item(room_id, ci);
-		}
+		Send_All_Item(room_id, ci);
 	}
-	catch (DWORD dwError) {
-		errnum++;
-		std::cout << "Error : " << dwError << "Count : " << errnum << std::endl;
-	}
-
 }
 
 void IOCP_Server::SendPacket(const int type, const int room_id, const int ci, const void *packet, const int psize)
@@ -729,7 +727,8 @@ void IOCP_Server::Send_All_Item(const int room_id, const int ci)
 	for (auto iter : GameRoom[room_id].get_room().get_item()) {
 		//if (iter.second.get_eat() == true)	// 아이템을 이미 먹은경우 패스 한다.
 		//	continue;
-		if (Distance(room_id, ci, iter.first, Player_Dist, Kind_Item) == false && iter.second.get_name() != "UAZ")
+		if (Distance(room_id, ci, iter.first, Player_Dist, Kind_Item) == false &&
+			(iter.second.get_name() != "UAZ" || iter.second.get_name() != "ZEEP"))
 			continue;
 
 		auto id = iter.first;

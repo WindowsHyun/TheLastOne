@@ -264,6 +264,8 @@ public class SingletonCtrl : MonoBehaviour
         }
         instance_S = this;                  // 유일한 인스턴스로 만듬
         DontDestroyOnLoad(gameObject);      // 씬이 바뀌어도 계속 유지 시킨다
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = 60;
         Application.runInBackground = true;
         StartCoroutine(connectSocket());
     }

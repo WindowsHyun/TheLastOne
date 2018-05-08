@@ -71,9 +71,11 @@ namespace TheLastOne.Game.Network
         public GameObject iterm_Armor;
         // 게임 차량 Object
         public GameObject Car_UAZ;
+        public GameObject Car_JEEP;
         //------------------------------------------
         public Text TimeText;
         public Text FPSText;
+        public Text SurvivalCount;
         //------------------------------------------
         float deltaTime = 0.0f;     // FPS 측정
         float msec;
@@ -319,6 +321,16 @@ namespace TheLastOne.Game.Network
                                 iter.Value.item.name = "UAZ_" + iter.Key;
                                 iter.Value.set_draw(true);
                             }
+                            else if (iter.Value.get_name() == "JEEP")
+                            {
+                                iter.Value.item = Instantiate(Car_JEEP, iter.Value.get_pos(), Quaternion.Euler(iter.Value.get_rotation().x, iter.Value.get_rotation().y, iter.Value.get_rotation().z));
+                                iter.Value.item.transform.SetParent(ItemCollection.transform);
+
+                                iter.Value.car = iter.Value.item.GetComponent<VehicleCtrl>();
+                                iter.Value.car.carNum = iter.Key;  // 해당 차량이 몇번째 차량인지 알려주자.
+                                iter.Value.item.name = "JEEP_" + iter.Key;
+                                iter.Value.set_draw(true);
+                            }
                             else if (iter.Value.get_name() == "M4A1")
                             {
                                 iter.Value.item = Instantiate(item_M4A1, iter.Value.get_pos(), Quaternion.Euler(0, 0, 90));
@@ -359,7 +371,7 @@ namespace TheLastOne.Game.Network
                             // Item이 정상적으로 나왔다가 다른 사람이 먹었을 경우에 대한 처리
                             iter.Value.item.SetActive(false);
                         }
-                        if (iter.Value.get_name() == "UAZ")
+                        if (iter.Value.get_name() == "UAZ" || iter.Value.get_name() == "JEEP")
                         {
                             // 차량의 탑승 상태를 전달해 준다.
                             iter.Value.car.Car_Status = iter.Value.get_riding();
@@ -369,7 +381,6 @@ namespace TheLastOne.Game.Network
                                 iter.Value.set_explosion(true);
                                 iter.Value.car.ExpCar();
                             }
-
                         }
                         if (iter.Value.get_kind() == recv_protocol.Kind_Car && Player_Script.CarNum != iter.Key)
                         {
