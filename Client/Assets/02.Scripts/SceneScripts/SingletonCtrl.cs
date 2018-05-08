@@ -19,8 +19,10 @@ public class SingletonCtrl : MonoBehaviour
     private int playerMoney = 0;    // 플레이어 돈
     private string playerID = "";   // 플레이어 아이디
     private string playerIP = "";   // 플레이어 아이피
+    private int survivalPlayer = 0;       // 게임 내 살아있는 플레이어 인원 수 
     private bool startCarRun = false;  // 수송차량 출발 대기
     private bool corutinSocket = true;     // 커넥트 하기전 까지 대기
+
     //-------------------------------------------------------------------------------------------
     // 네트워크 관련한 부분
     private Socket m_Socket;
@@ -100,6 +102,18 @@ public class SingletonCtrl : MonoBehaviour
         set
         {
             playerIP = value;
+        }
+    }
+
+    public int SurvivalPlayer                 // 게임 내 살아있는 플레이어 인원수 접근 프로퍼티
+    {
+        get
+        {
+            return survivalPlayer;
+        }
+        set
+        {
+            survivalPlayer = value;
         }
     }
 

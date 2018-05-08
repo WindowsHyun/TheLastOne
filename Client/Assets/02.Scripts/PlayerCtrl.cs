@@ -37,7 +37,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
     // enum 변수에서 fire 삭제
     public enum PlayerState
     {
-        idle, die,
+        idle, die
     };
 
     public enum WeaponState
@@ -166,7 +166,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
     private bool realView;
     public RectTransform playerPositionImage;
 
-    public Image youDieImage;
+    public Image ScreenSceneOFF;
 
     // NavMeshAgent 키고 끌 수 있게.
     private NavMeshAgent navagent;
@@ -409,16 +409,28 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
             if(playerState == PlayerState.die)
             {
-                youDieImage.color += new Color(0f, 0f, 0f, 0.003f);
+                ScreenSceneOFF.color += new Color(0f, 0f, 0f, 0.003f);
 
-                if(youDieImage.color.a >= 1.0f)
-                {
-                    Debug.Log("씬 넘어 가기전");
+                if(ScreenSceneOFF.color.a >= 1.0f)
+                {     
                     // 플레이어 모든 코루틴 종료
                     SceneManager.LoadScene("DieGameScene"); // 다음씬으로 넘어감
-                    Debug.Log("씬 넘어감");
-                    //StopAllCoroutines();
+                 
                 }
+            }
+
+            if(SingletonCtrl.Instance_S.SurvivalPlayer == 1)
+            {
+                ScreenSceneOFF.gameObject.SetActive(true);
+                Cursor.lockState = CursorLockMode.None;//마우스 커서 고정 해제
+                Cursor.visible = true;//마우스 커서 보이기
+                ScreenSceneOFF.color += new Color(0f, 0f, 0f, 0.003f);
+
+                if (ScreenSceneOFF.color.a >= 1.0f)
+                {         
+                    // 플레이어 모든 코루틴 종료
+                    SceneManager.LoadScene("WinGameScene"); // 다음씬으로 넘어감              
+                }            
             }
 
 
@@ -780,7 +792,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
         animator.SetTrigger("IsDie");
         playerState = PlayerState.die;
 
-        youDieImage.gameObject.SetActive(true);
+        ScreenSceneOFF.gameObject.SetActive(true);
 
         // 캐릭터 캡슐 콜라이더 비활성화
         gameObject.GetComponent<CapsuleCollider>().enabled = false;
