@@ -6,6 +6,16 @@ public class VehicleCtrl : PlayerVehicleCtrl
 // PlayerVehicleCtrl을 쓴 이유는 Player를 GetComponent로 가져오는 방법 보다는 상속을 받는것이
 // 오버헤드를 줄이고 실시간으로 데이터 값을 확인할 수 있어서.
 {
+
+    public enum VehicleType
+    {
+        UAZ, JEEP
+    };
+
+
+    // 캐릭터의 현재 상태 정보를 저장할 Enum 변수
+    public VehicleType vehicleType;
+
     // 차량 체력을 보내기 위하여
     private PlayerCtrl playerCtrl;
 
@@ -38,6 +48,9 @@ public class VehicleCtrl : PlayerVehicleCtrl
     // 차량 자체의 브레이크를 위함
     public bool vehicleStop = false;
 
+    [HideInInspector]
+    public float KMh;
+
     void Awake()
     {
         // 생명 초기값 설정
@@ -53,7 +66,7 @@ public class VehicleCtrl : PlayerVehicleCtrl
         playerCtrl = GameObject.FindWithTag("Player").GetComponent<PlayerCtrl>();
     }
 
-    void FixedUpdate()
+    void Update()
     {
 
         if (GetTheCar == true)
@@ -79,6 +92,9 @@ public class VehicleCtrl : PlayerVehicleCtrl
                 wheelColliders[i].brakeTorque = 0.0f;
             }
         }
+
+
+        KMh = (m_rigidbody.velocity.magnitude * 3.6f)*0.4f;
     }
 
     void UpdateMeshsPositions()

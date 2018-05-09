@@ -28,6 +28,8 @@ public class PlayerVehicleCtrl : MonoBehaviour
     // 차량 정보
     public VehicleCtrl ridingCar;
     public GameObject VehicleUI;
+    public GameObject UAZImage;
+    public GameObject JEEPImage;
     public Image vehicleHpBar;
 }
 
@@ -54,8 +56,8 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
     public WeaponState nowWeaponState = WeaponState.None;
 
-    public float h = 0.0f;
-    public float v = 0.0f;
+    [HideInInspector] public float h = 0.0f;
+    [HideInInspector] public float v = 0.0f;
 
     // 접근해야 하는 컴포넌트는 반드시 변수에 할당한 후 사용
     public Transform tr;
@@ -63,7 +65,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
     private Rigidbody player_rigidbody;
 
     // 캐릭터 이동 속도 변수
-    public float moveSpeed = 23.0f;
+    public float moveSpeed = 20.0f;
     // 캐릭터 회전 속도 변수
     public float rotSpeed = 100.0f;
 
@@ -101,7 +103,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
     public MeshRenderer muzzleFlash2;
 
     // 카메라 뷰 전환을 체크하기 위한 변수
-    public bool sensorCheck = false;
+    [HideInInspector] public bool sensorCheck = false;
 
     // 플레이어가 총알 발사시 Packet을 전송하기 위하여
     NetworkCtrl networkCtrl = new NetworkCtrl();
@@ -112,18 +114,18 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
     // 무기 슬롯 타입
     //public string[] weaponSlotType = new string[2];
-    public int[] weaponSlotNumber = new int[2];
+    [HideInInspector] public int[] weaponSlotNumber = new int[2];
 
 
     // 총알 값 찾아오는 변수
     public SlotCtrl bulletFinding;
 
     // 0번 7.62mm 총알, 1번 5.56mm 총알(m16),2번 5.56mm 총알(m4), 3번 9mm 총알
-    public int[] bulletCount = new int[4];
-    public int[] reloadBulletCount = new int[4];
+    [HideInInspector] public int[] bulletCount = new int[4];
+    [HideInInspector] public int[] reloadBulletCount = new int[4];
 
     // 무기 정보 저장
-    public GameObject[] weaponView = new GameObject[4];
+    [HideInInspector] public GameObject[] weaponView = new GameObject[4];
     public GameObject ak47;
     public GameObject m16;
     public GameObject m4;
@@ -170,6 +172,8 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
     // NavMeshAgent 키고 끌 수 있게.
     private NavMeshAgent navagent;
+
+    public Text vehicleKMH;
 
     IEnumerator StartKeyInput()
     {
@@ -334,9 +338,22 @@ public class PlayerCtrl : PlayerVehicleCtrl
                     //firePos.GetComponent<CapsuleCollider>().enabled = false;
 
                     // 차량 UI 활성화
-                    VehicleUI.SetActive(true);
-
+                    VehicleUI.SetActive(true);   
                     vehicleHpBar.fillAmount = (float)ridingCar.vehicleHp / (float)ridingCar.vehicleInitHp;
+
+
+
+                    if(ridingCar.vehicleType.ToString() == "JEEP")
+                    {
+                        JEEPImage.SetActive(true);
+                        UAZImage.SetActive(false);
+                    }
+                    else if (ridingCar.vehicleType.ToString() == "UAZ")
+                    {
+                        UAZImage.SetActive(true);
+                        JEEPImage.SetActive(false);
+                    }
+
                 }
                 else if (rideCar == true && GetTheCar == true && ridingCar.Car_Status == true)
                 {
@@ -372,7 +389,11 @@ public class PlayerCtrl : PlayerVehicleCtrl
                     // 총구 앞 캡슐 콜라이더 활성화
                     //firePos.GetComponent<CapsuleCollider>().enabled = true;
 
-                    // 차량 UI 활성화
+                    // 차량 UI 비활성화 전 이미지 부터 비활성화
+                    JEEPImage.SetActive(false);
+                    UAZImage.SetActive(false);
+
+                    // 차량 UI 비활성화
                     VehicleUI.SetActive(false);
                 }
             }
@@ -620,6 +641,8 @@ public class PlayerCtrl : PlayerVehicleCtrl
             tr.transform.position = new Vector3(ridingCar.transform.position.x, ridingCar.transform.position.y, ridingCar.transform.position.z);
 
             vehicleHpBar.fillAmount = (float)ridingCar.vehicleHp / (float)ridingCar.vehicleInitHp;
+
+            vehicleKMH.text = (int)ridingCar.KMh + " km / h";
         }
     }
 
