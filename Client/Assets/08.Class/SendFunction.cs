@@ -209,8 +209,18 @@ namespace TheLastOne.SendFunction
                 //intBytes[i] -= 48;
             }
             intBytes[p_size.ToString().Length] = 124;
-            intBytes[p_size.ToString().Length + 1] = cpy_type[0];
-            intBytes[p_size.ToString().Length + 1] -= 48;
+            if (type >= 10)
+            {
+                // 10보다 큰 경우 앞 숫자가 아닌 뒷 숫자로 판별한다.
+                intBytes[p_size.ToString().Length + 1] = cpy_type[1];
+                intBytes[p_size.ToString().Length + 1] -= 38;
+            }
+            else
+            {
+                intBytes[p_size.ToString().Length + 1] = cpy_type[0];
+                intBytes[p_size.ToString().Length + 1] -= 48;
+            }
+           
             // 48을 마이너스 해준 이유는 Server에서 packet[i]로 형 변환 없이 바로 값을 확인하기 위하여
 
             return intBytes;

@@ -16,6 +16,7 @@ public class WinSceneCtrl : MonoBehaviour {
 
     public void LobbyButtonClick()
     {
+        SingletonCtrl.Instance_S.NowModeNumber = -1;
         SceneManager.LoadScene("LobbyGameScene");
     }
 }
