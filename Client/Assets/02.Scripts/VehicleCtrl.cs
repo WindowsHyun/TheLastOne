@@ -48,8 +48,14 @@ public class VehicleCtrl : PlayerVehicleCtrl
     // 차량 자체의 브레이크를 위함
     public bool vehicleStop = false;
 
+    // 차량 속도, 인스펙터 창에 보이지 않음
     [HideInInspector]
     public float KMh;
+
+    // 엔진 사운드를 위한 변수
+    private float pitch = 0;
+
+
 
     void Awake()
     {
@@ -95,6 +101,11 @@ public class VehicleCtrl : PlayerVehicleCtrl
 
 
         KMh = (m_rigidbody.velocity.magnitude * 3.6f)*0.4f;
+
+        pitch = KMh * 0.05f;
+
+        GetComponent<AudioSource>().pitch = pitch;
+
     }
 
     void UpdateMeshsPositions()

@@ -705,6 +705,9 @@ public class PlayerCtrl : PlayerVehicleCtrl
                 followCam.dist = 7.0f;
                 sensorCheck = true;
             }
+
+            //집안에 들어갈 경우 네비 체크 해제
+            navagent.enabled = false;
         }
 
         // 충돌한 게임오브젝트의 태그값 비교
@@ -824,6 +827,9 @@ public class PlayerCtrl : PlayerVehicleCtrl
                 followCam.dist = 25.0f;
                 sensorCheck = false;
             }
+
+            //집밖으로 나올 경우 네비 체크 해제
+            navagent.enabled = true;
         }
 
         // 캐릭터 앞 트리거가 내부 벽과 충돌을 검사하는 변수
