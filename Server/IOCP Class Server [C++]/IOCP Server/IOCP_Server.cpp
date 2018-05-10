@@ -891,7 +891,7 @@ void IOCP_Server::Send_SurvivalCount(const int room_id, const int client)
 		if (iter.second.get_hp() > 0)
 			count++;
 	}
-
+	count++;
 	flatbuffers::FlatBufferBuilder builder;
 	auto Client_id = count;
 	auto orc = CreateClient_Packet(builder, Client_id);

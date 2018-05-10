@@ -317,6 +317,7 @@ namespace TheLastOne.Game.Network
                                 iter.Value.item.transform.SetParent(ItemCollection.transform);
 
                                 iter.Value.car = iter.Value.item.GetComponent<VehicleCtrl>();
+                                iter.Value.c_rigidbody = iter.Value.item.GetComponent<Rigidbody>();
                                 iter.Value.car.carNum = iter.Key;  // 해당 차량이 몇번째 차량인지 알려주자.
                                 iter.Value.item.name = "UAZ_" + iter.Key;
                                 iter.Value.set_draw(true);
@@ -327,6 +328,7 @@ namespace TheLastOne.Game.Network
                                 iter.Value.item.transform.SetParent(ItemCollection.transform);
 
                                 iter.Value.car = iter.Value.item.GetComponent<VehicleCtrl>();
+                                iter.Value.c_rigidbody = iter.Value.item.GetComponent<Rigidbody>();
                                 iter.Value.car.carNum = iter.Key;  // 해당 차량이 몇번째 차량인지 알려주자.
                                 iter.Value.item.name = "JEEP_" + iter.Key;
                                 iter.Value.set_draw(true);
@@ -382,16 +384,26 @@ namespace TheLastOne.Game.Network
                                 iter.Value.car.ExpCar();
                             }
                         }
-                        if (iter.Value.get_kind() == recv_protocol.Kind_Car && Player_Script.CarNum != iter.Key)
+                        if (iter.Value.get_kind() == recv_protocol.Kind_Car && Player_Script.CarNum != iter.Key 
+                            && iter.Value.get_riding() == true)
                         {
                             // 차량의 경우 지속적으로 위치를 갱신 해준다.
-                            iter.Value.item.transform.position = Vector3.MoveTowards(iter.Value.item.transform.position, iter.Value.get_pos(), Time.deltaTime * 4000.0f);
-
+                            //Debug.Log(iter.Value.get_pos().y + " | " + iter.Value.item.transform.position.y);
+                            iter.Value.car.MovePos(iter.Value.get_pos());
+                            //iter.Value.item.transform.position = Vector3.MoveTowards(iter.Value.item.transform.position, iter.Value.get_pos(), Time.deltaTime * 4000.0f);
+                            iter.Value.c_rigidbody.isKinematic = false;
                             iter.Value.item.transform.rotation = Quaternion.Euler(iter.Value.get_rotation().x, iter.Value.get_rotation().y, iter.Value.get_rotation().z);
+
+                        }else if (iter.Value.get_kind() == recv_protocol.Kind_Car && Player_Script.CarNum != iter.Key
+                            && iter.Value.get_riding() == false)
+                        {
+                            iter.Value.c_rigidbody.isKinematic = true;
                         }
+
                     }
                 }
-                yield return new WaitForSeconds(0.06f);
+                //yield return new WaitForSeconds(0.06f);
+                yield return null;
             } while (true);
             //yield return null;
         }

@@ -22,6 +22,7 @@ namespace TheLastOne.GameClass
         private int kind = -1;
         public GameObject item;
         public VehicleCtrl car;
+        public Rigidbody c_rigidbody;
 
         public int get_id() { return this.id; }
         public int get_hp() { return this.hp; }

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System;
 public class VehicleCtrl : PlayerVehicleCtrl
 // PlayerVehicleCtrl을 쓴 이유는 Player를 GetComponent로 가져오는 방법 보다는 상속을 받는것이
 // 오버헤드를 줄이고 실시간으로 데이터 값을 확인할 수 있어서.
@@ -121,6 +121,24 @@ public class VehicleCtrl : PlayerVehicleCtrl
         }
     }
 
+    public float DistanceToPoint(Vector3 a, Vector3 b)
+    {
+        // 캐릭터 간의 거리 구하기.
+        return (float)Math.Sqrt(Math.Pow(a.x - b.x, 2) + Math.Pow(a.z - b.z, 2));
+    }
+
+    public void MovePos(Vector3 pos)
+    {
+        if (DistanceToPoint(vehicle_tr.position, pos) >= 20)
+        {
+            // 20이상 거리 차이가 날경우 움직여 주는것이 아닌 바로 동기화를 시켜 버린다.
+            vehicle_tr.position = pos;
+        }
+        else
+        {
+            vehicle_tr.position = Vector3.MoveTowards(vehicle_tr.position, pos, Time.deltaTime * 4000.0f);
+        }
+    }
 
     void OnTriggerEnter(Collider coll)
     {
