@@ -487,7 +487,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
                 }
             }
 
-            if(SingletonCtrl.Instance_S.SurvivalPlayer == 1)
+            if(SingletonCtrl.Instance_S.SurvivalPlayer == 1 && hp > 0)
             {
                 ScreenSceneOFF.gameObject.SetActive(true);
                 Cursor.lockState = CursorLockMode.None;//마우스 커서 고정 해제

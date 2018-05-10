@@ -62,6 +62,8 @@ private:
 	void Attack_DangerLine_Damge(const int room_id);			// 자기장 데미지를 플레이어에게 준다.
 	bool Distance(const int room_id, const int me, const int  you, const int Radius, const int kind);
 	void Check_InGamePlayer(const int room_id);
+	int GameRoomEnter(const int client, const SOCKET sock);	// 클라이언트 방 입장 처리
+	void Send_SurvivalCount(const int room_id, const int client);		// 클라이언트 남은 인원을 보내준다.
 public:
 	HANDLE getHandle() { return g_hiocp; }
 	IOCP_Server();

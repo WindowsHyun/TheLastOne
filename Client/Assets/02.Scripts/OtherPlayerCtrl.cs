@@ -113,7 +113,7 @@ public class OtherPlayerCtrl : MonoBehaviour
         muzzleFlash1.enabled = false;
         muzzleFlash2.enabled = false;
 
-        animator.SetInteger("IsState", animator_value);
+        //animator.SetInteger("IsState", animator_value);
 
         StartCoroutine(this.createPrefab());
 

@@ -11,6 +11,7 @@ void Game_Client::init()
 	this->rotation.y = 0;
 	this->rotation.z = 0;
 	this->hp = Player_HP;
+	this->armour = 0;
 	this->animator = 0;
 	this->connect = false;
 	this->weaponState = 0;
@@ -61,7 +62,7 @@ Game_Client::Game_Client(const SOCKET sock, const int client_id, const char * ga
 	this->vertical = 0.0f;
 	this->inCar = -1;
 	this->hp = Player_HP;
-	this->armour = 100;
+	this->armour = 0;
 	this->animator = 0;
 	this->weaponState = 0;
 	this->dangerLineIn = false;

@@ -51,6 +51,15 @@ public class SingletonCtrl : MonoBehaviour
         set
         {
             nowModeNumber = value;
+            if ( nowModeNumber == -1)
+            {
+                m_Socket.Close();
+                networkCtrl.NetworkInit();
+                nowModeNumber = 0;
+                playerStatus = 1;
+                startCarRun = false;
+                StartCoroutine(connectSocket());
+            }
         }
     }
 
@@ -278,8 +287,8 @@ public class SingletonCtrl : MonoBehaviour
         }
         instance_S = this;                  // 유일한 인스턴스로 만듬
         DontDestroyOnLoad(gameObject);      // 씬이 바뀌어도 계속 유지 시킨다
-        //QualitySettings.vSyncCount = 0;
-        //Application.targetFrameRate = 60;
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = 60;
         Application.runInBackground = true;
         StartCoroutine(connectSocket());
     }

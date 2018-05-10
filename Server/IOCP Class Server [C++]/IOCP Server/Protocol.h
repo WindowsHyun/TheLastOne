@@ -41,6 +41,7 @@ enum Event_Type {
 #define SC_Remove_Zombie 10		// 좀비 삭제
 #define SC_Lobby_Time 11				// 클라이언트 에게 로비 대기시간을 보내준다.
 #define SC_StartCar_Play 12			// 클라이언트 에게 시작 차량을 움직이라고 보내준다.
+#define SC_Survival_Count 13			// 클라이언트 에게 총 인원을 보내준다.
 
 
 // 클라이언트가 서버에게 보내는 패킷

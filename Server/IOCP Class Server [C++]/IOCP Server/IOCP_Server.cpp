@@ -107,8 +107,6 @@ void IOCP_Server::Worker_Thread()
 		OverlappedEx *over;
 		BOOL ret = GetQueuedCompletionStatus(g_hiocp, &io_size, &ci, reinterpret_cast<LPWSAOVERLAPPED *>(&over), INFINITE);
 
-		//std::cout << "Ci : " << ci << " | Room_id : " << over->room_id << std::endl;
-
 		if (FALSE == ret) {
 			int err_no = WSAGetLastError();
 			if (err_no == 64)
@@ -316,21 +314,7 @@ void IOCP_Server::Accept_Thread()
 		std::cout << "New Client : " << new_id << std::endl;
 #endif
 
-		// 방중에서 현재 시작이 안된 방을 찾는다.
-		int room_id = -1;
-		for (auto iter : GameRoom) {
-			if ((iter.get_status() == LobbyStatus || iter.get_status() == ReadyStatus) && iter.get_room().get_client().size() <= MAX_Client) {
-				room_id = iter.get_id();
-#if (DebugMod == TRUE )
-				std::cout << "Connect to Room " << iter.get_id() << std::endl;
-#endif
-				// 접속된 클라이언트 데이터를 넣어 준다.
-				GameRoom[room_id].get_room().get_client().insert(std::pair< int, Game_Client>(new_id, { new_client, new_id, (char *)"TheLastOne", room_id }));
-				Send_Client_ID(room_id, new_id, SC_ID, false);		// 클라이언트에게 자신의 아이디를 보내준다.
-				//ci_room.insert(std::pair<int, int> {new_id, room_id});		// 클라이언트 아이디와 룸 정보를 저장한다.
-				break;
-			}
-		}
+		int room_id = GameRoomEnter(new_id, new_client);
 
 		if (room_id == -1) {
 			// 10개의 방이 모두 인게임 상태 혹은 방이 없을 경우.
@@ -341,7 +325,7 @@ void IOCP_Server::Accept_Thread()
 			continue;
 		}
 		//---------------------------------------------------------------------------------------------------------------------------------------------------
-				// map에 들어간 클라이언트를 찾는다.
+		// map에 들어간 클라이언트를 찾는다.
 		auto client = GameRoom[room_id].get_room().get_client_iter(new_id);
 		//---------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -436,119 +420,120 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *pac
 
 	auto client = GameRoom[room_id].get_room().get_client_iter(ci);
 
-		switch (packet[packet_i + 1]) {
-		case CS_Info:
-		{
-			auto client_View = GetClientView(get_packet);
-			xyz packet_position{ client_View->position()->x() , client_View->position()->y() , client_View->position()->z() };
-			xyz packet_rotation{ client_View->rotation()->x() , client_View->rotation()->y() , client_View->rotation()->z() };
-			client->second.set_client_position(packet_position);
-			client->second.set_client_rotation(packet_rotation);
-			client->second.set_client_animator(client_View->animator());
-			client->second.set_client_weapon(client_View->nowWeapon());
-			client->second.set_horizontal(client_View->Horizontal());
-			client->second.set_vertical(client_View->Vertical());
-			client->second.set_inCar(client_View->inCar());
-			client->second.set_client_DangerLine(client_View->dangerLineIn());
-			if (client_View->inCar() != -1) {
-				// 차량을 실제로 탑승 하고 있을 경우.
-				auto item = GameRoom[room_id].get_room().get_item_iter(client_View->inCar());
-				item->second.set_pos(client_View->position()->x(), client_View->position()->y(), client_View->position()->z());
-				xyz car_rotation{ client_View->carrotation()->x() , client_View->carrotation()->y() , client_View->carrotation()->z() };
-				client->second.set_client_car_rotation(car_rotation);
-				item->second.set_rotation(client_View->carrotation()->x(), client_View->carrotation()->y(), client_View->carrotation()->z());
-			}
-			//std::cout << client_View->position()->x() << ", " << client_View->position()->y() << ", " << client_View->position()->z() << std::endl;
+	switch (packet[packet_i + 1]) {
+	case CS_Info:
+	{
+		auto client_View = GetClientView(get_packet);
+		xyz packet_position{ client_View->position()->x() , client_View->position()->y() , client_View->position()->z() };
+		xyz packet_rotation{ client_View->rotation()->x() , client_View->rotation()->y() , client_View->rotation()->z() };
+		client->second.set_client_position(packet_position);
+		client->second.set_client_rotation(packet_rotation);
+		client->second.set_client_animator(client_View->animator());
+		client->second.set_client_weapon(client_View->nowWeapon());
+		client->second.set_horizontal(client_View->Horizontal());
+		client->second.set_vertical(client_View->Vertical());
+		client->second.set_inCar(client_View->inCar());
+		client->second.set_client_DangerLine(client_View->dangerLineIn());
+		if (client_View->inCar() != -1) {
+			// 차량을 실제로 탑승 하고 있을 경우.
+			auto item = GameRoom[room_id].get_room().get_item_iter(client_View->inCar());
+			item->second.set_pos(client_View->position()->x(), client_View->position()->y(), client_View->position()->z());
+			xyz car_rotation{ client_View->carrotation()->x() , client_View->carrotation()->y() , client_View->carrotation()->z() };
+			client->second.set_client_car_rotation(car_rotation);
+			item->second.set_rotation(client_View->carrotation()->x(), client_View->carrotation()->y(), client_View->carrotation()->z());
 		}
-		break;
-		case CS_Shot_info:
-		{
-			auto client_Shot_View = GetClient_packetView(get_packet);
-			auto client = GameRoom[room_id].get_room().get_client_iter(client_Shot_View->id());
-			Send_Client_Shot(room_id, client->first);
+		//std::cout << client_View->position()->x() << ", " << client_View->position()->y() << ", " << client_View->position()->z() << std::endl;
+	}
+	break;
+	case CS_Shot_info:
+	{
+		auto client_Shot_View = GetClient_packetView(get_packet);
+		auto client = GameRoom[room_id].get_room().get_client_iter(client_Shot_View->id());
+		Send_Client_Shot(room_id, client->first);
+	}
+	break;
+	case CS_Check_info:
+	{
+		auto client_Check_info = GetClient_packetView(get_packet);
+		if (ci != client_Check_info->id()) {
+			/*
+			클라이언트의 고유번호와 서버의 고유번호가 다를 경우
+			값이 다르다 라는 결과를 표출하고 다시한번 클라이언트 아이디를 보내줘야 한다.
+			현재 문제오류가 없어서 일단 임시 보류.
+			*/
+			std::cout << "클라이언트 의 값 : " << client_Check_info->id() << std::endl;
+			std::cout << "실제 값 : " << ci << std::endl;
+			Send_Client_ID(room_id, ci, SC_ID, false);
 		}
-		break;
-		case CS_Check_info:
-		{
-			auto client_Check_info = GetClient_packetView(get_packet);
-			if (ci != client_Check_info->id()) {
-				/*
-				클라이언트의 고유번호와 서버의 고유번호가 다를 경우
-				값이 다르다 라는 결과를 표출하고 다시한번 클라이언트 아이디를 보내줘야 한다.
-				현재 문제오류가 없어서 일단 임시 보류.
-				*/
-				std::cout << "클라이언트 의 값 : " << client_Check_info->id() << std::endl;
-				std::cout << "실제 값 : " << ci << std::endl;
-				Send_Client_ID(room_id, ci, SC_ID, false);
-			}
-		}
-		break;
-		case CS_Eat_Item:
-		{
-			auto client_Check_info = GetClient_packetView(get_packet);
-			auto iter = GameRoom[room_id].get_room().get_item_iter(client_Check_info->id());
-			iter->second.set_eat(true);
-		}
-		break;
-		case CS_Zombie_info:
-		{
-			auto client_Check_info = getZombie_CollectionView(get_packet);
-			//std::cout << sizeof(get_packet) << std::endl;
-			auto packet_zombie = client_Check_info->data();
+	}
+	break;
+	case CS_Eat_Item:
+	{
+		auto client_Check_info = GetClient_packetView(get_packet);
+		auto iter = GameRoom[room_id].get_room().get_item_iter(client_Check_info->id());
+		iter->second.set_eat(true);
+	}
+	break;
+	case CS_Zombie_info:
+	{
+		auto client_Check_info = getZombie_CollectionView(get_packet);
+		//std::cout << sizeof(get_packet) << std::endl;
+		auto packet_zombie = client_Check_info->data();
 
-			if (packet_zombie == NULL)
-				break;
+		if (packet_zombie == NULL)
+			break;
 
-			for (unsigned int i = 0; i < packet_zombie->size(); ++i) {
-				auto iter = GameRoom[room_id].get_room().get_zombie_iter(packet_zombie->Get(i)->id());
-				iter->second.set_animator(packet_zombie->Get(i)->animator());
-				xyz packet_position{ packet_zombie->Get(i)->position()->x() , packet_zombie->Get(i)->position()->y() , packet_zombie->Get(i)->position()->z() };
-				//std::cout << packet_zombie->Get(i)->id() << " : " << packet_zombie->Get(i)->position()->x() << ", " << packet_zombie->Get(i)->position()->y() << ", " << packet_zombie->Get(i)->position()->z() << std::endl;
-				iter->second.set_zombie_position(packet_position);
-				xyz packet_rotation{ packet_zombie->Get(i)->rotation()->x() , packet_zombie->Get(i)->rotation()->y() , packet_zombie->Get(i)->rotation()->z() };
-				iter->second.set_zombie_rotation(packet_rotation);
-			}
+		for (unsigned int i = 0; i < packet_zombie->size(); ++i) {
+			auto iter = GameRoom[room_id].get_room().get_zombie_iter(packet_zombie->Get(i)->id());
+			iter->second.set_animator(packet_zombie->Get(i)->animator());
+			xyz packet_position{ packet_zombie->Get(i)->position()->x() , packet_zombie->Get(i)->position()->y() , packet_zombie->Get(i)->position()->z() };
+			//std::cout << packet_zombie->Get(i)->id() << " : " << packet_zombie->Get(i)->position()->x() << ", " << packet_zombie->Get(i)->position()->y() << ", " << packet_zombie->Get(i)->position()->z() << std::endl;
+			iter->second.set_zombie_position(packet_position);
+			xyz packet_rotation{ packet_zombie->Get(i)->rotation()->x() , packet_zombie->Get(i)->rotation()->y() , packet_zombie->Get(i)->rotation()->z() };
+			iter->second.set_zombie_rotation(packet_rotation);
 		}
-		break;
-		case CS_Object_HP:
-		{
-			auto client_Check_info = getGame_HP_SetView(get_packet);
-			if (client_Check_info->kind() == Kind_Player) {
-				auto iter = GameRoom[room_id].get_room().get_client_iter(client_Check_info->id());
-				iter->second.set_hp(client_Check_info->hp());
-				iter->second.set_armour(client_Check_info->armour());
-			}
-			else if (client_Check_info->kind() == Kind_Zombie) {
-				auto iter = GameRoom[room_id].get_room().get_zombie_iter(client_Check_info->id());
-				iter->second.set_hp(client_Check_info->hp());
-			}
-			else if (client_Check_info->kind() == Kind_Car) {
-				auto iter = GameRoom[room_id].get_room().get_item_iter(client_Check_info->id());
-				iter->second.set_hp(client_Check_info->hp());
-			}
+	}
+	break;
+	case CS_Object_HP:
+	{
+		auto client_Check_info = getGame_HP_SetView(get_packet);
+		if (client_Check_info->kind() == Kind_Player) {
+			auto iter = GameRoom[room_id].get_room().get_client_iter(client_Check_info->id());
+			iter->second.set_hp(client_Check_info->hp());
+			iter->second.set_armour(client_Check_info->armour());
+			std::cout << client_Check_info->hp() << std::endl;
 		}
-		break;
-		case CS_Car_Riding:
-		{
-			auto client_Check_info = GetClient_packetView(get_packet);
+		else if (client_Check_info->kind() == Kind_Zombie) {
+			auto iter = GameRoom[room_id].get_room().get_zombie_iter(client_Check_info->id());
+			iter->second.set_hp(client_Check_info->hp());
+		}
+		else if (client_Check_info->kind() == Kind_Car) {
 			auto iter = GameRoom[room_id].get_room().get_item_iter(client_Check_info->id());
-			iter->second.set_riding(true);
+			iter->second.set_hp(client_Check_info->hp());
 		}
-		break;
-		case CS_Car_Rode:
-		{
-			auto client_Check_info = GetClient_packetView(get_packet);
-			auto iter = GameRoom[room_id].get_room().get_item_iter(client_Check_info->id());
-			iter->second.set_riding(false);
-		}
-		break;
-		case CS_Player_Status:
-		{
-			auto client_Check_info = GetClient_packetView(get_packet);
-			client->second.set_playerStatus(client_Check_info->id());
-		}
-		break;
-		}
+	}
+	break;
+	case CS_Car_Riding:
+	{
+		auto client_Check_info = GetClient_packetView(get_packet);
+		auto iter = GameRoom[room_id].get_room().get_item_iter(client_Check_info->id());
+		iter->second.set_riding(true);
+	}
+	break;
+	case CS_Car_Rode:
+	{
+		auto client_Check_info = GetClient_packetView(get_packet);
+		auto iter = GameRoom[room_id].get_room().get_item_iter(client_Check_info->id());
+		iter->second.set_riding(false);
+	}
+	break;
+	case CS_Player_Status:
+	{
+		auto client_Check_info = GetClient_packetView(get_packet);
+		client->second.set_playerStatus(client_Check_info->id());
+	}
+	break;
+	}
 
 	if (GameRoom[room_id].get_status() == inGameStatus) {
 		// 인게임에 들어가기 전까지는 패킷 전송을 하지 않는다.
@@ -561,6 +546,8 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *pac
 		GameRoom[room_id].get_room().player_To_Zombie();
 
 		Send_All_Item(room_id, ci);
+
+		Send_SurvivalCount(room_id, ci);
 	}
 }
 
@@ -718,7 +705,6 @@ void IOCP_Server::Send_All_Time(const int room_id, const int type, const int kin
 	}
 }
 
-
 void IOCP_Server::Send_All_Item(const int room_id, const int ci)
 {
 	flatbuffers::FlatBufferBuilder builder;
@@ -874,6 +860,44 @@ void IOCP_Server::Check_InGamePlayer(const int room_id)
 		Timer_Event t = { room_id, 1, high_resolution_clock::now() + 100ms, E_StartCarWait };
 		Timer.setTimerEvent(t);
 	}
+}
+
+int IOCP_Server::GameRoomEnter(const int client, const SOCKET sock)
+{
+	// 방중에서 현재 시작이 안된 방을 찾는다.
+	int room_id = -1;
+	for (auto iter : GameRoom) {
+		if ((iter.get_status() == LobbyStatus || iter.get_status() == ReadyStatus) && iter.get_room().get_client().size() <= MAX_Client) {
+			room_id = iter.get_id();
+#if (DebugMod == TRUE )
+			std::cout << "Connect to Room " << iter.get_id() << std::endl;
+#endif
+			// 접속된 클라이언트 데이터를 넣어 준다.
+			GameRoom[room_id].get_room().get_client().insert(std::pair< int, Game_Client>(client, { sock, client, (char *)"TheLastOne", room_id }));
+			Send_Client_ID(room_id, client, SC_ID, false);		// 클라이언트에게 자신의 아이디를 보내준다.
+			break;
+		}
+	}
+	if (room_id == -1)
+		return -1;
+	else
+		return room_id;
+}
+
+void IOCP_Server::Send_SurvivalCount(const int room_id, const int client)
+{
+	int count = 0;
+	for (auto iter : GameRoom[room_id].get_room().get_client()) {
+		if (iter.second.get_hp() > 0)
+			count++;
+	}
+
+	flatbuffers::FlatBufferBuilder builder;
+	auto Client_id = count;
+	auto orc = CreateClient_Packet(builder, Client_id);
+	builder.Finish(orc); // Serialize the root of the object.
+
+	SendPacket(SC_Survival_Count, room_id, client , builder.GetBufferPointer(), builder.GetSize());
 }
 
 void IOCP_Server::Attack_DangerLine_Damge(const int room_id)

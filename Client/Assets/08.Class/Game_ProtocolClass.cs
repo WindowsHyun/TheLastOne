@@ -29,8 +29,8 @@ namespace TheLastOne.GameClass
         public int CS_Object_HP;        // 클라이언트가 서버에게 HP 데이터를 전달해 준다.
         public int CS_Car_Riding; 		// 클라이언트가 서버에게 차량에 탑승했다고 전달해 준다.
         public int CS_Car_Rode;             // 클라이언트가 서버에게 차량에 하차했다고 전달해 준다.
-        public int CS_Player_Status;			// 클라이언트가 서버에게 자신의 상태를 전달한다.
-
+        public int CS_Player_Status;            // 클라이언트가 서버에게 자신의 상태를 전달한다.
+        public int SC_Survival_Count;			// 클라이언트 에게 총 인원을 보내준다.
         public int Kind_Item;           // 아이템
         public int Kind_Car;            // 자동차
         public int Kind_Zombie;     // 좀비
@@ -59,6 +59,7 @@ namespace TheLastOne.GameClass
             SC_Remove_Zombie = 10;
             SC_Lobby_Time = 11;
             SC_StartCar_Play = 12;
+            SC_Survival_Count = 13;
             //----------------------------------
             // 클라이언트에서 서버로
             CS_Info = 1;

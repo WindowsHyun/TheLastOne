@@ -441,6 +441,7 @@ namespace TheLastOne.Game.Network
             {
                 //debugString = "1. M16, 2. 556, 3. AK, 4. 762, 5. M4A1, 6. UMP, 7. 9mm, 8. AidKit, 9. Armor, 0. UAZ";
                 TimeText.text = debugString.ToString();
+                SurvivalCount.text = SingletonCtrl.Instance_S.SurvivalPlayer.ToString();
                 msec = deltaTime * 1000.0f;
                 fps = 1.0f / deltaTime;
                 FPSstring = string.Format("{0:0.0} ms ({1:0.} fps)", msec, fps);
@@ -698,6 +699,14 @@ namespace TheLastOne.Game.Network
                 // 차량을 움직이라고 전달을 해준다.
                 SingletonCtrl.Instance_S.startCarStatus = true;
             }
+            else if (type == recv_protocol.SC_Survival_Count)
+            {
+                byte[] t_buf = new byte[size + 1];
+                System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
+                ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
+                var Get_ServerData = Client_Packet.GetRootAsClient_Packet(revc_buf);
+                SingletonCtrl.Instance_S.SurvivalPlayer = Int32.Parse(Get_ServerData.Id.ToString());
+            }
 
         }
 
@@ -707,6 +716,13 @@ namespace TheLastOne.Game.Network
             Application.runInBackground = true; // 백그라운드에서도 Network는 작동해야한다.
             m_Socket = SingletonCtrl.Instance_S.PlayerSocket;
             StartCoroutine(SocketCheck());
+        }
+
+        public void NetworkInit()
+        {
+            client_data.Clear();
+            zombie_data.Clear();
+            item_Collection.Clear();
         }
 
         public void Send_Packet(byte[] packet)
