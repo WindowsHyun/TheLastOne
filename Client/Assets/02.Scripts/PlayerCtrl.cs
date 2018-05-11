@@ -98,6 +98,9 @@ public class PlayerCtrl : PlayerVehicleCtrl
     // AudioSource 컴포넌트를 저장할 변수
     private AudioSource source = null;
 
+    // AudioSource 컴포넌트를 저장할 변수
+    private AudioSource engineSource = null;
+
     // MuzzleFlash의 MeshRenderer 컴포넌트 연결 변수
     public MeshRenderer muzzleFlash1;
     public MeshRenderer muzzleFlash2;
@@ -174,6 +177,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
     private NavMeshAgent navagent;
 
     public Text vehicleKMH;
+
 
     IEnumerator StartKeyInput()
     {
@@ -353,6 +357,9 @@ public class PlayerCtrl : PlayerVehicleCtrl
                         UAZImage.SetActive(true);
                         JEEPImage.SetActive(false);
                     }
+                    
+                    // 차량 탑승시 PlayerModel에 있는 engine 사운드 재생
+                    engineSource.Play();     
 
                 }
                 else if (rideCar == true && GetTheCar == true && ridingCar.Car_Status == true)
@@ -395,6 +402,10 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
                     // 차량 UI 비활성화
                     VehicleUI.SetActive(false);
+
+
+                    // 차량 하차시 PlayerModel에 있는 engine 사운드 멈춤
+                    engineSource.Stop();
                 }
             }
 
@@ -551,6 +562,9 @@ public class PlayerCtrl : PlayerVehicleCtrl
         // AudioSource 컴포넌트를 추출한 후 변수에 할당
         source = GetComponent<AudioSource>();
 
+        // AudioSource 컴포넌트를 추출한 후 변수에 할당 (차량 엔진 사운드, PlayerModel에 넣음)
+        engineSource = this.transform.GetChild(0).GetComponent<AudioSource>();
+
         // 최초의 MuzzleFlash MeshRenderer를 비활성화
         muzzleFlash1.enabled = false;
         muzzleFlash2.enabled = false;
@@ -643,6 +657,9 @@ public class PlayerCtrl : PlayerVehicleCtrl
             vehicleHpBar.fillAmount = (float)ridingCar.vehicleHp / (float)ridingCar.vehicleInitHp;
 
             vehicleKMH.text = (int)ridingCar.KMh + " km / h";
+
+            engineSource.pitch = ridingCar.pitch;
+
         }
     }
 

@@ -53,7 +53,8 @@ public class VehicleCtrl : PlayerVehicleCtrl
     public float KMh;
 
     // 엔진 사운드를 위한 변수
-    private float pitch = 0;
+    [HideInInspector]
+    public float pitch = 0;
 
 
 
@@ -104,7 +105,7 @@ public class VehicleCtrl : PlayerVehicleCtrl
 
         pitch = KMh * 0.05f;
 
-        GetComponent<AudioSource>().pitch = pitch;
+      
 
     }
 
