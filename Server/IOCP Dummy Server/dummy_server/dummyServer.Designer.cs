@@ -28,16 +28,19 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.connect_Server = new System.Windows.Forms.Button();
             this.DebugBox = new System.Windows.Forms.RichTextBox();
             this.connectCount = new System.Windows.Forms.TextBox();
             this.MovePos = new System.Windows.Forms.TextBox();
             this.disconnect_Server = new System.Windows.Forms.Button();
+            this.connectCountTimer = new System.Windows.Forms.Timer(this.components);
+            this.iPAdressText = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // connect_Server
             // 
-            this.connect_Server.Location = new System.Drawing.Point(135, 15);
+            this.connect_Server.Location = new System.Drawing.Point(133, 46);
             this.connect_Server.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.connect_Server.Name = "connect_Server";
             this.connect_Server.Size = new System.Drawing.Size(177, 26);
@@ -48,16 +51,16 @@
             // 
             // DebugBox
             // 
-            this.DebugBox.Location = new System.Drawing.Point(504, 15);
+            this.DebugBox.Location = new System.Drawing.Point(316, 13);
             this.DebugBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.DebugBox.Name = "DebugBox";
-            this.DebugBox.Size = new System.Drawing.Size(426, 306);
+            this.DebugBox.Size = new System.Drawing.Size(426, 93);
             this.DebugBox.TabIndex = 1;
             this.DebugBox.Text = "";
             // 
             // connectCount
             // 
-            this.connectCount.Location = new System.Drawing.Point(14, 15);
+            this.connectCount.Location = new System.Drawing.Point(12, 46);
             this.connectCount.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.connectCount.Name = "connectCount";
             this.connectCount.Size = new System.Drawing.Size(114, 25);
@@ -67,7 +70,7 @@
             // 
             // MovePos
             // 
-            this.MovePos.Location = new System.Drawing.Point(14, 48);
+            this.MovePos.Location = new System.Drawing.Point(12, 79);
             this.MovePos.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.MovePos.Name = "MovePos";
             this.MovePos.Size = new System.Drawing.Size(114, 25);
@@ -77,7 +80,7 @@
             // 
             // disconnect_Server
             // 
-            this.disconnect_Server.Location = new System.Drawing.Point(135, 49);
+            this.disconnect_Server.Location = new System.Drawing.Point(133, 80);
             this.disconnect_Server.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.disconnect_Server.Name = "disconnect_Server";
             this.disconnect_Server.Size = new System.Drawing.Size(177, 26);
@@ -86,11 +89,27 @@
             this.disconnect_Server.UseVisualStyleBackColor = true;
             this.disconnect_Server.Click += new System.EventHandler(this.disconnect_Server_Click);
             // 
+            // connectCountTimer
+            // 
+            this.connectCountTimer.Enabled = true;
+            this.connectCountTimer.Tick += new System.EventHandler(this.connectCountTimer_Tick);
+            // 
+            // iPAdressText
+            // 
+            this.iPAdressText.Location = new System.Drawing.Point(12, 13);
+            this.iPAdressText.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.iPAdressText.Name = "iPAdressText";
+            this.iPAdressText.Size = new System.Drawing.Size(298, 25);
+            this.iPAdressText.TabIndex = 5;
+            this.iPAdressText.Text = "127.0.0.1";
+            this.iPAdressText.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
             // dummyServer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(944, 411);
+            this.ClientSize = new System.Drawing.Size(760, 120);
+            this.Controls.Add(this.iPAdressText);
             this.Controls.Add(this.disconnect_Server);
             this.Controls.Add(this.MovePos);
             this.Controls.Add(this.connectCount);
@@ -112,6 +131,8 @@
         private System.Windows.Forms.TextBox connectCount;
         private System.Windows.Forms.TextBox MovePos;
         private System.Windows.Forms.Button disconnect_Server;
+        private System.Windows.Forms.Timer connectCountTimer;
+        private System.Windows.Forms.TextBox iPAdressText;
     }
 }
 

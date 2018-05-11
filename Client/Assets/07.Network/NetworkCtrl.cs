@@ -21,9 +21,9 @@ using UnityEngine.UI;   // TimeText를 쓰기 위하여
 
 public class NetworkMessage
 {
-    public int LimitReceivebyte = 4000;                     // Receive Data Length. (byte)
-    public byte[] Receivebyte = new byte[4000];    // Receive data by this array to save.
-    public byte[] Sendbyte = new byte[4000];
+    public int LimitReceivebyte = 7000;                     // Receive Data Length. (byte)
+    public byte[] Receivebyte = new byte[7000];    // Receive data by this array to save.
+    public byte[] Sendbyte = new byte[7000];
     public int now_packet_size = 0;
     public int prev_packet_size = 0;
     public StringBuilder sb = new StringBuilder();
@@ -86,7 +86,7 @@ namespace TheLastOne.Game.Network
         Vector3 Player_Rotation;
         Vector3 Car_Rotation;
 
-        private byte[] Sendbyte = new byte[4000];
+        private byte[] Sendbyte = new byte[7000];
 
         public static Dictionary<int, Game_ClientClass> client_data = new Dictionary<int, Game_ClientClass>();
         // 클라이언트 데이터 저장할 컨테이너

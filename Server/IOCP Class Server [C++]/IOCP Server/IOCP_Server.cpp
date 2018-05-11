@@ -259,6 +259,7 @@ void IOCP_Server::Worker_Thread()
 				// 카운트 다운이 모두 끝난 경우.
 				GameRoom[over->room_id].get_room().set_playGame(true);
 				GameRoom[over->room_id].set_status(inGameStatus);
+				std::cout << over->room_id << " Game Start..!" << std::endl;
 				// 게임이 시작 되었으므로 자기장 타이머도 시작이 된다.
 				Timer_Event t = { over->room_id, DangerLine_init, high_resolution_clock::now() + 1s, E_DangerLine };
 				Timer.setTimerEvent(t);
