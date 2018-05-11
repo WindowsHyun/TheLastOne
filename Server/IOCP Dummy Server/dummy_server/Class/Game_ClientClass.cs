@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using TheLastOne.NetworkClass;
 
+using System.Threading;
 using System.Net.Sockets;
 
 public struct Vector3
@@ -24,11 +25,12 @@ namespace TheLastOne.GameClass
     public class Game_ClientClass
     {
         public m_Network m_Net;
+        public Thread t1;
         private int id;             // 클라이언트 고유번호
         private int hp;             // 클라이언트 체력
         private int armour;         // 클라이언트 아머
         private int animator;    // 클라이언트 애니메이션
-        private Vector3 position;  // 클라이언트 위치
+        public Vector3 position;  // 클라이언트 위치
         private Vector3 rotation;    // 클라이언트 보는 방향
         private Vector3 carrotation;    // 클라이언트 보는 방향
         private bool prefab;    // 클라이언트 프리팹이 만들어졌는지 확인
@@ -78,9 +80,11 @@ namespace TheLastOne.GameClass
         public void set_removeClient(bool value) { this.removeClient = value; }
         public void set_weapon(int value) { this.nowWeaponState = value; }
 
+
         public Game_ClientClass(int id, m_Network m_net, Vector3 pos)
         {
             this.m_Net = m_net;
+            this.t1 = null;
             this.id = id;
             this.hp = 100;
             this.armour = 0;

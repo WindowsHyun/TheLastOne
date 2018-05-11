@@ -236,13 +236,6 @@ namespace TheLastOne.Game.Network
                             zombie_data[key].script.animator_value = zombie_data[key].get_animator();
                         }
 
-                        if (zombie_data[key].Zombie.transform.position.x != 0 && zombie_data[key].script.zombieNum != -1 && zombie_data[key].get_pos().y <= 25)
-                        {
-                            zombie_data[key].Zombie.transform.position = new Vector3(zombie_data[key].get_pos().x, 70, zombie_data[key].get_pos().z);
-                        }
-
-
-
                         if (zombie_data[key].get_hp() <= 0 && zombie_data[key].get_isDie() == false && zombie_data[key].get_pos().x != 0)
                         {
                             // 서버에서의 체력은 이미 0인데 클라가 0인 아닌경우를 대비하여
@@ -258,8 +251,9 @@ namespace TheLastOne.Game.Network
                     }
                     if (zombie_data[key].get_removeZombie() == true)
                     {
-                        // 플레이어 삭제를 할 경우 SetActive를 꺼준다.
+                        // 좀비 삭제를 할 경우 SetActive를 꺼준다.
                         zombie_data[key].set_activeZombie(false);
+                        zombie_data[key].script.StopAllCoroutines();
                         zombie_data[key].Zombie.SetActive(false);
                         zombie_data[key].set_removeZombie(false);
                     }
@@ -276,136 +270,135 @@ namespace TheLastOne.Game.Network
             {
                 if (Client_imei != -1)
                 {
-                    foreach (KeyValuePair<int, Game_ItemClass> iter in item_Collection)
+                    foreach (var key in item_Collection.Keys.ToList())
                     {
-                        if (iter.Value.get_draw() == false && iter.Value.get_name() != "")
+                        if (item_Collection[key].get_draw() == false && item_Collection[key].get_name() != "")
                         {
                             // 그려져 있지 않을경우 그려준다.
-                            if (iter.Value.get_name() == "AK47")
+                            if (item_Collection[key].get_name() == "AK47")
                             {
-                                iter.Value.item = (GameObject)Instantiate(item_AK47, iter.Value.get_pos(), Quaternion.identity);
-                                iter.Value.item.transform.SetParent(ItemCollection.transform);
-                                iter.Value.set_draw(true);
+                                item_Collection[key].item = (GameObject)Instantiate(item_AK47, item_Collection[key].get_pos(), Quaternion.identity);
+                                item_Collection[key].item.transform.SetParent(ItemCollection.transform);
+                                item_Collection[key].set_draw(true);
                             }
-                            else if (iter.Value.get_name() == "M16")
+                            else if (item_Collection[key].get_name() == "M16")
                             {
-                                iter.Value.item = Instantiate(item_M16, iter.Value.get_pos(), Quaternion.identity);
-                                iter.Value.item.transform.SetParent(ItemCollection.transform);
-                                iter.Value.set_draw(true);
+                                item_Collection[key].item = Instantiate(item_M16, item_Collection[key].get_pos(), Quaternion.identity);
+                                item_Collection[key].item.transform.SetParent(ItemCollection.transform);
+                                item_Collection[key].set_draw(true);
                             }
-                            else if (iter.Value.get_name() == "556")
+                            else if (item_Collection[key].get_name() == "556")
                             {
-                                iter.Value.item = Instantiate(item_556, iter.Value.get_pos(), Quaternion.Euler(-90, 0, 0));
-                                iter.Value.item.transform.SetParent(ItemCollection.transform);
-                                iter.Value.set_draw(true);
+                                item_Collection[key].item = Instantiate(item_556, item_Collection[key].get_pos(), Quaternion.Euler(-90, 0, 0));
+                                item_Collection[key].item.transform.SetParent(ItemCollection.transform);
+                                item_Collection[key].set_draw(true);
                             }
-                            else if (iter.Value.get_name() == "762")
+                            else if (item_Collection[key].get_name() == "762")
                             {
-                                iter.Value.item = Instantiate(item_762, iter.Value.get_pos(), Quaternion.Euler(-90, 0, 0));
-                                iter.Value.item.transform.SetParent(ItemCollection.transform);
-                                iter.Value.set_draw(true);
+                                item_Collection[key].item = Instantiate(item_762, item_Collection[key].get_pos(), Quaternion.Euler(-90, 0, 0));
+                                item_Collection[key].item.transform.SetParent(ItemCollection.transform);
+                                item_Collection[key].set_draw(true);
                             }
-                            else if (iter.Value.get_name() == "AidKit")
+                            else if (item_Collection[key].get_name() == "AidKit")
                             {
-                                iter.Value.item = Instantiate(item_AidKit, iter.Value.get_pos(), Quaternion.Euler(-90, 0, 0));
-                                iter.Value.item.transform.SetParent(ItemCollection.transform);
-                                iter.Value.set_draw(true);
+                                item_Collection[key].item = Instantiate(item_AidKit, item_Collection[key].get_pos(), Quaternion.Euler(-90, 0, 0));
+                                item_Collection[key].item.transform.SetParent(ItemCollection.transform);
+                                item_Collection[key].set_draw(true);
                             }
-                            else if (iter.Value.get_name() == "UAZ")
+                            else if (item_Collection[key].get_name() == "UAZ")
                             {
-                                iter.Value.item = Instantiate(Car_UAZ, iter.Value.get_pos(), Quaternion.Euler(iter.Value.get_rotation().x, iter.Value.get_rotation().y, iter.Value.get_rotation().z));
-                                iter.Value.item.transform.SetParent(ItemCollection.transform);
+                                item_Collection[key].item = Instantiate(Car_UAZ, item_Collection[key].get_pos(), Quaternion.Euler(item_Collection[key].get_rotation().x, item_Collection[key].get_rotation().y, item_Collection[key].get_rotation().z));
+                                item_Collection[key].item.transform.SetParent(ItemCollection.transform);
 
-                                iter.Value.car = iter.Value.item.GetComponent<VehicleCtrl>();
-                                iter.Value.c_rigidbody = iter.Value.item.GetComponent<Rigidbody>();
-                                iter.Value.car.carNum = iter.Key;  // 해당 차량이 몇번째 차량인지 알려주자.
-                                iter.Value.item.name = "UAZ_" + iter.Key;
-                                iter.Value.set_draw(true);
+                                item_Collection[key].car = item_Collection[key].item.GetComponent<VehicleCtrl>();
+                                item_Collection[key].c_rigidbody = item_Collection[key].item.GetComponent<Rigidbody>();
+                                item_Collection[key].car.carNum = key;  // 해당 차량이 몇번째 차량인지 알려주자.
+                                item_Collection[key].item.name = "UAZ_" + key;
+                                item_Collection[key].set_draw(true);
                             }
-                            else if (iter.Value.get_name() == "JEEP")
+                            else if (item_Collection[key].get_name() == "JEEP")
                             {
-                                iter.Value.item = Instantiate(Car_JEEP, iter.Value.get_pos(), Quaternion.Euler(iter.Value.get_rotation().x, iter.Value.get_rotation().y, iter.Value.get_rotation().z));
-                                iter.Value.item.transform.SetParent(ItemCollection.transform);
+                                item_Collection[key].item = Instantiate(Car_JEEP, item_Collection[key].get_pos(), Quaternion.Euler(item_Collection[key].get_rotation().x, item_Collection[key].get_rotation().y, item_Collection[key].get_rotation().z));
+                                item_Collection[key].item.transform.SetParent(ItemCollection.transform);
 
-                                iter.Value.car = iter.Value.item.GetComponent<VehicleCtrl>();
-                                iter.Value.c_rigidbody = iter.Value.item.GetComponent<Rigidbody>();
-                                iter.Value.car.carNum = iter.Key;  // 해당 차량이 몇번째 차량인지 알려주자.
-                                iter.Value.item.name = "JEEP_" + iter.Key;
-                                iter.Value.set_draw(true);
+                                item_Collection[key].car = item_Collection[key].item.GetComponent<VehicleCtrl>();
+                                item_Collection[key].c_rigidbody = item_Collection[key].item.GetComponent<Rigidbody>();
+                                item_Collection[key].car.carNum = key;  // 해당 차량이 몇번째 차량인지 알려주자.
+                                item_Collection[key].item.name = "JEEP_" + key;
+                                item_Collection[key].set_draw(true);
                             }
-                            else if (iter.Value.get_name() == "M4A1")
+                            else if (item_Collection[key].get_name() == "M4A1")
                             {
-                                iter.Value.item = Instantiate(item_M4A1, iter.Value.get_pos(), Quaternion.Euler(0, 0, 90));
-                                iter.Value.item.transform.SetParent(ItemCollection.transform);
+                                item_Collection[key].item = Instantiate(item_M4A1, item_Collection[key].get_pos(), Quaternion.Euler(0, 0, 90));
+                                item_Collection[key].item.transform.SetParent(ItemCollection.transform);
 
-                                iter.Value.car = iter.Value.item.GetComponent<VehicleCtrl>();
-                                iter.Value.item.transform.SetParent(ItemCollection.transform);
-                                iter.Value.set_draw(true);
+                                item_Collection[key].car = item_Collection[key].item.GetComponent<VehicleCtrl>();
+                                item_Collection[key].item.transform.SetParent(ItemCollection.transform);
+                                item_Collection[key].set_draw(true);
                             }
-                            else if (iter.Value.get_name() == "UMP")
+                            else if (item_Collection[key].get_name() == "UMP")
                             {
-                                iter.Value.item = Instantiate(item_UMP, iter.Value.get_pos(), Quaternion.Euler(0, 0, 90));
-                                iter.Value.item.transform.SetParent(ItemCollection.transform);
-                                iter.Value.set_draw(true);
+                                item_Collection[key].item = Instantiate(item_UMP, item_Collection[key].get_pos(), Quaternion.Euler(0, 0, 90));
+                                item_Collection[key].item.transform.SetParent(ItemCollection.transform);
+                                item_Collection[key].set_draw(true);
                             }
-                            else if (iter.Value.get_name() == "9mm")
+                            else if (item_Collection[key].get_name() == "9mm")
                             {
-                                iter.Value.item = Instantiate(item_9mm, iter.Value.get_pos(), Quaternion.Euler(-90, 0, 0));
-                                iter.Value.item.transform.SetParent(ItemCollection.transform);
-                                iter.Value.set_draw(true);
+                                item_Collection[key].item = Instantiate(item_9mm, item_Collection[key].get_pos(), Quaternion.Euler(-90, 0, 0));
+                                item_Collection[key].item.transform.SetParent(ItemCollection.transform);
+                                item_Collection[key].set_draw(true);
                             }
-                            else if (iter.Value.get_name() == "Armor")
+                            else if (item_Collection[key].get_name() == "Armor")
                             {
-                                iter.Value.item = Instantiate(iterm_Armor, iter.Value.get_pos(), Quaternion.identity);
-                                iter.Value.item.transform.SetParent(ItemCollection.transform);
-                                iter.Value.set_draw(true);
+                                item_Collection[key].item = Instantiate(iterm_Armor, item_Collection[key].get_pos(), Quaternion.identity);
+                                item_Collection[key].item.transform.SetParent(ItemCollection.transform);
+                                item_Collection[key].set_draw(true);
                             }
                         }
-                        else if (iter.Value.get_draw() == true && iter.Value.item.activeInHierarchy == false && iter.Value.get_sendPacket() == false && iter.Value.get_kind() != recv_protocol.Kind_Car)
+                        else if (item_Collection[key].get_draw() == true && item_Collection[key].item.activeInHierarchy == false && item_Collection[key].get_sendPacket() == false && item_Collection[key].get_kind() != recv_protocol.Kind_Car)
                         {
                             // 이미 그려진 상태에서 아이템이 먹어졌을 경우, 서버로 아이템을 먹었다고 보내야 한다.
-                            iter.Value.set_sendPacket(true);
-                            Sendbyte = sF.makeEatItem_PacketInfo(iter.Value.get_id());
+                            item_Collection[key].set_sendPacket(true);
+                            Sendbyte = sF.makeEatItem_PacketInfo(item_Collection[key].get_id());
                             Send_Packet(Sendbyte);
                         }
-                        else if (iter.Value.get_eat() == true && iter.Value.item != null && iter.Value.item.activeInHierarchy == true)
+                        else if (item_Collection[key].get_eat() == true && item_Collection[key].item != null && item_Collection[key].item.activeInHierarchy == true)
                         {
                             // Item이 정상적으로 나왔다가 다른 사람이 먹었을 경우에 대한 처리
-                            iter.Value.item.SetActive(false);
+                            item_Collection[key].item.SetActive(false);
                         }
-                        if (iter.Value.get_name() == "UAZ" || iter.Value.get_name() == "JEEP")
+                        if (item_Collection[key].get_name() == "UAZ" || item_Collection[key].get_name() == "JEEP")
                         {
                             // 차량의 탑승 상태를 전달해 준다.
-                            iter.Value.car.Car_Status = iter.Value.get_riding();
-                            iter.Value.car.vehicleHp = iter.Value.get_hp();
-                            if (iter.Value.get_hp() <= 0 && iter.Value.get_explosion() == false)
+                            item_Collection[key].car.Car_Status = item_Collection[key].get_riding();
+                            item_Collection[key].car.vehicleHp = item_Collection[key].get_hp();
+                            if (item_Collection[key].get_hp() <= 0 && item_Collection[key].get_explosion() == false)
                             {
-                                iter.Value.set_explosion(true);
-                                iter.Value.car.ExpCar();
+                                item_Collection[key].set_explosion(true);
+                                item_Collection[key].car.ExpCar();
                             }
                         }
-                        if (iter.Value.get_kind() == recv_protocol.Kind_Car && Player_Script.CarNum != iter.Key 
-                            && iter.Value.get_riding() == true)
+                        if (item_Collection[key].get_kind() == recv_protocol.Kind_Car && Player_Script.CarNum != key
+                            && item_Collection[key].get_riding() == true)
                         {
                             // 차량의 경우 지속적으로 위치를 갱신 해준다.
-                            //Debug.Log(iter.Value.get_pos().y + " | " + iter.Value.item.transform.position.y);
-                            iter.Value.car.MovePos(iter.Value.get_pos());
-                            //iter.Value.item.transform.position = Vector3.MoveTowards(iter.Value.item.transform.position, iter.Value.get_pos(), Time.deltaTime * 4000.0f);
-                            iter.Value.c_rigidbody.isKinematic = false;
-                            iter.Value.item.transform.rotation = Quaternion.Euler(iter.Value.get_rotation().x, iter.Value.get_rotation().y, iter.Value.get_rotation().z);
+                            //Debug.Log(item_Collection[key].get_pos().y + " | " + item_Collection[key].item.transform.position.y);
+                            item_Collection[key].car.MovePos(item_Collection[key].get_pos());
+                            //item_Collection[key].item.transform.position = Vector3.MoveTowards(item_Collection[key].item.transform.position, item_Collection[key].get_pos(), Time.deltaTime * 4000.0f);
+                            item_Collection[key].c_rigidbody.isKinematic = false;
+                            item_Collection[key].item.transform.rotation = Quaternion.Euler(item_Collection[key].get_rotation().x, item_Collection[key].get_rotation().y, item_Collection[key].get_rotation().z);
 
-                        }else if (iter.Value.get_kind() == recv_protocol.Kind_Car && Player_Script.CarNum != iter.Key
-                            && iter.Value.get_riding() == false)
+                        }
+                        else if (item_Collection[key].get_kind() == recv_protocol.Kind_Car && Player_Script.CarNum != key
+                           && item_Collection[key].get_riding() == false)
                         {
-                            iter.Value.c_rigidbody.isKinematic = true;
+                            item_Collection[key].c_rigidbody.isKinematic = true;
                         }
 
                     }
                 }
-                //yield return new WaitForSeconds(0.06f);
                 yield return null;
             } while (true);
-            //yield return null;
         }
 
         IEnumerator playerLocation_Packet()
@@ -759,12 +752,16 @@ namespace TheLastOne.Game.Network
             Send_Packet(Sendbyte);
         }
 
-        public void Zombie_Pos(Vector3 pos, Vector3 rotation, int zombieNum, Enum animation)
+        public void Zombie_Pos(Vector3 pos, Vector3 rotation, int zombieNum, Enum animation, int target)
         {
             // 좀비의 위치를 Zombie_Data에 넣어준다.
             Game_ZombieClass iter = zombie_data[zombieNum];
             iter.set_pos(pos);
             iter.set_rot(rotation);
+            if (target == 0)
+                iter.set_target(Client_imei);
+            else
+                iter.set_target(target);
             iter.set_animator(Convert.ToInt32(animation));
         }
 

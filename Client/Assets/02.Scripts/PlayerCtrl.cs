@@ -759,7 +759,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
         }
 
         // 충돌한 게임오브젝트의 태그값 비교
-        if (coll.gameObject.tag == "ZombieAttack")
+        if (coll.gameObject.tag == "ZombieAttack" )
         {
             CreateBloodEffect(coll.transform.position);
 
@@ -896,9 +896,9 @@ public class PlayerCtrl : PlayerVehicleCtrl
         Destroy(blood1, 1.0f);
     }
 
-    public void send_ZombieData(Vector3 pos, Vector3 rotation, int zombieNum, Enum animation)
+    public void send_ZombieData(Vector3 pos, Vector3 rotation, int zombieNum, Enum animation, int target)
     {
-        networkCtrl.Zombie_Pos(pos, rotation, zombieNum, animation);
+        networkCtrl.Zombie_Pos(pos, rotation, zombieNum, animation, target);
     }
 
     public void send_ZombieHP(int id, int hp)

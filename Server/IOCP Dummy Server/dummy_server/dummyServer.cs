@@ -26,7 +26,7 @@ namespace dummy_server
         public const int kPort = 9000;
 
         private byte[] Sendbyte = new byte[7000];
-        private int MaxClient = 48;
+        private int MaxClient = 35;
 
         public static Dictionary<int, Game_ClientClass> client_data = new Dictionary<int, Game_ClientClass>();
         // 클라이언트 데이터 저장할 컨테이너
@@ -79,51 +79,64 @@ namespace dummy_server
                 Thread.Sleep(50);
             }
 
+            foreach (var key in client_data.Keys.ToList())
+            {
+                // 레디 준비 완료.
+                Send_Packet(client_data[key].m_Net ,sF.makePlayer_Status(2));
+                Thread.Sleep(100);
+            }
+            connect_Server.Enabled = false;
         }
 
-        //void Update(int ci)
-        //{
-        //    int animation = 0;
-        //    while (true)
-        //    {
-        //        switch (r.Next(0, 5))
-        //        {
-        //            case 0:
-        //                // 위로
-        //                animation = 3;
-        //                client_data[ci].position.x += Int32.Parse(MovePos.Text);
-        //                client_data[ci].position.z += Int32.Parse(MovePos.Text);
-        //                break;
-        //            case 1:
-        //                // 아래로
-        //                animation = 4;
-        //                client_data[ci].position.x -= Int32.Parse(MovePos.Text);
-        //                client_data[ci].position.z -= Int32.Parse(MovePos.Text);
-        //                break;
-        //            case 2:
-        //                // 왼쪽
-        //                animation = 5;
-        //                client_data[ci].position.x -= Int32.Parse(MovePos.Text);
-        //                break;
-        //            case 3:
-        //                // 오른쪽
-        //                animation = 6;
-        //                client_data[ci].position.x += Int32.Parse(MovePos.Text);
-        //                break;
-        //            case 4:
-        //                // 총알 발사!
-        //                // 더미 서버의 클라이언트와,  
-        //                //SetText(ci + "가 총을 발사 합니다.");
-        //                client_data[ci].stateObject.Sendbyte = makeShot_PacketInfo(client_data[ci].id);
-        //                Send_Packet(client_data[ci].stateObject.workSocket, client_data[ci].stateObject.Sendbyte);
-        //                break;
-        //        }
+        void Update(int ci)
+        {
+            int h = 0;
+            int v = 0;
+            while (true)
+            {
+                switch (r.Next(0, 5))
+                {
+                    case 0:
+                        // 위로
+                        h = 0;
+                        v = 1;
+                        
+                        client_data[ci].position.x += Int32.Parse(MovePos.Text);
+                        client_data[ci].position.z += Int32.Parse(MovePos.Text);
+                        break;
+                    case 1:
+                        // 아래로
+                        h = 0;
+                        v = -1;
+                        client_data[ci].position.x -= Int32.Parse(MovePos.Text);
+                        client_data[ci].position.z -= Int32.Parse(MovePos.Text);
+                        break;
+                    case 2:
+                        // 왼쪽
+                        h = -1;
+                        v = 0;
+                        client_data[ci].position.x -= Int32.Parse(MovePos.Text);
+                        break;
+                    case 3:
+                        // 오른쪽
+                        h = 1;
+                        v = 0;
+                        client_data[ci].position.x += Int32.Parse(MovePos.Text);
+                        break;
+                    case 4:
+                        // 총알 발사!
+                        // 더미 서버의 클라이언트와,  
+                        //SetText(ci + "가 총을 발사 합니다.");
+                        client_data[ci].m_Net.Sendbyte = sF.makeShot_PacketInfo(ci);
+                        Send_Packet(client_data[ci].m_Net, client_data[ci].m_Net.Sendbyte);
+                        break;
+                }
 
-        //        client_data[ci].stateObject.Sendbyte = makeClient_PacketInfo(client_data[ci].position, animation, client_data[ci].rotation);
-        //        Send_Packet(client_data[ci].stateObject.workSocket, client_data[ci].stateObject.Sendbyte);
-        //        Thread.Sleep(500);
-        //    }
-        //}
+                client_data[ci].m_Net.Sendbyte = sF.makeClient_PacketInfo(client_data[ci].position, 0, h, v, r.Next(1,4));
+                Send_Packet(client_data[ci].m_Net, client_data[ci].m_Net.Sendbyte);
+                Thread.Sleep(1024);
+            }
+        }
 
 
         public void Send_Packet(m_Network m_Net, byte[] packet)
@@ -158,15 +171,13 @@ namespace dummy_server
                 var Get_ServerData = Client_id.GetRootAsClient_id(revc_buf);
                 //client_data[state.client_id].id = Int32.Parse(Get_ServerData.Id.ToString());
 
-                client_data.Add(Get_ServerData.Id, new Game_ClientClass(Get_ServerData.Id, m_Net, new Vector3(r.Next(500, 1200), 30, r.Next(900, 1800))));
+                client_data.Add(Get_ServerData.Id, new Game_ClientClass(Get_ServerData.Id, m_Net, new Vector3(r.Next(880, 1400), 30, r.Next(750, 1600))));
 
 
                 System.Diagnostics.Debug.WriteLine("클라이언트 아이디 : " + Get_ServerData.Id.ToString());
                 SetText("클라이언트 아이디 : " + Get_ServerData.Id.ToString());
 
                 // 클라이언트 아이디를 여기서 제공해준다.
-                //Thread t1 = new Thread(() => Update(state.client_id));
-                //t1.Start();
             }
             else if (type == recv_protocol.SC_Client_Data)
             {
@@ -192,16 +203,21 @@ namespace dummy_server
 
         private void disconnect_Server_Click(object sender, EventArgs e)
         {
-            for (int i = 0; i < MaxClient; ++i)
+            foreach (var key in client_data.Keys.ToList())
             {
+                client_data[key].m_Net.workSocket.Close();
+                client_data[key].t1.Join();
+                Thread.Sleep(50);
             }
+            allReady.Enabled = true;
+            connect_Server.Enabled = true;
+            DebugBox.Text = "";
         }
 
         private void connectCountTimer_Tick(object sender, EventArgs e)
         {
             MaxClient = Int32.Parse(connectCount.Text.ToString());
         }
-
 
         public void ConnectCallback(IAsyncResult ar)
         {
@@ -289,10 +305,25 @@ namespace dummy_server
             catch
             {
                 m_Network client = (m_Network)ar.AsyncState;
-                client.workSocket.BeginReceive(client.new_msg.Receivebyte, 0, client.new_msg.LimitReceivebyte, SocketFlags.None, new AsyncCallback(RecieveHeaderCallback), client);
+                if (client.workSocket.Connected != false)
+                    client.workSocket.BeginReceive(client.new_msg.Receivebyte, 0, client.new_msg.LimitReceivebyte, SocketFlags.None, new AsyncCallback(RecieveHeaderCallback), client);
             }
         }
 
+        private void allReady_Click(object sender, EventArgs e)
+        {
+            foreach (var key in client_data.Keys.ToList())
+            {
+                // 인게임 화면 완료.
+                Send_Packet(client_data[key].m_Net, sF.makePlayer_Status(4));
+                Thread.Sleep(100);
+
+                client_data[key].t1 = new Thread(() => Update(key));
+                client_data[key].t1.Start();
+            }
+           // allReady.Enabled = false;
+
+        }
     }
 }
 

@@ -57,7 +57,7 @@ enum Event_Type {
 
 // 자기장 시간
 #define DangerLine_init 10
-#define DangerLine_Level4 240
+#define DangerLine_Level4 2400
 #define DangerLine_Level3 240
 #define DangerLine_Level2 240
 #define DangerLine_Level1 240
@@ -67,7 +67,7 @@ enum Event_Type {
 #define Player_Dist 500
 
 // 좀비가 볼 수 있는 거리
-#define Zombie_Dist 200
+#define Zombie_Dist 250
 //#define Limit_Zombie 15
 #define Create_Zombie 50
 

@@ -219,7 +219,7 @@ void IOCP_Server::Worker_Thread()
 		else if (OP_RemoveClient == over->event_type) {
 			// 1초마다 한번씩 종료된 클라이언트를 지워 준다.
 			Remove_Client();
-			Timer_Event t = { over->room_id, 1, high_resolution_clock::now() + 1s, E_Remove_Client };
+			Timer_Event t = { over->room_id, 3, high_resolution_clock::now() + 1s, E_Remove_Client };
 			Timer.setTimerEvent(t);
 		}
 		else if (OP_DangerLineDamage == over->event_type) {
@@ -259,12 +259,9 @@ void IOCP_Server::Worker_Thread()
 				// 카운트 다운이 모두 끝난 경우.
 				GameRoom[over->room_id].get_room().set_playGame(true);
 				GameRoom[over->room_id].set_status(inGameStatus);
-				std::cout << over->room_id << " Game Start..!" << std::endl;
-				// 게임이 시작 되었으므로 자기장 타이머도 시작이 된다.
-				Timer_Event t = { over->room_id, DangerLine_init, high_resolution_clock::now() + 1s, E_DangerLine };
-				Timer.setTimerEvent(t);
-				// 자기장 밖의 경우 데미지를 잃게 수정을 한다.
-				t = { over->room_id, 1, high_resolution_clock::now() + 1s, E_DangerLineDamage };
+				std::cout << "Room : "<< over->room_id << " Game Start..!" << std::endl;
+				// 자기장 밖의 경우 데미지를 잃게 타이머 시작을 한다.
+				Timer_Event t = { over->room_id, 1, high_resolution_clock::now() + 1s, E_DangerLineDamage };
 				Timer.setTimerEvent(t);
 				// 모든 플레이어들이 인게임에 들어와 있는지 타이머를 돌려 확인한다.
 				t = { over->room_id, 1, high_resolution_clock::now() + 100ms, E_StartCarWait };
@@ -354,12 +351,13 @@ void IOCP_Server::Remove_Client()
 			// 방 안 인원이 0명 이거나 그보다 작은 경우는 넘긴다.
 			continue;
 
-		std::unordered_map< int, Game_Client> &client = room_iter.get_room().get_client();
+		//std::unordered_map< int, Game_Client> &client = room_iter.get_room().get_client();
 
-		if (client.size() == 0)
+		if (room_iter.get_room().get_client().size() == 0)
 			continue;
 
-		for (auto client_iter = client.begin(); client_iter != client.end();) {
+
+		for (auto client_iter = room_iter.get_room().get_client().begin(); client_iter != room_iter.get_room().get_client().end();) {
 			// 해당 방에서 Client를 시작부터 끝까지 확인 한다.
 			if (client_iter->second.get_Connect() == false && client_iter->second.get_Remove() == true) {
 				// Disconnect로 설정된 클라이언트만 찾는다.
@@ -367,15 +365,16 @@ void IOCP_Server::Remove_Client()
 				std::cout << "Disconnect Client : " << client_iter->second.get_client_id() << std::endl;
 #endif
 				Send_Client_ID(client_iter->second.get_room_id(), client_iter->second.get_client_id(), SC_REMOVE_PLAYER, true);
-				closesocket(client_iter->second.get_Socket());
+				if (client_iter->second.get_hp() >= -100 && client_iter->second.get_hp() <= 100)
+					closesocket(client_iter->second.get_Socket());
 				remove_client_id.push(client_iter->second.get_client_id());	// 종료된 클라이언트 번호를 스택에 넣어준다.
-				client_iter = client.erase(client_iter);		// Map 에서 해당 클라이언트를 삭제한다.
+				client_iter = room_iter.get_room().get_client().erase(client_iter++);		// Map 에서 해당 클라이언트를 삭제한다.
 			}
 			else {
-				client_iter++;
+				++client_iter;
 			}
-
 		}
+
 	}
 }
 
@@ -435,6 +434,7 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *pac
 		client->second.set_vertical(client_View->Vertical());
 		client->second.set_inCar(client_View->inCar());
 		client->second.set_client_DangerLine(client_View->dangerLineIn());
+		//std::cout << client->first << " | 자기장 : " << client_View->dangerLineIn() << std::endl;
 		if (client_View->inCar() != -1) {
 			// 차량을 실제로 탑승 하고 있을 경우.
 			auto item = GameRoom[room_id].get_room().get_item_iter(client_View->inCar());
@@ -488,10 +488,20 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *pac
 			auto iter = GameRoom[room_id].get_room().get_zombie_iter(packet_zombie->Get(i)->id());
 			iter->second.set_animator(packet_zombie->Get(i)->animator());
 			xyz packet_position{ packet_zombie->Get(i)->position()->x() , packet_zombie->Get(i)->position()->y() , packet_zombie->Get(i)->position()->z() };
-			//std::cout << packet_zombie->Get(i)->id() << " : " << packet_zombie->Get(i)->position()->x() << ", " << packet_zombie->Get(i)->position()->y() << ", " << packet_zombie->Get(i)->position()->z() << std::endl;
 			iter->second.set_zombie_position(packet_position);
 			xyz packet_rotation{ packet_zombie->Get(i)->rotation()->x() , packet_zombie->Get(i)->rotation()->y() , packet_zombie->Get(i)->rotation()->z() };
 			iter->second.set_zombie_rotation(packet_rotation);
+			if (iter->second.get_target() == -1 && packet_zombie->Get(i)->targetPlayer() != -1) {
+				// 타겟이 없었는데 클라이언트에서 타겟을 넣어줬다.
+				iter->second.set_target(packet_zombie->Get(i)->targetPlayer());
+				//std::cout << "타겟 설정 : " << iter->second.get_target() << std::endl;
+			}else if (iter->second.get_target() != -1 && packet_zombie->Get(i)->targetPlayer() == -1) {
+				// 타겟이 있었는데 클라이언트에서 타겟을 초기화 해줬다.
+				iter->second.set_target(packet_zombie->Get(i)->targetPlayer());
+				//std::cout << "타겟 초기화 : " << iter->second.get_target() << std::endl;
+			}
+
+
 		}
 	}
 	break;
@@ -502,7 +512,6 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *pac
 			auto iter = GameRoom[room_id].get_room().get_client_iter(client_Check_info->id());
 			iter->second.set_hp(client_Check_info->hp());
 			iter->second.set_armour(client_Check_info->armour());
-			std::cout << client_Check_info->hp() << std::endl;
 		}
 		else if (client_Check_info->kind() == Kind_Zombie) {
 			auto iter = GameRoom[room_id].get_room().get_zombie_iter(client_Check_info->id());
@@ -625,8 +634,8 @@ void IOCP_Server::Send_All_Player(const int room_id, const int client)
 	flatbuffers::FlatBufferBuilder builder;
 	std::vector<flatbuffers::Offset<Client_info>> Individual_client;		// 개인 데이터
 	for (auto iter : GameRoom[room_id].get_room().get_client()) {
-		if (iter.second.get_Connect() != true || Distance(room_id, client_iter->second.get_client_id(), iter.second.get_client_id(), Player_Dist, Kind_Player) == false)
-			// 클라이언트가 연결 안되어 있으면 제외 한다.
+		if (iter.second.get_Connect() != true || Distance(room_id, client_iter->second.get_client_id(), iter.second.get_client_id(), Player_Dist, Kind_Player) == false || iter.second.get_hp() <= 0)
+			// 클라이언트가 연결 안되어 있으면 제외 한다. 또는 체력이 없을경우 제외한다.
 			continue;
 
 		auto id = iter.second.get_client_id();
@@ -663,7 +672,8 @@ void IOCP_Server::Send_All_Zombie(const int room_id, const int client)
 	std::vector<flatbuffers::Offset<Zombie_info>> Individual_zombie;		// 개인 데이터
 
 	for (auto zombie : GameRoom[room_id].get_room().get_zombie()) {
-		if (Distance(room_id, client_iter->second.get_client_id(), zombie.second.get_client_id(), Zombie_Dist, Kind_Zombie) == false)
+		if (Distance(room_id, client_iter->second.get_client_id(), zombie.second.get_client_id(), Zombie_Dist, Kind_Zombie) == false ||
+			zombie.second.get_hp() <= 0)
 			// 클라이언트가 연결 안되어 있으면 제외 한다.
 			continue;
 
@@ -844,18 +854,24 @@ void IOCP_Server::Check_InGamePlayer(const int room_id)
 	}
 
 	if (GameRoom[room_id].get_room().get_client().size() == ingamePlayer) {
+		std::cout << "Room : "<< room_id << " In Game Start..!" << std::endl;
 		// 모두 인게임 상태일 경우 패킷을 전송해 준다.
 		flatbuffers::FlatBufferBuilder builder;
 		auto id = 616;		// 패킷 값만 보내면 되므로 아무런 숫자나 입력 해준다.
 		auto orc = CreateClient_Packet(builder, id);
 		builder.Finish(orc); // Serialize the root of the object.
 
-		for (auto iter : GameRoom[room_id].get_room().get_client()) {
-			if (iter.second.get_Connect() != true)
-				continue;
-			SendPacket(SC_StartCar_Play, room_id, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
+		for (int i = 0; i < 2; ++i) {
+			// 혹시 패킷 오류로 못받을 수 있으니 한번 더 보내준다.
+			for (auto iter : GameRoom[room_id].get_room().get_client()) {
+				if (iter.second.get_Connect() != true)
+					continue;
+				SendPacket(SC_StartCar_Play, room_id, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
+			}
 		}
-
+		// 게임이 시작 되었으므로 자기장 타이머도 시작이 된다.
+		Timer_Event t = { room_id, DangerLine_init, high_resolution_clock::now() + 1s, E_DangerLine };
+		Timer.setTimerEvent(t);
 	}
 	else {
 		Timer_Event t = { room_id, 1, high_resolution_clock::now() + 100ms, E_StartCarWait };
@@ -898,7 +914,7 @@ void IOCP_Server::Send_SurvivalCount(const int room_id, const int client)
 	auto orc = CreateClient_Packet(builder, Client_id);
 	builder.Finish(orc); // Serialize the root of the object.
 
-	SendPacket(SC_Survival_Count, room_id, client , builder.GetBufferPointer(), builder.GetSize());
+	SendPacket(SC_Survival_Count, room_id, client, builder.GetBufferPointer(), builder.GetSize());
 }
 
 void IOCP_Server::Attack_DangerLine_Damge(const int room_id)

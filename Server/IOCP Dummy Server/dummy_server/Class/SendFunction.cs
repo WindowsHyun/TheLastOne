@@ -24,7 +24,7 @@ namespace TheLastOne.SendFunction
             Client_info.AddCarrotation(fbb, Vec3.CreateVec3(fbb, 0, 0, 0));
             Client_info.AddPosition(fbb, Vec3.CreateVec3(fbb, Player.x, Player.y, Player.z));
             Client_info.AddRotation(fbb, Vec3.CreateVec3(fbb, 0, 0, 0));
-            Client_info.AddDangerLineIn(fbb, false);
+            Client_info.AddDangerLineIn(fbb, true);
             Client_info.AddNowWeapon(fbb, Player_Weapone);
             var endOffset = Client_info.EndClient_info(fbb);
             fbb.Finish(endOffset.Value);
