@@ -99,10 +99,33 @@ public class ZombieCtrl : MonoBehaviour
     {
         while (!isDie)
         {
-
-            if (playerCtrl.Client_imei != targetPlayer && targetPlayer != -1)
+            if ((targetPlayer == -1 || playerCtrl.Client_imei == targetPlayer) && targetPlayer != -2)
             {
-                // 좀비의 Target과 자신의 IMEI가 다른경우 Walk 등을 하지 않는다.
+                // 좀비의 타겟이 없을 경우.
+                float dist = Vector3.Distance(playerTr.position, zombieTr.position);
+                if (dist <= attackDist)
+                {
+                    // 공격거리 범위 이내로 들어왔는지 확인{
+                    zombieState = ZombieState.attack;
+                    playerCtrl.send_ZombieData(zombieTr.position, zombieTr.eulerAngles, zombieNum, zombieState, 0);
+                }
+                else if (dist <= traceDist)
+                {
+                    // 플레이어 추격위치에 도달할 경우
+                    zombieState = ZombieState.walk;
+                    playerCtrl.send_ZombieData(zombieTr.position, zombieTr.eulerAngles, zombieNum, zombieState, 0);
+                }
+                else if (dist > traceDist)
+                {
+                    // 플레이어 추격위치에 멀어질 경우
+                    zombieState = ZombieState.idle;
+                    playerCtrl.send_ZombieData(zombieTr.position, zombieTr.eulerAngles, zombieNum, zombieState, -2);
+                    // -2를 한 이유는 플레이어가 좀비 보내줄때 -1은 예외처리를 하기 떄문에
+                }
+            }
+            else if (playerCtrl.Client_imei != targetPlayer && targetPlayer != -1)
+            {
+                // 좀비의 Target과 자신의 IMEI가 다른경우 애니메이션 동기화만 해준다.
                 switch (animator_value)
                 {
                     case 0:
@@ -120,28 +143,8 @@ public class ZombieCtrl : MonoBehaviour
                         StopAllCoroutines();
                         break;
                 }
-                yield return new WaitForSeconds(0.2f);
             }
-            else
-            {
-                float dist = Vector3.Distance(playerTr.position, zombieTr.position);
 
-                if (dist <= attackDist)
-                {
-                    // 공격거리 범위 이내로 들어왔는지 확인{
-                    zombieState = ZombieState.attack;
-                }
-                else if (dist <= traceDist)
-                {
-                    zombieState = ZombieState.walk;
-                }
-                else if (dist > traceDist)
-                {
-                    zombieState = ZombieState.idle;
-                }
-                if (stopPos && zombieNum != -1)
-                    playerCtrl.send_ZombieData(zombieTr.position, zombieTr.eulerAngles, zombieNum, zombieState);
-            }
             yield return new WaitForSeconds(0.2f);
         }
 
@@ -208,7 +211,7 @@ public class ZombieCtrl : MonoBehaviour
         animator.SetTrigger("IsDie");
         isDie = true;
         hp = 0;
-        playerCtrl.send_ZombieData(zombieTr.position, zombieTr.eulerAngles, zombieNum, zombieState);
+        playerCtrl.send_ZombieData(zombieTr.position, zombieTr.eulerAngles, zombieNum, zombieState, 0);
         StopAllCoroutines();
 
         gameObject.GetComponentInChildren<SphereCollider>().enabled = false;

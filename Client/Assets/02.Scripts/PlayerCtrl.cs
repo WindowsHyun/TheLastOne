@@ -315,6 +315,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
                 //차량이 탑승 중에 차가 터진 경우
                 this.transform.position = new Vector3(ridingCar.transform.position.x - 1, ridingCar.transform.position.y, ridingCar.transform.position.z);
                 PlayerDie();
+                networkCtrl.Player_HP(-1, hp, armour);  // 차량이 터지면서 hp는 0으로 만든다.
             }
 
             if (Input.GetKeyDown(KeyCode.G))
@@ -442,7 +443,8 @@ public class PlayerCtrl : PlayerVehicleCtrl
                 navagent.enabled = false;
                 tr.transform.position = new Vector3(776.9319f, 30.00061f, 441.4027f);
                 navagent.enabled = true;
-            }else if (Input.GetKeyDown(KeyCode.Alpha4))
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha4))
             {
                 navagent.enabled = false;
                 tr.transform.position = new Vector3(718.0281f, 50.0f, 1235.498f);
@@ -776,7 +778,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
         }
 
         // 충돌한 게임오브젝트의 태그값 비교
-        if (coll.gameObject.tag == "ZombieAttack")
+        if (coll.gameObject.tag == "ZombieAttack" )
         {
             CreateBloodEffect(coll.transform.position);
 
@@ -913,9 +915,9 @@ public class PlayerCtrl : PlayerVehicleCtrl
         Destroy(blood1, 1.0f);
     }
 
-    public void send_ZombieData(Vector3 pos, Vector3 rotation, int zombieNum, Enum animation)
+    public void send_ZombieData(Vector3 pos, Vector3 rotation, int zombieNum, Enum animation, int target)
     {
-        networkCtrl.Zombie_Pos(pos, rotation, zombieNum, animation);
+        networkCtrl.Zombie_Pos(pos, rotation, zombieNum, animation, target);
     }
 
     public void send_ZombieHP(int id, int hp)

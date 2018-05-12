@@ -20,16 +20,19 @@ private:
 	bool riding_car;
 	int hp;
 	int item_Kinds;
+	float Car_Kmh;
 
 public:
-	xyz get_position() { return item_position; }
-	xyz get_rotation() { return item_rotation; }
-	bool get_eat() { return item_eat; }
-	bool get_riding() { return riding_car; }
-	int get_kind() { return item_Kinds; }
-	int get_hp() { return hp; }
-	std::string get_name() { return item_name; }
+	xyz get_position() { return this->item_position; }
+	xyz get_rotation() { return this->item_rotation; }
+	float get_Kmh() { return this->Car_Kmh; }
+	bool get_eat() { return this->item_eat; }
+	bool get_riding() { return this->riding_car; }
+	int get_kind() { return this->item_Kinds; }
+	int get_hp() { return this->hp; }
+	std::string get_name() { return this->item_name; }
 
+	void set_Kmh(float value) { this->Car_Kmh = value; }
 	void set_eat(bool value) { this->item_eat = value; }
 	void set_hp(int value) { this->hp = value; }
 	void set_riding(bool value) { this->riding_car = value; }

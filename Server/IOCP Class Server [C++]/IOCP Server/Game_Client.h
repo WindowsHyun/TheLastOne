@@ -1,4 +1,4 @@
-#ifndef __GAMECLIENT_H__
+ï»¿#ifndef __GAMECLIENT_H__
 #define __GAMECLIENT_H__
 
 #include "Core_Header.h"
@@ -13,67 +13,67 @@ private:
 	int hp = -1;
 	int armour = 0;
 	int animator = 0;
-	int weaponState = 0;
+	int weaponState = -1;
 	int limit_Zombie = 0;
 	int inCar = -1;
 	int playerStatus = 0;
 	float horizontal = 0.0f;
 	float vertical = 0.0f;
+	float car_kmh = 0.0f;
 	bool connect;
 	bool remove_client;
 	bool dangerLineIn;
 	SOCKET client_socket;
-	int prev_packet_data; // ÀÌÀü Ã³¸®µÇÁö ¾Ê´Â ÆĞÅ¶ÀÌ ¾ó¸¶³Ä
-	int curr_packet_size; // Áö±İ Ã³¸®ÇÏ°í ÀÖ´Â ÆĞÅ¶ÀÌ ¾ó¸¶³Ä
+	int prev_packet_data; // ì´ì „ ì²˜ë¦¬ë˜ì§€ ì•ŠëŠ” íŒ¨í‚·ì´ ì–¼ë§ˆëƒ
+	int curr_packet_size; // ì§€ê¸ˆ ì²˜ë¦¬í•˜ê³  ìˆëŠ” íŒ¨í‚·ì´ ì–¼ë§ˆëƒ
 	
 
 public:
-	std::string nickName;																					// Å¬¶óÀÌ¾ğÆ® ´Ğ³×ÀÓ
+	std::string nickName;																					// í´ë¼ì´ì–¸íŠ¸ ë‹‰ë„¤ì„
 	OverlappedEx recv_over;
 	unsigned char packet_buf[MAX_PACKET_SIZE];
 
 	void init();
-	int get_room_id() { return this->room_id; }						// Å¬¶óÀÌ¾ğÆ® ¹æ Á¤º¸ Àü´Ş
-	int get_inCar() { return this->inCar; }								// Å¬¶óÀÌ¾ğÆ® ¹«½¼ Â÷·® Å¾½Â °ª Àü´Ş
-	float get_vertical() { return (float)this->vertical; }				// Å¬¶óÀÌ¾ğÆ® ¾Ö´Ï¸ŞÀÌ¼Ç °ª Àü´Ş
-	float get_horizontal() { return (float)this->horizontal; }		// Å¬¶óÀÌ¾ğÆ® ¾Ö´Ï¸ŞÀÌ¼Ç °ª Àü´Ş
-	int get_limit_zombie() { return this->limit_Zombie; }			// Å¬¶óÀÌ¾ğÆ® Á»ºñ ÃÖ´ëÄ¡ Àü´Ş
-	int get_client_id() { return this->client_id; }						// Å¬¶óÀÌ¾ğÆ® ¾ÆÀÌµğ Àü´Ş
-	int get_hp() { return this->hp; };									// Å¬¶óÀÌ¾ğÆ® Ã¼·Â Àü´Ş
-	int get_armour() { return this->armour; };						// Å¬¶óÀÌ¾ğÆ® ¾Æ¸Ó Àü´Ş
-	int get_animator() { return this->animator; };					// Å¬¶óÀÌ¾ğÆ® ¾Ö´Ï¸ŞÀÌ¼Ç Àü´Ş
-	int get_weapon() { return this->weaponState; };				// Å¬¶óÀÌ¾ğÆ® WeaponState Àü´Ş
-	bool get_Connect() { return this->connect; };					// Å¬¶óÀÌ¾ğÆ® ¿¬°á ¿©ºÎ Àü´Ş
-	bool get_Remove() { return this->remove_client; };			// Å¬¶óÀÌ¾ğÆ® »èÁ¦ ¿©ºÎ Àü´Ş
-	bool get_DangerLine() { return this->dangerLineIn; };			// Å¬¶óÀÌ¾ğÆ® ÀÚ±âÀå ¿©ºÎ
-	int get_curr_packet() { return this->curr_packet_size; };		// Å¬¶óÀÌ¾ğÆ® ÆĞÅ¶ »çÀÌÁî Àü´Ş
-	int get_prev_packet() { return this->prev_packet_data; };		// Å¬¶óÀÌ¾ğÆ® ÆĞÅ¶ »çÀÌÁî Àü´Ş
-	int get_playerStatus() { return this->playerStatus; };		// Å¬¶óÀÌ¾ğÆ® °ÔÀÓ »óÅÂ Àü´Ş
-	//xyz get_pos() { return this->position; };
-	xyz get_position();													// Å¬¶óÀÌ¾ğÆ® Æ÷Áö¼Ç Àü´Ş
-	xyz get_rotation();													// Å¬¶óÀÌ¾ğÆ® ·ÎÅ×ÀÌ¼Ç Àü´Ş
-	xyz get_car_rotation();												// Å¬¶óÀÌ¾ğÆ® ·ÎÅ×ÀÌ¼Ç Àü´Ş
-	SOCKET get_Socket() { return this->client_socket; };			// Å¬¶óÀÌ¾ğÆ® ¼ÒÄÏ Àü´Ş
-	OverlappedEx get_over() { return this->recv_over; };			// Overlapped ±¸Á¶Ã¼ Àü´Ş
+	int get_room_id() { return this->room_id; }						// í´ë¼ì´ì–¸íŠ¸ ë°© ì •ë³´ ì „ë‹¬
+	int get_inCar() { return this->inCar; }								// í´ë¼ì´ì–¸íŠ¸ ë¬´ìŠ¨ ì°¨ëŸ‰ íƒ‘ìŠ¹ ê°’ ì „ë‹¬
+	float get_vertical() { return (float)this->vertical; }				// í´ë¼ì´ì–¸íŠ¸ ì• ë‹ˆë©”ì´ì…˜ ê°’ ì „ë‹¬
+	float get_horizontal() { return (float)this->horizontal; }		// í´ë¼ì´ì–¸íŠ¸ ì• ë‹ˆë©”ì´ì…˜ ê°’ ì „ë‹¬
+	int get_limit_zombie() { return this->limit_Zombie; }			// í´ë¼ì´ì–¸íŠ¸ ì¢€ë¹„ ìµœëŒ€ì¹˜ ì „ë‹¬
+	int get_client_id() { return this->client_id; }						// í´ë¼ì´ì–¸íŠ¸ ì•„ì´ë”” ì „ë‹¬
+	int get_hp() { return this->hp; };									// í´ë¼ì´ì–¸íŠ¸ ì²´ë ¥ ì „ë‹¬
+	int get_armour() { return this->armour; };						// í´ë¼ì´ì–¸íŠ¸ ì•„ë¨¸ ì „ë‹¬
+	int get_animator() { return this->animator; };					// í´ë¼ì´ì–¸íŠ¸ ì• ë‹ˆë©”ì´ì…˜ ì „ë‹¬
+	int get_weapon() { return this->weaponState; };				// í´ë¼ì´ì–¸íŠ¸ WeaponState ì „ë‹¬
+	bool get_Connect() { return this->connect; };					// í´ë¼ì´ì–¸íŠ¸ ì—°ê²° ì—¬ë¶€ ì „ë‹¬
+	bool get_Remove() { return this->remove_client; };			// í´ë¼ì´ì–¸íŠ¸ ì‚­ì œ ì—¬ë¶€ ì „ë‹¬
+	bool get_DangerLine() { return this->dangerLineIn; };			// í´ë¼ì´ì–¸íŠ¸ ìê¸°ì¥ ì—¬ë¶€
+	int get_curr_packet() { return this->curr_packet_size; };		// í´ë¼ì´ì–¸íŠ¸ íŒ¨í‚· ì‚¬ì´ì¦ˆ ì „ë‹¬
+	int get_prev_packet() { return this->prev_packet_data; };		// í´ë¼ì´ì–¸íŠ¸ íŒ¨í‚· ì‚¬ì´ì¦ˆ ì „ë‹¬
+	int get_playerStatus() { return this->playerStatus; };		// í´ë¼ì´ì–¸íŠ¸ ê²Œì„ ìƒíƒœ ì „ë‹¬
+	xyz get_position();													// í´ë¼ì´ì–¸íŠ¸ í¬ì§€ì…˜ ì „ë‹¬
+	xyz get_rotation();													// í´ë¼ì´ì–¸íŠ¸ ë¡œí…Œì´ì…˜ ì „ë‹¬
+	xyz get_car_rotation();												// í´ë¼ì´ì–¸íŠ¸ ë¡œí…Œì´ì…˜ ì „ë‹¬
+	SOCKET get_Socket() { return this->client_socket; };			// í´ë¼ì´ì–¸íŠ¸ ì†Œì¼“ ì „ë‹¬
+	OverlappedEx get_over() { return this->recv_over; };			// Overlapped êµ¬ì¡°ì²´ ì „ë‹¬
 
-	void set_prev_packet(const int size) { this->prev_packet_data = size; };				// Å¬¶óÀÌ¾ğÆ® ÆĞÅ¶ »çÀÌÁî ÀúÀå
-	void set_curr_packet(const int size) { this->curr_packet_size = size; };				// Å¬¶óÀÌ¾ğÆ® ÆĞÅ¶ »çÀÌÁî ÀúÀå
-	void set_client_position(const xyz position) { this->position = position; };			// Å¬¶óÀÌ¾ğÆ® Æ÷Áö¼Ç ÀúÀå
-	void set_client_rotation(const xyz rotation) { this->rotation = rotation; };			// Å¬¶óÀÌ¾ğÆ® ·ÎÅ×ÀÌ¼Ç ÀúÀå
-	void set_client_car_rotation(const xyz rotation) { this->car_rotation = rotation; };			// Å¬¶óÀÌ¾ğÆ® Â÷·® ·ÎÅ×ÀÌ¼Ç ÀúÀå
-	void set_client_animator(const int value) { this->animator = value; };					// Å¬¶óÀÌ¾ğÆ® ¾Ö´Ï¸ŞÀÌ¼Ç ÀúÀå
-	void set_client_weapon(const int value) { this->weaponState = value; };				// Å¬¶óÀÌ¾ğÆ® WeaponState ÀúÀå
-	void set_client_Connect(const bool value) { this->connect = value; };				// Å¬¶óÀÌ¾ğÆ® Connect ÀúÀå
-	void set_client_Remove(const bool value) { this->remove_client = value; };				// Å¬¶óÀÌ¾ğÆ® Remove ÀúÀå
-	void set_client_DangerLine(const bool value) { this->dangerLineIn = value; };				// Å¬¶óÀÌ¾ğÆ® ÀÚ±âÀå °ª ÀúÀå
-	void set_limit_zombie(const int value) { this->limit_Zombie += value; }				// Å¬¶óÀÌ¾ğÆ® Á»ºñ ÃÖ´ëÄ¡ ÀúÀå
-	void set_playerStatus(const int value) { this->playerStatus = value; }				// Å¬¶óÀÌ¾ğÆ® °ÔÀÓ »óÅÂ ÀúÀå
+	void set_prev_packet(const int size) { this->prev_packet_data = size; };				// í´ë¼ì´ì–¸íŠ¸ íŒ¨í‚· ì‚¬ì´ì¦ˆ ì €ì¥
+	void set_curr_packet(const int size) { this->curr_packet_size = size; };				// í´ë¼ì´ì–¸íŠ¸ íŒ¨í‚· ì‚¬ì´ì¦ˆ ì €ì¥
+	void set_client_position(const xyz position) { this->position = position; };			// í´ë¼ì´ì–¸íŠ¸ í¬ì§€ì…˜ ì €ì¥
+	void set_client_rotation(const xyz rotation) { this->rotation = rotation; };			// í´ë¼ì´ì–¸íŠ¸ ë¡œí…Œì´ì…˜ ì €ì¥
+	void set_client_car_rotation(const xyz rotation) { this->car_rotation = rotation; };			// í´ë¼ì´ì–¸íŠ¸ ì°¨ëŸ‰ ë¡œí…Œì´ì…˜ ì €ì¥
+	void set_client_animator(const int value) { this->animator = value; };					// í´ë¼ì´ì–¸íŠ¸ ì• ë‹ˆë©”ì´ì…˜ ì €ì¥
+	void set_client_weapon(const int value) { this->weaponState = (int)value; };				// í´ë¼ì´ì–¸íŠ¸ WeaponState ì €ì¥
+	void set_client_Connect(const bool value) { this->connect = value; };				// í´ë¼ì´ì–¸íŠ¸ Connect ì €ì¥
+	void set_client_Remove(const bool value) { this->remove_client = value; };				// í´ë¼ì´ì–¸íŠ¸ Remove ì €ì¥
+	void set_client_DangerLine(const bool value) { this->dangerLineIn = value; };				// í´ë¼ì´ì–¸íŠ¸ ìê¸°ì¥ ê°’ ì €ì¥
+	void set_limit_zombie(const int value) { this->limit_Zombie += value; }				// í´ë¼ì´ì–¸íŠ¸ ì¢€ë¹„ ìµœëŒ€ì¹˜ ì €ì¥
+	void set_playerStatus(const int value) { this->playerStatus = value; }				// í´ë¼ì´ì–¸íŠ¸ ê²Œì„ ìƒíƒœ ì €ì¥
 	void set_vertical(float value) { this->vertical = (float)value; }
 	void set_horizontal(float value) {  this->horizontal = (float)value; }
-	void set_inCar(int value) { this->inCar = value; }												// Å¬¶óÀÌ¾ğÆ® ¹«½¼ Â÷·® Å¾½Â °ª ÀúÀå
-	void set_hp(int value) { this->hp = value; };														// Å¬¶óÀÌ¾ğÆ® Ã¼·Â ÀúÀå
-	void set_armour(int value) { this->armour = value; };											// Å¬¶óÀÌ¾ğÆ® ¾Æ¸Ó ÀúÀå
-	void set_room_id(int value) { this->room_id = value; }										// Å¬¶óÀÌ¾ğÆ® ·ë ¾ÆÀÌµğ ÀúÀå
+	void set_inCar(int value) { this->inCar = value; }												// í´ë¼ì´ì–¸íŠ¸ ë¬´ìŠ¨ ì°¨ëŸ‰ íƒ‘ìŠ¹ ê°’ ì €ì¥
+	void set_hp(int value) { this->hp = value; };														// í´ë¼ì´ì–¸íŠ¸ ì²´ë ¥ ì €ì¥
+	void set_armour(int value) { this->armour = value; };											// í´ë¼ì´ì–¸íŠ¸ ì•„ë¨¸ ì €ì¥
+	void set_room_id(int value) { this->room_id = value; }										// í´ë¼ì´ì–¸íŠ¸ ë£¸ ì•„ì´ë”” ì €ì¥
 
 	Game_Client(const SOCKET sock, const int client_id, const char * game_id, const int room_id);
 	Game_Client(const Game_Client& g_cl);

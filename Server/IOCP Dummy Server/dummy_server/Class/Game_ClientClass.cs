@@ -2,18 +2,35 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TheLastOne.NetworkClass;
 
-using UnityEngine;
+using System.Threading;
+using System.Net.Sockets;
+
+public struct Vector3
+{
+    public float x;
+    public float y;
+    public float z;
+    public Vector3(float x, float y, float z)
+    {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+}
 
 namespace TheLastOne.GameClass
 {
     public class Game_ClientClass
     {
+        public m_Network m_Net;
+        public Thread t1;
         private int id;             // 클라이언트 고유번호
         private int hp;             // 클라이언트 체력
         private int armour;         // 클라이언트 아머
         private int animator;    // 클라이언트 애니메이션
-        private Vector3 position;  // 클라이언트 위치
+        public Vector3 position;  // 클라이언트 위치
         private Vector3 rotation;    // 클라이언트 보는 방향
         private Vector3 carrotation;    // 클라이언트 보는 방향
         private bool prefab;    // 클라이언트 프리팹이 만들어졌는지 확인
@@ -26,9 +43,6 @@ namespace TheLastOne.GameClass
         private bool removeClient;   // 클라이언트 지울경우 true
         private int nowWeaponState; // 클라이언트 무기 상태
         private bool activePlayer;
-        public GameObject Player;   // 프리팹을 위한 게임 오브젝트
-        public OtherPlayerCtrl script;  // 프리팹 오브젝트 안의 함수를 호출하기 위한 스크립트
-
 
         public bool get_isDie() { return this.isDie; }
         public int get_inCar() { return this.inCar; }
@@ -50,7 +64,7 @@ namespace TheLastOne.GameClass
 
         public void set_isDie(bool value) { this.isDie = value; }
         public void set_inCar(int value) { this.inCar = value; }
-        public void set_vertical(float value) {  this.vertical = value; }
+        public void set_vertical(float value) { this.vertical = value; }
         public void set_horizontal(float value) { this.horizontal = value; }
         public void set_id(int value) { this.id = value; }
         public void set_hp(int value) { this.hp = value; }
@@ -66,26 +80,31 @@ namespace TheLastOne.GameClass
         public void set_removeClient(bool value) { this.removeClient = value; }
         public void set_weapon(int value) { this.nowWeaponState = value; }
 
-        public Game_ClientClass(int id, int hp, string name, Vector3 pos, Vector3 rot)
+
+        public Game_ClientClass(int id, m_Network m_net, Vector3 pos)
         {
+            this.m_Net = m_net;
+            this.t1 = null;
             this.id = id;
-            this.hp = hp;
+            this.hp = 100;
             this.armour = 0;
-            this.name = name;
-            this.rotation = rot;
+            this.name = "Dummy_Client";
+            this.position = pos;
+            this.rotation = new Vector3(0,0,0);
             this.animator = 0;
             this.connect = true;
             this.removeClient = false;
-            this.Player = null;
-            this.script = null;
             this.prefab = false;
             this.removeClient = false;
             this.activePlayer = true;
-            this.nowWeaponState = -1;
+            this.nowWeaponState = 0;
             this.vertical = 0.0f;
             this.horizontal = 0.0f;
             this.inCar = -1;
             this.isDie = false;
+
+           
+
         }
 
     }

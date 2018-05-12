@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
+using TheLastOne.Game.Network;
 using System;
 
 [RequireComponent(typeof(AudioSource))]
@@ -30,7 +30,7 @@ public class OtherPlayerCtrl : MonoBehaviour
     // 캐릭터 회전 속도 변수
     public float rotSpeed = 100.0f;
     // 캐릭터 체력
-    private int hp = 100;
+    public int hp = 100;
     public int armour = 0;
 
     public int otherPlayer_id = -1;
@@ -50,6 +50,8 @@ public class OtherPlayerCtrl : MonoBehaviour
     public AudioClip M16A4Sound;
     public AudioClip M4A1Sound;
     public AudioClip UMP45Sound;
+
+    NetworkCtrl networkCtrl = new NetworkCtrl();
 
     // AudioSource 컴포넌트를 저장할 변수
     private AudioSource source = null;
@@ -200,6 +202,12 @@ public class OtherPlayerCtrl : MonoBehaviour
                         weaponView[i].GetComponent<Renderer>().enabled = false;
                 }
             }
+            else
+            {
+                animator.SetBool("IsEquip", false);
+                for (int i = 0; i < 4; ++i)
+                    weaponView[i].GetComponent<Renderer>().enabled = false;
+            }
 
             if (createBullet_b == true)
             {
@@ -238,10 +246,12 @@ public class OtherPlayerCtrl : MonoBehaviour
             if (armour <= 0)
             {
                 hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
+                networkCtrl.Player_HP(otherPlayer_id, hp, armour);
             }
             else
             {
                 armour -= coll.gameObject.GetComponent<BulletCtrl>().damage;
+                networkCtrl.Player_HP(otherPlayer_id, hp, armour);
             }
 
             if (hp <= 0)

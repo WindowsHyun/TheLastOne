@@ -20,6 +20,7 @@ namespace TheLastOne.GameClass
         private bool explosion = false;
         private int hp = 1;
         private int kind = -1;
+        private float Car_kmh = 0.0f;
         public GameObject item;
         public VehicleCtrl car;
         public Rigidbody c_rigidbody;
@@ -35,6 +36,7 @@ namespace TheLastOne.GameClass
         public bool get_sendPacket() { return this.sendPacket; }
         public bool get_riding() { return this.riding; }
         public int get_kind() { return this.kind; }
+        public float get_kmh() { return this.Car_kmh; }
 
         public void set_id(int value) { this.id = value; }
         public void set_hp(int value) { this.hp = value; }
@@ -46,6 +48,7 @@ namespace TheLastOne.GameClass
         public void set_draw(bool value) { this.draw = value; }
         public void set_explosion(bool value) { this.explosion = value; }
         public void set_sendPacket(bool value) { this.sendPacket = value; }
+        public void set_kmh(float value) { this.Car_kmh = value; }
 
         public Game_ItemClass(int id, string name, Vector3 pos, Vector3 rotation, bool eat, int hp, int kind)
         {
@@ -59,6 +62,7 @@ namespace TheLastOne.GameClass
             this.riding = false;
             this.explosion = false;
             this.car = null;
+            this.Car_kmh = 0.0f;
         }
     }
 }

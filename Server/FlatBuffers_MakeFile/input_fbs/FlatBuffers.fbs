@@ -24,6 +24,7 @@ table Client_info {
   position:Vec3;
   rotation:Vec3;
   carrotation:Vec3;
+  carkmh:float;
   dangerLineIn:bool;
   nowWeapon:int;
 }
@@ -54,6 +55,7 @@ table Gameitem{
   riding:bool;
   hp:int;
   kind:int;
+  Carkmh:float;
 }
 
 table GameDangerLine{

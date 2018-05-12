@@ -153,6 +153,7 @@ public class InventoryCtrl : MonoBehaviour
             {
                 player.armour += 100;
                 player.imgArmourBar.fillAmount = (float)player.armour / (float)player.initArmour;
+                player.send_PlayerHP(player.hp, player.armour);
             }
 
             slot.AddItem(item, false, null);

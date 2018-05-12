@@ -17,7 +17,7 @@ namespace TheLastOne.SendFunction
     {
 
 
-        public Byte[] makeClient_PacketInfo(Vector3 Player, int Player_Animator, float horizontal, float vertical, Vector3 PlayerRotation, int Player_Weapone, int inCar, bool dangerLineIn, Vector3 CarRotation)
+        public Byte[] makeClient_PacketInfo(Vector3 Player, int Player_Animator, float horizontal, float vertical, Vector3 PlayerRotation, int Player_Weapone, int inCar, bool dangerLineIn, Vector3 CarRotation, float CarKmh)
         {
             //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.
             FlatBufferBuilder fbb = new FlatBufferBuilder(1);
@@ -29,6 +29,7 @@ namespace TheLastOne.SendFunction
             Client_info.AddVertical(fbb, vertical);
             Client_info.AddInCar(fbb, inCar);
             Client_info.AddCarrotation(fbb, Vec3.CreateVec3(fbb, CarRotation.x, CarRotation.y, CarRotation.z));
+            Client_info.AddCarkmh(fbb, CarKmh);
             Client_info.AddPosition(fbb, Vec3.CreateVec3(fbb, Player.x, Player.y, Player.z));
             Client_info.AddRotation(fbb, Vec3.CreateVec3(fbb, PlayerRotation.x, PlayerRotation.y, PlayerRotation.z));
             Client_info.AddDangerLineIn(fbb, dangerLineIn);
@@ -56,13 +57,21 @@ namespace TheLastOne.SendFunction
             int num = 0;
             foreach (var key in zombie_data.Keys.ToList())
             {
-                if (zombie_data[key].get_target() == client_imei && zombie_data[key].get_isDie() == false)
+                if (zombie_data[key].get_target() == client_imei  || zombie_data[key].get_target() == -2)
                 {
                     // 좀비 Target과 Client_Imei가 같은경우에만 Vector에 넣는다.
                     Zombie_info.StartZombie_info(fbb);
                     Zombie_info.AddId(fbb, zombie_data[key].get_id());
                     Zombie_info.AddAnimator(fbb, zombie_data[key].get_animator());
-                    Zombie_info.AddTargetPlayer(fbb, zombie_data[key].get_target());
+
+                    if (zombie_data[key].get_target() == -2 || zombie_data[key].Zombie.activeSelf == false) {
+                        // -2의 경우 추적 거리를 벗어나서 아무도 추적을 하지 않으므로 -1로 돌려준다.
+                        zombie_data[key].set_target(-1);
+                        Zombie_info.AddTargetPlayer(fbb, zombie_data[key].get_target());
+                    }
+                    else
+                        Zombie_info.AddTargetPlayer(fbb, zombie_data[key].get_target());
+
                     Zombie_info.AddPosition(fbb, Vec3.CreateVec3(fbb, zombie_data[key].get_pos().x, zombie_data[key].get_pos().y, zombie_data[key].get_pos().z));
                     Zombie_info.AddRotation(fbb, Vec3.CreateVec3(fbb, zombie_data[key].get_rot().x, zombie_data[key].get_rot().y, zombie_data[key].get_rot().z));
                     target_zombie.Add(Zombie_info.EndZombie_info(fbb));
@@ -220,7 +229,7 @@ namespace TheLastOne.SendFunction
                 intBytes[p_size.ToString().Length + 1] = cpy_type[0];
                 intBytes[p_size.ToString().Length + 1] -= 48;
             }
-           
+
             // 48을 마이너스 해준 이유는 Server에서 packet[i]로 형 변환 없이 바로 값을 확인하기 위하여
 
             return intBytes;

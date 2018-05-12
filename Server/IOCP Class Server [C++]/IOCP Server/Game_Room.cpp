@@ -1,4 +1,4 @@
-#include "Game_Room.h"
+ï»¿#include "Game_Room.h"
 
 std::unordered_map<int, Game_Client>::iterator Game_Room::get_client_iter(int ci)
 {
@@ -22,44 +22,48 @@ std::unordered_map<int, Game_Zombie>::iterator Game_Room::get_zombie_iter(int ci
 
 float DistanceToPoint(const xyz player, const xyz zombie)
 {
-	// ÇÃ·¹ÀÌ¾î¿Í Á»ºñ°£ÀÇ °Å¸® ±¸ÇÏ±â.
+	// í”Œë ˆì´ì–´ì™€ ì¢€ë¹„ê°„ì˜ ê±°ë¦¬ êµ¬í•˜ê¸°.
 	return (float)sqrt(pow(player.x - zombie.x, 2) + pow(player.z - zombie.z, 2));
 }
 
-
 void Game_Room::player_To_Zombie()
 {
+	// í´ë¼ì´ì–¸íŠ¸ì—ì„œ ì¢€ë¹„ì˜ targetì„ ì„¤ì •í•œë‹¤.
+	// ì„œë²„ì—ì„œëŠ” ì¢€ë¹„ì™€ targetëœ í”Œë ˆì´ì–´ ê±°ë¦¬ê°€ ë©€ì–´ì§„ ê²½ìš°ì—ë§Œ targetì„ -1ë¡œ ë³€ê²½í•´ ì¤€ë‹¤.
 	float dist = 0.0f;
 	for (auto zombie : g_zombie) {
-
-		if (zombie.second.get_target() != -1 && g_clients.find(zombie.second.get_target()) == g_clients.end()) {
-			// ÇÃ·¹ÀÌ¾î°¡ °­Á¦ Á¾·á ÇÒ °æ¿ì Á»ºñ ÃÊ±âÈ­
-			zombie.second.set_distance(Zombie_Dist);
-			zombie.second.set_target(-1);
-		}
+		if (zombie.second.get_live() == false)
+			// ì¢€ë¹„ê°€ ì£½ì–´ ìˆì„ ê²½ìš° ë„˜ê¸´ë‹¤.
+			continue;
 		if (zombie.second.get_hp() <= 0 && zombie.second.get_live() != false) {
-			// Á»ºñÀÇ Ã¼·ÂÀÌ 0ÀÏ°æ¿ì
+			// ì¢€ë¹„ì˜ ì²´ë ¥ì´ 0ì¼ê²½ìš°
 			g_zombie.find(zombie.first)->second.set_live(false);
 			g_zombie.find(zombie.first)->second.set_target(-1);
 		}
+		if (zombie.second.get_target() == -1)
+			// ì¢€ë¹„ì˜ Targetì´ ì •í•´ì ¸ ìˆì§€ ì•Šìœ¼ë©´ ë„˜ê¸´ë‹¤.
+			continue;
 
-		for (auto player : g_clients) {
-			dist = DistanceToPoint(player.second.get_position(), zombie.second.get_position());
+		if (g_clients.find(zombie.second.get_target()) == g_clients.end())
+			// í”Œë ˆì´ì–´ê°€ ì—†ì„ ê²½ìš°.
+			continue;
 
-			if (dist <= zombie.second.get_distance() && dist <= Zombie_Dist && player.second.get_hp() > 0) {
-				// ÃÖ±Ù ÃøÁ¤ÇÑ °Å¸®°¡ ´õ ¸Ö°æ¿ì °¡±î¿î °Å¸®¸¦ ÁöÁ¤ÇØÁØ´Ù.
-				g_zombie.find(zombie.first)->second.set_distance(dist);
-				g_zombie.find(zombie.first)->second.set_target(player.second.get_client_id());
-			}
-			if (dist >= Zombie_Dist) {
-				// ÇÃ·¹ÀÌ¾î°¡ Á¸ÀçÇÏÁö¸¸ °Å¸®°¡ ¸Ö¾îÁ® ÀÖÀ» °æ¿ì Á»ºñ TargetÀ» ÃÊ±âÈ­
-				zombie.second.set_distance(Zombie_Dist);
-				g_zombie.find(zombie.first)->second.set_target(-1);
-			}
+		dist = DistanceToPoint(g_clients.find(zombie.second.get_target())->second.get_position(), zombie.second.get_position());
+
+		if (dist >= Zombie_Dist) {
+			// í”Œë ˆì´ì–´ê°€ ì¡´ì¬í•˜ì§€ë§Œ ê±°ë¦¬ê°€ ë©€ì–´ì ¸ ìˆì„ ê²½ìš° ì¢€ë¹„ Targetì„ ì´ˆê¸°í™”
+			zombie.second.set_distance(Zombie_Dist);
+			g_zombie.find(zombie.first)->second.set_target(-1);
 		}
-		// ÇÃ·¹ÀÌ¾î¸¦ ¸ğµÎ È®ÀÎÇÑ ÀÌÈÄ zombie dist´Â ÃÊ±âÈ­ ÇØÁØ´Ù.
-		zombie.second.set_distance(Zombie_Dist);
+		else if (g_clients.find(zombie.second.get_target())->second.get_hp() < 0) {
+			// í”Œë ˆì´ì–´ê°€ ì²´ë ¥ì´ 0 ì´í•˜ë¡œ ë‚´ë ¤ê°”ì„ ê²½ìš°.
+			zombie.second.set_distance(Zombie_Dist);
+			g_zombie.find(zombie.first)->second.set_target(-1);
+		}
+
 	}
+
+
 }
 
 int Game_Room::check_ReadyClients()
@@ -82,19 +86,19 @@ void Game_Room::room_init()
 
 	this->playGame = false;
 
-	// °ÔÀÓ ¾ÆÀÌÅÛ Á¤º¸ g_item¿¡ ³Ö¾îÁÖ±â.
+	// ê²Œì„ ì•„ì´í…œ ì •ë³´ g_itemì— ë„£ì–´ì£¼ê¸°.
 	load_item_txt("./Game_Item_Collection.txt", &g_item);
 
-	// Á»ºñ Ä³¸¯ÅÍ »ı¼ºÇÏ±â
+	// ì¢€ë¹„ ìºë¦­í„° ìƒì„±í•˜ê¸°
 	init_Zombie(Create_Zombie, &g_zombie);
 }
 
 Game_Room::Game_Room()
 {
-	// °ÔÀÓ ¾ÆÀÌÅÛ Á¤º¸ g_item¿¡ ³Ö¾îÁÖ±â.
+	// ê²Œì„ ì•„ì´í…œ ì •ë³´ g_itemì— ë„£ì–´ì£¼ê¸°.
 	load_item_txt("./Game_Item_Collection.txt", &g_item);
 
-	// Á»ºñ Ä³¸¯ÅÍ »ı¼ºÇÏ±â
+	// ì¢€ë¹„ ìºë¦­í„° ìƒì„±í•˜ê¸°
 	init_Zombie(Create_Zombie, &g_zombie);
 
 	this->playGame = false;
