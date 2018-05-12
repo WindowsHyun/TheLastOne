@@ -249,6 +249,10 @@
     <Compile Include="Assets\02.Scripts\DangerLineCtrl.cs" />
     <Compile Include="Assets\02.Scripts\EXPVehicleCtrl.cs" />
     <Compile Include="Assets\02.Scripts\FollowCam.cs" />
+    <Compile Include="Assets\02.Scripts\FootStep\CharacterFootsteps.cs" />
+    <Compile Include="Assets\02.Scripts\FootStep\CustomInspectors.cs" />
+    <Compile Include="Assets\02.Scripts\FootStep\FootstepTrigger.cs" />
+    <Compile Include="Assets\02.Scripts\FootStep\SurfaceManager.cs" />
     <Compile Include="Assets\02.Scripts\InventoryCtrl.cs" />
     <Compile Include="Assets\02.Scripts\ItemCtrl.cs" />
     <Compile Include="Assets\02.Scripts\ItemDragCtrl.cs" />
