@@ -720,8 +720,8 @@ void IOCP_Server::Send_All_Item(const int room_id, const int ci)
 	for (auto iter : GameRoom[room_id].get_room().get_item()) {
 		//if (iter.second.get_eat() == true)	// 아이템을 이미 먹은경우 패스 한다.
 		//	continue;
-		if (Distance(room_id, ci, iter.first, Player_Dist, Kind_Item) == false &&
-			(iter.second.get_name() != "UAZ" || iter.second.get_name() != "ZEEP"))
+		if (Distance(room_id, ci, iter.first, Item_Dist, Kind_Item) == false &&
+			(iter.second.get_name() != "UAZ" || iter.second.get_name() != "JEEP"))
 			continue;
 
 		auto id = iter.first;

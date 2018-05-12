@@ -65,6 +65,7 @@ enum Event_Type {
 
 // 플레이어 볼 수 있는 거리
 #define Player_Dist 500
+#define Item_Dist 300
 
 // 좀비가 볼 수 있는 거리
 #define Zombie_Dist 250
