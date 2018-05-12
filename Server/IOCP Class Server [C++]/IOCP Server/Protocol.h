@@ -69,7 +69,6 @@ enum Event_Type {
 
 // 좀비가 볼 수 있는 거리
 #define Zombie_Dist 250
-//#define Limit_Zombie 15
 #define Create_Zombie 50
 
 // 아이템, 플레이어 종류

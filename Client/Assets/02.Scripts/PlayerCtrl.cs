@@ -168,7 +168,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
     private Sprite[] weaponIEquipImage = new Sprite[4];
 
     public GameObject realMap;
-    private bool realView;
+    [HideInInspector] public bool realView;
     public RectTransform playerPositionImage;
 
     public Image ScreenSceneOFF;
@@ -177,7 +177,6 @@ public class PlayerCtrl : PlayerVehicleCtrl
     private NavMeshAgent navagent;
 
     public Text vehicleKMH;
-
 
     IEnumerator StartKeyInput()
     {

@@ -49,7 +49,7 @@ public class StartCarCtrl : MonoBehaviour
         Player_Script.cooltime.SetActive(false);
         Player_Script.VehicleUI.SetActive(false);
 
-        
+
         if (SingletonCtrl.Instance_S.PlayerSocket.Connected == false)
         {
             // 서버와 연결이 되어있지 않을경우 바로 출발한다.
@@ -71,6 +71,29 @@ public class StartCarCtrl : MonoBehaviour
             if (startSet != true)
             {
                 player.transform.position = new Vector3(this.transform.position.x, 30.0f, this.transform.position.z);
+
+                //------------------------------------------------------------------------------
+                // 차량 이동 중 에도 지도를 볼 수 있다.
+                if (Input.GetKeyDown(KeyCode.CapsLock))
+                {
+                    if (Player_Script.realView == false)
+                    {
+                        Player_Script.realMap.SetActive(true);
+                        Player_Script.realView = true;
+                    }
+                    else if (Player_Script.realView == true)
+                    {
+                        Player_Script.realMap.SetActive(false);
+                        Player_Script.realView = false;
+                    }
+                }
+
+                if (Player_Script.realView == true)
+                {
+                    Player_Script.playerPositionImage.localPosition = new Vector3(-gameObject.transform.position.z * 0.5f, gameObject.transform.position.x * 0.5f);
+                    Player_Script.playerPositionImage.eulerAngles = new Vector3(0, 0, player.transform.eulerAngles.y );
+                }
+                //------------------------------------------------------------------------------
             }
             // F키 입력 시
             if (Input.GetKeyDown(KeyCode.F) && startSet == false)
@@ -89,7 +112,6 @@ public class StartCarCtrl : MonoBehaviour
 
                 // 차량에 하차 할때 차량의 위치로 플레이어를 이동시킨다.
                 player.transform.position = new Vector3(this.transform.position.x, 30.0f, this.transform.position.z);
-
                 // 차량 하차 후 true로 F키 입력 시 재하차 불가능하게 만듬
                 startSet = true;
             }
