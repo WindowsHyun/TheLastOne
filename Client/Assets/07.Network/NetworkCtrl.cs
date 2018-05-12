@@ -21,9 +21,9 @@ using UnityEngine.UI;   // TimeText를 쓰기 위하여
 
 public class NetworkMessage
 {
-    public int LimitReceivebyte = 7000;                     // Receive Data Length. (byte)
-    public byte[] Receivebyte = new byte[7000];    // Receive data by this array to save.
-    public byte[] Sendbyte = new byte[7000];
+    public int LimitReceivebyte = 10000;                     // Receive Data Length. (byte)
+    public byte[] Receivebyte = new byte[10000];    // Receive data by this array to save.
+    public byte[] Sendbyte = new byte[10000];
     public int now_packet_size = 0;
     public int prev_packet_size = 0;
     public StringBuilder sb = new StringBuilder();
@@ -86,7 +86,7 @@ namespace TheLastOne.Game.Network
         Vector3 Player_Rotation;
         Vector3 Car_Rotation;
 
-        private byte[] Sendbyte = new byte[7000];
+        private byte[] Sendbyte = new byte[10000];
 
         public static Dictionary<int, Game_ClientClass> client_data = new Dictionary<int, Game_ClientClass>();
         // 클라이언트 데이터 저장할 컨테이너
@@ -382,7 +382,6 @@ namespace TheLastOne.Game.Network
                             && item_Collection[key].get_riding() == true)
                         {
                             // 차량의 경우 지속적으로 위치를 갱신 해준다.
-                            //Debug.Log(item_Collection[key].get_pos().y + " | " + item_Collection[key].item.transform.position.y);
                             item_Collection[key].car.KMh = item_Collection[key].get_kmh();  // 차량 속도를 넣어준다.
                             item_Collection[key].car.MovePos(item_Collection[key].get_pos());
                             item_Collection[key].c_rigidbody.isKinematic = false;
@@ -526,7 +525,6 @@ namespace TheLastOne.Game.Network
                         iter.set_pos(new Vector3(Get_ServerData.Data(i).Value.Position.Value.X, Get_ServerData.Data(i).Value.Position.Value.Y, Get_ServerData.Data(i).Value.Position.Value.Z));
                         iter.set_rot(new Vector3(Get_ServerData.Data(i).Value.Rotation.Value.X, Get_ServerData.Data(i).Value.Rotation.Value.Y, Get_ServerData.Data(i).Value.Rotation.Value.Z));
                         iter.set_weapon(Get_ServerData.Data(i).Value.NowWeapon);
-                        Debug.Log(Get_ServerData.Data(i).Value.Id + " : " + iter.get_weapon());
                         iter.set_hp(Get_ServerData.Data(i).Value.Hp);
                         iter.set_armour(Get_ServerData.Data(i).Value.Armour);
                         iter.set_horizontal(Get_ServerData.Data(i).Value.Horizontal);
@@ -538,7 +536,6 @@ namespace TheLastOne.Game.Network
                         {
                             // 프리팹이 만들어진 이후 부터 script를 사용할 수 있기 때문에 그 이후 애니메이션 동기화를 시작한다.
                             iter.script.get_Animator(Get_ServerData.Data(i).Value.Animator);
-                            //Debug.Log(Get_ServerData.Data(i).Value.Id + " : "+ Get_ServerData.Data(i).Value.NowWeapon);
                             iter.script.get_Weapon(Get_ServerData.Data(i).Value.NowWeapon);
                             iter.script.Vertical = Get_ServerData.Data(i).Value.Vertical;
                             iter.script.Horizontal = Get_ServerData.Data(i).Value.Horizontal;

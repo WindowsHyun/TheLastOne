@@ -204,6 +204,7 @@ public class OtherPlayerCtrl : MonoBehaviour
             }
             else
             {
+                animator.SetBool("IsEquip", false);
                 for (int i = 0; i < 4; ++i)
                     weaponView[i].GetComponent<Renderer>().enabled = false;
             }

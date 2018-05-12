@@ -44,6 +44,10 @@ void Game_Room::player_To_Zombie()
 			// 좀비의 Target이 정해져 있지 않으면 넘긴다.
 			continue;
 
+		if (g_clients.find(zombie.second.get_target()) == g_clients.end())
+			// 플레이어가 없을 경우.
+			continue;
+
 		dist = DistanceToPoint(g_clients.find(zombie.second.get_target())->second.get_position(), zombie.second.get_position());
 
 		if (dist >= Zombie_Dist) {

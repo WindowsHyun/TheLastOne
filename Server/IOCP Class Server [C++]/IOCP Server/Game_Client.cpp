@@ -58,6 +58,7 @@ Game_Client::Game_Client(const SOCKET sock, const int client_id, const char * ga
 	this->car_rotation.x = 0;
 	this->car_rotation.y = 0;
 	this->car_rotation.z = 0;
+	this->car_kmh = 0.0f;
 	this->horizontal = 0.0f;
 	this->vertical = 0.0f;
 	this->inCar = -1;

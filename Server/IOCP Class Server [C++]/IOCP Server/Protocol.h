@@ -16,8 +16,8 @@ enum Event_Type {
 // 소켓 설정
 #define SERVERPORT 9000
 #define BUFSIZE    1024
-#define MAX_BUFF_SIZE   7000
-#define MAX_PACKET_SIZE  7000
+#define MAX_BUFF_SIZE   10000
+#define MAX_PACKET_SIZE  10000
 #define MAX_Client 50
 
 // 게임 설정
@@ -56,7 +56,7 @@ enum Event_Type {
 #define CS_Player_Status 9					// 클라이언트가 서버에게 자신의 상태를 전달한다.
 
 // 자기장 시간
-#define DangerLine_init 10
+#define DangerLine_init 120
 #define DangerLine_Level4 2400
 #define DangerLine_Level3 240
 #define DangerLine_Level2 240

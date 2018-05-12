@@ -431,7 +431,7 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *pac
 		if (client_View->inCar() != -1) {
 			// 차량을 실제로 탑승 하고 있을 경우.
 			auto item = GameRoom[room_id].get_room().get_item_iter(client_View->inCar());
-			item->second.set_Kmh(client_View->carkmh());
+			item->second.set_Kmh(client_View->carkmh());	// 클라이언트에서 Carkmh를 받아오지만 클라이언트에 저장 안하고 아이템에 저장한다.
 			item->second.set_pos(client_View->position()->x(), client_View->position()->y(), client_View->position()->z());
 			xyz car_rotation{ client_View->carrotation()->x() , client_View->carrotation()->y() , client_View->carrotation()->z() };
 			client->second.set_client_car_rotation(car_rotation);
@@ -640,13 +640,13 @@ void IOCP_Server::Send_All_Player(const int room_id, const int client)
 		auto animator = iter.second.get_animator();
 		float horizontal = iter.second.get_horizontal();
 		float vertical = iter.second.get_vertical();
-		auto xyz = Vec3(iter.second.get_position().x, iter.second.get_position().y, iter.second.get_position().z);
+		auto position = Vec3(iter.second.get_position().x, iter.second.get_position().y, iter.second.get_position().z);
 		auto rotation = Vec3(iter.second.get_rotation().x, iter.second.get_rotation().y, iter.second.get_rotation().z);
 		auto weaponState = iter.second.get_weapon();
-		
 		auto inCar = iter.second.get_inCar();
+		auto dangerLineIn = iter.second.get_DangerLine();
 		auto car_rotation = Vec3(iter.second.get_car_rotation().x, iter.second.get_car_rotation().y, iter.second.get_car_rotation().z);
-		auto client_data = CreateClient_info(builder, id, hp, armour, animator, horizontal, vertical, inCar, name, &xyz, &rotation, &car_rotation, false, -1);
+		auto client_data = CreateClient_info(builder, id, hp, armour, animator, horizontal, vertical, inCar, name, &position, &rotation, &car_rotation, 0.0f, dangerLineIn, weaponState);
 		// client_data 라는 테이블에 클라이언트 데이터가 들어가 있다.
 
 		Individual_client.push_back(client_data);	// Vector에 넣었다.
