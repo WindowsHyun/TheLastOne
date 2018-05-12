@@ -41,9 +41,10 @@ public class VehicleCtrl : PlayerVehicleCtrl
 
     public bool carDestroy = false;
 
-    // 폭팔된 차량 및 이펙트
+    // 폭팔된 차량 및 이펙트, 사운드
     public GameObject expCar;
     public GameObject expEffect;
+
 
     // 차량 자체의 브레이크를 위함
     public bool vehicleStop = false;
@@ -100,13 +101,9 @@ public class VehicleCtrl : PlayerVehicleCtrl
             }
         }
 
-
         KMh = (m_rigidbody.velocity.magnitude * 3.6f)*0.4f;
 
         pitch = KMh * 0.05f;
-
-      
-
     }
 
     void UpdateMeshsPositions()
@@ -143,7 +140,6 @@ public class VehicleCtrl : PlayerVehicleCtrl
 
     void OnTriggerEnter(Collider coll)
     {
-
         // 충돌한 게임오브젝트의 태그값 비교
         if (coll.gameObject.tag == "BULLET")
         {

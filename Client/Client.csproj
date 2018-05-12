@@ -247,6 +247,7 @@
     <Compile Include="Assets\02.Scripts\BulletCtrl.cs" />
     <Compile Include="Assets\02.Scripts\CoolTimeCtrl.cs" />
     <Compile Include="Assets\02.Scripts\DangerLineCtrl.cs" />
+    <Compile Include="Assets\02.Scripts\EXPVehicleCtrl.cs" />
     <Compile Include="Assets\02.Scripts\FollowCam.cs" />
     <Compile Include="Assets\02.Scripts\InventoryCtrl.cs" />
     <Compile Include="Assets\02.Scripts\ItemCtrl.cs" />
