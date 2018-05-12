@@ -29,6 +29,7 @@ Game_Item::Game_Item(const float x, const float y, const float z, const std::str
 		this->item_Kinds = Kind_Car;
 	else
 		this->item_Kinds = Kind_Item;
+	this->Car_Kmh = 0.0f;
 }
 
 Game_Item::~Game_Item()

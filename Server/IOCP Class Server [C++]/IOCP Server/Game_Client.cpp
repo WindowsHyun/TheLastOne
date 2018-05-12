@@ -64,7 +64,7 @@ Game_Client::Game_Client(const SOCKET sock, const int client_id, const char * ga
 	this->hp = Player_HP;
 	this->armour = 0;
 	this->animator = 0;
-	this->weaponState = 0;
+	this->weaponState = -1;
 	this->dangerLineIn = true;
 	this->playerStatus = 0;
 	ZeroMemory(&this->recv_over, sizeof(this->recv_over));

@@ -311,6 +311,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
                 //차량이 탑승 중에 차가 터진 경우
                 this.transform.position = new Vector3(ridingCar.transform.position.x - 1, ridingCar.transform.position.y, ridingCar.transform.position.z);
                 PlayerDie();
+                networkCtrl.Player_HP(-1, hp, armour);  // 차량이 터지면서 hp는 0으로 만든다.
             }
 
             if (Input.GetKeyDown(KeyCode.G))
@@ -431,7 +432,8 @@ public class PlayerCtrl : PlayerVehicleCtrl
                 navagent.enabled = false;
                 tr.transform.position = new Vector3(776.9319f, 30.00061f, 441.4027f);
                 navagent.enabled = true;
-            }else if (Input.GetKeyDown(KeyCode.Alpha4))
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha4))
             {
                 navagent.enabled = false;
                 tr.transform.position = new Vector3(718.0281f, 50.0f, 1235.498f);

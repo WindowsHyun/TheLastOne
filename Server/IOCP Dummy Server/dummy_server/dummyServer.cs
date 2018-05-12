@@ -206,9 +206,9 @@ namespace dummy_server
             foreach (var key in client_data.Keys.ToList())
             {
                 client_data[key].m_Net.workSocket.Close();
-                client_data[key].t1.Join();
                 Thread.Sleep(50);
             }
+            client_data.Clear();
             allReady.Enabled = true;
             connect_Server.Enabled = true;
             DebugBox.Text = "";

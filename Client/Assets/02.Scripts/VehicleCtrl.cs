@@ -49,8 +49,7 @@ public class VehicleCtrl : PlayerVehicleCtrl
     public bool vehicleStop = false;
 
     // 차량 속도, 인스펙터 창에 보이지 않음
-    [HideInInspector]
-    public float KMh;
+    [HideInInspector] public float KMh = 0.0f;
 
     // 엔진 사운드를 위한 변수
     private float pitch = 0;
@@ -61,6 +60,7 @@ public class VehicleCtrl : PlayerVehicleCtrl
     {
         // 생명 초기값 설정
         vehicleInitHp = vehicleHp;
+        KMh = 0.0f;
 
         // 차량의 무게중심을 중심으로 맞춘다.
         vehicle_tr = GetComponent<Transform>();
@@ -78,6 +78,7 @@ public class VehicleCtrl : PlayerVehicleCtrl
         if (GetTheCar == true)
         {
             // 차량 탑승 후에도 좌우 화면 전환이 가능하게 수정
+            Car_Status = true;
             VehicleCtrl_tr.transform.Rotate(Vector3.up * Time.deltaTime * 15.0f * Input.GetAxis("Mouse X"));
         }
         // 바퀴 회전의 랜더링을 위함
@@ -136,7 +137,8 @@ public class VehicleCtrl : PlayerVehicleCtrl
         }
         else
         {
-            vehicle_tr.position = Vector3.MoveTowards(vehicle_tr.position, pos, Time.deltaTime * 4000.0f);
+            if (KMh == 0) KMh = 1.0f;
+            vehicle_tr.position = Vector3.MoveTowards(vehicle_tr.position, pos, Time.deltaTime * KMh);
         }
     }
 
@@ -177,8 +179,11 @@ public class VehicleCtrl : PlayerVehicleCtrl
         Instantiate(expEffect, vehicle_tr.position, Quaternion.identity);
         Instantiate(expCar, vehicle_tr.position, this.transform.localRotation);
 
-        if (Car_Status == true) // 차량이 폭파하는데 사람이 타있다고 나올경우
+        if (Car_Status == true)
+        {
+            // 차량이 폭파하는데 사람이 타있다고 나올경우
             player_die = true;
+        }
 
         gameObject.SetActive(false);
     }

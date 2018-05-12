@@ -383,8 +383,8 @@ namespace TheLastOne.Game.Network
                         {
                             // 차량의 경우 지속적으로 위치를 갱신 해준다.
                             //Debug.Log(item_Collection[key].get_pos().y + " | " + item_Collection[key].item.transform.position.y);
+                            item_Collection[key].car.KMh = item_Collection[key].get_kmh();  // 차량 속도를 넣어준다.
                             item_Collection[key].car.MovePos(item_Collection[key].get_pos());
-                            //item_Collection[key].item.transform.position = Vector3.MoveTowards(item_Collection[key].item.transform.position, item_Collection[key].get_pos(), Time.deltaTime * 4000.0f);
                             item_Collection[key].c_rigidbody.isKinematic = false;
                             item_Collection[key].item.transform.rotation = Quaternion.Euler(item_Collection[key].get_rotation().x, item_Collection[key].get_rotation().y, item_Collection[key].get_rotation().z);
 
@@ -422,7 +422,7 @@ namespace TheLastOne.Game.Network
                     Enum get_int_enum = Player_Script.playerState;
 
                     // 플레이어 데이터 보내주기
-                    Sendbyte = sF.makeClient_PacketInfo(Player_Position, Convert.ToInt32(get_int_enum), Player_Script.h, Player_Script.v, Player_Rotation, Player_Script.now_Weapon, Player_Script.CarNum, Player_Script.dangerLineIn, Car_Rotation);
+                    Sendbyte = sF.makeClient_PacketInfo(Player_Position, Convert.ToInt32(get_int_enum), Player_Script.h, Player_Script.v, Player_Rotation, Player_Script.now_Weapon, Player_Script.CarNum, Player_Script.dangerLineIn, Car_Rotation, Player_Script.ridingCar.KMh);
                     Send_Packet(Sendbyte);
 
                     //좀비 데이터 보내주기
@@ -526,6 +526,7 @@ namespace TheLastOne.Game.Network
                         iter.set_pos(new Vector3(Get_ServerData.Data(i).Value.Position.Value.X, Get_ServerData.Data(i).Value.Position.Value.Y, Get_ServerData.Data(i).Value.Position.Value.Z));
                         iter.set_rot(new Vector3(Get_ServerData.Data(i).Value.Rotation.Value.X, Get_ServerData.Data(i).Value.Rotation.Value.Y, Get_ServerData.Data(i).Value.Rotation.Value.Z));
                         iter.set_weapon(Get_ServerData.Data(i).Value.NowWeapon);
+                        Debug.Log(Get_ServerData.Data(i).Value.Id + " : " + iter.get_weapon());
                         iter.set_hp(Get_ServerData.Data(i).Value.Hp);
                         iter.set_armour(Get_ServerData.Data(i).Value.Armour);
                         iter.set_horizontal(Get_ServerData.Data(i).Value.Horizontal);
@@ -537,6 +538,7 @@ namespace TheLastOne.Game.Network
                         {
                             // 프리팹이 만들어진 이후 부터 script를 사용할 수 있기 때문에 그 이후 애니메이션 동기화를 시작한다.
                             iter.script.get_Animator(Get_ServerData.Data(i).Value.Animator);
+                            //Debug.Log(Get_ServerData.Data(i).Value.Id + " : "+ Get_ServerData.Data(i).Value.NowWeapon);
                             iter.script.get_Weapon(Get_ServerData.Data(i).Value.NowWeapon);
                             iter.script.Vertical = Get_ServerData.Data(i).Value.Vertical;
                             iter.script.Horizontal = Get_ServerData.Data(i).Value.Horizontal;
@@ -600,6 +602,7 @@ namespace TheLastOne.Game.Network
                         iter.set_eat(Get_ServerData.Data(i).Value.Eat);
                         iter.set_hp(Get_ServerData.Data(i).Value.Hp);
                         iter.set_riding(Get_ServerData.Data(i).Value.Riding);
+                        iter.set_kmh(Get_ServerData.Data(i).Value.Carkmh);
                     }
                     else
                     {

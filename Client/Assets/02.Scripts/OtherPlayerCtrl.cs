@@ -202,6 +202,11 @@ public class OtherPlayerCtrl : MonoBehaviour
                         weaponView[i].GetComponent<Renderer>().enabled = false;
                 }
             }
+            else
+            {
+                for (int i = 0; i < 4; ++i)
+                    weaponView[i].GetComponent<Renderer>().enabled = false;
+            }
 
             if (createBullet_b == true)
             {

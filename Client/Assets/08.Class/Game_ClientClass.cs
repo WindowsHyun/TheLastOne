@@ -81,7 +81,7 @@ namespace TheLastOne.GameClass
             this.prefab = false;
             this.removeClient = false;
             this.activePlayer = true;
-            this.nowWeaponState = 0;
+            this.nowWeaponState = -1;
             this.vertical = 0.0f;
             this.horizontal = 0.0f;
             this.inCar = -1;

@@ -121,8 +121,9 @@ struct Client_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_POSITION = 20,
     VT_ROTATION = 22,
     VT_CARROTATION = 24,
-    VT_DANGERLINEIN = 26,
-    VT_NOWWEAPON = 28
+    VT_CARKMH = 26,
+    VT_DANGERLINEIN = 28,
+    VT_NOWWEAPON = 30
   };
   int32_t id() const {
     return GetField<int32_t>(VT_ID, 0);
@@ -157,6 +158,9 @@ struct Client_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const Vec3 *carrotation() const {
     return GetStruct<const Vec3 *>(VT_CARROTATION);
   }
+  float carkmh() const {
+    return GetField<float>(VT_CARKMH, 0.0f);
+  }
   bool dangerLineIn() const {
     return GetField<uint8_t>(VT_DANGERLINEIN, 0) != 0;
   }
@@ -177,6 +181,7 @@ struct Client_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<Vec3>(verifier, VT_POSITION) &&
            VerifyField<Vec3>(verifier, VT_ROTATION) &&
            VerifyField<Vec3>(verifier, VT_CARROTATION) &&
+           VerifyField<float>(verifier, VT_CARKMH) &&
            VerifyField<uint8_t>(verifier, VT_DANGERLINEIN) &&
            VerifyField<int32_t>(verifier, VT_NOWWEAPON) &&
            verifier.EndTable();
@@ -219,6 +224,9 @@ struct Client_infoBuilder {
   void add_carrotation(const Vec3 *carrotation) {
     fbb_.AddStruct(Client_info::VT_CARROTATION, carrotation);
   }
+  void add_carkmh(float carkmh) {
+    fbb_.AddElement<float>(Client_info::VT_CARKMH, carkmh, 0.0f);
+  }
   void add_dangerLineIn(bool dangerLineIn) {
     fbb_.AddElement<uint8_t>(Client_info::VT_DANGERLINEIN, static_cast<uint8_t>(dangerLineIn), 0);
   }
@@ -250,10 +258,12 @@ inline flatbuffers::Offset<Client_info> CreateClient_info(
     const Vec3 *position = 0,
     const Vec3 *rotation = 0,
     const Vec3 *carrotation = 0,
+    float carkmh = 0.0f,
     bool dangerLineIn = false,
     int32_t nowWeapon = 0) {
   Client_infoBuilder builder_(_fbb);
   builder_.add_nowWeapon(nowWeapon);
+  builder_.add_carkmh(carkmh);
   builder_.add_carrotation(carrotation);
   builder_.add_rotation(rotation);
   builder_.add_position(position);
@@ -282,6 +292,7 @@ inline flatbuffers::Offset<Client_info> CreateClient_infoDirect(
     const Vec3 *position = 0,
     const Vec3 *rotation = 0,
     const Vec3 *carrotation = 0,
+    float carkmh = 0.0f,
     bool dangerLineIn = false,
     int32_t nowWeapon = 0) {
   return Game::TheLastOne::CreateClient_info(
@@ -297,6 +308,7 @@ inline flatbuffers::Offset<Client_info> CreateClient_infoDirect(
       position,
       rotation,
       carrotation,
+      carkmh,
       dangerLineIn,
       nowWeapon);
 }
@@ -500,7 +512,8 @@ struct Gameitem FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_EAT = 12,
     VT_RIDING = 14,
     VT_HP = 16,
-    VT_KIND = 18
+    VT_KIND = 18,
+    VT_CARKMH = 20
   };
   int32_t id() const {
     return GetField<int32_t>(VT_ID, 0);
@@ -526,6 +539,9 @@ struct Gameitem FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t kind() const {
     return GetField<int32_t>(VT_KIND, 0);
   }
+  float Carkmh() const {
+    return GetField<float>(VT_CARKMH, 0.0f);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_ID) &&
@@ -537,6 +553,7 @@ struct Gameitem FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_RIDING) &&
            VerifyField<int32_t>(verifier, VT_HP) &&
            VerifyField<int32_t>(verifier, VT_KIND) &&
+           VerifyField<float>(verifier, VT_CARKMH) &&
            verifier.EndTable();
   }
 };
@@ -568,6 +585,9 @@ struct GameitemBuilder {
   void add_kind(int32_t kind) {
     fbb_.AddElement<int32_t>(Gameitem::VT_KIND, kind, 0);
   }
+  void add_Carkmh(float Carkmh) {
+    fbb_.AddElement<float>(Gameitem::VT_CARKMH, Carkmh, 0.0f);
+  }
   explicit GameitemBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -589,8 +609,10 @@ inline flatbuffers::Offset<Gameitem> CreateGameitem(
     bool eat = false,
     bool riding = false,
     int32_t hp = 0,
-    int32_t kind = 0) {
+    int32_t kind = 0,
+    float Carkmh = 0.0f) {
   GameitemBuilder builder_(_fbb);
+  builder_.add_Carkmh(Carkmh);
   builder_.add_kind(kind);
   builder_.add_hp(hp);
   builder_.add_rotation(rotation);
@@ -611,7 +633,8 @@ inline flatbuffers::Offset<Gameitem> CreateGameitemDirect(
     bool eat = false,
     bool riding = false,
     int32_t hp = 0,
-    int32_t kind = 0) {
+    int32_t kind = 0,
+    float Carkmh = 0.0f) {
   return Game::TheLastOne::CreateGameitem(
       _fbb,
       id,
@@ -621,7 +644,8 @@ inline flatbuffers::Offset<Gameitem> CreateGameitemDirect(
       eat,
       riding,
       hp,
-      kind);
+      kind,
+      Carkmh);
 }
 
 struct GameDangerLine FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {

@@ -45,7 +45,7 @@ private:
 	void makeThread();								// 스레드 만들기
 	void Worker_Thread();							// 실제 동작 스레드
 	void Accept_Thread();								// 클라이언트 받는 스레드
-	void Remove_Client();								// 클라이언트가 종료시 데이터 지우기
+	void Remove_Client(const int room_id);								// 클라이언트가 종료시 데이터 지우기
 	void Shutdown_Server();							// 서버 종료
 	void DisconnectClient(const int room_id, const int ci);					// 클라이언트 종료
 	void ProcessPacket(const int room_id, const int ci, const char *packet);		// 패킷 처리

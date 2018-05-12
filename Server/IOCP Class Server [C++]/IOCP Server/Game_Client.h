@@ -13,7 +13,7 @@ private:
 	int hp = -1;
 	int armour = 0;
 	int animator = 0;
-	int weaponState = 0;
+	int weaponState = -1;
 	int limit_Zombie = 0;
 	int inCar = -1;
 	int playerStatus = 0;
