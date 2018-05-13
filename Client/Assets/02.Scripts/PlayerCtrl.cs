@@ -178,6 +178,9 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
     public Text vehicleKMH;
 
+    public AudioClip vehicleHornSound;
+
+
     IEnumerator StartKeyInput()
     {
         do
@@ -407,6 +410,14 @@ public class PlayerCtrl : PlayerVehicleCtrl
                     // 차량 하차시 PlayerModel에 있는 engine 사운드 멈춤
                     engineSource.Stop();
                 }
+            }
+
+            // 차량 탑승시 스페이스바로 경적 울림
+            if(Input.GetKeyDown(KeyCode.Space) && GetTheCar == true)
+            {
+                source.PlayOneShot(vehicleHornSound, 1.0f);
+
+
             }
 
             // R키를 누르면 재장전
