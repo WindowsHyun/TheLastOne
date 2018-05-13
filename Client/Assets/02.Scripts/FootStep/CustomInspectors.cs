@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿/*
+using UnityEngine;
 using UnityEditor;
 
 namespace Footsteps {
@@ -159,3 +160,4 @@ namespace Footsteps {
 		}
 	}
 }
+*/
