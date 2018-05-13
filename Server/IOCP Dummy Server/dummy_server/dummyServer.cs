@@ -171,7 +171,7 @@ namespace dummy_server
                 var Get_ServerData = Client_id.GetRootAsClient_id(revc_buf);
                 //client_data[state.client_id].id = Int32.Parse(Get_ServerData.Id.ToString());
 
-                client_data.Add(Get_ServerData.Id, new Game_ClientClass(Get_ServerData.Id, m_Net, new Vector3(r.Next(880, 1400), 30, r.Next(750, 1600))));
+                client_data.Add(Get_ServerData.Id, new Game_ClientClass(Get_ServerData.Id, m_Net, new Vector3(r.Next(920, 1150), 30, r.Next(750, 1420))));
 
 
                 System.Diagnostics.Debug.WriteLine("클라이언트 아이디 : " + Get_ServerData.Id.ToString());

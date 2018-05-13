@@ -185,17 +185,6 @@ public class PlayerCtrl : PlayerVehicleCtrl
     {
         do
         {
-            if (dangerLineIn == false)
-            {
-                // 범위 밖에 있을 경우 HP 감소
-                //hp -= 0;
-                // Image UI 항목의 fillAmount 속성을 조절해 생명 게이지 값 조절
-                imgHpBar.fillAmount = (float)hp / (float)initHp;
-
-                if (hp <= 0)
-                    PlayerDie();
-            }
-
             // 총이 장착이 되었을때만 발사 가능
             if (shotable == true)
             {
@@ -508,11 +497,10 @@ public class PlayerCtrl : PlayerVehicleCtrl
                 {     
                     // 플레이어 모든 코루틴 종료
                     SceneManager.LoadScene("DieGameScene"); // 다음씬으로 넘어감
-                 
                 }
             }
 
-            if(SingletonCtrl.Instance_S.SurvivalPlayer == 1 && hp > 0)
+            if(SingletonCtrl.Instance_S.SurvivalPlayer == 1 && playerState != PlayerState.die)
             {
                 ScreenSceneOFF.gameObject.SetActive(true);
                 Cursor.lockState = CursorLockMode.None;//마우스 커서 고정 해제
@@ -889,7 +877,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
         // 체력 초기화
         hp = 0;
-        imgHpBar.fillAmount = (float)hp / (float)initHp;
+        imgHpBar.fillAmount = 0.0f / (float)initHp;
         armour = 0;
         imgArmourBar.fillAmount = (float)armour / (float)initArmour;
 

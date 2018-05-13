@@ -515,6 +515,10 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *pac
 		else if (client_Check_info->kind() == Kind_Car) {
 			auto iter = GameRoom[room_id].get_room().get_item_iter(client_Check_info->id());
 			iter->second.set_hp(client_Check_info->hp());
+			if (iter->second.get_hp() <= 0) {
+				// 차량 체력이 0일경우 폭파를 허용한다.
+				iter->second.set_exp(true);
+			}
 		}
 	}
 	break;
@@ -545,11 +549,12 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *pac
 		Send_All_Player(room_id, ci);
 		Send_Hide_Player(room_id, ci);
 
-		Send_All_Zombie(room_id, ci);
-		Send_Hide_Zombie(room_id, ci);
+		if (GameRoom[room_id].get_room().get_dangerLine().get_level() <= 4) {
+			Send_All_Zombie(room_id, ci);
+			Send_Hide_Zombie(room_id, ci);
 
-		GameRoom[room_id].get_room().player_To_Zombie();
-
+			GameRoom[room_id].get_room().player_To_Zombie();
+		}
 		Send_All_Item(room_id, ci);
 
 		Send_SurvivalCount(room_id, ci);
@@ -629,7 +634,7 @@ void IOCP_Server::Send_All_Player(const int room_id, const int client)
 	flatbuffers::FlatBufferBuilder builder;
 	std::vector<flatbuffers::Offset<Client_info>> Individual_client;		// 개인 데이터
 	for (auto iter : GameRoom[room_id].get_room().get_client()) {
-		if (iter.second.get_Connect() != true || Distance(room_id, client_iter->second.get_client_id(), iter.second.get_client_id(), Player_Dist, Kind_Player) == false || iter.second.get_hp() <= 0)
+		if (iter.second.get_Connect() != true || Distance(room_id, client_iter->second.get_client_id(), iter.second.get_client_id(), Player_Dist, Kind_Player) == false )
 			// 클라이언트가 연결 안되어 있으면 제외 한다. 또는 체력이 없을경우 제외한다.
 			continue;
 
@@ -733,7 +738,8 @@ void IOCP_Server::Send_All_Item(const int room_id, const int ci)
 		auto hp = iter.second.get_hp();
 		auto kind = iter.second.get_kind();
 		auto kmh = iter.second.get_Kmh();
-		auto client_data = CreateGameitem(builder, id, name, &pos, &rotation, eat, riding, hp, kind, kmh);
+		auto explosion = iter.second.get_exp();
+		auto client_data = CreateGameitem(builder, id, name, &pos, &rotation, eat, riding, hp, kind, kmh, explosion);
 
 		Individual_client.push_back(client_data);	// Vector에 넣었다.
 	}
@@ -905,7 +911,7 @@ void IOCP_Server::Send_SurvivalCount(const int room_id, const int client)
 		if (iter.second.get_hp() > 0)
 			count++;
 	}
-	//count++;
+	count++;
 	flatbuffers::FlatBufferBuilder builder;
 	auto Client_id = count;
 	auto orc = CreateClient_Packet(builder, Client_id);
@@ -924,6 +930,9 @@ void IOCP_Server::Attack_DangerLine_Damge(const int room_id)
 			auto client_iter = GameRoom[room_id].get_room().get_client_iter(iter.first);
 			int my_hp = client_iter->second.get_hp();
 			client_iter->second.set_hp(my_hp - GameRoom[room_id].get_room().get_dangerLine().get_demage());
+			if (client_iter->second.get_hp() <= 0) {
+				client_iter->second.set_hp(0);
+			}
 		}
 	}
 

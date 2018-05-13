@@ -38,7 +38,6 @@ public class StartCarCtrl : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        player.GetComponent<PlayerCtrl>().enabled = false;
         Player_Script = GameObject.FindWithTag("Player").GetComponent<PlayerCtrl>();
 
         // 플레이어는 인게임 상태로 들어왔다.
@@ -63,6 +62,7 @@ public class StartCarCtrl : MonoBehaviour
             // 서버와 연결이 되어있을 경우 출발 대기를 한다.
             StartCoroutine(waitStartCar());
         }
+        Player_Script.enabled = false;
     }
 
     void Update()
@@ -70,52 +70,48 @@ public class StartCarCtrl : MonoBehaviour
         if (dontStart == false)
         {
             // 서버에서 시작차량을 출발하라고 한 뒤 부터 F를 누를 수 있다.
-            if (startSet != true)
+            if (startSet == false)
             {
                 player.transform.position = new Vector3(this.transform.position.x, 30.0f, this.transform.position.z);
-
                 //------------------------------------------------------------------------------
                 // 차량 이동 중 에도 지도를 볼 수 있다.
-                if (Input.GetKeyDown(KeyCode.CapsLock))
-                {
-                    if (Player_Script.realView == false)
-                    {
-                        Player_Script.realMap.SetActive(true);
-                        Player_Script.realView = true;
-                    }
-                    else if (Player_Script.realView == true)
-                    {
-                        Player_Script.realMap.SetActive(false);
-                        Player_Script.realView = false;
-                    }
-                }
+                // 빌드 되었을 경우 플레이어 컨트롤러가 안꺼지는 오류 때문에 주석처리.
+                //if (Input.GetKeyDown(KeyCode.CapsLock))
+                //{
+                //    if (Player_Script.realView == false)
+                //    {
+                //        Player_Script.realMap.SetActive(true);
+                //        Player_Script.realView = true;
+                //    }
+                //    else if (Player_Script.realView == true)
+                //    {
+                //        Player_Script.realMap.SetActive(false);
+                //        Player_Script.realView = false;
+                //    }
+                //}
 
-                if (Player_Script.realView == true)
-                {
-                    Player_Script.playerPositionImage.localPosition = new Vector3(-gameObject.transform.position.z * 0.5f, gameObject.transform.position.x * 0.5f);
-                    Player_Script.playerPositionImage.eulerAngles = new Vector3(0, 0, player.transform.eulerAngles.y );
-                }
+                //if (Player_Script.realView == true)
+                //    Player_Script.playerPositionImage.localPosition = new Vector3(-gameObject.transform.position.z * 0.5f, gameObject.transform.position.x * 0.5f);
                 //------------------------------------------------------------------------------
-            }
-            // F키 입력 시
-            if (Input.GetKeyDown(KeyCode.F) && startSet == false)
-            {
-                // 플레이어에 가해진 힘을 0으로 만든다. - > 차량 하차
-                //player.GetComponent<Rigidbody>().velocity = Vector3.zero;
 
-                // 플레이어 스크립트 사용 (이동 때문)
-                player.GetComponent<PlayerCtrl>().enabled = true;
+                // F키 입력 시
+                if (Input.GetKeyDown(KeyCode.F))
+                {
+                    // 플레이어 스크립트 사용 (이동 때문)
+                    Player_Script.enabled = true;
 
-                // 카메라 전환
-                FollowCam followCam = GameObject.Find("Main Camera").GetComponent<FollowCam>();
-                followCam.getOff = true;
-                followCam.height = 35.0f;
-                followCam.dist = 25.0f;
+                    // 카메라 전환
+                    FollowCam followCam = GameObject.Find("Main Camera").GetComponent<FollowCam>();
+                    followCam.getOff = true;
+                    followCam.height = 35.0f;
+                    followCam.dist = 25.0f;
 
-                // 차량에 하차 할때 차량의 위치로 플레이어를 이동시킨다.
-                player.transform.position = new Vector3(this.transform.position.x, 30.0f, this.transform.position.z);
-                // 차량 하차 후 true로 F키 입력 시 재하차 불가능하게 만듬
-                startSet = true;
+                    // 차량에 하차 할때 차량의 위치로 플레이어를 이동시킨다.
+                    player.transform.position = new Vector3(this.transform.position.x, 30.0f, this.transform.position.z);
+                    // 차량 하차 후 true로 F키 입력 시 재하차 불가능하게 만듬
+                    startSet = true;
+                }
+
             }
         }
     }

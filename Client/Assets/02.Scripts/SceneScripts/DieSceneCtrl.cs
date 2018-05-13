@@ -8,7 +8,6 @@ using TheLastOne.Game.Network;
 public class DieSceneCtrl : MonoBehaviour
 {
     public Text playerIdText;
-    NetworkCtrl networkCtrl = new NetworkCtrl();
 
     private void Start()
     {

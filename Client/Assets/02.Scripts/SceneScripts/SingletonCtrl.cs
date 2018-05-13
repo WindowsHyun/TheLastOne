@@ -56,8 +56,11 @@ public class SingletonCtrl : MonoBehaviour
                 m_Socket.Close();
                 networkCtrl.NetworkInit();
                 nowModeNumber = 0;
+                survivalPlayer = 0;
                 playerStatus = 1;
                 startCarRun = false;
+                waitTime = -1;
+                corutinSocket = true;
                 StartCoroutine(connectSocket());
             }
         }

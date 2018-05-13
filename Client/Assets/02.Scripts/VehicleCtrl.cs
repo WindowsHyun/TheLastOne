@@ -56,8 +56,6 @@ public class VehicleCtrl : PlayerVehicleCtrl
     [HideInInspector]
     public float pitch = 0;
 
-
-
     void Awake()
     {
         // 생명 초기값 설정
@@ -158,14 +156,6 @@ public class VehicleCtrl : PlayerVehicleCtrl
                     ExpCar();
                     carDestroy = true;
                 }
-
-                // 미래를 위한 예비 코드
-                //if(player.GetTheCar == true)
-                //{
-                //    player.hp = 0;
-                //    player.imgHpBar.fillAmount = (float)player.hp / (float)player.initHp;
-                //    player.PlayerDie();
-                //}
             }
         }
     }
