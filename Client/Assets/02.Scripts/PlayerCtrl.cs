@@ -437,37 +437,37 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
             //------------------------------------------------------------------------------
             // 위치 이동 치트.
-            if (Input.GetKeyDown(KeyCode.Alpha3))
-            {
-                navagent.enabled = false;
-                tr.transform.position = new Vector3(349.1992f, 60.06981f, 376.0149f);
-                navagent.enabled = true;
-            }
-            else if (Input.GetKeyDown(KeyCode.Alpha4))
-            {
-                navagent.enabled = false;
-                tr.transform.position = new Vector3(718.0281f, 50.0f, 1235.498f);
-                navagent.enabled = true;
-            }
-            else if (Input.GetKeyDown(KeyCode.Alpha5))
+            if (Input.GetKeyDown(KeyCode.Alpha3)) // 낡은 공장 단지
             {
                 navagent.enabled = false;
                 tr.transform.position = new Vector3(526.118f, 50.04224f, 2705.361f);
                 navagent.enabled = true;
             }
-            else if (Input.GetKeyDown(KeyCode.Alpha6))
+            else if (Input.GetKeyDown(KeyCode.Alpha4)) // 학교
             {
                 navagent.enabled = false;
                 tr.transform.position = new Vector3(1407.026f, 50.0f, 2190.113f);
                 navagent.enabled = true;
             }
-            else if (Input.GetKeyDown(KeyCode.Alpha7))
+            else if (Input.GetKeyDown(KeyCode.Alpha5)) // 언덕위 집
+            {
+                navagent.enabled = false;
+                tr.transform.position = new Vector3(718.0281f, 50.0f, 1235.498f);
+                navagent.enabled = true;
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha6)) // 컨테이너 단지
+            {
+                navagent.enabled = false;
+                tr.transform.position = new Vector3(349.1992f, 60.06981f, 376.0149f);
+                navagent.enabled = true;
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha7)) // 호수 옆 집
             {
                 navagent.enabled = false;
                 tr.transform.position = new Vector3(1545.017f, 59.95751f, 904.9451f);
                 navagent.enabled = true;
             }
-            else if (Input.GetKeyDown(KeyCode.Alpha8))
+            else if (Input.GetKeyDown(KeyCode.Alpha8)) // 센터
             {
                 navagent.enabled = false;
                 tr.transform.position = new Vector3(1008.397f, 30.06981f, 1553.832f);
@@ -760,13 +760,13 @@ public class PlayerCtrl : PlayerVehicleCtrl
             // Image UI 항목의 fillAmount 속성을 조절해 생명 게이지 값 조절
             //imgHpBar.fillAmount = (float)hp / (float)initHp;
 
-            if (hp <= 0)
-            {
-                // 마우스 잠겨 있을경우 푼다.
-                Cursor.lockState = CursorLockMode.None;//마우스 커서 고정 해제
-                Cursor.visible = true;//마우스 커서 보이기
-                PlayerDie();
-            }
+            //if (hp <= 0)
+            //{
+            //    // 마우스 잠겨 있을경우 푼다.
+            //    Cursor.lockState = CursorLockMode.None;//마우스 커서 고정 해제
+            //    Cursor.visible = true;//마우스 커서 보이기
+            //    PlayerDie();
+            //}
             // Bullet 삭제
             Destroy(coll.gameObject);
         }
@@ -809,14 +809,14 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
             }
 
-            if (hp <= 0)
-            {
-                // 마우스 잠겨 있을경우 푼다.
-                Cursor.lockState = CursorLockMode.None;//마우스 커서 고정 해제
-                Cursor.visible = true;//마우스 커서 보이기
-                PlayerDie();
+            //if (hp <= 0)
+            //{
+            //    // 마우스 잠겨 있을경우 푼다.
+            //    Cursor.lockState = CursorLockMode.None;//마우스 커서 고정 해제
+            //    Cursor.visible = true;//마우스 커서 보이기
+            //    PlayerDie();
 
-            }
+            //}
         }
 
         if (coll.gameObject.tag == "DangerLine")

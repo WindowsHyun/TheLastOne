@@ -1,4 +1,4 @@
-#ifndef __GAMEZOMBIE_H__
+ï»¿#ifndef __GAMEZOMBIE_H__
 #define __GAMEZOMBIE_H__
 
 #include "Core_Header.h"
@@ -15,25 +15,25 @@ private:
 	float distance;
 
 public:
-	float get_distance() { return this->distance; }															// Á»ºñ¿Í ÇÃ·¹ÀÌ¾î °Å¸® Àü´Ş
-	bool get_live() { return this->live; }																		// Á»ºñ »ı»ç ¿©ºÎ Àü´Ş
-	int get_client_id() { return this->client_id; }																// Á»ºñ ¾ÆÀÌµğ Àü´Ş
-	int get_hp() { return this->hp; };																			// Á»ºñ Ã¼·Â Àü´Ş
-	int get_animator() { return this->animator; };															// Á»ºñ ¾Ö´Ï¸ŞÀÌ¼Ç Àü´Ş
-	int get_target() { return this->target_Player; };															// Á»ºñ Å¸ÄÏ ÇÃ·¹ÀÌ¾î Àü´Ş
+	float get_distance() { return this->distance; }															// ì¢€ë¹„ì™€ í”Œë ˆì´ì–´ ê±°ë¦¬ ì „ë‹¬
+	bool get_live() { return this->live; }																		// ì¢€ë¹„ ìƒì‚¬ ì—¬ë¶€ ì „ë‹¬
+	int get_client_id() { return this->client_id; }																// ì¢€ë¹„ ì•„ì´ë”” ì „ë‹¬
+	int get_hp() { return this->hp; };																			// ì¢€ë¹„ ì²´ë ¥ ì „ë‹¬
+	int get_animator() { return this->animator; };															// ì¢€ë¹„ ì• ë‹ˆë©”ì´ì…˜ ì „ë‹¬
+	int get_target() { return this->target_Player; };															// ì¢€ë¹„ íƒ€ì¼“ í”Œë ˆì´ì–´ ì „ë‹¬
 	//xyz get_pos() { return this->position; };
-	xyz get_position() { return this->position; };		// Á»ºñ Æ÷Áö¼Ç Àü´Ş
-	xyz get_rotation() { return this->rotation; };		// Á»ºñ ·ÎÅ×ÀÌ¼Ç Àü´Ş
+	xyz get_position() { return this->position; };		// ì¢€ë¹„ í¬ì§€ì…˜ ì „ë‹¬
+	xyz get_rotation() { return this->rotation; };		// ì¢€ë¹„ ë¡œí…Œì´ì…˜ ì „ë‹¬
 
 
-	void set_distance(const float value) { this->distance = value; }							// Á»ºñ¿Í ÇÃ·¹ÀÌ¾î °Å¸® ÀúÀå
-	void set_live(const bool value) { this->live = value; };										// Á»ºñ »ı»ç ¿©ºÎ ÀúÀå
-	void set_target(const int value) { this->target_Player = value; };						// Á»ºñ Å¸ÄÏ ÇÃ·¹ÀÌ¾î ÀúÀå
-	void set_animator(const int value) { this->animator = value; };							// Á»ºñ ¾Ö´Ï¸ŞÀÌ¼Ç ÀúÀå
-	void set_hp(const int value) { this->hp = value; };											// Á»ºñ Ã¼·Â ÀúÀå
-	void set_zombie_position(const xyz position) { this->position = position; };			// Á»ºñ Æ÷Áö¼Ç ÀúÀå
-	void set_zombie_rotation(const xyz rotation) { this->rotation = rotation; };			// Á»ºñ ·ÎÅ×ÀÌ¼Ç ÀúÀå
-	void set_zombie_animator(const int value) { this->animator = value; };					// Á»ºñ ¾Ö´Ï¸ŞÀÌ¼Ç ÀúÀå
+	void set_distance(const float value) { this->distance = value; }							// ì¢€ë¹„ì™€ í”Œë ˆì´ì–´ ê±°ë¦¬ ì €ì¥
+	void set_live(const bool value) { this->live = value; };										// ì¢€ë¹„ ìƒì‚¬ ì—¬ë¶€ ì €ì¥
+	void set_target(const int value) { this->target_Player = value; };						// ì¢€ë¹„ íƒ€ì¼“ í”Œë ˆì´ì–´ ì €ì¥
+	void set_animator(const int value) { this->animator = value; };							// ì¢€ë¹„ ì• ë‹ˆë©”ì´ì…˜ ì €ì¥
+	void set_hp(const int value) { this->hp = value; };											// ì¢€ë¹„ ì²´ë ¥ ì €ì¥
+	void set_zombie_position(const xyz position) { this->position = position; };			// ì¢€ë¹„ í¬ì§€ì…˜ ì €ì¥
+	void set_zombie_rotation(const xyz rotation) { this->rotation = rotation; };			// ì¢€ë¹„ ë¡œí…Œì´ì…˜ ì €ì¥
+	void set_zombie_animator(const int value) { this->animator = value; };					// ì¢€ë¹„ ì• ë‹ˆë©”ì´ì…˜ ì €ì¥
 
 	Game_Zombie(const int client_id);
 	~Game_Zombie();

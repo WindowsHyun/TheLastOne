@@ -1,12 +1,12 @@
-#include "Game_Zombie.h"
+ï»¿#include "Game_Zombie.h"
 
 Game_Zombie::Game_Zombie(const int client_id)
 {
-	//< 1´Ü°è. ½Ãµå ¼³Á¤
+	//< 1ë‹¨ê³„. ì‹œë“œ ì„¤ì •
 	std::random_device rn;
 	std::mt19937_64 rnd(rn());
-	std::uniform_int_distribution<int> xRange(300, 1700);
-	std::uniform_int_distribution<int> zRange(260, 2750);
+	std::uniform_int_distribution<int> xRange(500, 1500);
+	std::uniform_int_distribution<int> zRange(1000, 2000);
 
 	this->client_id = client_id;
 	this->hp = Zombie_HP;
@@ -17,7 +17,7 @@ Game_Zombie::Game_Zombie(const int client_id)
 	this->rotation.y = 0;
 	this->rotation.z = 0;
 	this->target_Player = -1;
-	this->distance = Zombie_Dist;		// ÃÊ±â°ªÀº °¡Àå ³ôÀº °ªÀ¸·Î ÁöÁ¤ÇØÁØ´Ù.
+	this->distance = Zombie_Dist;		// ì´ˆê¸°ê°’ì€ ê°€ìž¥ ë†’ì€ ê°’ìœ¼ë¡œ ì§€ì •í•´ì¤€ë‹¤.
 	this->live = true;
 }
 

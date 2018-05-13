@@ -135,8 +135,8 @@ namespace TheLastOne.Game.Network
                         Player_Script.armour = client_data[key].get_armour();
                         Player_Script.imgHpBar.fillAmount = (float)Player_Script.hp / (float)Player_Script.initHp;
                         Player_Script.imgArmourBar.fillAmount = (float)Player_Script.armour / (float)Player_Script.initArmour;
-
-                        if (Player_Script.hp <= 0)
+                        Enum get_int_enum = Player_Script.playerState;
+                        if (Player_Script.hp <= 0 && Convert.ToInt32(get_int_enum) != 1 )
                         {
                             // 플레이어 체력이 0 이하일 경우
                             Player_Script.hp = 0;
