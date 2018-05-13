@@ -24,9 +24,6 @@
     <ClInclude Include="Game_Client.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Flatbuffers_View.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Timer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -56,6 +53,9 @@
     </ClInclude>
     <ClInclude Include="Game_Room.h">
       <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Flatbuffers_View.h">
+      <Filter>헤더 파일\CoreHeader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

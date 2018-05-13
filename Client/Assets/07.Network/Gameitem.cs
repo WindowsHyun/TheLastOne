@@ -27,8 +27,9 @@ public struct Gameitem : IFlatbufferObject
   public int Hp { get { int o = __p.__offset(16); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
   public int Kind { get { int o = __p.__offset(18); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
   public float Carkmh { get { int o = __p.__offset(20); return o != 0 ? __p.bb.GetFloat(o + __p.bb_pos) : (float)0.0f; } }
+  public bool CarExp { get { int o = __p.__offset(22); return o != 0 ? 0!=__p.bb.Get(o + __p.bb_pos) : (bool)false; } }
 
-  public static void StartGameitem(FlatBufferBuilder builder) { builder.StartObject(9); }
+  public static void StartGameitem(FlatBufferBuilder builder) { builder.StartObject(10); }
   public static void AddId(FlatBufferBuilder builder, int id) { builder.AddInt(0, id, 0); }
   public static void AddName(FlatBufferBuilder builder, StringOffset nameOffset) { builder.AddOffset(1, nameOffset.Value, 0); }
   public static void AddPosition(FlatBufferBuilder builder, Offset<Vec3> positionOffset) { builder.AddStruct(2, positionOffset.Value, 0); }
@@ -38,6 +39,7 @@ public struct Gameitem : IFlatbufferObject
   public static void AddHp(FlatBufferBuilder builder, int hp) { builder.AddInt(6, hp, 0); }
   public static void AddKind(FlatBufferBuilder builder, int kind) { builder.AddInt(7, kind, 0); }
   public static void AddCarkmh(FlatBufferBuilder builder, float Carkmh) { builder.AddFloat(8, Carkmh, 0.0f); }
+  public static void AddCarExp(FlatBufferBuilder builder, bool CarExp) { builder.AddBool(9, CarExp, false); }
   public static Offset<Gameitem> EndGameitem(FlatBufferBuilder builder) {
     int o = builder.EndObject();
     return new Offset<Gameitem>(o);

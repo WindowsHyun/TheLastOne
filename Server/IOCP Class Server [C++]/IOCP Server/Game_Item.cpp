@@ -19,12 +19,13 @@ Game_Item::Game_Item(const float x, const float y, const float z, const std::str
 	this->item_name = item_name;
 	this->item_eat = false;
 	this->riding_car = false;
+	this->Car_Exp = false;
 	if (item_name == "UAZ")
 		this->hp = UAZ_HP;
 	else if (item_name == "JEEP")
 		this->hp = JEEP_HP;
 	else
-		this->hp = 0;
+		this->hp = 10;
 	if (item_name == "UAZ" || item_name == "JEEP")
 		this->item_Kinds = Kind_Car;
 	else

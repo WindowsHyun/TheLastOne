@@ -17,7 +17,7 @@ using Game.TheLastOne; // Client, Vec3 을 불러오기 위해
 using TheLastOne.SendFunction;
 using TheLastOne.GameClass;
 using UnityEngine.UI;   // TimeText를 쓰기 위하여
-                        //---------------------------------------------------------------
+//---------------------------------------------------------------
 
 public class NetworkMessage
 {
@@ -106,7 +106,7 @@ namespace TheLastOne.Game.Network
         private static bool serverConnect = false;  // 서버 연결을 했는지 체크
 
 
-        IEnumerator SocketCheck()
+        public IEnumerator SocketCheck()
         {
             StartCoroutine(DrawAllText());
             if (m_Socket.Connected == true)
@@ -135,6 +135,14 @@ namespace TheLastOne.Game.Network
                         Player_Script.armour = client_data[key].get_armour();
                         Player_Script.imgHpBar.fillAmount = (float)Player_Script.hp / (float)Player_Script.initHp;
                         Player_Script.imgArmourBar.fillAmount = (float)Player_Script.armour / (float)Player_Script.initArmour;
+
+                        if (Player_Script.hp <= 0)
+                        {
+                            // 플레이어 체력이 0 이하일 경우
+                            Player_Script.hp = 0;
+                            Player_Script.PlayerDie();
+                        }
+
                         continue;
                     }
                     if (client_data[key].get_connect() == true && client_data[key].get_prefab() == false)
@@ -372,9 +380,9 @@ namespace TheLastOne.Game.Network
                             // 차량의 탑승 상태를 전달해 준다.
                             item_Collection[key].car.Car_Status = item_Collection[key].get_riding();
                             item_Collection[key].car.vehicleHp = item_Collection[key].get_hp();
-                            if (item_Collection[key].get_hp() <= 0 && item_Collection[key].get_explosion() == false)
+                            if (item_Collection[key].get_explosion() == true && item_Collection[key].get_exp_already() == false)
                             {
-                                item_Collection[key].set_explosion(true);
+                                item_Collection[key].set_exp_already(true);
                                 item_Collection[key].car.ExpCar();
                             }
                         }
@@ -433,7 +441,7 @@ namespace TheLastOne.Game.Network
                     }
 
                     yield return new WaitForSeconds(0.05f);
-                    // 초당 20번 패킷 전송으로 제한을 한다.
+                    // 초당 25번 패킷 전송으로 제한을 한다.
                 }
             } while (true);
             //yield return null;
@@ -600,10 +608,11 @@ namespace TheLastOne.Game.Network
                         iter.set_hp(Get_ServerData.Data(i).Value.Hp);
                         iter.set_riding(Get_ServerData.Data(i).Value.Riding);
                         iter.set_kmh(Get_ServerData.Data(i).Value.Carkmh);
+                        iter.set_explosion(Get_ServerData.Data(i).Value.CarExp);
                     }
                     else
                     {
-                        item_Collection.Add(Get_ServerData.Data(i).Value.Id, new Game_ItemClass(Get_ServerData.Data(i).Value.Id, Get_ServerData.Data(i).Value.Name.ToString(), pos, rotation, Get_ServerData.Data(i).Value.Eat, Get_ServerData.Data(i).Value.Hp, Get_ServerData.Data(i).Value.Kind));
+                        item_Collection.Add(Get_ServerData.Data(i).Value.Id, new Game_ItemClass(Get_ServerData.Data(i).Value.Id, Get_ServerData.Data(i).Value.Name.ToString(), pos, rotation, Get_ServerData.Data(i).Value.Eat, Get_ServerData.Data(i).Value.Hp, Get_ServerData.Data(i).Value.Kind, Get_ServerData.Data(i).Value.CarExp));
                     }
                 }
 

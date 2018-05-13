@@ -21,6 +21,7 @@ private:
 	int hp;
 	int item_Kinds;
 	float Car_Kmh;
+	bool Car_Exp;
 
 public:
 	xyz get_position() { return this->item_position; }
@@ -31,6 +32,7 @@ public:
 	int get_kind() { return this->item_Kinds; }
 	int get_hp() { return this->hp; }
 	std::string get_name() { return this->item_name; }
+	bool get_exp() { return this->Car_Exp; }
 
 	void set_Kmh(float value) { this->Car_Kmh = value; }
 	void set_eat(bool value) { this->item_eat = value; }
@@ -38,6 +40,8 @@ public:
 	void set_riding(bool value) { this->riding_car = value; }
 	void set_pos(float x, float y, float z) { this->item_position.x = x;  this->item_position.y = y; this->item_position.z = z; }
 	void set_rotation(float x, float y, float z);
+	void set_exp(bool value) { this->Car_Exp = value; }
+
 	Game_Item(const float x, const float y, const float z, const std::string item_name);
 	~Game_Item();
 };
