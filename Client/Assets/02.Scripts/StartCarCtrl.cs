@@ -15,7 +15,31 @@ public class StartCarCtrl : MonoBehaviour
 
     private bool startSet = false;
     private bool dontStart = true;
+    private int waitTime = 0;
     Game_ProtocolClass recv_protocol = new Game_ProtocolClass();
+
+    IEnumerator waitTimeOnline()
+    {
+        // 온라인으로 접속을 하였지만 너무 오랜 시간 기다릴 경우를 대비하여 n초후 출발하게 한다.
+        do
+        {
+            if (SingletonCtrl.Instance_S.startCarStatus == false)
+            {
+                // 모든 플레이어가 인게임 상태일 경우
+                waitTime++;
+            }
+            if (waitTime >= 5)
+            {
+                // 5초이상 기다려도 모든 팀원이 준비가 안되어 있을경우 그냥 출발한다.
+                GetComponent<Rigidbody>().AddForce(transform.forward * speed);
+                StopCoroutine(waitTimeOnline());
+                dontStart = false;
+            }
+            yield return new WaitForSeconds(1.0f);
+        } while (dontStart);
+        //yield return null;
+    }
+
 
     IEnumerator waitStartCar()
     {
@@ -25,6 +49,7 @@ public class StartCarCtrl : MonoBehaviour
             {
                 // 모든 플레이어가 인게임 상태일 경우
                 GetComponent<Rigidbody>().AddForce(transform.forward * speed);
+                StopCoroutine(waitStartCar());
                 dontStart = false;
             }
             yield return null;
@@ -60,6 +85,7 @@ public class StartCarCtrl : MonoBehaviour
         {
             // 서버와 연결이 되어있을 경우 출발 대기를 한다.
             StartCoroutine(waitStartCar());
+            StartCoroutine(waitTimeOnline());
         }
     }
 
