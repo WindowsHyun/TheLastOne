@@ -136,7 +136,7 @@ namespace TheLastOne.Game.Network
                         Player_Script.imgHpBar.fillAmount = (float)Player_Script.hp / (float)Player_Script.initHp;
                         Player_Script.imgArmourBar.fillAmount = (float)Player_Script.armour / (float)Player_Script.initArmour;
                         Enum get_int_enum = Player_Script.playerState;
-                        if (Player_Script.hp <= 0 && Convert.ToInt32(get_int_enum) != 1 )
+                        if (Player_Script.hp <= 0 && Convert.ToInt32(get_int_enum) != 1)
                         {
                             // 플레이어 체력이 0 이하일 경우
                             Player_Script.hp = 0;
@@ -530,8 +530,11 @@ namespace TheLastOne.Game.Network
                     {
                         // 이미 값이 들어가 있는 상태라면
                         Game_ClientClass iter = client_data[Get_ServerData.Data(i).Value.Id];
-                        iter.set_pos(new Vector3(Get_ServerData.Data(i).Value.Position.Value.X, Get_ServerData.Data(i).Value.Position.Value.Y, Get_ServerData.Data(i).Value.Position.Value.Z));
-                        iter.set_rot(new Vector3(Get_ServerData.Data(i).Value.Rotation.Value.X, Get_ServerData.Data(i).Value.Rotation.Value.Y, Get_ServerData.Data(i).Value.Rotation.Value.Z));
+                        if (Get_ServerData.Data(i).Value.Hp > 0)
+                        {
+                            iter.set_pos(new Vector3(Get_ServerData.Data(i).Value.Position.Value.X, Get_ServerData.Data(i).Value.Position.Value.Y, Get_ServerData.Data(i).Value.Position.Value.Z));
+                            iter.set_rot(new Vector3(Get_ServerData.Data(i).Value.Rotation.Value.X, Get_ServerData.Data(i).Value.Rotation.Value.Y, Get_ServerData.Data(i).Value.Rotation.Value.Z));
+                        }
                         iter.set_weapon(Get_ServerData.Data(i).Value.NowWeapon);
                         iter.set_hp(Get_ServerData.Data(i).Value.Hp);
                         iter.set_armour(Get_ServerData.Data(i).Value.Armour);
