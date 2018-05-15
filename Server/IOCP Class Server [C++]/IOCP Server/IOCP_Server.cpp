@@ -507,6 +507,10 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *pac
 			auto iter = GameRoom[room_id].get_room().get_client_iter(client_Check_info->id());
 			iter->second.set_hp(client_Check_info->hp());
 			iter->second.set_armour(client_Check_info->armour());
+			if (iter->second.get_hp() <= 0) {
+				// 체력이 0일경우 죽을을 허용한다.
+				iter->second.set_clientDie(true);
+			}
 		}
 		else if (client_Check_info->kind() == Kind_Zombie) {
 			auto iter = GameRoom[room_id].get_room().get_zombie_iter(client_Check_info->id());
@@ -651,7 +655,8 @@ void IOCP_Server::Send_All_Player(const int room_id, const int client)
 		auto inCar = iter.second.get_inCar();
 		auto dangerLineIn = iter.second.get_DangerLine();
 		auto car_rotation = Vec3(iter.second.get_car_rotation().x, iter.second.get_car_rotation().y, iter.second.get_car_rotation().z);
-		auto client_data = CreateClient_info(builder, id, hp, armour, animator, horizontal, vertical, inCar, name, &position, &rotation, &car_rotation, 0.0f, dangerLineIn, weaponState);
+		auto playerDie = iter.second.get_clientdie();
+		auto client_data = CreateClient_info(builder, id, hp, armour, animator, horizontal, vertical, inCar, name, &position, &rotation, &car_rotation, 0.0f, dangerLineIn, weaponState, playerDie);
 		// client_data 라는 테이블에 클라이언트 데이터가 들어가 있다.
 
 		Individual_client.push_back(client_data);	// Vector에 넣었다.

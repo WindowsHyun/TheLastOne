@@ -41,6 +41,9 @@ MANUALLY_ALIGNED_STRUCT(4) Vec3 FLATBUFFERS_FINAL_CLASS {
   Vec3() {
     memset(this, 0, sizeof(Vec3));
   }
+  Vec3(const Vec3 &_o) {
+    memcpy(this, &_o, sizeof(Vec3));
+  }
   Vec3(float _x, float _y, float _z)
       : x_(flatbuffers::EndianScalar(_x)),
         y_(flatbuffers::EndianScalar(_y)),
@@ -80,13 +83,13 @@ struct Client_CollectionBuilder {
   void add_data(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Client_info>>> data) {
     fbb_.AddOffset(Client_Collection::VT_DATA, data);
   }
-  explicit Client_CollectionBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  Client_CollectionBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
   Client_CollectionBuilder &operator=(const Client_CollectionBuilder &);
   flatbuffers::Offset<Client_Collection> Finish() {
-    const auto end = fbb_.EndTable(start_);
+    const auto end = fbb_.EndTable(start_, 1);
     auto o = flatbuffers::Offset<Client_Collection>(end);
     return o;
   }
@@ -123,7 +126,8 @@ struct Client_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_CARROTATION = 24,
     VT_CARKMH = 26,
     VT_DANGERLINEIN = 28,
-    VT_NOWWEAPON = 30
+    VT_NOWWEAPON = 30,
+    VT_PLAYERDIE = 32
   };
   int32_t id() const {
     return GetField<int32_t>(VT_ID, 0);
@@ -167,6 +171,9 @@ struct Client_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t nowWeapon() const {
     return GetField<int32_t>(VT_NOWWEAPON, 0);
   }
+  bool playerDie() const {
+    return GetField<uint8_t>(VT_PLAYERDIE, 0) != 0;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_ID) &&
@@ -184,6 +191,7 @@ struct Client_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<float>(verifier, VT_CARKMH) &&
            VerifyField<uint8_t>(verifier, VT_DANGERLINEIN) &&
            VerifyField<int32_t>(verifier, VT_NOWWEAPON) &&
+           VerifyField<uint8_t>(verifier, VT_PLAYERDIE) &&
            verifier.EndTable();
   }
 };
@@ -233,13 +241,16 @@ struct Client_infoBuilder {
   void add_nowWeapon(int32_t nowWeapon) {
     fbb_.AddElement<int32_t>(Client_info::VT_NOWWEAPON, nowWeapon, 0);
   }
-  explicit Client_infoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  void add_playerDie(bool playerDie) {
+    fbb_.AddElement<uint8_t>(Client_info::VT_PLAYERDIE, static_cast<uint8_t>(playerDie), 0);
+  }
+  Client_infoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
   Client_infoBuilder &operator=(const Client_infoBuilder &);
   flatbuffers::Offset<Client_info> Finish() {
-    const auto end = fbb_.EndTable(start_);
+    const auto end = fbb_.EndTable(start_, 15);
     auto o = flatbuffers::Offset<Client_info>(end);
     return o;
   }
@@ -260,7 +271,8 @@ inline flatbuffers::Offset<Client_info> CreateClient_info(
     const Vec3 *carrotation = 0,
     float carkmh = 0.0f,
     bool dangerLineIn = false,
-    int32_t nowWeapon = 0) {
+    int32_t nowWeapon = 0,
+    bool playerDie = false) {
   Client_infoBuilder builder_(_fbb);
   builder_.add_nowWeapon(nowWeapon);
   builder_.add_carkmh(carkmh);
@@ -275,6 +287,7 @@ inline flatbuffers::Offset<Client_info> CreateClient_info(
   builder_.add_armour(armour);
   builder_.add_hp(hp);
   builder_.add_id(id);
+  builder_.add_playerDie(playerDie);
   builder_.add_dangerLineIn(dangerLineIn);
   return builder_.Finish();
 }
@@ -294,7 +307,8 @@ inline flatbuffers::Offset<Client_info> CreateClient_infoDirect(
     const Vec3 *carrotation = 0,
     float carkmh = 0.0f,
     bool dangerLineIn = false,
-    int32_t nowWeapon = 0) {
+    int32_t nowWeapon = 0,
+    bool playerDie = false) {
   return Game::TheLastOne::CreateClient_info(
       _fbb,
       id,
@@ -310,7 +324,8 @@ inline flatbuffers::Offset<Client_info> CreateClient_infoDirect(
       carrotation,
       carkmh,
       dangerLineIn,
-      nowWeapon);
+      nowWeapon,
+      playerDie);
 }
 
 struct Zombie_Collection FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -335,13 +350,13 @@ struct Zombie_CollectionBuilder {
   void add_data(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Zombie_info>>> data) {
     fbb_.AddOffset(Zombie_Collection::VT_DATA, data);
   }
-  explicit Zombie_CollectionBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  Zombie_CollectionBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
   Zombie_CollectionBuilder &operator=(const Zombie_CollectionBuilder &);
   flatbuffers::Offset<Zombie_Collection> Finish() {
-    const auto end = fbb_.EndTable(start_);
+    const auto end = fbb_.EndTable(start_, 1);
     auto o = flatbuffers::Offset<Zombie_Collection>(end);
     return o;
   }
@@ -423,13 +438,13 @@ struct Zombie_infoBuilder {
   void add_rotation(const Vec3 *rotation) {
     fbb_.AddStruct(Zombie_info::VT_ROTATION, rotation);
   }
-  explicit Zombie_infoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  Zombie_infoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
   Zombie_infoBuilder &operator=(const Zombie_infoBuilder &);
   flatbuffers::Offset<Zombie_info> Finish() {
-    const auto end = fbb_.EndTable(start_);
+    const auto end = fbb_.EndTable(start_, 6);
     auto o = flatbuffers::Offset<Zombie_info>(end);
     return o;
   }
@@ -475,13 +490,13 @@ struct Game_ItemsBuilder {
   void add_data(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Gameitem>>> data) {
     fbb_.AddOffset(Game_Items::VT_DATA, data);
   }
-  explicit Game_ItemsBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  Game_ItemsBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
   Game_ItemsBuilder &operator=(const Game_ItemsBuilder &);
   flatbuffers::Offset<Game_Items> Finish() {
-    const auto end = fbb_.EndTable(start_);
+    const auto end = fbb_.EndTable(start_, 1);
     auto o = flatbuffers::Offset<Game_Items>(end);
     return o;
   }
@@ -596,13 +611,13 @@ struct GameitemBuilder {
   void add_CarExp(bool CarExp) {
     fbb_.AddElement<uint8_t>(Gameitem::VT_CAREXP, static_cast<uint8_t>(CarExp), 0);
   }
-  explicit GameitemBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  GameitemBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
   GameitemBuilder &operator=(const GameitemBuilder &);
   flatbuffers::Offset<Gameitem> Finish() {
-    const auto end = fbb_.EndTable(start_);
+    const auto end = fbb_.EndTable(start_, 10);
     auto o = flatbuffers::Offset<Gameitem>(end);
     return o;
   }
@@ -696,13 +711,13 @@ struct GameDangerLineBuilder {
   void add_scale(const Vec3 *scale) {
     fbb_.AddStruct(GameDangerLine::VT_SCALE, scale);
   }
-  explicit GameDangerLineBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  GameDangerLineBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
   GameDangerLineBuilder &operator=(const GameDangerLineBuilder &);
   flatbuffers::Offset<GameDangerLine> Finish() {
-    const auto end = fbb_.EndTable(start_);
+    const auto end = fbb_.EndTable(start_, 3);
     auto o = flatbuffers::Offset<GameDangerLine>(end);
     return o;
   }
@@ -748,13 +763,13 @@ struct Game_TimerBuilder {
   void add_time(int32_t time) {
     fbb_.AddElement<int32_t>(Game_Timer::VT_TIME, time, 0);
   }
-  explicit Game_TimerBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  Game_TimerBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
   Game_TimerBuilder &operator=(const Game_TimerBuilder &);
   flatbuffers::Offset<Game_Timer> Finish() {
-    const auto end = fbb_.EndTable(start_);
+    const auto end = fbb_.EndTable(start_, 2);
     auto o = flatbuffers::Offset<Game_Timer>(end);
     return o;
   }
@@ -790,13 +805,13 @@ struct Client_PacketBuilder {
   void add_id(int32_t id) {
     fbb_.AddElement<int32_t>(Client_Packet::VT_ID, id, 0);
   }
-  explicit Client_PacketBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  Client_PacketBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
   Client_PacketBuilder &operator=(const Client_PacketBuilder &);
   flatbuffers::Offset<Client_Packet> Finish() {
-    const auto end = fbb_.EndTable(start_);
+    const auto end = fbb_.EndTable(start_, 1);
     auto o = flatbuffers::Offset<Client_Packet>(end);
     return o;
   }
@@ -854,13 +869,13 @@ struct Game_HP_SetBuilder {
   void add_kind(int32_t kind) {
     fbb_.AddElement<int32_t>(Game_HP_Set::VT_KIND, kind, 0);
   }
-  explicit Game_HP_SetBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  Game_HP_SetBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
   Game_HP_SetBuilder &operator=(const Game_HP_SetBuilder &);
   flatbuffers::Offset<Game_HP_Set> Finish() {
-    const auto end = fbb_.EndTable(start_);
+    const auto end = fbb_.EndTable(start_, 4);
     auto o = flatbuffers::Offset<Game_HP_Set>(end);
     return o;
   }

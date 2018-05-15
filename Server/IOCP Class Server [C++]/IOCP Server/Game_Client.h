@@ -23,10 +23,11 @@ private:
 	bool connect;
 	bool remove_client;
 	bool dangerLineIn;
+	bool client_die;
 	SOCKET client_socket;
 	int prev_packet_data; // 이전 처리되지 않는 패킷이 얼마냐
 	int curr_packet_size; // 지금 처리하고 있는 패킷이 얼마냐
-	
+
 
 public:
 	std::string nickName;																					// 클라이언트 닉네임
@@ -55,6 +56,7 @@ public:
 	xyz get_car_rotation();												// 클라이언트 로테이션 전달
 	SOCKET get_Socket() { return this->client_socket; };			// 클라이언트 소켓 전달
 	OverlappedEx get_over() { return this->recv_over; };			// Overlapped 구조체 전달
+	bool get_clientdie() { return this->client_die; }					// 클라이언트 Die 여부 체크
 
 	void set_prev_packet(const int size) { this->prev_packet_data = size; };				// 클라이언트 패킷 사이즈 저장
 	void set_curr_packet(const int size) { this->curr_packet_size = size; };				// 클라이언트 패킷 사이즈 저장
@@ -69,11 +71,12 @@ public:
 	void set_limit_zombie(const int value) { this->limit_Zombie += value; }				// 클라이언트 좀비 최대치 저장
 	void set_playerStatus(const int value) { this->playerStatus = value; }				// 클라이언트 게임 상태 저장
 	void set_vertical(float value) { this->vertical = (float)value; }
-	void set_horizontal(float value) {  this->horizontal = (float)value; }
+	void set_horizontal(float value) { this->horizontal = (float)value; }
 	void set_inCar(int value) { this->inCar = value; }												// 클라이언트 무슨 차량 탑승 값 저장
 	void set_hp(int value) { this->hp = value; };														// 클라이언트 체력 저장
 	void set_armour(int value) { this->armour = value; };											// 클라이언트 아머 저장
 	void set_room_id(int value) { this->room_id = value; }										// 클라이언트 룸 아이디 저장
+	void set_clientDie(bool value) { this->client_die = value; }									// 클라이언트 Die 여부 저장
 
 	Game_Client(const SOCKET sock, const int client_id, const char * game_id, const int room_id);
 	Game_Client(const Game_Client& g_cl);

@@ -136,9 +136,10 @@ namespace TheLastOne.Game.Network
                         Player_Script.imgHpBar.fillAmount = (float)Player_Script.hp / (float)Player_Script.initHp;
                         Player_Script.imgArmourBar.fillAmount = (float)Player_Script.armour / (float)Player_Script.initArmour;
                         Enum get_int_enum = Player_Script.playerState;
-                        if (Player_Script.hp <= 0 && Convert.ToInt32(get_int_enum) != 1)
+                        if (client_data[key].get_Die() == true && client_data[key].get_DieAlready() == false)
                         {
-                            // 플레이어 체력이 0 이하일 경우
+                            // 서버에서 죽으라고 하였고 한번도 죽지 않았을 경우
+                            client_data[key].set_DieAlready(true);
                             Player_Script.hp = 0;
                             Player_Script.PlayerDie();
                         }
@@ -169,10 +170,11 @@ namespace TheLastOne.Game.Network
                             client_data[key].set_activePlayer(false);
                         }
 
-                        if (client_data[key].get_hp() <= 0 && client_data[key].get_isDie() == false && client_data[key].get_pos().x != 0)
+                        if (client_data[key].get_hp() <= 0 && client_data[key].get_Die() == true && client_data[key].get_DieAlready() == false && client_data[key].get_pos().x != 0)
                         {
-                            // 서버에서의 체력은 이미 0인데 클라가 0인 아닌경우를 대비하여
-                            client_data[key].set_isDie(true);
+                            // 서버에서 해당 클라이언트 체력이 0 이고 죽는게 허가 된 경우
+                            client_data[key].set_hp(0);
+                            client_data[key].set_DieAlready(true);
                             client_data[key].script.OtherPlayerDie();
                         }
 
@@ -530,8 +532,9 @@ namespace TheLastOne.Game.Network
                     {
                         // 이미 값이 들어가 있는 상태라면
                         Game_ClientClass iter = client_data[Get_ServerData.Data(i).Value.Id];
-                        if (Get_ServerData.Data(i).Value.Hp > 0)
+                        if (Get_ServerData.Data(i).Value.PlayerDie == false)
                         {
+                            // 플레이어가 죽지 않은 경우에만 위치, 회전 값을 받아온다.
                             iter.set_pos(new Vector3(Get_ServerData.Data(i).Value.Position.Value.X, Get_ServerData.Data(i).Value.Position.Value.Y, Get_ServerData.Data(i).Value.Position.Value.Z));
                             iter.set_rot(new Vector3(Get_ServerData.Data(i).Value.Rotation.Value.X, Get_ServerData.Data(i).Value.Rotation.Value.Y, Get_ServerData.Data(i).Value.Rotation.Value.Z));
                         }
@@ -541,6 +544,7 @@ namespace TheLastOne.Game.Network
                         iter.set_horizontal(Get_ServerData.Data(i).Value.Horizontal);
                         iter.set_vertical(Get_ServerData.Data(i).Value.Vertical);
                         iter.set_inCar(Get_ServerData.Data(i).Value.InCar);
+                        iter.set_Die(Get_ServerData.Data(i).Value.PlayerDie);
                         iter.set_car_rot(new Vector3(Get_ServerData.Data(i).Value.Carrotation.Value.X, Get_ServerData.Data(i).Value.Carrotation.Value.Y, Get_ServerData.Data(i).Value.Carrotation.Value.Z));
                         iter.set_activePlayer(true);
                         if (iter.get_prefab() == true)

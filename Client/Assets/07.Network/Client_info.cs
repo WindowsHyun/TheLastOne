@@ -32,8 +32,9 @@ public struct Client_info : IFlatbufferObject
   public float Carkmh { get { int o = __p.__offset(26); return o != 0 ? __p.bb.GetFloat(o + __p.bb_pos) : (float)0.0f; } }
   public bool DangerLineIn { get { int o = __p.__offset(28); return o != 0 ? 0!=__p.bb.Get(o + __p.bb_pos) : (bool)false; } }
   public int NowWeapon { get { int o = __p.__offset(30); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
+  public bool PlayerDie { get { int o = __p.__offset(32); return o != 0 ? 0!=__p.bb.Get(o + __p.bb_pos) : (bool)false; } }
 
-  public static void StartClient_info(FlatBufferBuilder builder) { builder.StartObject(14); }
+  public static void StartClient_info(FlatBufferBuilder builder) { builder.StartObject(15); }
   public static void AddId(FlatBufferBuilder builder, int id) { builder.AddInt(0, id, 0); }
   public static void AddHp(FlatBufferBuilder builder, int hp) { builder.AddInt(1, hp, 0); }
   public static void AddArmour(FlatBufferBuilder builder, int armour) { builder.AddInt(2, armour, 0); }
@@ -48,6 +49,7 @@ public struct Client_info : IFlatbufferObject
   public static void AddCarkmh(FlatBufferBuilder builder, float carkmh) { builder.AddFloat(11, carkmh, 0.0f); }
   public static void AddDangerLineIn(FlatBufferBuilder builder, bool dangerLineIn) { builder.AddBool(12, dangerLineIn, false); }
   public static void AddNowWeapon(FlatBufferBuilder builder, int nowWeapon) { builder.AddInt(13, nowWeapon, 0); }
+  public static void AddPlayerDie(FlatBufferBuilder builder, bool playerDie) { builder.AddBool(14, playerDie, false); }
   public static Offset<Client_info> EndClient_info(FlatBufferBuilder builder) {
     int o = builder.EndObject();
     return new Offset<Client_info>(o);

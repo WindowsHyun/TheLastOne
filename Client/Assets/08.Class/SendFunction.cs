@@ -19,11 +19,9 @@ namespace TheLastOne.SendFunction
 
         public Byte[] makeClient_PacketInfo(Vector3 Player, int Player_Animator, float horizontal, float vertical, Vector3 PlayerRotation, int Player_Weapone, int inCar, bool dangerLineIn, Vector3 CarRotation, float CarKmh)
         {
-            //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.
             FlatBufferBuilder fbb = new FlatBufferBuilder(1);
             fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
             Client_info.StartClient_info(fbb);
-            //Client.AddName(fbb, offset); // string 사용
             Client_info.AddAnimator(fbb, Player_Animator);
             Client_info.AddHorizontal(fbb, horizontal);
             Client_info.AddVertical(fbb, vertical);
@@ -34,9 +32,9 @@ namespace TheLastOne.SendFunction
             Client_info.AddRotation(fbb, Vec3.CreateVec3(fbb, PlayerRotation.x, PlayerRotation.y, PlayerRotation.z));
             Client_info.AddDangerLineIn(fbb, dangerLineIn);
             Client_info.AddNowWeapon(fbb, Player_Weapone);
+            Client_info.AddPlayerDie(fbb, false);
             var endOffset = Client_info.EndClient_info(fbb);
             fbb.Finish(endOffset.Value);
-
 
             byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
             byte[] magic_packet = makePacketinfo(packet.Length, CS_Info);
@@ -51,20 +49,20 @@ namespace TheLastOne.SendFunction
         {
             FlatBufferBuilder fbb = new FlatBufferBuilder(1);
             fbb.Clear();
-            //var target_zombie = new Offset<Zombie_info>[10];
             List<Offset<Zombie_info>> target_zombie = new List<Offset<Zombie_info>>();
 
             int num = 0;
             foreach (var key in zombie_data.Keys.ToList())
             {
-                if (zombie_data[key].get_target() == client_imei  || zombie_data[key].get_target() == -2)
+                if (zombie_data[key].get_target() == client_imei || zombie_data[key].get_target() == -2)
                 {
                     // 좀비 Target과 Client_Imei가 같은경우에만 Vector에 넣는다.
                     Zombie_info.StartZombie_info(fbb);
                     Zombie_info.AddId(fbb, zombie_data[key].get_id());
                     Zombie_info.AddAnimator(fbb, zombie_data[key].get_animator());
 
-                    if (zombie_data[key].get_target() == -2 || zombie_data[key].Zombie.activeSelf == false) {
+                    if (zombie_data[key].get_target() == -2 || zombie_data[key].Zombie.activeSelf == false)
+                    {
                         // -2의 경우 추적 거리를 벗어나서 아무도 추적을 하지 않으므로 -1로 돌려준다.
                         zombie_data[key].set_target(-1);
                         Zombie_info.AddTargetPlayer(fbb, zombie_data[key].get_target());

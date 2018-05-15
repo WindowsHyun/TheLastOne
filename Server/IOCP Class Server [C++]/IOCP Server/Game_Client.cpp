@@ -67,6 +67,7 @@ Game_Client::Game_Client(const SOCKET sock, const int client_id, const char * ga
 	this->animator = 0;
 	this->weaponState = -1;
 	this->dangerLineIn = true;
+	this->client_die = false;
 	this->playerStatus = 0;
 	ZeroMemory(&this->recv_over, sizeof(this->recv_over));
 	ZeroMemory(&this->packet_buf, sizeof(this->packet_buf));
@@ -105,6 +106,7 @@ Game_Client::Game_Client(const Game_Client & g_cl)
 	this->weaponState = g_cl.weaponState;
 	this->dangerLineIn = g_cl.dangerLineIn;
 	this->playerStatus = g_cl.playerStatus;
+	this->client_die = g_cl.client_die;
 	ZeroMemory(&this->recv_over, sizeof(this->recv_over));
 	ZeroMemory(&this->packet_buf, sizeof(this->packet_buf));
 	this->recv_over.event_type = OP_RECV;

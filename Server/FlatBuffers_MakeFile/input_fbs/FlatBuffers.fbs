@@ -27,6 +27,7 @@ table Client_info {
   carkmh:float;
   dangerLineIn:bool;
   nowWeapon:int;
+  playerDie:bool;
 }
 
 table Zombie_Collection{
