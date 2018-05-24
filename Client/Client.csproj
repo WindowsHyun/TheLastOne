@@ -245,17 +245,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\02.Scripts\BulletCtrl.cs" />
-    <Compile Include="Assets\02.Scripts\CoolTimeCtrl.cs" />
-    <Compile Include="Assets\02.Scripts\DangerLineCtrl.cs" />
     <Compile Include="Assets\02.Scripts\EXPVehicleCtrl.cs" />
     <Compile Include="Assets\02.Scripts\FollowCam.cs" />
-    <Compile Include="Assets\02.Scripts\FootStep\CharacterFootsteps.cs" />
-    <Compile Include="Assets\02.Scripts\FootStep\CustomInspectors.cs" />
-    <Compile Include="Assets\02.Scripts\FootStep\FootstepTrigger.cs" />
-    <Compile Include="Assets\02.Scripts\FootStep\SurfaceManager.cs" />
-    <Compile Include="Assets\02.Scripts\InventoryCtrl.cs" />
-    <Compile Include="Assets\02.Scripts\ItemCtrl.cs" />
-    <Compile Include="Assets\02.Scripts\ItemDragCtrl.cs" />
+    <Compile Include="Assets\02.Scripts\FootStepScripts\CharacterFootsteps.cs" />
+    <Compile Include="Assets\02.Scripts\FootStepScripts\CustomInspectors.cs" />
+    <Compile Include="Assets\02.Scripts\FootStepScripts\FootstepTrigger.cs" />
+    <Compile Include="Assets\02.Scripts\FootStepScripts\SurfaceManager.cs" />
     <Compile Include="Assets\02.Scripts\OtherPlayerCtrl.cs" />
     <Compile Include="Assets\02.Scripts\ParticleCtrl.cs" />
     <Compile Include="Assets\02.Scripts\PlayerCtrl.cs" />
@@ -264,12 +259,17 @@
     <Compile Include="Assets\02.Scripts\SceneScripts\SingletonCtrl.cs" />
     <Compile Include="Assets\02.Scripts\SceneScripts\StartSceneCtrl.cs" />
     <Compile Include="Assets\02.Scripts\SceneScripts\WinSceneCtrl.cs" />
-    <Compile Include="Assets\02.Scripts\SlotCtrl.cs" />
     <Compile Include="Assets\02.Scripts\StartCarCtrl.cs" />
+    <Compile Include="Assets\02.Scripts\UIScripts\CoolTimeCtrl.cs" />
+    <Compile Include="Assets\02.Scripts\UIScripts\DangerLineCtrl.cs" />
+    <Compile Include="Assets\02.Scripts\UIScripts\InventoryCtrl.cs" />
+    <Compile Include="Assets\02.Scripts\UIScripts\ItemCtrl.cs" />
+    <Compile Include="Assets\02.Scripts\UIScripts\ItemDragCtrl.cs" />
+    <Compile Include="Assets\02.Scripts\UIScripts\SlotCtrl.cs" />
+    <Compile Include="Assets\02.Scripts\UIScripts\WeaponCtrl.cs" />
+    <Compile Include="Assets\02.Scripts\UIScripts\WeaponDragCtrl.cs" />
+    <Compile Include="Assets\02.Scripts\UIScripts\WeaponSlotCtrl.cs" />
     <Compile Include="Assets\02.Scripts\VehicleCtrl.cs" />
-    <Compile Include="Assets\02.Scripts\WeaponCtrl.cs" />
-    <Compile Include="Assets\02.Scripts\WeaponDragCtrl.cs" />
-    <Compile Include="Assets\02.Scripts\WeaponSlotCtrl.cs" />
     <Compile Include="Assets\02.Scripts\ZombieCtrl.cs" />
     <Compile Include="Assets\07.Network\Client_Collection.cs" />
     <Compile Include="Assets\07.Network\Client_info.cs" />
