@@ -1,0 +1,113 @@
+fileFormatVersion: 2
+guid: 611d347039217684d9fabf15b4a196b2
+timeCreated: 1483907565
+licenseType: Store
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: Fountain_1A1(Water)
+    100002: Fountain_1A1_B(Water)
+    100004: Fountain_1A2(Water)
+    100006: Fountain_1A2_B(Water)
+    100008: //RootNode
+    100010: Water_Plane_1
+    100012: Water_Plane_2
+    400000: Fountain_1A1(Water)
+    400002: Fountain_1A1_B(Water)
+    400004: Fountain_1A2(Water)
+    400006: Fountain_1A2_B(Water)
+    400008: //RootNode
+    400010: Water_Plane_1
+    400012: Water_Plane_2
+    2300000: Fountain_1A1(Water)
+    2300002: Fountain_1A1_B(Water)
+    2300004: Fountain_1A2(Water)
+    2300006: Fountain_1A2_B(Water)
+    2300008: Water_Plane_1
+    2300010: Water_Plane_2
+    3300000: Fountain_1A1(Water)
+    3300002: Fountain_1A1_B(Water)
+    3300004: Fountain_1A2(Water)
+    3300006: Fountain_1A2_B(Water)
+    3300008: Water_Plane_1
+    3300010: Water_Plane_2
+    4300000: Water_Plane_1
+    4300002: Water_Plane_2
+    4300004: Fountain_1A2_B(Water)
+    4300006: Fountain_1A1_B(Water)
+    4300008: Fountain_1A1(Water)
+    4300010: Fountain_1A2(Water)
+    6400000: Fountain_1A1(Water)
+    6400002: Fountain_1A1_B(Water)
+    6400004: Fountain_1A2(Water)
+    6400006: Fountain_1A2_B(Water)
+    6400008: Water_Plane_1
+    6400010: Water_Plane_2
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 1
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

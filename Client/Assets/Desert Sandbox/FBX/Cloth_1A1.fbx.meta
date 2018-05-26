@@ -1,0 +1,173 @@
+fileFormatVersion: 2
+guid: c1f565e1120f0f34480bd6ef7c98b4a5
+timeCreated: 1484234764
+licenseType: Store
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: Chair_1A1
+    100002: Chair_1A2
+    100004: //RootNode
+    100006: Pillow_1A1
+    100008: Pillow_1A1_Large
+    100010: Pillow_1A2
+    100012: Pillow_1A2_Large
+    100014: Pillow_1A3
+    100016: Pillow_1A3_Large
+    100018: Pillow_1A4
+    100020: Pillow_1A4_Large
+    100022: Pillow_1A5
+    100024: Pillow_1A5_Large
+    100026: Pillow_1A6
+    100028: Pillow_1A6_Large
+    100030: Pillow_1A7
+    100032: Pillow_1A7_Large
+    400000: Chair_1A1
+    400002: Chair_1A2
+    400004: //RootNode
+    400006: Pillow_1A1
+    400008: Pillow_1A1_Large
+    400010: Pillow_1A2
+    400012: Pillow_1A2_Large
+    400014: Pillow_1A3
+    400016: Pillow_1A3_Large
+    400018: Pillow_1A4
+    400020: Pillow_1A4_Large
+    400022: Pillow_1A5
+    400024: Pillow_1A5_Large
+    400026: Pillow_1A6
+    400028: Pillow_1A6_Large
+    400030: Pillow_1A7
+    400032: Pillow_1A7_Large
+    2300000: Chair_1A1
+    2300002: Chair_1A2
+    2300004: Pillow_1A1
+    2300006: Pillow_1A1_Large
+    2300008: Pillow_1A2
+    2300010: Pillow_1A2_Large
+    2300012: Pillow_1A3
+    2300014: Pillow_1A3_Large
+    2300016: Pillow_1A4
+    2300018: Pillow_1A4_Large
+    2300020: Pillow_1A5
+    2300022: Pillow_1A5_Large
+    2300024: Pillow_1A6
+    2300026: Pillow_1A6_Large
+    2300028: Pillow_1A7
+    2300030: Pillow_1A7_Large
+    3300000: Chair_1A1
+    3300002: Chair_1A2
+    3300004: Pillow_1A1
+    3300006: Pillow_1A1_Large
+    3300008: Pillow_1A2
+    3300010: Pillow_1A2_Large
+    3300012: Pillow_1A3
+    3300014: Pillow_1A3_Large
+    3300016: Pillow_1A4
+    3300018: Pillow_1A4_Large
+    3300020: Pillow_1A5
+    3300022: Pillow_1A5_Large
+    3300024: Pillow_1A6
+    3300026: Pillow_1A6_Large
+    3300028: Pillow_1A7
+    3300030: Pillow_1A7_Large
+    4300000: Pillow_1A2
+    4300002: Pillow_1A1
+    4300004: Pillow_1A5
+    4300006: Pillow_1A6
+    4300008: Pillow_1A3
+    4300010: Pillow_1A7
+    4300012: Pillow_1A4
+    4300014: Chair_1A2
+    4300016: Chair_1A1
+    4300018: Pillow_1A4_Large
+    4300020: Pillow_1A7_Large
+    4300022: Pillow_1A3_Large
+    4300024: Pillow_1A6_Large
+    4300026: Pillow_1A5_Large
+    4300028: Pillow_1A1_Large
+    4300030: Pillow_1A2_Large
+    6400000: Chair_1A1
+    6400002: Chair_1A2
+    6400004: Pillow_1A1
+    6400006: Pillow_1A1_Large
+    6400008: Pillow_1A2
+    6400010: Pillow_1A2_Large
+    6400012: Pillow_1A3
+    6400014: Pillow_1A3_Large
+    6400016: Pillow_1A4
+    6400018: Pillow_1A4_Large
+    6400020: Pillow_1A5
+    6400022: Pillow_1A5_Large
+    6400024: Pillow_1A6
+    6400026: Pillow_1A6_Large
+    6400028: Pillow_1A7
+    6400030: Pillow_1A7_Large
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 1
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

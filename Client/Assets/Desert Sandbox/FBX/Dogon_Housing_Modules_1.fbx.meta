@@ -1,0 +1,199 @@
+fileFormatVersion: 2
+guid: 9a1ae1055ba185340ac71f52b3918a56
+timeCreated: 1479316035
+licenseType: Store
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: Dogon_Housing_Block_1A
+    100002: Dogon_Housing_Block_1B
+    100004: Dogon_Housing_Block_1C
+    100006: Dogon_Housing_Block_2A
+    100008: Dogon_Housing_Block_2A2
+    100010: Dogon_Housing_Block_2B
+    100012: Dogon_Housing_Block_2B2
+    100014: Dogon_Housing_Floor_1A
+    100016: Dogon_Housing_Floor_1B
+    100018: //RootNode
+    100020: Dogon_Housing_Roof_1A
+    100022: Dogon_Housing_Roof_1B
+    100024: Dogon_Housing_Wall_1A
+    100026: Dogon_Housing_Wall_1A2
+    100028: Dogon_Housing_Wall_1B
+    100030: Dogon_Housing_Wall_Door_1A
+    100032: Dogon_Housing_Wall_Door_1A2
+    100034: Dogon_Housing_Wall_Door_1B
+    100036: Dogon_Housing_Wood_Support_1A
+    100038: Dogon_Housing_Wood_Support_1B
+    100040: Dogon_Housing_Wood_Support_2A
+    100042: Dogon_Housing_Wood_Support_2B
+    400000: Dogon_Housing_Block_1A
+    400002: Dogon_Housing_Block_1B
+    400004: Dogon_Housing_Block_1C
+    400006: Dogon_Housing_Block_2A
+    400008: Dogon_Housing_Block_2A2
+    400010: Dogon_Housing_Block_2B
+    400012: Dogon_Housing_Block_2B2
+    400014: Dogon_Housing_Floor_1A
+    400016: Dogon_Housing_Floor_1B
+    400018: //RootNode
+    400020: Dogon_Housing_Roof_1A
+    400022: Dogon_Housing_Roof_1B
+    400024: Dogon_Housing_Wall_1A
+    400026: Dogon_Housing_Wall_1A2
+    400028: Dogon_Housing_Wall_1B
+    400030: Dogon_Housing_Wall_Door_1A
+    400032: Dogon_Housing_Wall_Door_1A2
+    400034: Dogon_Housing_Wall_Door_1B
+    400036: Dogon_Housing_Wood_Support_1A
+    400038: Dogon_Housing_Wood_Support_1B
+    400040: Dogon_Housing_Wood_Support_2A
+    400042: Dogon_Housing_Wood_Support_2B
+    2300000: Dogon_Housing_Block_1A
+    2300002: Dogon_Housing_Block_1B
+    2300004: Dogon_Housing_Block_1C
+    2300006: Dogon_Housing_Block_2A
+    2300008: Dogon_Housing_Block_2A2
+    2300010: Dogon_Housing_Block_2B
+    2300012: Dogon_Housing_Block_2B2
+    2300014: Dogon_Housing_Floor_1A
+    2300016: Dogon_Housing_Floor_1B
+    2300018: Dogon_Housing_Roof_1A
+    2300020: Dogon_Housing_Roof_1B
+    2300022: Dogon_Housing_Wall_1A
+    2300024: Dogon_Housing_Wall_1A2
+    2300026: Dogon_Housing_Wall_1B
+    2300028: Dogon_Housing_Wall_Door_1A
+    2300030: Dogon_Housing_Wall_Door_1A2
+    2300032: Dogon_Housing_Wall_Door_1B
+    2300034: Dogon_Housing_Wood_Support_1A
+    2300036: Dogon_Housing_Wood_Support_1B
+    2300038: Dogon_Housing_Wood_Support_2A
+    2300040: Dogon_Housing_Wood_Support_2B
+    3300000: Dogon_Housing_Block_1A
+    3300002: Dogon_Housing_Block_1B
+    3300004: Dogon_Housing_Block_1C
+    3300006: Dogon_Housing_Block_2A
+    3300008: Dogon_Housing_Block_2A2
+    3300010: Dogon_Housing_Block_2B
+    3300012: Dogon_Housing_Block_2B2
+    3300014: Dogon_Housing_Floor_1A
+    3300016: Dogon_Housing_Floor_1B
+    3300018: Dogon_Housing_Roof_1A
+    3300020: Dogon_Housing_Roof_1B
+    3300022: Dogon_Housing_Wall_1A
+    3300024: Dogon_Housing_Wall_1A2
+    3300026: Dogon_Housing_Wall_1B
+    3300028: Dogon_Housing_Wall_Door_1A
+    3300030: Dogon_Housing_Wall_Door_1A2
+    3300032: Dogon_Housing_Wall_Door_1B
+    3300034: Dogon_Housing_Wood_Support_1A
+    3300036: Dogon_Housing_Wood_Support_1B
+    3300038: Dogon_Housing_Wood_Support_2A
+    3300040: Dogon_Housing_Wood_Support_2B
+    4300000: Dogon_Housing_Block_2B
+    4300002: Dogon_Housing_Block_2B2
+    4300004: Dogon_Housing_Wood_Support_2B
+    4300006: Dogon_Housing_Wood_Support_1B
+    4300008: Dogon_Housing_Wood_Support_1A
+    4300010: Dogon_Housing_Wood_Support_2A
+    4300012: Dogon_Housing_Wall_Door_1A2
+    4300014: Dogon_Housing_Wall_1A2
+    4300016: Dogon_Housing_Floor_1B
+    4300018: Dogon_Housing_Roof_1B
+    4300020: Dogon_Housing_Block_1C
+    4300022: Dogon_Housing_Block_1B
+    4300024: Dogon_Housing_Wall_1B
+    4300026: Dogon_Housing_Wall_Door_1B
+    4300028: Dogon_Housing_Wall_Door_1A
+    4300030: Dogon_Housing_Wall_1A
+    4300032: Dogon_Housing_Roof_1A
+    4300034: Dogon_Housing_Block_2A2
+    4300036: Dogon_Housing_Block_1A
+    4300038: Dogon_Housing_Floor_1A
+    4300040: Dogon_Housing_Block_2A
+    6400000: Dogon_Housing_Block_1A
+    6400002: Dogon_Housing_Block_1B
+    6400004: Dogon_Housing_Block_1C
+    6400006: Dogon_Housing_Block_2A
+    6400008: Dogon_Housing_Block_2A2
+    6400010: Dogon_Housing_Block_2B
+    6400012: Dogon_Housing_Block_2B2
+    6400014: Dogon_Housing_Floor_1A
+    6400016: Dogon_Housing_Floor_1B
+    6400018: Dogon_Housing_Roof_1A
+    6400020: Dogon_Housing_Roof_1B
+    6400022: Dogon_Housing_Wall_1A
+    6400024: Dogon_Housing_Wall_1A2
+    6400026: Dogon_Housing_Wall_1B
+    6400028: Dogon_Housing_Wall_Door_1A
+    6400030: Dogon_Housing_Wall_Door_1A2
+    6400032: Dogon_Housing_Wall_Door_1B
+    6400034: Dogon_Housing_Wood_Support_1A
+    6400036: Dogon_Housing_Wood_Support_1B
+    6400038: Dogon_Housing_Wood_Support_2A
+    6400040: Dogon_Housing_Wood_Support_2B
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleRotations: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 1
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
