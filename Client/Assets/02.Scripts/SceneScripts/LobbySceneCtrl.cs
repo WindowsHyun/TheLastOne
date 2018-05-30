@@ -28,7 +28,7 @@ public class LobbySceneCtrl : MonoBehaviour
 
     public void NextInGameScene()
     {
-        SceneManager.LoadScene("ForestGameScene");
+        SceneManager.LoadScene("DesertGameScene");
     }
 
 

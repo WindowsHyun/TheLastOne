@@ -72,7 +72,7 @@ public class StartCarCtrl : MonoBehaviour
             // 서버에서 시작차량을 출발하라고 한 뒤 부터 F를 누를 수 있다.
             if (startSet == false)
             {
-                player.transform.position = new Vector3(this.transform.position.x, 30.0f, this.transform.position.z);
+                player.transform.position = new Vector3(this.transform.position.x, 33.0f, this.transform.position.z);
                 //------------------------------------------------------------------------------
                 // 차량 이동 중 에도 지도를 볼 수 있다.
                 // 빌드 되었을 경우 플레이어 컨트롤러가 안꺼지는 오류 때문에 주석처리.
@@ -107,7 +107,7 @@ public class StartCarCtrl : MonoBehaviour
                     followCam.dist = 25.0f;
 
                     // 차량에 하차 할때 차량의 위치로 플레이어를 이동시킨다.
-                    player.transform.position = new Vector3(this.transform.position.x, 30.0f, this.transform.position.z);
+                    player.transform.position = new Vector3(this.transform.position.x, 33.0f, this.transform.position.z);
                     // 차량 하차 후 true로 F키 입력 시 재하차 불가능하게 만듬
                     startSet = true;
                 }
