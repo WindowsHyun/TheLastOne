@@ -16,7 +16,7 @@ public:
 	int get_id() { return this->id; }		// 룸 아이디를 전달.
 
 	void set_status(int value) { this->gameStatus = value; }		// 룸에 대한 상태를 저장.
-	Room_Manager(const int id, const HANDLE g_hiocp);
+	Room_Manager(const int id, const int mapType, const HANDLE g_hiocp);
 	Room_Manager(const Room_Manager& g_r);
 	~Room_Manager();
 };

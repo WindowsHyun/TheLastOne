@@ -28,7 +28,14 @@ public class LobbySceneCtrl : MonoBehaviour
 
     public void NextInGameScene()
     {
-        SceneManager.LoadScene("DesertGameScene");
+        if (SingletonCtrl.Instance_S.NowModeNumber == 1)
+        {
+            SceneManager.LoadScene("ForestGameScene");
+        }else if (SingletonCtrl.Instance_S.NowModeNumber == 2)
+        {
+            SceneManager.LoadScene("DesertGameScene");
+        }
+
     }
 
 
@@ -76,16 +83,16 @@ public class LobbySceneCtrl : MonoBehaviour
 
     public void StandardModeCheck()
     {
-        // 1번의 경우, StandardMode로 싱글톤 NowModeNumber에게 1을 넣어준다.
+        // 1번 Foreset Map.
         SingletonCtrl.Instance_S.NowModeNumber = 1;
-        Debug.Log("현재 Standard Mode를 선택하셨습니다 = " + SingletonCtrl.Instance_S.NowModeNumber);
+        Debug.Log("Foreset Map을 선택 하였습니다.");
     }
 
     public void ZombieModeCheck()
     {
-        // 2번의 경우, ZombieMode로 싱글톤 NowModeNumber에게 2을 넣어준다.
+        // 2번 Desert Map.
         SingletonCtrl.Instance_S.NowModeNumber = 2;
-        Debug.Log("현재 Zombie Mode를 선택하셨습니다 = " + SingletonCtrl.Instance_S.NowModeNumber);
+        Debug.Log("Desert Map을 선택 하였습니다.");
     }
 
     public void PlayerButtonCheck()

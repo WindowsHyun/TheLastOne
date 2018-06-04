@@ -1,10 +1,11 @@
 #include "Room_Manager.h"
 
-Room_Manager::Room_Manager(const int id, const HANDLE g_hiocp)
+Room_Manager::Room_Manager(const int id, const int mapType, const HANDLE g_hiocp)
 {
 	this->id = id;
 	this->gameStatus = LobbyStatus;
 	this->g_hiocp = g_hiocp;
+	this->get_room().set_mapType(mapType);
 	//::cout << "Room : " << this->id << std::endl;
 }
 

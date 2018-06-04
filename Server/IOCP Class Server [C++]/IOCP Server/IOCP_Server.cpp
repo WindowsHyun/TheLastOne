@@ -39,16 +39,18 @@ void IOCP_Server::initServer()
 		remove_client_id.push(i);
 	}
 
-	// GameRoom 생성하기
-	for (int i = 0; i < GameRoomLimit; ++i) {
-		GameRoom.emplace_back(Room_Manager(i, g_hiocp));
-
+	// 게임 대기방 생성
+	for (int i = 0; i < 1; ++i) {
+		GameRoom.emplace_back(Room_Manager(i, -1, g_hiocp));	// 대기방은 MapType 이 -1
+		if (i == 0)	continue;		// 0 의 경우 대기방으로 만들기 위하여.
+		/*
 		// 클라이언트 종료시 삭제 처리를 위한 각 방에대한 타이머 이벤트 추가.
 		Timer_Event t = { i, 1, high_resolution_clock::now() + 1s, E_Remove_Client };
 		Timer.setTimerEvent(t);
 		// 클라이언트 로비 대기 타이머 이벤트 추가.
 		t = { i, 1, high_resolution_clock::now() + 1s, E_LobbyWait };
 		Timer.setTimerEvent(t);
+		*/
 	}
 
 	std::cout << "init Complete..!" << std::endl;
@@ -310,16 +312,10 @@ void IOCP_Server::Accept_Thread()
 		std::cout << "New Client : " << new_id << std::endl;
 #endif
 
-		int room_id = GameRoomEnter(new_id, new_client);
-
-		if (room_id == -1) {
-			// 10개의 방이 모두 인게임 상태 혹은 방이 없을 경우.
-#if (DebugMod == TRUE )
-			std::cout << "설정된 인원 이상으로 접속하여 차단하였습니다..!" << std::endl;
-#endif
-			closesocket(new_client);
-			continue;
-		}
+		// 처음 시작시 대기방으로 들어가는 것 이므로, 0번 방 으로 보낸다.
+		int room_id = 0;	//GameRoomEnter(new_id, new_client);
+		GameRoom[room_id].get_room().get_client().insert(std::pair< int, Game_Client>(new_id, { new_client, new_id, (char *)"TheLastOne", room_id }));
+		Send_Client_ID(room_id, new_id, SC_ID, false);		// 클라이언트에게 자신의 아이디를 보내준다.
 		//---------------------------------------------------------------------------------------------------------------------------------------------------
 		// map에 들어간 클라이언트를 찾는다.
 		auto client = GameRoom[room_id].get_room().get_client_iter(new_id);
@@ -638,7 +634,7 @@ void IOCP_Server::Send_All_Player(const int room_id, const int client)
 	flatbuffers::FlatBufferBuilder builder;
 	std::vector<flatbuffers::Offset<Client_info>> Individual_client;		// 개인 데이터
 	for (auto iter : GameRoom[room_id].get_room().get_client()) {
-		if (iter.second.get_Connect() != true || Distance(room_id, client_iter->second.get_client_id(), iter.second.get_client_id(), Player_Dist, Kind_Player) == false )
+		if (iter.second.get_Connect() != true || Distance(room_id, client_iter->second.get_client_id(), iter.second.get_client_id(), Player_Dist, Kind_Player) == false)
 			// 클라이언트가 연결 안되어 있으면 제외 한다. 또는 체력이 없을경우 제외한다.
 			continue;
 
@@ -892,6 +888,7 @@ int IOCP_Server::GameRoomEnter(const int client, const SOCKET sock)
 	// 방중에서 현재 시작이 안된 방을 찾는다.
 	int room_id = -1;
 	for (auto iter : GameRoom) {
+		if (iter.get_id() == 0) continue;	// 0번은 대기방 이므로 넘어간다.
 		if ((iter.get_status() == LobbyStatus || iter.get_status() == ReadyStatus) && iter.get_room().get_client().size() <= MAX_Client) {
 			room_id = iter.get_id();
 #if (DebugMod == TRUE )

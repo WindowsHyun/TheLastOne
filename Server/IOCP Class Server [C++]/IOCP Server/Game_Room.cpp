@@ -93,6 +93,11 @@ void Game_Room::room_init()
 	init_Zombie(Create_Zombie, &g_zombie);
 }
 
+void Game_Room::set_mapType(int mapType)
+{
+	this->mapType = mapType;
+}
+
 Game_Room::Game_Room()
 {
 	// 게임 아이템 정보 g_item에 넣어주기.

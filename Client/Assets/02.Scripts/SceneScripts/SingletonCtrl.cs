@@ -93,7 +93,7 @@ public class SingletonCtrl : MonoBehaviour
         }
     }
 
-    public string PlayerID                  // 플레이어 아이디 접근 프로퍼티
+    public string PlayerID                  // 플레이어 ID 접근 프로퍼티
     {
         get
         {
@@ -105,7 +105,7 @@ public class SingletonCtrl : MonoBehaviour
         }
     }
 
-    public string PlayerIP                 // 플레이어 패스워드 접근 프로퍼티
+    public string PlayerIP                 // 플레이어 IP 접근 프로퍼티
     {
         get
         {
