@@ -19,7 +19,8 @@ namespace TheLastOne.GameClass
         public int SC_Zombie_Info;               // 클라이언트에게 좀비 위치를 전달해 준다.
         public int SC_Remove_Zombie;            // 좀비 삭제
         public int SC_Lobby_Time;               // 클라이언트 에게 로비 대기시간을 보내준다.
-        public int SC_StartCar_Play;			// 클라이언트 에게 시작 차량을 움직이라고 보내준다.
+        public int SC_StartCar_Play;            // 클라이언트 에게 시작 차량을 움직이라고 보내준다.
+        public int SC_Survival_Count;			// 클라이언트 에게 총 인원을 보내준다.
 
         public int CS_Info;              // 클라이언트가 서버에게 자신의 위치정보를 보내준다.
         public int CS_Shot_info;       // 클라이언트가 서버에게 Shot 정보를 보내준다.
@@ -30,7 +31,7 @@ namespace TheLastOne.GameClass
         public int CS_Car_Riding; 		// 클라이언트가 서버에게 차량에 탑승했다고 전달해 준다.
         public int CS_Car_Rode;             // 클라이언트가 서버에게 차량에 하차했다고 전달해 준다.
         public int CS_Player_Status;            // 클라이언트가 서버에게 자신의 상태를 전달한다.
-        public int SC_Survival_Count;			// 클라이언트 에게 총 인원을 보내준다.
+
         public int Kind_Item;           // 아이템
         public int Kind_Car;            // 자동차
         public int Kind_Zombie;     // 좀비

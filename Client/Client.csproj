@@ -274,6 +274,7 @@
     <Compile Include="Assets\07.Network\Client_Collection.cs" />
     <Compile Include="Assets\07.Network\Client_info.cs" />
     <Compile Include="Assets\07.Network\Client_Packet.cs" />
+    <Compile Include="Assets\07.Network\Client_Status.cs" />
     <Compile Include="Assets\07.Network\CollisionCheckCtrl.cs" />
     <Compile Include="Assets\07.Network\Game_HP_Set.cs" />
     <Compile Include="Assets\07.Network\Game_Items.cs" />

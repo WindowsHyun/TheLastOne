@@ -75,6 +75,11 @@ table Client_Packet {
   id:int;
 }
 
+table Client_Status {
+  status:int;
+  mapType:int;
+}
+
 table Game_HP_Set {
   id:int;
   hp:int;

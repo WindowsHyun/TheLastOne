@@ -93,6 +93,11 @@ void Game_Room::room_init()
 	init_Zombie(Create_Zombie, &g_zombie);
 }
 
+int Game_Room::get_mapType()
+{
+	return this->mapType;
+}
+
 void Game_Room::set_mapType(int mapType)
 {
 	this->mapType = mapType;

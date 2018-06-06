@@ -31,7 +31,8 @@ public class LobbySceneCtrl : MonoBehaviour
         if (SingletonCtrl.Instance_S.NowModeNumber == 1)
         {
             SceneManager.LoadScene("ForestGameScene");
-        }else if (SingletonCtrl.Instance_S.NowModeNumber == 2)
+        }
+        else if (SingletonCtrl.Instance_S.NowModeNumber == 2)
         {
             SceneManager.LoadScene("DesertGameScene");
         }
@@ -99,27 +100,37 @@ public class LobbySceneCtrl : MonoBehaviour
     {
         // 레디 상태가 아닐 경우
         if (SingletonCtrl.Instance_S.PlayerSocket.Connected == false)
-        {
-            // 서버와 연결이 되어있지 않을 경우...
+            // 서버와 연결이 끊어진 상태에서는 바로 게임을 진행한다.
             StartCoroutine("StartGameCount"); // 대기방 씬 시작 -> 코루틴 시작
-        }
         else
         {
-            // 서버와 연결이 되어있지 않을경우 레디 상태로 전환한다.
-            if (readyStatus == false)
-            {
-                // 레디 상태가 아닐 경우
-                SingletonCtrl.Instance_S.PlayerStatus = recv_protocol.ReadyStatus;
-                readyBtn.color = new Color32(235, 235, 235, 255);
-                readyStatus = true;
-                StartCoroutine("ReadyStatus");
-            }
-            else
-            {
-                SingletonCtrl.Instance_S.PlayerStatus = recv_protocol.LobbyStatus;
-                readyBtn.color = new Color32(255, 144, 0, 255);
-                readyStatus = false;
-            }
+            // 서버와 연결된 상태에서는 서버에게 패킷을 먼저 보낸다.
+            if (SingletonCtrl.Instance_S.NowModeNumber == 0)
+                // map이 선택이 안되었을 경우 Foreset Map으로 선택한다.
+                SingletonCtrl.Instance_S.NowModeNumber = 1;
+
+            SingletonCtrl.Instance_S.PlayerStatus = recv_protocol.ReadyStatus;
+            readyBtn.color = new Color32(235, 235, 235, 255);
+            readyStatus = true;
+            StartCoroutine("ReadyStatus");
+
+
+
+
+            //if (readyStatus == false)
+            //{
+            //    // 레디 상태가 아닐 경우
+            //    SingletonCtrl.Instance_S.PlayerStatus = recv_protocol.ReadyStatus;
+            //    readyBtn.color = new Color32(235, 235, 235, 255);
+            //    readyStatus = true;
+            //    StartCoroutine("ReadyStatus");
+            //}
+            //else
+            //{
+            //    SingletonCtrl.Instance_S.PlayerStatus = recv_protocol.LobbyStatus;
+            //    readyBtn.color = new Color32(255, 144, 0, 255);
+            //    readyStatus = false;
+            //}
 
 
 

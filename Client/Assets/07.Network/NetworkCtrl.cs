@@ -818,9 +818,9 @@ namespace TheLastOne.Game.Network
             Send_Packet(Sendbyte);
         }
 
-        public byte[] Player_Status(int status)
+        public byte[] Player_Status(int status, int mapType)
         {
-            return sF.makePlayer_Status(status);
+            return sF.makePlayer_Status(status, mapType);
         }
 
         void OnApplicationQuit()

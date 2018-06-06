@@ -51,7 +51,7 @@ public class SingletonCtrl : MonoBehaviour
         set
         {
             nowModeNumber = value;
-            if ( nowModeNumber == -1)
+            if (nowModeNumber == -1)
             {
                 m_Socket.Close();
                 networkCtrl.NetworkInit();
@@ -77,7 +77,12 @@ public class SingletonCtrl : MonoBehaviour
             playerStatus = value;
             // 상태가 변경 되면 바로 패킷을 보내주자.
             // 인게임 Socket이 열려있지 않으므로, 싱글톤에서 패킷을 보내주자.
-            Send_Packet(networkCtrl.Player_Status(playerStatus));
+            if (PlayerStatus == 2)
+                // 플레이어가 Reday를 하였을 경우에는 MapType도 같이 보내준다.
+                Send_Packet(networkCtrl.Player_Status(playerStatus, nowModeNumber));
+            else
+                Send_Packet(networkCtrl.Player_Status(playerStatus, -1));
+
         }
     }
 

@@ -31,6 +31,7 @@ public:
 	void player_To_Zombie();
 	int check_ReadyClients();
 	void room_init();
+	int get_mapType();
 	void set_mapType(int mapType);
 
 	Game_Room();

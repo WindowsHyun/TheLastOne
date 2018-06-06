@@ -233,13 +233,14 @@ namespace TheLastOne.SendFunction
             return intBytes;
         }
 
-        public Byte[] makePlayer_Status(int status)
+        public Byte[] makePlayer_Status(int status, int mapType)
         {
             FlatBufferBuilder fbb = new FlatBufferBuilder(1);
             fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
-            Client_Packet.StartClient_Packet(fbb);
-            Client_Packet.AddId(fbb, status);
-            var endOffset = Client_Packet.EndClient_Packet(fbb);
+            Client_Status.StartClient_Status(fbb);
+            Client_Status.AddStatus(fbb, status);
+            Client_Status.AddMapType(fbb, mapType);
+            var endOffset = Client_Status.EndClient_Status(fbb);
             fbb.Finish(endOffset.Value);
 
             byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
