@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: eefdcb18e2fc8404daab5961d794fb16
-timeCreated: 1528201684
+guid: 73a12078fb0e1954cb27156125273949
+timeCreated: 1528358034
 licenseType: Free
 ModelImporter:
   serializedVersion: 22
@@ -139,7 +139,7 @@ ModelImporter:
       name: run backward
       takeName: mixamo.com
       firstFrame: 0
-      lastFrame: 17
+      lastFrame: 19
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: a343bf4d099aed94eb3e865fd4c9b9a1
-timeCreated: 1528202182
+guid: 9b648708344ddfa4e9758d6b0faf9123
+timeCreated: 1528362317
 licenseType: Free
 ModelImporter:
   serializedVersion: 22
@@ -139,7 +139,7 @@ ModelImporter:
       name: run forword
       takeName: mixamo.com
       firstFrame: 0
-      lastFrame: 21
+      lastFrame: 19
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

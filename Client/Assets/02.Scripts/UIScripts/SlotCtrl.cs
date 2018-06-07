@@ -28,7 +28,7 @@ public class SlotCtrl : MonoBehaviour
 
     private void Awake()
     {
-        player = GameObject.Find("Player").GetComponent<PlayerCtrl>();
+        player = GameObject.Find("CostumePlayer").GetComponent<PlayerCtrl>();
 
         cooltime = GameObject.Find("PanelCoolTime").GetComponent<CoolTimeCtrl>();
 
