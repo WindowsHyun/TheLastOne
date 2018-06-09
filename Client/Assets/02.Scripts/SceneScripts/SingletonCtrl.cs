@@ -22,6 +22,7 @@ public class SingletonCtrl : MonoBehaviour
     private int survivalPlayer = 0;       // 게임 내 살아있는 플레이어 인원 수 
     private bool startCarRun = false;  // 수송차량 출발 대기
     private bool corutinSocket = true;     // 커넥트 하기전 까지 대기
+    private int nowMapNumber = -1;
 
     //-------------------------------------------------------------------------------------------
     // 네트워크 관련한 부분
@@ -63,6 +64,18 @@ public class SingletonCtrl : MonoBehaviour
                 corutinSocket = true;
                 StartCoroutine(connectSocket());
             }
+        }
+    }
+
+    public int NowMapNumber                  // 플레이어 현재 맵 접근 프로퍼티
+    {
+        get
+        {
+            return nowMapNumber;
+        }
+        set
+        {
+            nowMapNumber = value;   
         }
     }
 
