@@ -20,5 +20,6 @@ struct OverlappedEx {
 	OPTYPE event_type;
 	int target_id;
 	int room_id;
+	bool room_change = false;
 };
 #endif

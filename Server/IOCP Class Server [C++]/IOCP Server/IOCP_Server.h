@@ -64,6 +64,8 @@ private:
 	void Check_InGamePlayer(const int room_id);
 	int GameRoomEnter(const int client, const int mapType, const SOCKET sock);	// 클라이언트 방 입장 처리
 	void Send_SurvivalCount(const int room_id, const int client);		// 클라이언트 남은 인원을 보내준다.
+	bool findRoomCi(const int room_id, const int ci);		// 해당 방에 실제로 클라이언트가 접속 되어있는지 확인을 한다.
+
 public:
 	HANDLE getHandle() { return g_hiocp; }
 	IOCP_Server();
