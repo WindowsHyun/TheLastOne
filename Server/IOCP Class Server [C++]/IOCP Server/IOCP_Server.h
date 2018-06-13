@@ -36,7 +36,6 @@ private:
 	HANDLE g_hiocp;
 	std::vector<Room_Manager> GameRoom;		// 게임 룸을 Vector로 선언
 	std::queue<int> remove_client_id;					// 클라이언트 아이디를	Queue에 넣는다.
-	//std::unordered_map< int, int> ci_room;			// 클라이언트 아이디와 룸 정보를 가지고 있는다. [아이디, 룸정보]
 	Server_Timer Timer;									// 서버 타이머
 
 	void initServer();
@@ -65,6 +64,7 @@ private:
 	int GameRoomEnter(const int client, const int mapType, const SOCKET sock);	// 클라이언트 방 입장 처리
 	void Send_SurvivalCount(const int room_id, const int client);		// 클라이언트 남은 인원을 보내준다.
 	bool findRoomCi(const int room_id, const int ci);		// 해당 방에 실제로 클라이언트가 접속 되어있는지 확인을 한다.
+	void create_GameRoom(const int mapType);		// RoomManager 크기를 확인 후, 자동으로 방 번호를 배정하여 만든다.
 
 public:
 	HANDLE getHandle() { return g_hiocp; }

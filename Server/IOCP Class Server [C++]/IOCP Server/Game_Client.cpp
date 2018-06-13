@@ -73,6 +73,7 @@ Game_Client::Game_Client(const SOCKET sock, const int client_id, const char * ga
 	ZeroMemory(&this->packet_buf, sizeof(this->packet_buf));
 	this->recv_over.event_type = OP_RECV;
 	this->recv_over.room_id = this->room_id;
+	this->recv_over.room_change = false;
 	this->recv_over.wsabuf.buf = reinterpret_cast<CHAR *>(this->recv_over.IOCP_buf);
 	this->recv_over.wsabuf.len = sizeof(this->recv_over.IOCP_buf);
 	this->prev_packet_data = 0;
@@ -110,7 +111,9 @@ Game_Client::Game_Client(const Game_Client & g_cl)
 	ZeroMemory(&this->recv_over, sizeof(this->recv_over));
 	ZeroMemory(&this->packet_buf, sizeof(this->packet_buf));
 	this->recv_over.event_type = OP_RECV;
-	this->recv_over.room_id = g_cl.room_id;
+	this->recv_over.room_id = g_cl.recv_over.room_id;
+	this->recv_over.target_id = g_cl.recv_over.target_id;
+	this->recv_over.room_change = g_cl.recv_over.room_change;
 	this->recv_over.wsabuf.buf = reinterpret_cast<CHAR *>(this->recv_over.IOCP_buf);
 	this->recv_over.wsabuf.len = sizeof(this->recv_over.IOCP_buf);
 	this->prev_packet_data = 0;

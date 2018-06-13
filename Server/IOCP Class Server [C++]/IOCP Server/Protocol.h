@@ -22,7 +22,7 @@ enum Event_Type {
 
 // 게임 설정
 #define DebugMod TRUE
-#define GameRoomLimit 2		// 최대 방 개수
+#define GameRoomLimit 10		// 최대 방 개수
 #define Total_Max_Client MAX_Client * GameRoomLimit		// 모든 방에 최대 들어 올 수 있는 인원
 #define Minimum_Players 1		// 최소 레디 인원
 #define GamePlayWait 1			// 게임 시작전 대기 시간

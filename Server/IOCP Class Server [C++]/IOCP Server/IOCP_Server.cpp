@@ -33,29 +33,17 @@ void IOCP_Server::initServer()
 	int option = TRUE;
 	setsockopt(g_socket, IPPROTO_TCP, TCP_NODELAY, (const char*)&option, sizeof(option));	// 네이글 알고리즘 OFF
 
-
 	for (int i = 0; i < Total_Max_Client; ++i) {
 		// 클라이언트 고유번호 넣어 주기.
 		remove_client_id.push(i);
 	}
 
 	// 게임 대기방 생성
-	for (int i = 0; i < 2; ++i) {
-		if (i == 0)
-			GameRoom.emplace_back(Room_Manager(i, -1, g_hiocp));	// 대기방은 MapType 이 -1
-		else
-			GameRoom.emplace_back(Room_Manager(i, 1, g_hiocp));
-		if (i == 0)	continue;		// 0 의 경우 대기방으로 만들기 위하여.
-
-		// 클라이언트 종료시 삭제 처리를 위한 각 방에대한 타이머 이벤트 추가.
-		Timer_Event t = { i, 1, high_resolution_clock::now() + 1s, E_Remove_Client };
-		Timer.setTimerEvent(t);
-		// 클라이언트 로비 대기 타이머 이벤트 추가.
-		t = { i, 1, high_resolution_clock::now() + 1s, E_LobbyWait };
-		Timer.setTimerEvent(t);
-
-	}
-
+	GameRoom.reserve(GameRoomLimit);
+	create_GameRoom(-1);
+	//for (int i = 0; i < 1; ++i) {
+	//	GameRoom.emplace_back(Room_Manager(i, -1));	// 대기방은 MapType 이 -1
+	//}
 	std::cout << "init Complete..!" << std::endl;
 }
 
@@ -130,6 +118,7 @@ void IOCP_Server::Worker_Thread()
 			//std::cout << "RECV from Client : " << ci << std::endl;
 			//std::cout << "IO_SIZE : " << io_size << std::endl;
 #endif
+
 			auto client = GameRoom[over->room_id].get_room().get_client_iter((int)ci);
 			unsigned char *buf = client->second.recv_over.IOCP_buf;
 
@@ -169,10 +158,12 @@ void IOCP_Server::Worker_Thread()
 			client->second.set_prev_packet(pr_size);
 			DWORD recv_flag = 0;
 
-			if (over->room_change == false)
+			if (over->room_change == true || over->target_id >= MAX_Client || over->target_id < 0) {
+				GameRoom[0].get_room().get_client().erase((int)ci);
+			}
+			else {
 				WSARecv(client->second.get_Socket(), &client->second.recv_over.wsabuf, 1, NULL, &recv_flag, &client->second.recv_over.over, NULL);
-			else
-				GameRoom[0].get_room().get_client().erase(ci);
+			}
 		}
 		else if (OP_SEND == over->event_type) {
 
@@ -290,9 +281,7 @@ void IOCP_Server::Worker_Thread()
 			//exit(-1);
 		}
 
-
 	}
-
 }
 
 void IOCP_Server::Accept_Thread()
@@ -318,7 +307,6 @@ void IOCP_Server::Accept_Thread()
 #if (DebugMod == TRUE )
 		std::cout << "New Client : " << new_id << std::endl;
 #endif
-
 		// 처음 시작시 대기방으로 들어가는 것 이므로, 0번 방 으로 보낸다.
 		int room_id = 0;	//GameRoomEnter(new_id, new_client);
 		GameRoom[room_id].get_room().get_client().insert(std::pair< int, Game_Client>(new_id, { new_client, new_id, (char *)"TheLastOne", room_id }));
@@ -549,7 +537,6 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *pac
 		client->second.set_playerStatus(client_Check_info->status());
 		if (client_Check_info->mapType() != -1) {
 			// mapType가 -1이 아닐경우 : 플레이어가 레디를 하여 방을 찾는 상황이다.
-			std::cout << "MapType : " << client_Check_info->mapType() << std::endl;
 			GameRoomEnter(ci, client_Check_info->mapType(), client->second.get_Socket());
 		}
 	}
@@ -898,42 +885,48 @@ void IOCP_Server::Check_InGamePlayer(const int room_id)
 int IOCP_Server::GameRoomEnter(const int client, const int mapType, const SOCKET sock)
 {
 	// 방중에서 현재 시작이 안된 방을 찾는다.
+searchRoom:
 	int room_id = -1;
+
 	for (auto iter : GameRoom) {
 		if (iter.get_id() == 0) continue;	// 0번은 대기방 이므로 넘어간다.
-		std::cout << iter.get_room().get_mapType() << " : " << mapType << std::endl;
 		if ((iter.get_status() == LobbyStatus || iter.get_status() == ReadyStatus) && iter.get_room().get_client().size() <= MAX_Client && iter.get_room().get_mapType() == mapType) {
 			// room_id 부여
 			room_id = iter.get_id();
 #if (DebugMod == TRUE )
-			std::cout << "Connect to Room " << iter.get_id() << std::endl;
+			std::cout << "Connect to Room : " << iter.get_id() << std::endl;
 #endif
 			// 접속된 클라이언트 데이터를 넣어 준다.
 			GameRoom[room_id].get_room().get_client().insert(std::pair< int, Game_Client>(client, { sock, client, (char *)"TheLastOne", room_id }));
-			// Room을 옮겨준 이후 Ready 상태로 변경해 준다.
+			//Room을 옮겨준 이후 Ready 상태로 변경해 준다.
 			GameRoom[room_id].get_room().get_client_iter(client)->second.set_playerStatus(ReadyStatus);
 
 
 			//---------------------------------------------------------------------------------------
 			// 새로 입장한 Room에 Recv를 설정 해준다.
 			auto client_data = GameRoom[room_id].get_room().get_client_iter((int)client);
+			client_data->second.recv_over.room_id = room_id;
+			client_data->second.recv_over.target_id = (int)client;
+
 			DWORD recv_flag = 0;
 			WSARecv(client_data->second.get_Socket(), &client_data->second.recv_over.wsabuf, 1, NULL, &recv_flag, &client_data->second.recv_over.over, NULL);
 			//---------------------------------------------------------------------------------------
-
+			// 기존 Overlapped 대기방이 변경이 되었다고 수정을 한다.
 			GameRoom[0].get_room().get_client().find(client)->second.set_room_id(room_id);
 			GameRoom[0].get_room().get_client_iter((int)client)->second.recv_over.room_change = true;
-			// 기존 대기방에 클라이언트 데이터를 삭제 해준다.
-			//
-
-
+			// 대기방 번호를 리턴한다.
+			return room_id;
 			break;
 		}
 	}
-	if (room_id == -1)
-		return -1;
-	else
+	if (room_id == -1) {
+		// 빈 방이 없을 경우 게임방 + 맵을 설정하여 만들어 준다.
+		create_GameRoom(mapType);
+		goto searchRoom;
+	}
+	else {
 		return room_id;
+	}
 }
 
 void IOCP_Server::Send_SurvivalCount(const int room_id, const int client)
@@ -963,6 +956,27 @@ bool IOCP_Server::findRoomCi(const int room_id, const int ci)
 	else {
 		// 클라이언트가 존재 한다.
 		return true;
+	}
+}
+
+void IOCP_Server::create_GameRoom(const int mapType)
+{
+	int createroom_id = (int)(GameRoom.size());
+	if (createroom_id >= GameRoomLimit) {
+		std::cout << "You can not make a room anymore.." << std::endl;
+	}
+	else {
+		std::cout << "Create to Room : " << createroom_id << " (" << mapType << ")" << std::endl;
+		GameRoom.emplace_back(Room_Manager(createroom_id, mapType));
+		// 대기방이 아닐 경우에만 타이머를 추가해준다.
+		if (mapType != -1) {
+			// 클라이언트 종료시 삭제 처리를 위한 각 방에대한 타이머 이벤트 추가.
+			Timer_Event t = { createroom_id, 1, high_resolution_clock::now() + 1s, E_Remove_Client };
+			Timer.setTimerEvent(t);
+			// 클라이언트 로비 대기 타이머 이벤트 추가.
+			t = { createroom_id, 1, high_resolution_clock::now() + 1s, E_LobbyWait };
+			Timer.setTimerEvent(t);
+		}
 	}
 }
 
