@@ -256,6 +256,7 @@
     <Compile Include="Assets\02.Scripts\PlayerCtrl.cs" />
     <Compile Include="Assets\02.Scripts\SceneScripts\DieSceneCtrl.cs" />
     <Compile Include="Assets\02.Scripts\SceneScripts\LobbySceneCtrl.cs" />
+    <Compile Include="Assets\02.Scripts\SceneScripts\LobbyStoreCtrl.cs" />
     <Compile Include="Assets\02.Scripts\SceneScripts\SingletonCtrl.cs" />
     <Compile Include="Assets\02.Scripts\SceneScripts\StartSceneCtrl.cs" />
     <Compile Include="Assets\02.Scripts\SceneScripts\WinSceneCtrl.cs" />

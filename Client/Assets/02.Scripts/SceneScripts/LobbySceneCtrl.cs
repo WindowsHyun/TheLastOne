@@ -14,6 +14,9 @@ public class LobbySceneCtrl : MonoBehaviour
     public Image readyBtn;
     private bool readyStatus = false;
 
+    public Text PlayerMoney;
+    public Text PlayerID;
+
     // 추후 개발 업데이트 내용
     // 상점 - 커스텀 BOX 구매 및 개봉
     // 인벤토리 - 커스텀 아이템 장착 및 탈착
@@ -24,6 +27,10 @@ public class LobbySceneCtrl : MonoBehaviour
         {
             gameStartTimeText.text = "Offline Game Mode..!"; // text 출력
         }
+
+
+        PlayerID.text = SingletonCtrl.Instance_S.PlayerID;
+        PlayerMoney.text = SingletonCtrl.Instance_S.PlayerMoney.ToString();
     }
 
     public void NextInGameScene()
