@@ -17,6 +17,7 @@ private:
 	int limit_Zombie = 0;
 	int inCar = -1;
 	int playerStatus = 0;
+	int CostumNum = 0;
 	float horizontal = 0.0f;
 	float vertical = 0.0f;
 	float car_kmh = 0.0f;
@@ -57,6 +58,7 @@ public:
 	SOCKET get_Socket() { return this->client_socket; };			// 클라이언트 소켓 전달
 	OverlappedEx get_over() { return this->recv_over; };			// Overlapped 구조체 전달
 	bool get_clientdie() { return this->client_die; }					// 클라이언트 Die 여부 체크
+	int get_CostumNum() { return this->CostumNum; };		// 클라이언트 Costum 상태
 
 	void set_prev_packet(const int size) { this->prev_packet_data = size; };				// 클라이언트 패킷 사이즈 저장
 	void set_curr_packet(const int size) { this->curr_packet_size = size; };				// 클라이언트 패킷 사이즈 저장
@@ -77,6 +79,7 @@ public:
 	void set_armour(int value) { this->armour = value; };											// 클라이언트 아머 저장
 	void set_room_id(int value) { this->room_id = value; }										// 클라이언트 룸 아이디 저장
 	void set_clientDie(bool value) { this->client_die = value; }									// 클라이언트 Die 여부 저장
+	void set_CostumNum(int value) { this->CostumNum = value; }							// 클라이언트 Costum Num 저장
 
 	Game_Client(const SOCKET sock, const int client_id, const char * game_id, const int room_id);
 	Game_Client(const Game_Client& g_cl);

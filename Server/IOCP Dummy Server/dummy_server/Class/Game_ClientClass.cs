@@ -43,6 +43,9 @@ namespace TheLastOne.GameClass
         private bool removeClient;   // 클라이언트 지울경우 true
         private int nowWeaponState; // 클라이언트 무기 상태
         private bool activePlayer;
+        private bool die;
+        private bool die_already;   // 플레이어 죽는것을 한번만 죽게 하기 위하여
+        private int CostumeNum;
 
         public bool get_isDie() { return this.isDie; }
         public int get_inCar() { return this.inCar; }
@@ -61,6 +64,7 @@ namespace TheLastOne.GameClass
         public string get_name() { return this.name; }
         public bool get_removeClient() { return this.removeClient; }
         public int get_weapon() { return this.nowWeaponState; }
+        public int get_costumeNum() { return this.CostumeNum; }
 
         public void set_isDie(bool value) { this.isDie = value; }
         public void set_inCar(int value) { this.inCar = value; }
@@ -79,6 +83,7 @@ namespace TheLastOne.GameClass
         public void set_name(string name) { this.name = name; }
         public void set_removeClient(bool value) { this.removeClient = value; }
         public void set_weapon(int value) { this.nowWeaponState = value; }
+        public void set_costumeNum(int value) { this.CostumeNum = value; }
 
 
         public Game_ClientClass(int id, m_Network m_net, Vector3 pos)
@@ -102,8 +107,9 @@ namespace TheLastOne.GameClass
             this.horizontal = 0.0f;
             this.inCar = -1;
             this.isDie = false;
-
-           
+            this.die = false;
+            this.die_already = false;
+            this.CostumeNum = 0;
 
         }
 

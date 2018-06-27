@@ -108,6 +108,7 @@ Game_Client::Game_Client(const Game_Client & g_cl)
 	this->dangerLineIn = g_cl.dangerLineIn;
 	this->playerStatus = g_cl.playerStatus;
 	this->client_die = g_cl.client_die;
+	this->CostumNum = g_cl.CostumNum;
 	ZeroMemory(&this->recv_over, sizeof(this->recv_over));
 	ZeroMemory(&this->packet_buf, sizeof(this->packet_buf));
 	this->recv_over.event_type = OP_RECV;

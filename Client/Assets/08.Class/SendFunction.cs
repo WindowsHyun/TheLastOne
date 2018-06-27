@@ -33,6 +33,7 @@ namespace TheLastOne.SendFunction
             Client_info.AddDangerLineIn(fbb, dangerLineIn);
             Client_info.AddNowWeapon(fbb, Player_Weapone);
             Client_info.AddPlayerDie(fbb, false);
+            Client_info.AddCostumNum(fbb, SingletonCtrl.Instance_S.WereCostumNumber);
             var endOffset = Client_info.EndClient_info(fbb);
             fbb.Finish(endOffset.Value);
 

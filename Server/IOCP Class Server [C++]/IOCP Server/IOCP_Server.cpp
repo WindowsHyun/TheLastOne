@@ -418,6 +418,8 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *pac
 		client->second.set_vertical(client_View->Vertical());
 		client->second.set_inCar(client_View->inCar());
 		client->second.set_client_DangerLine(client_View->dangerLineIn());
+		client->second.set_CostumNum(client_View->costumNum());
+		//std::cout << "Costum Num : " << client->second.get_CostumNum() << std::endl;
 		//std::cout << client->first << " | 자기장 : " << client_View->dangerLineIn() << std::endl;
 		if (client_View->inCar() != -1) {
 			// 차량을 실제로 탑승 하고 있을 경우.
@@ -651,7 +653,9 @@ void IOCP_Server::Send_All_Player(const int room_id, const int client)
 		auto dangerLineIn = iter.second.get_DangerLine();
 		auto car_rotation = Vec3(iter.second.get_car_rotation().x, iter.second.get_car_rotation().y, iter.second.get_car_rotation().z);
 		auto playerDie = iter.second.get_clientdie();
-		auto client_data = CreateClient_info(builder, id, hp, armour, animator, horizontal, vertical, inCar, name, &position, &rotation, &car_rotation, 0.0f, dangerLineIn, weaponState, playerDie);
+		auto CostumNum = iter.second.get_CostumNum();
+		//std::cout << CostumNum << std::endl;
+		auto client_data = CreateClient_info(builder, id, hp, armour, animator, horizontal, vertical, inCar, name, &position, &rotation, &car_rotation, 0.0f, dangerLineIn, weaponState, playerDie, CostumNum);
 		// client_data 라는 테이블에 클라이언트 데이터가 들어가 있다.
 
 		Individual_client.push_back(client_data);	// Vector에 넣었다.
@@ -938,7 +942,7 @@ void IOCP_Server::Send_SurvivalCount(const int room_id, const int client)
 	}
 	//count++;
 	flatbuffers::FlatBufferBuilder builder;
-	auto Client_id = count;
+	auto Client_id = count+1;	// 임시로 올려놓자.
 	auto orc = CreateClient_Packet(builder, Client_id);
 	builder.Finish(orc); // Serialize the root of the object.
 

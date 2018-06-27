@@ -27,6 +27,7 @@ namespace dummy_server
 
         private byte[] Sendbyte = new byte[7000];
         private int MaxClient = 35;
+        private int mapNum = 2;
 
         public static Dictionary<int, Game_ClientClass> client_data = new Dictionary<int, Game_ClientClass>();
         // 클라이언트 데이터 저장할 컨테이너
@@ -82,7 +83,7 @@ namespace dummy_server
             foreach (var key in client_data.Keys.ToList())
             {
                 // 레디 준비 완료.
-                Send_Packet(client_data[key].m_Net ,sF.makePlayer_Status(2));
+                Send_Packet(client_data[key].m_Net ,sF.makePlayer_Status(2, -1));
                 Thread.Sleep(100);
             }
             connect_Server.Enabled = false;
@@ -168,7 +169,7 @@ namespace dummy_server
                 byte[] t_buf = new byte[size + 1];
                 System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
                 ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
-                var Get_ServerData = Client_id.GetRootAsClient_id(revc_buf);
+                var Get_ServerData = Client_Packet.GetRootAsClient_Packet(revc_buf);
                 //client_data[state.client_id].id = Int32.Parse(Get_ServerData.Id.ToString());
 
                 client_data.Add(Get_ServerData.Id, new Game_ClientClass(Get_ServerData.Id, m_Net, new Vector3(r.Next(920, 1150), 30, r.Next(750, 1420))));
@@ -315,7 +316,7 @@ namespace dummy_server
             foreach (var key in client_data.Keys.ToList())
             {
                 // 인게임 화면 완료.
-                Send_Packet(client_data[key].m_Net, sF.makePlayer_Status(4));
+                Send_Packet(client_data[key].m_Net, sF.makePlayer_Status(4, mapNum));
                 Thread.Sleep(100);
 
                 client_data[key].t1 = new Thread(() => Update(key));
@@ -323,6 +324,16 @@ namespace dummy_server
             }
            // allReady.Enabled = false;
 
+        }
+
+        private void Desert_Click(object sender, EventArgs e)
+        {
+            mapNum = 2;
+        }
+
+        private void Forest_Click(object sender, EventArgs e)
+        {
+            mapNum = 1;
         }
     }
 }

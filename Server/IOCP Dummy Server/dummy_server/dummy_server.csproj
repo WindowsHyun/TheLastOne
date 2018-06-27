@@ -54,16 +54,15 @@
     <Compile Include="Class\Network.cs" />
     <Compile Include="Class\SendFunction.cs" />
     <Compile Include="FlatBuffers\Client_Collection.cs" />
-    <Compile Include="FlatBuffers\Client_id.cs" />
     <Compile Include="FlatBuffers\Client_info.cs" />
     <Compile Include="FlatBuffers\Client_Packet.cs" />
-    <Compile Include="FlatBuffers\Client_Shot_info.cs" />
     <Compile Include="dummyServer.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="dummyServer.Designer.cs">
       <DependentUpon>dummyServer.cs</DependentUpon>
     </Compile>
+    <Compile Include="FlatBuffers\Client_Status.cs" />
     <Compile Include="FlatBuffers\GameDangerLine.cs" />
     <Compile Include="FlatBuffers\Gameitem.cs" />
     <Compile Include="FlatBuffers\Game_HP_Set.cs" />

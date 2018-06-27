@@ -25,7 +25,7 @@ enum Event_Type {
 #define GameRoomLimit 10		// 최대 방 개수
 #define Total_Max_Client MAX_Client * GameRoomLimit		// 모든 방에 최대 들어 올 수 있는 인원
 #define Minimum_Players 1		// 최소 레디 인원
-#define GamePlayWait 1			// 게임 시작전 대기 시간
+#define GamePlayWait 5		// 게임 시작전 대기 시간
 #define noPlayer -1				// 플레이어 번호가 필요 없을 경우
 
 // 서버에서 클라이언트에게 보내는 패킷

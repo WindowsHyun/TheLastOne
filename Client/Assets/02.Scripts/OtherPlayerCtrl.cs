@@ -92,6 +92,8 @@ public class OtherPlayerCtrl : MonoBehaviour
 
     // OtherPlayer 코스튬 종류
     public GameObject[] otherPlayerCostume = new GameObject[15];
+    public bool CostumeChange = false;
+    public int CostumeNumber = 0;
 
     void Start()
     {
@@ -191,6 +193,23 @@ public class OtherPlayerCtrl : MonoBehaviour
     {
         do
         {
+            if (CostumeChange == true)
+            {
+                // Costume를 변경 한다.
+
+                for (int i = 0; i < 15; ++i)
+                {
+                    if (i == CostumeNumber)
+                    {
+                        otherPlayerCostume[i].SetActive(true);
+                    }
+                    else
+                    {
+                        otherPlayerCostume[i].SetActive(false);
+                    }
+                }
+                CostumeChange = false;
+            }
 
             animator.SetFloat("Vertical", Vertical);
             animator.SetFloat("Horizontal", Horizontal);

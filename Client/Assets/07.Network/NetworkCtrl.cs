@@ -154,6 +154,9 @@ namespace TheLastOne.Game.Network
 
                         client_data[key].script = client_data[key].Player.GetComponent<OtherPlayerCtrl>();
                         client_data[key].script.otherPlayer_id = client_data[key].get_id();
+                        // Costume 를 적용 시켜준다.
+                        client_data[key].script.CostumeChange = true;
+                        client_data[key].script.CostumeNumber = client_data[key].get_costumeNum();
                         client_data[key].set_prefab(true);
 
                         // 처음 위치를 넣어 줘야 한다. 그러지 않을경우 다른 클라이언트 에서는 0,0 에서부터 천천히 올라오게 보인다
@@ -477,6 +480,7 @@ namespace TheLastOne.Game.Network
 
         public void ProcessPacket(int size, int type, byte[] recvPacket)
         {
+            SingletonCtrl.Instance_S.startCarStatus = true;
             if (type == recv_protocol.SC_ID)
             {
                 // 클라이언트 아이디를 가져온다.
@@ -545,6 +549,7 @@ namespace TheLastOne.Game.Network
                         iter.set_vertical(Get_ServerData.Data(i).Value.Vertical);
                         iter.set_inCar(Get_ServerData.Data(i).Value.InCar);
                         iter.set_Die(Get_ServerData.Data(i).Value.PlayerDie);
+                        iter.set_costumeNum(Get_ServerData.Data(i).Value.CostumNum);
                         iter.set_car_rot(new Vector3(Get_ServerData.Data(i).Value.Carrotation.Value.X, Get_ServerData.Data(i).Value.Carrotation.Value.Y, Get_ServerData.Data(i).Value.Carrotation.Value.Z));
                         iter.set_activePlayer(true);
                         if (iter.get_prefab() == true)

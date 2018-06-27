@@ -126,7 +126,8 @@ struct Client_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_CARKMH = 26,
     VT_DANGERLINEIN = 28,
     VT_NOWWEAPON = 30,
-    VT_PLAYERDIE = 32
+    VT_PLAYERDIE = 32,
+    VT_COSTUMNUM = 34
   };
   int32_t id() const {
     return GetField<int32_t>(VT_ID, 0);
@@ -173,6 +174,9 @@ struct Client_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool playerDie() const {
     return GetField<uint8_t>(VT_PLAYERDIE, 0) != 0;
   }
+  int32_t costumNum() const {
+    return GetField<int32_t>(VT_COSTUMNUM, 0);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_ID) &&
@@ -191,6 +195,7 @@ struct Client_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_DANGERLINEIN) &&
            VerifyField<int32_t>(verifier, VT_NOWWEAPON) &&
            VerifyField<uint8_t>(verifier, VT_PLAYERDIE) &&
+           VerifyField<int32_t>(verifier, VT_COSTUMNUM) &&
            verifier.EndTable();
   }
 };
@@ -243,6 +248,9 @@ struct Client_infoBuilder {
   void add_playerDie(bool playerDie) {
     fbb_.AddElement<uint8_t>(Client_info::VT_PLAYERDIE, static_cast<uint8_t>(playerDie), 0);
   }
+  void add_costumNum(int32_t costumNum) {
+    fbb_.AddElement<int32_t>(Client_info::VT_COSTUMNUM, costumNum, 0);
+  }
   explicit Client_infoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -271,8 +279,10 @@ inline flatbuffers::Offset<Client_info> CreateClient_info(
     float carkmh = 0.0f,
     bool dangerLineIn = false,
     int32_t nowWeapon = 0,
-    bool playerDie = false) {
+    bool playerDie = false,
+    int32_t costumNum = 0) {
   Client_infoBuilder builder_(_fbb);
+  builder_.add_costumNum(costumNum);
   builder_.add_nowWeapon(nowWeapon);
   builder_.add_carkmh(carkmh);
   builder_.add_carrotation(carrotation);
@@ -307,7 +317,8 @@ inline flatbuffers::Offset<Client_info> CreateClient_infoDirect(
     float carkmh = 0.0f,
     bool dangerLineIn = false,
     int32_t nowWeapon = 0,
-    bool playerDie = false) {
+    bool playerDie = false,
+    int32_t costumNum = 0) {
   return Game::TheLastOne::CreateClient_info(
       _fbb,
       id,
@@ -324,7 +335,8 @@ inline flatbuffers::Offset<Client_info> CreateClient_infoDirect(
       carkmh,
       dangerLineIn,
       nowWeapon,
-      playerDie);
+      playerDie,
+      costumNum);
 }
 
 struct Zombie_Collection FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {

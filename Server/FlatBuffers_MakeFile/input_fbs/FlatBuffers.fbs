@@ -28,6 +28,7 @@ table Client_info {
   dangerLineIn:bool;
   nowWeapon:int;
   playerDie:bool;
+  costumNum:int;
 }
 
 table Zombie_Collection{

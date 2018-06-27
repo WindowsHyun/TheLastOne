@@ -22,7 +22,7 @@ public class SingletonCtrl : MonoBehaviour
     private int survivalPlayer = 0;       // 게임 내 살아있는 플레이어 인원 수 
     private bool startCarRun = false;  // 수송차량 출발 대기
     private bool corutinSocket = true;     // 커넥트 하기전 까지 대기
-    private int nowMapNumber = -1;
+    private int nowMapNumber = 2;       // 기본은 사막맵
 
 
     // 코스튬 보유수
@@ -98,7 +98,7 @@ public class SingletonCtrl : MonoBehaviour
             // 인게임 Socket이 열려있지 않으므로, 싱글톤에서 패킷을 보내주자.
             if (PlayerStatus == 2)
                 // 플레이어가 Reday를 하였을 경우에는 MapType도 같이 보내준다.
-                Send_Packet(networkCtrl.Player_Status(playerStatus, nowModeNumber));
+                Send_Packet(networkCtrl.Player_Status(playerStatus, nowMapNumber));
             else
                 Send_Packet(networkCtrl.Player_Status(playerStatus, -1));
 

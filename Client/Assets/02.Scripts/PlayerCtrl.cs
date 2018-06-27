@@ -55,7 +55,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
     // 캐릭터의 현재 상태 정보를 저장할 Enum 변수
     public PlayerState playerState = PlayerState.idle;
-
+    
     public WeaponState nowWeaponState = WeaponState.None;
 
     [HideInInspector] public float h = 0.0f;

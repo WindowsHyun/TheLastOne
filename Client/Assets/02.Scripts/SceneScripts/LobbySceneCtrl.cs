@@ -93,6 +93,7 @@ public class LobbySceneCtrl : MonoBehaviour
     {
         // 1번 Foreset Map.
         SingletonCtrl.Instance_S.NowModeNumber = 1;
+        SingletonCtrl.Instance_S.NowMapNumber = 1;
         Debug.Log("Foreset Map을 선택 하였습니다.");
     }
 
@@ -100,6 +101,7 @@ public class LobbySceneCtrl : MonoBehaviour
     {
         // 2번 Desert Map.
         SingletonCtrl.Instance_S.NowModeNumber = 2;
+        SingletonCtrl.Instance_S.NowMapNumber = 2;
         Debug.Log("Desert Map을 선택 하였습니다.");
     }
 

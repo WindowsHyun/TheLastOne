@@ -37,6 +37,8 @@
             this.connectCountTimer = new System.Windows.Forms.Timer(this.components);
             this.iPAdressText = new System.Windows.Forms.TextBox();
             this.allReady = new System.Windows.Forms.Button();
+            this.Desert = new System.Windows.Forms.Button();
+            this.Forest = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // connect_Server
@@ -53,7 +55,7 @@
             // 
             this.DebugBox.Location = new System.Drawing.Point(276, 10);
             this.DebugBox.Name = "DebugBox";
-            this.DebugBox.Size = new System.Drawing.Size(373, 101);
+            this.DebugBox.Size = new System.Drawing.Size(373, 128);
             this.DebugBox.TabIndex = 1;
             this.DebugBox.Text = "";
             // 
@@ -109,11 +111,33 @@
             this.allReady.UseVisualStyleBackColor = true;
             this.allReady.Click += new System.EventHandler(this.allReady_Click);
             // 
+            // Desert
+            // 
+            this.Desert.Location = new System.Drawing.Point(10, 117);
+            this.Desert.Name = "Desert";
+            this.Desert.Size = new System.Drawing.Size(100, 21);
+            this.Desert.TabIndex = 7;
+            this.Desert.Text = "Desert";
+            this.Desert.UseVisualStyleBackColor = true;
+            this.Desert.Click += new System.EventHandler(this.Desert_Click);
+            // 
+            // Forest
+            // 
+            this.Forest.Location = new System.Drawing.Point(116, 117);
+            this.Forest.Name = "Forest";
+            this.Forest.Size = new System.Drawing.Size(155, 21);
+            this.Forest.TabIndex = 8;
+            this.Forest.Text = "Forest";
+            this.Forest.UseVisualStyleBackColor = true;
+            this.Forest.Click += new System.EventHandler(this.Forest_Click);
+            // 
             // dummyServer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(665, 119);
+            this.ClientSize = new System.Drawing.Size(665, 144);
+            this.Controls.Add(this.Forest);
+            this.Controls.Add(this.Desert);
             this.Controls.Add(this.allReady);
             this.Controls.Add(this.iPAdressText);
             this.Controls.Add(this.disconnect_Server);
@@ -139,6 +163,8 @@
         private System.Windows.Forms.Timer connectCountTimer;
         private System.Windows.Forms.TextBox iPAdressText;
         private System.Windows.Forms.Button allReady;
+        private System.Windows.Forms.Button Desert;
+        private System.Windows.Forms.Button Forest;
     }
 }
 
