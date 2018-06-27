@@ -6,10 +6,14 @@ public class LobbyCostumCtrl : MonoBehaviour
 {
 
     public GameObject costumUI;
+    public GameObject storeUI;
     public GameObject playButton;
     public GameObject mapButton;
 
     public bool costumOnOff;
+
+    public LobbyStoreCtrl storeCtrl;
+
 
     // v 표시 체크 아이콘을 위함
     public GameObject[] checkIcon = new GameObject[15];
@@ -45,6 +49,9 @@ public class LobbyCostumCtrl : MonoBehaviour
         {
             costumUI.SetActive(true);
             costumOnOff = true;
+
+            storeUI.SetActive(false);
+            storeCtrl.storeOnOff = false;
         }
         else if (costumUI == true)
         {

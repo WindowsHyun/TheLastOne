@@ -5,29 +5,35 @@ using UnityEngine.UI;
 
 public class LobbyStoreCtrl : MonoBehaviour {
 
-    public GameObject StoreUI;
-    public GameObject PlayButton;
-    public GameObject MapButton;
+    public GameObject storeUI;
+    public GameObject costumUI;
+    public GameObject playButton;
+    public GameObject mapButton;
 
-    public bool StoreOnOff;
+    public bool storeOnOff;
+
+    public LobbyCostumCtrl costumCtrl;
 
     private void Awake()
     {
-        StoreUI.SetActive(false);
-        StoreOnOff = false;
+        storeUI.SetActive(false);
+        storeOnOff = false;
     }
 
     public void StoreButton()
     {
-        if (StoreOnOff == false)
+        if (storeOnOff == false)
         {
-            StoreUI.SetActive(true);
-            StoreOnOff = true;
+            storeUI.SetActive(true);
+            storeOnOff = true;
+
+            costumUI.SetActive(false);
+            costumCtrl.costumOnOff = false;
         }
-        else if (StoreUI == true)
+        else if (storeUI == true)
         {
-            StoreUI.SetActive(false);
-            StoreOnOff = false;
+            storeUI.SetActive(false);
+            storeOnOff = false;
         }
         //// 2번의 경우, ZombieMode로 싱글톤 NowModeNumber에게 2을 넣어준다.
         //SingletonCtrl.Instance_S.NowModeNumber = 2;

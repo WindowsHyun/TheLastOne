@@ -90,6 +90,9 @@ public class OtherPlayerCtrl : MonoBehaviour
     // 캐릭터 캡슐 콜라이더 비활성화
     public CapsuleCollider collider_script;
 
+    // OtherPlayer 코스튬 종류
+    public GameObject[] otherPlayerCostume = new GameObject[15];
+
     void Start()
     {
         weaponView[0] = ak47;
