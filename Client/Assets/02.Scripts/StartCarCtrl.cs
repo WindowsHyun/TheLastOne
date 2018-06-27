@@ -45,9 +45,9 @@ public class StartCarCtrl : MonoBehaviour
 
         // 게임 시작후 차량 하차 시 인벤토리 창을 끈다.
         // 쿨타임 스크립트 할당
-        Player_Script.cooltimeCtrl = GameObject.Find("PanelCoolTime").GetComponent<CoolTimeCtrl>();
+        //Player_Script.cooltimeCtrl = GameObject.Find("PanelCoolTime").GetComponent<CoolTimeCtrl>();
         Player_Script.inventory.SetActive(false);
-        Player_Script.cooltime.SetActive(false);
+        //Player_Script.cooltime.SetActive(false);
         Player_Script.VehicleUI.SetActive(false);
 
 

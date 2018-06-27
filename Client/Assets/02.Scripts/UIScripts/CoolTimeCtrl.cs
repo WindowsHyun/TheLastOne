@@ -20,9 +20,9 @@ public class CoolTimeCtrl : MonoBehaviour
 
     void Start()
     {
-        player = GameObject.Find("Player").GetComponent<PlayerCtrl>();
+        player = GameObject.Find("CostumePlayer").GetComponent<PlayerCtrl>();
 
-        //gameObject.SetActive(false);
+        gameObject.SetActive(false);
         //coolTimeImage.fillAmount = 0; //처음에 스킬 버튼을 가리지 않음
     }
 

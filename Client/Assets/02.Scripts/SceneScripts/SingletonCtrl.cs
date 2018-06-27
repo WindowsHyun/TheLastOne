@@ -22,6 +22,13 @@ public class SingletonCtrl : MonoBehaviour
     private int survivalPlayer = 0;       // 게임 내 살아있는 플레이어 인원 수 
     private bool startCarRun = false;  // 수송차량 출발 대기
     private bool corutinSocket = true;     // 커넥트 하기전 까지 대기
+    private int nowMapNumber = -1;
+
+
+    // 코스튬 보유수
+    private int[] playerCostumHold = new int[15];
+    // 착용 코스튬 번호
+    private int wereCostumNumber = 0;
 
     //-------------------------------------------------------------------------------------------
     // 네트워크 관련한 부분
@@ -66,6 +73,18 @@ public class SingletonCtrl : MonoBehaviour
         }
     }
 
+    public int NowMapNumber                  // 플레이어 현재 맵 접근 프로퍼티
+    {
+        get
+        {
+            return nowMapNumber;
+        }
+        set
+        {
+            nowMapNumber = value;
+        }
+    }
+
     public int PlayerStatus                  // 플레이어 게임 상태 접근 프로퍼티
     {
         get
@@ -98,7 +117,32 @@ public class SingletonCtrl : MonoBehaviour
         }
     }
 
-    public string PlayerID                  // 플레이어 ID 접근 프로퍼티
+    public int[] PlayerCostume
+    {
+        get
+        {
+            return playerCostumHold;
+        }
+        set
+        {
+            playerCostumHold = value;
+        }
+    }
+
+    public int WereCostumNumber
+    {
+        get
+        {
+            return wereCostumNumber;
+        }
+        set
+        {
+            wereCostumNumber = value;
+        }
+    }
+        
+
+    public string PlayerID                  // 플레이어 아이디 접근 프로퍼티
     {
         get
         {
@@ -288,6 +332,13 @@ public class SingletonCtrl : MonoBehaviour
 
     private void Awake()
     {
+        // 변수 초기화, 처음 모두 0개
+        for(int i = 0; i < 15; i++)
+        {
+            playerCostumHold[i] = 0;
+        }
+
+
         if (instance_S)                     // 인스턴스가 이미 생성 되었는가?
         {
             DestroyImmediate(gameObject);   // 또 만들 필요가 없다 -> 삭제
@@ -299,6 +350,9 @@ public class SingletonCtrl : MonoBehaviour
         Application.targetFrameRate = 60;
         Application.runInBackground = true;
         StartCoroutine(connectSocket());
+
+
+
     }
 
 }

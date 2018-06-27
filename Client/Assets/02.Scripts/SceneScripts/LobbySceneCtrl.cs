@@ -14,6 +14,9 @@ public class LobbySceneCtrl : MonoBehaviour
     public Image readyBtn;
     private bool readyStatus = false;
 
+    public Text PlayerMoney;
+    public Text PlayerID;
+
     // 추후 개발 업데이트 내용
     // 상점 - 커스텀 BOX 구매 및 개봉
     // 인벤토리 - 커스텀 아이템 장착 및 탈착
@@ -24,6 +27,10 @@ public class LobbySceneCtrl : MonoBehaviour
         {
             gameStartTimeText.text = "Offline Game Mode..!"; // text 출력
         }
+
+
+        PlayerID.text = SingletonCtrl.Instance_S.PlayerID;
+        PlayerMoney.text = SingletonCtrl.Instance_S.PlayerMoney.ToString();
     }
 
     public void NextInGameScene()
@@ -32,7 +39,7 @@ public class LobbySceneCtrl : MonoBehaviour
         {
             SceneManager.LoadScene("ForestGameScene");
         }
-        else if (SingletonCtrl.Instance_S.NowModeNumber == 2)
+        else if (SingletonCtrl.Instance_S.NowMapNumber == 2)
         {
             SceneManager.LoadScene("DesertGameScene");
         }
@@ -82,14 +89,14 @@ public class LobbySceneCtrl : MonoBehaviour
     }
 
 
-    public void StandardModeCheck()
+    public void ForestMapCheck()
     {
         // 1번 Foreset Map.
         SingletonCtrl.Instance_S.NowModeNumber = 1;
         Debug.Log("Foreset Map을 선택 하였습니다.");
     }
 
-    public void ZombieModeCheck()
+    public void DesertMapCheck()
     {
         // 2번 Desert Map.
         SingletonCtrl.Instance_S.NowModeNumber = 2;

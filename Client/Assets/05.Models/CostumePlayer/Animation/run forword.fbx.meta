@@ -1,0 +1,221 @@
+fileFormatVersion: 2
+guid: 9b648708344ddfa4e9758d6b0faf9123
+timeCreated: 1528362317
+licenseType: Free
+ModelImporter:
+  serializedVersion: 22
+  fileIDToRecycleName:
+    100000: genSWAT_AttachHandLeft
+    100002: genSWAT_AttachHandRight
+    100004: genSWAT_Head
+    100006: genSWAT_Hips
+    100008: genSWAT_LeftArm
+    100010: genSWAT_LeftFoot
+    100012: genSWAT_LeftForeArm
+    100014: genSWAT_LeftHand
+    100016: genSWAT_LeftHandIndex1
+    100018: genSWAT_LeftHandIndex2
+    100020: genSWAT_LeftHandIndex3
+    100022: genSWAT_LeftHandMiddle1
+    100024: genSWAT_LeftHandMiddle2
+    100026: genSWAT_LeftHandMiddle3
+    100028: genSWAT_LeftHandThumb1
+    100030: genSWAT_LeftHandThumb2
+    100032: genSWAT_LeftHandThumb3
+    100034: genSWAT_LeftLeg
+    100036: genSWAT_LeftShoulder
+    100038: genSWAT_LeftToeBase
+    100040: genSWAT_LeftUpLeg
+    100042: genSWAT_LOD0
+    100044: genSWAT_LOD1
+    100046: genSWAT_LOD2
+    100048: genSWAT_Neck
+    100050: genSWAT_Reference
+    100052: genSWAT_RightArm
+    100054: genSWAT_RightFoot
+    100056: genSWAT_RightForeArm
+    100058: genSWAT_RightHand
+    100060: genSWAT_RightHandIndex1
+    100062: genSWAT_RightHandIndex2
+    100064: genSWAT_RightHandIndex3
+    100066: genSWAT_RightHandMiddle1
+    100068: genSWAT_RightHandMiddle2
+    100070: genSWAT_RightHandMiddle3
+    100072: genSWAT_RightHandThumb1
+    100074: genSWAT_RightHandThumb2
+    100076: genSWAT_RightHandThumb3
+    100078: genSWAT_RightLeg
+    100080: genSWAT_RightShoulder
+    100082: genSWAT_RightToeBase
+    100084: genSWAT_RightUpLeg
+    100086: genSWAT_Spine
+    100088: genSWAT_Spine1
+    100090: //RootNode
+    400000: genSWAT_AttachHandLeft
+    400002: genSWAT_AttachHandRight
+    400004: genSWAT_Head
+    400006: genSWAT_Hips
+    400008: genSWAT_LeftArm
+    400010: genSWAT_LeftFoot
+    400012: genSWAT_LeftForeArm
+    400014: genSWAT_LeftHand
+    400016: genSWAT_LeftHandIndex1
+    400018: genSWAT_LeftHandIndex2
+    400020: genSWAT_LeftHandIndex3
+    400022: genSWAT_LeftHandMiddle1
+    400024: genSWAT_LeftHandMiddle2
+    400026: genSWAT_LeftHandMiddle3
+    400028: genSWAT_LeftHandThumb1
+    400030: genSWAT_LeftHandThumb2
+    400032: genSWAT_LeftHandThumb3
+    400034: genSWAT_LeftLeg
+    400036: genSWAT_LeftShoulder
+    400038: genSWAT_LeftToeBase
+    400040: genSWAT_LeftUpLeg
+    400042: genSWAT_LOD0
+    400044: genSWAT_LOD1
+    400046: genSWAT_LOD2
+    400048: genSWAT_Neck
+    400050: genSWAT_Reference
+    400052: genSWAT_RightArm
+    400054: genSWAT_RightFoot
+    400056: genSWAT_RightForeArm
+    400058: genSWAT_RightHand
+    400060: genSWAT_RightHandIndex1
+    400062: genSWAT_RightHandIndex2
+    400064: genSWAT_RightHandIndex3
+    400066: genSWAT_RightHandMiddle1
+    400068: genSWAT_RightHandMiddle2
+    400070: genSWAT_RightHandMiddle3
+    400072: genSWAT_RightHandThumb1
+    400074: genSWAT_RightHandThumb2
+    400076: genSWAT_RightHandThumb3
+    400078: genSWAT_RightLeg
+    400080: genSWAT_RightShoulder
+    400082: genSWAT_RightToeBase
+    400084: genSWAT_RightUpLeg
+    400086: genSWAT_Spine
+    400088: genSWAT_Spine1
+    400090: //RootNode
+    2100000: genSWAT
+    4300000: genSWAT_LOD0
+    4300002: genSWAT_LOD1
+    4300004: genSWAT_LOD2
+    7400000: Take 001
+    7400002: run forword
+    9500000: //RootNode
+    13700000: genSWAT_LOD0
+    13700002: genSWAT_LOD1
+    13700004: genSWAT_LOD2
+    20500000: //RootNode
+  externalObjects: {}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: run forword
+      takeName: mixamo.com
+      firstFrame: 0
+      lastFrame: 19
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 1
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages:
+    - 0.25
+    - 0.125
+    - 0.01
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
