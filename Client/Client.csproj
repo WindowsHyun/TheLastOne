@@ -13,12 +13,14 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile></CompilerResponseFile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
     <UnityProjectGenerator>VSTU</UnityProjectGenerator>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
     <UnityVersion>2017.4.2f2</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <LangVersion>4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -290,6 +292,7 @@
     <Compile Include="Assets\07.Network\Zombie_info.cs" />
     <Compile Include="Assets\08.Class\Game_ClientClass.cs" />
     <Compile Include="Assets\08.Class\Game_ItemClass.cs" />
+    <Compile Include="Assets\08.Class\Game_ParsingClass.cs" />
     <Compile Include="Assets\08.Class\Game_ProtocolClass.cs" />
     <Compile Include="Assets\08.Class\Game_ZombieClass.cs" />
     <Compile Include="Assets\08.Class\SendFunction.cs" />

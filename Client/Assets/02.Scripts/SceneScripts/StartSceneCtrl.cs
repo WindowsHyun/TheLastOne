@@ -7,8 +7,9 @@ using UnityEngine.UI;
 public class StartSceneCtrl: MonoBehaviour {
 
     private bool idCehck = false;               // 아이디 입력 확인을 위함
-    //private bool pwdCehck = false;              // 패스워드 입력 확인을 위함
+    private bool pwdCehck = false;              // 패스워드 입력 확인을 위함
     private bool ipCehck = false;              // 패스워드 입력 확인을 위함
+    private string pwdtext = "";
 
     public Image buttonimage;
 
@@ -23,7 +24,16 @@ public class StartSceneCtrl: MonoBehaviour {
         }
     }
 
-    public void InputTextPWD(InputField ip)
+    public void InputTextPWD(InputField pw)
+    {
+        if (pw.text != "" && pw.text != " ")
+        {
+            pwdtext = pw.text;  // 비밀번호는 싱글톤에 저장하지 않는다.
+            pwdCehck = true;
+        }
+    }
+
+    public void InputTextIP(InputField ip)
     {
         if (ip.text != "" && ip.text != " ")
         {
@@ -37,11 +47,20 @@ public class StartSceneCtrl: MonoBehaviour {
 
     public void NextLobbyScene()
     {
-        if (idCehck == true /*&& pwdCehck == true*/)  // 모두 입력 하였는지 확인
+        if (idCehck == true && pwdCehck == true)  // 모두 입력 하였는지 확인
         {
-            // 소켓 연결을 위하여
-            SingletonCtrl.Instance_S.NowModeNumber = 0;
-            SceneManager.LoadScene("LobbyGameScene"); // 다음씬으로 넘어감
+            // 로그인 테스트 시작!
+            bool logincheck = SingletonCtrl.Instance_S.loginWebServer(SingletonCtrl.Instance_S.PlayerID, pwdtext);
+
+            if (logincheck == true) {
+                // 소켓 연결을 위하여
+                SingletonCtrl.Instance_S.NowModeNumber = 0;
+                SceneManager.LoadScene("LobbyGameScene"); // 다음씬으로 넘어감
+            }
+            else
+            {
+                Debug.Log("가입된 회원아이디가 아니거나 비밀번호가 틀립니다.");
+            }
         }
     }
 

@@ -30,7 +30,7 @@ public class LobbySceneCtrl : MonoBehaviour
 
 
         PlayerID.text = SingletonCtrl.Instance_S.PlayerID;
-        PlayerMoney.text = SingletonCtrl.Instance_S.PlayerMoney.ToString();
+        PlayerMoney.text = "  " + SingletonCtrl.Instance_S.PlayerMoney.ToString();
     }
 
     public void NextInGameScene()

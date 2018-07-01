@@ -9,6 +9,7 @@ using System.Net.Sockets;
 using System.Threading;
 
 using TheLastOne.Game.Network;
+using TheLastOne.ParsingClass;
 
 public class SingletonCtrl : MonoBehaviour
 {
@@ -37,6 +38,7 @@ public class SingletonCtrl : MonoBehaviour
     private const int kPort = 9000;
     private static ManualResetEvent connectDone = new ManualResetEvent(false);
     NetworkCtrl networkCtrl = new NetworkCtrl();
+    public Game_ParsingClass parsing;
     //-------------------------------------------------------------------------------------------
 
     private static SingletonCtrl instance_S = null; // 정적 변수
@@ -140,7 +142,6 @@ public class SingletonCtrl : MonoBehaviour
             wereCostumNumber = value;
         }
     }
-        
 
     public string PlayerID                  // 플레이어 아이디 접근 프로퍼티
     {
@@ -309,6 +310,26 @@ public class SingletonCtrl : MonoBehaviour
         }
     }
 
+    public bool loginWebServer(string id, string pw)
+    {
+        string tmp;
+        tmp = parsing.httpWebPost("http://editer.iptime.org/bbs/login_check.php", "", "url=&mb_id=" + id + "&mb_password=" + pw, false);
+        if (tmp.IndexOf("비밀번호가 틀립니다") == -1)
+        {
+            // 정상적으로 로그인 완료!
+            tmp = parsing.httpWebPost("http://editer.iptime.org/get_info.php", "", "", true);
+            playerID = parsing.splitParsing(tmp, "Nick : ", "\\|");
+            playerMoney = Int32.Parse(parsing.splitParsing(tmp, "Point : ", "\\|"));
+
+            return true;
+        }
+        else
+        {
+            // 아이디 비밀번호 틀림...
+            return false;
+        }
+    }
+
     IEnumerator connectSocket()
     {
         do
@@ -333,7 +354,7 @@ public class SingletonCtrl : MonoBehaviour
     private void Awake()
     {
         // 변수 초기화, 처음 모두 0개
-        for(int i = 0; i < 15; i++)
+        for (int i = 0; i < 15; i++)
         {
             playerCostumHold[i] = 0;
         }
@@ -349,10 +370,8 @@ public class SingletonCtrl : MonoBehaviour
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = 60;
         Application.runInBackground = true;
+        parsing = new Game_ParsingClass();
         StartCoroutine(connectSocket());
-
-
-
     }
 
 }
