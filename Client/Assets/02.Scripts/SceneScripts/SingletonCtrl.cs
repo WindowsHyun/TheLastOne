@@ -310,6 +310,21 @@ public class SingletonCtrl : MonoBehaviour
         }
     }
 
+    public bool webServer_Point(int point, string content, string parameter)
+    {
+        string tmp;
+        tmp = parsing.httpWebPost("http://editer.iptime.org/set_point.php", "TheLastOne/WindowsHyun0616", "point=" + point  + "&content=" + content + "&parameter=" + parameter, true);
+        if (tmp.IndexOf("Error") == -1)
+        {
+            return true;
+        }
+        else
+        {
+            Debug.Log("포인트 지급 에러");
+            return false;
+        }
+    }
+
     public bool loginWebServer(string id, string pw)
     {
         string tmp;
@@ -317,10 +332,10 @@ public class SingletonCtrl : MonoBehaviour
         if (tmp.IndexOf("비밀번호가 틀립니다") == -1)
         {
             // 정상적으로 로그인 완료!
+            webServer_Point(100, "접속 보상", "처음로그인");
             tmp = parsing.httpWebPost("http://editer.iptime.org/get_info.php", "", "", true);
             playerID = parsing.splitParsing(tmp, "Nick : ", "\\|");
             playerMoney = Int32.Parse(parsing.splitParsing(tmp, "Point : ", "\\|"));
-
             return true;
         }
         else
