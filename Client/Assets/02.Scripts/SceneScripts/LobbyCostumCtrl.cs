@@ -16,15 +16,15 @@ public class LobbyCostumCtrl : MonoBehaviour
 
 
     // v 표시 체크 아이콘을 위함
-    public GameObject[] checkIcon = new GameObject[15];
-    public int[] checkIconNumber = new int[15];
+    public GameObject[] checkIcon = new GameObject[18];
+    public int[] checkIconNumber = new int[18];
 
     // 자물쇠 체크 아이콘을 위함
-    public GameObject[] lockIcon = new GameObject[15];
-    public int[] lockIconNumber = new int[15];
+    public GameObject[] lockIcon = new GameObject[18];
+    public int[] lockIconNumber = new int[18];
 
 
-    public GameObject[] playerCostumeView = new GameObject[15];
+    public GameObject[] playerCostumeView = new GameObject[18];
 
     private void Awake()
     {
@@ -33,7 +33,7 @@ public class LobbyCostumCtrl : MonoBehaviour
 
 
         // 수 초기화
-        for (int i = 0; i < 15; ++i)
+        for (int i = 0; i < 18; ++i)
         {
             checkIconNumber[i] = 0;
             lockIconNumber[i] = 0;
@@ -71,7 +71,7 @@ public class LobbyCostumCtrl : MonoBehaviour
         // checkIconNumber이 0이면 비활성화
         // checkIconNumber이 1이면 활성화
 
-        for (int i = 0; i < 15; ++i)
+        for (int i = 0; i < 18; ++i)
         {
             if (i != number)
             {

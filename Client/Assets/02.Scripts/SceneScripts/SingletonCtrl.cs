@@ -27,7 +27,7 @@ public class SingletonCtrl : MonoBehaviour
 
 
     // 코스튬 보유수
-    private int[] playerCostumHold = new int[15];
+    private int[] playerCostumHold = new int[18];
     // 착용 코스튬 번호
     private int wereCostumNumber = 0;
 

@@ -47,7 +47,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
         None, M16, AK47, M4, UMP
     };
 
-    public GameObject[] playerCostume = new GameObject[15];
+    public GameObject[] playerCostume = new GameObject[18];
 
     //// 델리게이트 및 이벤트 선언
     //public delegate void PlayerDieHandler();
@@ -524,7 +524,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
     void Start()
     {
-        for(int i = 0; i < 15; ++i)
+        for(int i = 0; i < 18; ++i)
         {
             if(i != SingletonCtrl.Instance_S.WereCostumNumber)
             {
