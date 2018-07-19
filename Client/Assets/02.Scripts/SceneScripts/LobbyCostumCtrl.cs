@@ -39,8 +39,11 @@ public class LobbyCostumCtrl : MonoBehaviour
             lockIconNumber[i] = 0;
         }
 
-        checkIcon[0].SetActive(true);
-        checkIconNumber[0] = 1;
+        // Costum을 읽어왔으니 Awake시 바로 정착 및 활성화 시켜 준다.
+        checkIcon[SingletonCtrl.Instance_S.WereCostumNumber].SetActive(true);
+        checkIconNumber[SingletonCtrl.Instance_S.WereCostumNumber] = 1;
+        WereCostumeButton(SingletonCtrl.Instance_S.WereCostumNumber);
+
     }
 
     public void CostumButton()
@@ -66,10 +69,11 @@ public class LobbyCostumCtrl : MonoBehaviour
 
     public void WereCostumeButton(int number)
     {
-
-        SingletonCtrl.Instance_S.WereCostumNumber = number;
         // checkIconNumber이 0이면 비활성화
         // checkIconNumber이 1이면 활성화
+
+        // Costum 을 서버에 등록 하기 위하여.
+        SingletonCtrl.Instance_S.WereCostumNumber = number;
 
         for (int i = 0; i < 18; ++i)
         {

@@ -4,14 +4,46 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class StartSceneCtrl: MonoBehaviour {
+public class StartSceneCtrl : MonoBehaviour
+{
 
     private bool idCehck = false;               // 아이디 입력 확인을 위함
     private bool pwdCehck = false;              // 패스워드 입력 확인을 위함
     private bool ipCehck = false;              // 패스워드 입력 확인을 위함
     private string pwdtext = "";
 
+    public InputField input_id;
+    public InputField input_pw;
+    public InputField input_ip;
     public Image buttonimage;
+
+    private void Awake()
+    {
+        input_id.Select();
+    }
+
+    private void Update()
+    {
+        if (input_id.isFocused == true)
+        {
+            if (Input.GetKeyUp(KeyCode.Tab))
+            {
+                input_pw.Select();
+            }
+        }
+
+        if (input_pw.isFocused == true)
+        {
+            if (Input.GetKeyUp(KeyCode.Tab))
+            {
+                input_ip.Select();
+            }
+            if (Input.GetKeyUp(KeyCode.Return))
+            {
+                NextLobbyScene();
+            }
+        }
+    }
 
     public void InputTextID(InputField id)
     {
@@ -52,7 +84,8 @@ public class StartSceneCtrl: MonoBehaviour {
             // 로그인 테스트 시작!
             bool logincheck = SingletonCtrl.Instance_S.loginWebServer(SingletonCtrl.Instance_S.PlayerID, pwdtext);
 
-            if (logincheck == true) {
+            if (logincheck == true)
+            {
                 // 소켓 연결을 위하여
                 SingletonCtrl.Instance_S.NowModeNumber = 0;
                 SceneManager.LoadScene("LobbyGameScene"); // 다음씬으로 넘어감

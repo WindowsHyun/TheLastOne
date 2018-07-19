@@ -38,7 +38,7 @@ public class SingletonCtrl : MonoBehaviour
     private const int kPort = 9000;
     private static ManualResetEvent connectDone = new ManualResetEvent(false);
     NetworkCtrl networkCtrl = new NetworkCtrl();
-    public Game_ParsingClass parsing;
+    public static Game_ParsingClass parsing;
     //-------------------------------------------------------------------------------------------
 
     private static SingletonCtrl instance_S = null; // 정적 변수
@@ -140,6 +140,7 @@ public class SingletonCtrl : MonoBehaviour
         set
         {
             wereCostumNumber = value;
+            webServer_NowCostum(value);
         }
     }
 
@@ -325,6 +326,44 @@ public class SingletonCtrl : MonoBehaviour
         }
     }
 
+    public bool webServer_NowCostum(int costum_num)
+    {
+        // 현재 장착된 Costum을 서버에 보내준다.
+        string tmp;
+        tmp = parsing.httpWebPost("http://editer.iptime.org/set_costum.php", "TheLastOne/WindowsHyun0616", "costum=" + costum_num, true);
+        if (tmp.IndexOf("Error") == -1)
+        {
+            return true;
+        }
+        else
+        {
+            Debug.Log("Costum 설정 Error");
+            return false;
+        }
+    }
+
+    public bool webServer_getPlayerinfo()
+    {
+        string tmp = parsing.httpWebPost("http://editer.iptime.org/get_info.php", "", "", true);
+        playerID = parsing.splitParsing(tmp, "Nick : ", "\\|");
+        playerMoney = Int32.Parse(parsing.splitParsing(tmp, "Point : ", "\\|"));
+        if (parsing.splitParsing(tmp, "NowCostum : ", "\\|") == "")
+            wereCostumNumber = 0;
+        else
+            wereCostumNumber = Int32.Parse(parsing.splitParsing(tmp, "NowCostum : ", "\\|"));
+        string costumList = parsing.splitParsing(tmp, "CostumList : ", "\\|");
+        if (costumList == "") costumList = "0, ";
+        for (int i = 0; i < 18; i++)
+        {
+            if (costumList.IndexOf(i + ",") != -1)
+                // 해당 Costum이 있을 경우
+                playerCostumHold[i] = 1;
+            else
+                playerCostumHold[i] = 0;
+        }
+        return true;
+    }
+
     public bool loginWebServer(string id, string pw)
     {
         string tmp;
@@ -333,9 +372,9 @@ public class SingletonCtrl : MonoBehaviour
         {
             // 정상적으로 로그인 완료!
             webServer_Point(100, "접속 보상", "처음로그인");
-            tmp = parsing.httpWebPost("http://editer.iptime.org/get_info.php", "", "", true);
-            playerID = parsing.splitParsing(tmp, "Nick : ", "\\|");
-            playerMoney = Int32.Parse(parsing.splitParsing(tmp, "Point : ", "\\|"));
+            // 플레이어 정보 가져오기.
+            webServer_getPlayerinfo();
+
             return true;
         }
         else
@@ -369,10 +408,7 @@ public class SingletonCtrl : MonoBehaviour
     private void Awake()
     {
         // 변수 초기화, 처음 모두 0개
-        for (int i = 0; i < 15; i++)
-        {
-            playerCostumHold[i] = 0;
-        }
+        
 
 
         if (instance_S)                     // 인스턴스가 이미 생성 되었는가?
