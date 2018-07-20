@@ -55,6 +55,15 @@ public class LobbyCostumCtrl : MonoBehaviour
 
             storeUI.SetActive(false);
             storeCtrl.storeOnOff = false;
+
+            for(int i=0;i<18; ++i)
+            {
+                if (SingletonCtrl.Instance_S.PlayerCostume[i] == 0)
+                {
+                    lockIconNumber[i] = 1;
+                    lockIcon[i].SetActive(true);
+                } 
+            }
         }
         else if (costumUI == true)
         {
@@ -71,12 +80,17 @@ public class LobbyCostumCtrl : MonoBehaviour
     {
         // checkIconNumber이 0이면 비활성화
         // checkIconNumber이 1이면 활성화
+        if (lockIconNumber[number] == 1)
+        {
+            return;
+        }
 
         // Costum 을 서버에 등록 하기 위하여.
-        SingletonCtrl.Instance_S.WereCostumNumber = number;
+            SingletonCtrl.Instance_S.WereCostumNumber = number;
 
         for (int i = 0; i < 18; ++i)
         {
+           
             if (i != number)
             {
                 checkIconNumber[i] = 0;

@@ -40,4 +40,16 @@ public class LobbyStoreCtrl : MonoBehaviour {
         //SingletonCtrl.Instance_S.NowMapNumber = 2;
         //Debug.Log("현재 Zombie Mode를 선택하셨습니다 = " + SingletonCtrl.Instance_S.NowModeNumber);
     }
+
+    public void ReceiveButton()
+    {
+        if (SingletonCtrl.Instance_S.PlayerMoney >= 1000)
+        {
+            SingletonCtrl.Instance_S.PlayerMoney -= 1000;
+        }
+        else
+        {
+            return;
+        }
+    }
 }
