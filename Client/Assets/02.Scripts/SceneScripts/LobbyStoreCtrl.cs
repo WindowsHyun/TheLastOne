@@ -9,6 +9,8 @@ public class LobbyStoreCtrl : MonoBehaviour {
     public GameObject costumUI;
     public GameObject playButton;
     public GameObject mapButton;
+    public GameObject resultText;
+    public Text resultContent;
 
     public bool storeOnOff;
 
@@ -17,6 +19,7 @@ public class LobbyStoreCtrl : MonoBehaviour {
     private void Awake()
     {
         storeUI.SetActive(false);
+        resultText.SetActive(false);
         storeOnOff = false;
     }
 
@@ -43,13 +46,13 @@ public class LobbyStoreCtrl : MonoBehaviour {
 
     public void ReceiveButton()
     {
-        if (SingletonCtrl.Instance_S.PlayerMoney >= 1000)
-        {
-            SingletonCtrl.Instance_S.PlayerMoney -= 1000;
-        }
-        else
-        {
-            return;
-        }
+        SingletonCtrl.Instance_S.webServer_RecvCostum();
+        resultContent.text = SingletonCtrl.Instance_S.ResultContent;
+        resultText.SetActive(true);
+    }
+
+    public void OkayButton()
+    {
+        resultText.SetActive(false);
     }
 }

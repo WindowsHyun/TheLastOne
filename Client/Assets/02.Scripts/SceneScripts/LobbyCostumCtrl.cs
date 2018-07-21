@@ -48,6 +48,7 @@ public class LobbyCostumCtrl : MonoBehaviour
 
     public void CostumButton()
     {
+        
         if (costumOnOff == false)
         {
             costumUI.SetActive(true);
@@ -55,14 +56,21 @@ public class LobbyCostumCtrl : MonoBehaviour
 
             storeUI.SetActive(false);
             storeCtrl.storeOnOff = false;
-
-            for(int i=0;i<18; ++i)
+            
+            for (int i=0;i<18; ++i)
             {
                 if (SingletonCtrl.Instance_S.PlayerCostume[i] == 0)
+                    // 코스튬 없을 경우 잠금, 있을 경우 해제
                 {
                     lockIconNumber[i] = 1;
                     lockIcon[i].SetActive(true);
-                } 
+                }
+                else
+                {
+                    lockIconNumber[i] = 0;
+                    lockIcon[i].SetActive(false);
+                }
+
             }
         }
         else if (costumUI == true)

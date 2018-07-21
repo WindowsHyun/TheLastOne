@@ -24,7 +24,7 @@ public class SingletonCtrl : MonoBehaviour
     private bool startCarRun = false;  // 수송차량 출발 대기
     private bool corutinSocket = true;     // 커넥트 하기전 까지 대기
     private int nowMapNumber = 2;       // 기본은 사막맵
-
+    private string resultContent = "";       // 결과 메시지
 
     // 코스튬 보유수
     private int[] playerCostumHold = new int[18];
@@ -204,6 +204,14 @@ public class SingletonCtrl : MonoBehaviour
         }
     }
 
+    public string ResultContent                 // 결과 메시지
+    {
+        get
+        {
+            return resultContent;
+        }
+    }
+
     public Socket PlayerSocket
     {
         get
@@ -326,6 +334,26 @@ public class SingletonCtrl : MonoBehaviour
         }
     }
 
+    public bool webServer_RecvCostum()
+    {
+        string tmp;
+        tmp = parsing.httpWebPost("http://editer.iptime.org/recv_costum.php", "TheLastOne/WindowsHyun0616", "", true);
+        if (tmp.IndexOf("Error") == -1)
+        {
+            string Content = parsing.splitParsing(tmp, "Success : ", "\\|");
+            resultContent = Content;
+            webServer_getPlayerinfo();
+            return true;
+        }
+        else
+        {
+            string Content = parsing.splitParsing(tmp, "Error : ", "\\|");
+            resultContent = Content;
+            webServer_getPlayerinfo();
+            return false;
+        }
+    }
+
     public bool webServer_NowCostum(int costum_num)
     {
         // 현재 장착된 Costum을 서버에 보내준다.
@@ -345,6 +373,7 @@ public class SingletonCtrl : MonoBehaviour
     public bool webServer_getPlayerinfo()
     {
         string tmp = parsing.httpWebPost("http://editer.iptime.org/get_info.php", "", "", true);
+        Debug.Log(tmp);
         playerID = parsing.splitParsing(tmp, "Nick : ", "\\|");
         playerMoney = Int32.Parse(parsing.splitParsing(tmp, "Point : ", "\\|"));
         if (parsing.splitParsing(tmp, "NowCostum : ", "\\|") == "")
@@ -355,9 +384,10 @@ public class SingletonCtrl : MonoBehaviour
         if (costumList == "") costumList = "0, ";
         for (int i = 0; i < 18; i++)
         {
-            if (costumList.IndexOf(i + ",") != -1)
+            if (costumList.IndexOf("^"+ i + ",") != -1) { 
                 // 해당 Costum이 있을 경우
                 playerCostumHold[i] = 1;
+            }
             else
                 playerCostumHold[i] = 0;
         }
@@ -408,9 +438,6 @@ public class SingletonCtrl : MonoBehaviour
     private void Awake()
     {
         // 변수 초기화, 처음 모두 0개
-        
-
-
         if (instance_S)                     // 인스턴스가 이미 생성 되었는가?
         {
             DestroyImmediate(gameObject);   // 또 만들 필요가 없다 -> 삭제

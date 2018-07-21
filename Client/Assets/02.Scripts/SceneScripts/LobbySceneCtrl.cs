@@ -27,8 +27,10 @@ public class LobbySceneCtrl : MonoBehaviour
         {
             gameStartTimeText.text = "Offline Game Mode..!"; // text 출력
         }
+    }
 
-
+    private void FixedUpdate()
+    {
         PlayerID.text = SingletonCtrl.Instance_S.PlayerID;
         PlayerMoney.text = "  " + SingletonCtrl.Instance_S.PlayerMoney.ToString();
     }
