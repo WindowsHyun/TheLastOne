@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LobbyCostumCtrl : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class LobbyCostumCtrl : MonoBehaviour
     public GameObject storeUI;
     public GameObject playButton;
     public GameObject mapButton;
+    public Scrollbar UI_Scrollbar;
 
     public bool costumOnOff;
 
@@ -44,6 +46,18 @@ public class LobbyCostumCtrl : MonoBehaviour
         checkIconNumber[SingletonCtrl.Instance_S.WereCostumNumber] = 1;
         WereCostumeButton(SingletonCtrl.Instance_S.WereCostumNumber);
 
+    }
+
+    private void Update()
+    {
+        if (Input.GetAxis("Mouse ScrollWheel") < 0)
+        {
+            UI_Scrollbar.value -= 0.2f;
+        }
+        if (Input.GetAxis("Mouse ScrollWheel") > 0)
+        {
+            UI_Scrollbar.value += 0.2f;
+        }
     }
 
     public void CostumButton()

@@ -16,10 +16,13 @@ public class StartSceneCtrl : MonoBehaviour
     public InputField input_pw;
     public InputField input_ip;
     public Image buttonimage;
+    public GameObject UI_Message;
+    public Text UI_Text;
 
     private void Awake()
     {
         input_id.Select();
+        UI_Message.SetActive(false);
     }
 
     private void Update()
@@ -76,6 +79,11 @@ public class StartSceneCtrl : MonoBehaviour
         }
     }
 
+    public void UI_MessageOkay()
+    {
+        UI_Message.SetActive(false);
+    }
+
 
     public void NextLobbyScene()
     {
@@ -92,8 +100,15 @@ public class StartSceneCtrl : MonoBehaviour
             }
             else
             {
-                Debug.Log("가입된 회원아이디가 아니거나 비밀번호가 틀립니다.");
+                // 로그인 오류 메시지를 표시 해준다.
+                UI_Text.text = SingletonCtrl.Instance_S.ResultContent;
+                UI_Message.SetActive(true);
             }
+        }
+        else
+        {
+            UI_Text.text = "Please enter your ID or Password.";
+            UI_Message.SetActive(true);
         }
     }
 

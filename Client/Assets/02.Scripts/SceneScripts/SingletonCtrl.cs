@@ -337,17 +337,18 @@ public class SingletonCtrl : MonoBehaviour
     public bool webServer_RecvCostum()
     {
         string tmp;
+        string Content;
         tmp = parsing.httpWebPost("http://editer.iptime.org/recv_costum.php", "TheLastOne/WindowsHyun0616", "", true);
         if (tmp.IndexOf("Error") == -1)
         {
-            string Content = parsing.splitParsing(tmp, "Success : ", "\\|");
+            Content = parsing.splitParsing(tmp, "Success : ", "\\|");
             resultContent = Content;
             webServer_getPlayerinfo();
             return true;
         }
         else
         {
-            string Content = parsing.splitParsing(tmp, "Error : ", "\\|");
+            Content = parsing.splitParsing(tmp, "Error : ", "\\|");
             resultContent = Content;
             webServer_getPlayerinfo();
             return false;
@@ -373,7 +374,7 @@ public class SingletonCtrl : MonoBehaviour
     public bool webServer_getPlayerinfo()
     {
         string tmp = parsing.httpWebPost("http://editer.iptime.org/get_info.php", "", "", true);
-        Debug.Log(tmp);
+
         playerID = parsing.splitParsing(tmp, "Nick : ", "\\|");
         playerMoney = Int32.Parse(parsing.splitParsing(tmp, "Point : ", "\\|"));
         if (parsing.splitParsing(tmp, "NowCostum : ", "\\|") == "")
@@ -410,6 +411,7 @@ public class SingletonCtrl : MonoBehaviour
         else
         {
             // 아이디 비밀번호 틀림...
+            resultContent = "It is not a registered member ID or password.";
             return false;
         }
     }
