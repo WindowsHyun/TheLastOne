@@ -124,10 +124,11 @@ void IOCP_Server::Worker_Thread()
 
 			unsigned psize = client->second.get_curr_packet();
 			unsigned pr_size = client->second.get_prev_packet();
+			int packet_i = 0;
 			char packet_data[8]{ 0 };
 			while (io_size != 0) {
 				if (0 == psize) {
-					for (int packet_i = 0; packet_i < 8; ++packet_i) {
+					for ( packet_i = 0; packet_i < 8; ++packet_i) {
 						if (buf[packet_i] != 124)
 							packet_data[packet_i] = buf[packet_i];
 						else
@@ -142,8 +143,9 @@ void IOCP_Server::Worker_Thread()
 					memcpy(packet, client->second.packet_buf, pr_size);
 					memcpy(packet + pr_size, buf, psize - pr_size);
 
-					if (psize > 19)
-						ProcessPacket(over->room_id, static_cast<int>(ci), packet);
+					if (psize > 19) {
+						ProcessPacket(over->room_id, static_cast<int>(ci), psize, packet_i, packet);
+					}
 					io_size -= psize - pr_size;
 					buf += psize - pr_size;
 					psize = 0; pr_size = 0;
@@ -376,20 +378,20 @@ void IOCP_Server::DisconnectClient(const int room_id, const int ci)
 	GameRoom[room_id].get_room().get_client().find(ci)->second.set_client_Remove(true);
 }
 
-void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *packet)
+void IOCP_Server::ProcessPacket(const int room_id, const int ci, const int packet_size, const int packet_i, const char *packet)
 {
 	int errnum = 0;
 
 	// 패킷 사이즈를 찾아주자.
-	char packet_data[8]{ 0 };
-	int packet_i = 0;
-	for (packet_i = 0; packet_i < 8; ++packet_i) {
-		if (packet[packet_i] != 124)
-			packet_data[packet_i] = packet[packet_i];
-		else
-			break;
-	}
-	int packet_size = atoi(packet_data) + 8;
+	//char packet_data[8]{ 0 };
+	//int packet_i = 0;
+	//for (packet_i = 0; packet_i < 8; ++packet_i) {
+	//	if (packet[packet_i] != 124)
+	//		packet_data[packet_i] = packet[packet_i];
+	//	else
+	//		break;
+	//}
+	//int packet_size = atoi(packet_data) + 8;
 
 
 	//char get_packet[MAX_PACKET_SIZE];
@@ -417,6 +419,7 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *pac
 		client->second.set_horizontal(client_View->Horizontal());
 		client->second.set_vertical(client_View->Vertical());
 		client->second.set_inCar(client_View->inCar());
+		client->second.nickName = client_View->name()->str();
 		client->second.set_client_DangerLine(client_View->dangerLineIn());
 		client->second.set_CostumNum(client_View->costumNum());
 		//std::cout << "Costum Num : " << client->second.get_CostumNum() << std::endl;
@@ -474,6 +477,10 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *pac
 		for (unsigned int i = 0; i < packet_zombie->size(); ++i) {
 			auto iter = GameRoom[room_id].get_room().get_zombie_iter(packet_zombie->Get(i)->id());
 			iter->second.set_animator(packet_zombie->Get(i)->animator());
+			if (packet_zombie->Get(i)->position()->x() <= 0.0f || packet_zombie->Get(i)->position()->y() <= 0.0f || packet_zombie->Get(i)->position()->z() <= 0.0f) {
+				// 좀비 위치가 정상적이지 않을경우 동기화 하지 않는다.
+				continue;
+			}
 			xyz packet_position{ packet_zombie->Get(i)->position()->x() , packet_zombie->Get(i)->position()->y() , packet_zombie->Get(i)->position()->z() };
 			iter->second.set_zombie_position(packet_position);
 			xyz packet_rotation{ packet_zombie->Get(i)->rotation()->x() , packet_zombie->Get(i)->rotation()->y() , packet_zombie->Get(i)->rotation()->z() };
@@ -502,6 +509,7 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *pac
 			iter->second.set_armour(client_Check_info->armour());
 			if (iter->second.get_hp() <= 0) {
 				// 체력이 0일경우 죽을을 허용한다.
+				Send_KillLog(room_id, client_Check_info->shotNick()->str(), iter->second.nickName);
 				iter->second.set_clientDie(true);
 			}
 		}
@@ -549,7 +557,6 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const char *pac
 		// 인게임에 들어가기 전까지는 패킷 전송을 하지 않는다.
 		Send_All_Player(room_id, ci);
 		Send_Hide_Player(room_id, ci);
-
 		if (GameRoom[room_id].get_room().get_dangerLine().get_level() <= 4) {
 			Send_All_Zombie(room_id, ci);
 			Send_Hide_Zombie(room_id, ci);
@@ -818,6 +825,8 @@ void IOCP_Server::Send_Hide_Zombie(const int room_id, const int client)
 	auto client_iter = GameRoom[room_id].get_room().get_client_iter(client);
 
 	for (auto iter : GameRoom[room_id].get_room().get_zombie()) {
+
+		//std::cout << Distance(room_id, client_iter->second.get_client_id(), iter.second.get_client_id(), Zombie_Dist, Kind_Zombie) << " ";
 		if (Distance(room_id, client_iter->second.get_client_id(), iter.second.get_client_id(), Zombie_Dist, Kind_Zombie) == true)
 			continue;		// 범위내에 있을경우 넘긴다.
 
@@ -942,7 +951,7 @@ void IOCP_Server::Send_SurvivalCount(const int room_id, const int client)
 	}
 	//count++;
 	flatbuffers::FlatBufferBuilder builder;
-	auto Client_id = count+1;	// 임시로 올려놓자.
+	auto Client_id = count + 1;	// 임시로 올려놓자.
 	auto orc = CreateClient_Packet(builder, Client_id);
 	builder.Finish(orc); // Serialize the root of the object.
 
@@ -981,6 +990,21 @@ void IOCP_Server::create_GameRoom(const int mapType)
 			t = { createroom_id, 1, high_resolution_clock::now() + 1s, E_LobbyWait };
 			Timer.setTimerEvent(t);
 		}
+	}
+}
+
+void IOCP_Server::Send_KillLog(const int room_id, const std::string killNick, const std::string dieNick)
+{
+	flatbuffers::FlatBufferBuilder builder;
+	auto leftNick = builder.CreateString(killNick);
+	auto rightNick = builder.CreateString(dieNick);
+	auto orc = CreateKillLog_info(builder, leftNick, rightNick);
+	builder.Finish(orc); // Serialize the root of the object.
+
+	for (auto iter : GameRoom[room_id].get_room().get_client()) {
+		if (iter.second.get_Connect() != true)
+			continue;
+		SendPacket(SC_KillLog, room_id, iter.second.get_client_id(), builder.GetBufferPointer(), builder.GetSize());
 	}
 }
 

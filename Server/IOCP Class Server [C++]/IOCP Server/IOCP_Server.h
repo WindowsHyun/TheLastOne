@@ -47,7 +47,7 @@ private:
 	void Remove_Client(const int room_id);								// 클라이언트가 종료시 데이터 지우기
 	void Shutdown_Server();							// 서버 종료
 	void DisconnectClient(const int room_id, const int ci);					// 클라이언트 종료
-	void ProcessPacket(const int room_id, const int ci, const char *packet);		// 패킷 처리
+	void ProcessPacket(const int room_id, const int ci, const int packet_size, const int packet_i, const char *packet);		// 패킷 처리
 	void SendPacket(const int type, const int room_id, const int ci, const void *packet, const int psize);		// 패킷 보내기
 	void Send_Client_ID(const int room_id, const int client_id, const int value, const bool allClient);	// 클라이언트 에게 패킷 아이디 보내기
 	void Send_All_Player(const int room_id, const int client);					// 클라이언트에게 모든 클라이언트 위치 보내기
@@ -65,6 +65,7 @@ private:
 	void Send_SurvivalCount(const int room_id, const int client);		// 클라이언트 남은 인원을 보내준다.
 	bool findRoomCi(const int room_id, const int ci);		// 해당 방에 실제로 클라이언트가 접속 되어있는지 확인을 한다.
 	void create_GameRoom(const int mapType);		// RoomManager 크기를 확인 후, 자동으로 방 번호를 배정하여 만든다.
+	void Send_KillLog(const int room_id, const std::string killNick, const std::string dieNick);		// 클라이언트들에게 KillLog를 보내준다.
 
 public:
 	HANDLE getHandle() { return g_hiocp; }

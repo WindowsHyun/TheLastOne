@@ -86,4 +86,10 @@ table Game_HP_Set {
   hp:int;
   armour:int;
   kind:int;
+  shotNick:string;
+}
+
+table KillLog_info {
+  LeftNick:string;
+  RightNick:string;
 }

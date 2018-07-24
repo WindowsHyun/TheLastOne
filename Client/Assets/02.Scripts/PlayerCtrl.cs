@@ -308,7 +308,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
                 //차량이 탑승 중에 차가 터진 경우
                 this.transform.position = new Vector3(ridingCar.transform.position.x - 1, ridingCar.transform.position.y, ridingCar.transform.position.z);
                 PlayerDie();
-                networkCtrl.Player_HP(-1, hp, armour);  // 차량이 터지면서 hp는 0으로 만든다.
+                networkCtrl.Player_HP(-1, hp, armour, "Car");  // 차량이 터지면서 hp는 0으로 만든다.
             }
 
             if (Input.GetKeyDown(KeyCode.G))
@@ -748,12 +748,15 @@ public class PlayerCtrl : PlayerVehicleCtrl
         // 충돌한 게임오브젝트의 태그값 비교
         if (coll.gameObject.tag == "BULLET")
         {
+
+            string shot_nickname = coll.gameObject.GetComponent<BulletCtrl>().playerNickName;
+
             CreateBloodEffect(coll.transform.position);
             if (armour <= 0)
             {
                 // 맞은 총알의 Damage를 추출해 Player HP 차감
                 hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
-                networkCtrl.Player_HP(-1, hp, armour);
+                networkCtrl.Player_HP(-1, hp, armour, shot_nickname);
                 // Image UI 항목의 fillAmount 속성을 조절해 생명 게이지 값 조절
                 imgHpBar.fillAmount = (float)hp / (float)initHp;
             }
@@ -761,7 +764,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
             {
                 // 방어력 차감
                 armour -= coll.gameObject.GetComponent<BulletCtrl>().damage;
-                networkCtrl.Player_HP(-1, hp, armour);
+                networkCtrl.Player_HP(-1, hp, armour, shot_nickname);
                 // Image UI 항목의 fillAmount 속성을 조절해 방어력 게이지 값 조절
                 imgArmourBar.fillAmount = (float)armour / (float)initArmour;
 
@@ -802,7 +805,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
             {
                 // 체력 차감
                 hp -= 50;
-                networkCtrl.Player_HP(-1, hp, armour);
+                networkCtrl.Player_HP(-1, hp, armour, "Zombie");
                 //Image UI 항목의 fillAmount 속성을 조절해 생명 게이지 값 조절
                 imgHpBar.fillAmount = (float)hp / (float)initHp;
             }
@@ -810,7 +813,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
             {
                 // 방어력 차감
                 armour -= 50;
-                networkCtrl.Player_HP(-1, hp, armour);
+                networkCtrl.Player_HP(-1, hp, armour, "Zombie");
                 // Image UI 항목의 fillAmount 속성을 조절해 방어력 게이지 값 조절
                 imgArmourBar.fillAmount = (float)armour / (float)initArmour;
 
@@ -948,7 +951,7 @@ public class PlayerCtrl : PlayerVehicleCtrl
 
     public void send_PlayerHP(int hp, int armour)
     {
-        networkCtrl.Player_HP(-1, hp, armour);
+        networkCtrl.Player_HP(-1, hp, armour, "");
     }
 
     // 총알 재장전 함수

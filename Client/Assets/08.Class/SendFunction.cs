@@ -17,15 +17,17 @@ namespace TheLastOne.SendFunction
     {
 
 
-        public Byte[] makeClient_PacketInfo(Vector3 Player, int Player_Animator, float horizontal, float vertical, Vector3 PlayerRotation, int Player_Weapone, int inCar, bool dangerLineIn, Vector3 CarRotation, float CarKmh)
+        public Byte[] makeClient_PacketInfo(Vector3 Player, int Player_Animator, float horizontal, float vertical, Vector3 PlayerRotation, int Player_Weapone, int inCar, bool dangerLineIn, Vector3 CarRotation, float CarKmh, string nickName)
         {
             FlatBufferBuilder fbb = new FlatBufferBuilder(1);
             fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
+            var fbbNickName = fbb.CreateString(nickName); // String 문자열이 있을경우 미리 생성해라.
             Client_info.StartClient_info(fbb);
             Client_info.AddAnimator(fbb, Player_Animator);
             Client_info.AddHorizontal(fbb, horizontal);
             Client_info.AddVertical(fbb, vertical);
             Client_info.AddInCar(fbb, inCar);
+            Client_info.AddName(fbb, fbbNickName);
             Client_info.AddCarrotation(fbb, Vec3.CreateVec3(fbb, CarRotation.x, CarRotation.y, CarRotation.z));
             Client_info.AddCarkmh(fbb, CarKmh);
             Client_info.AddPosition(fbb, Vec3.CreateVec3(fbb, Player.x, Player.y, Player.z));
@@ -36,7 +38,7 @@ namespace TheLastOne.SendFunction
             Client_info.AddCostumNum(fbb, SingletonCtrl.Instance_S.WereCostumNumber);
             var endOffset = Client_info.EndClient_info(fbb);
             fbb.Finish(endOffset.Value);
-
+            
             byte[] packet = fbb.SizedByteArray();   // flatbuffers 실제 패킷 데이터
             byte[] magic_packet = makePacketinfo(packet.Length, CS_Info);
             byte[] real_packet = new byte[packet.Length + 8];
@@ -163,15 +165,17 @@ namespace TheLastOne.SendFunction
             return real_packet;
         }
 
-        public Byte[] makeHP_PacketInfo(int id, int hp, int armour, int kind)
+        public Byte[] makeHP_PacketInfo(int id, int hp, int armour, int kind, string nickName)
         {
             FlatBufferBuilder fbb = new FlatBufferBuilder(1);
             fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
+            var fbbNickName = fbb.CreateString(nickName); // String 문자열이 있을경우 미리 생성해라.
             Game_HP_Set.StartGame_HP_Set(fbb);
             Game_HP_Set.AddId(fbb, id);
             Game_HP_Set.AddHp(fbb, hp);
             Game_HP_Set.AddArmour(fbb, armour);
             Game_HP_Set.AddKind(fbb, kind);
+            Game_HP_Set.AddShotNick(fbb, fbbNickName);
             var endOffset = Game_HP_Set.EndGame_HP_Set(fbb);
             fbb.Finish(endOffset.Value);
 

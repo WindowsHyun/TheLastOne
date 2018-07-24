@@ -42,6 +42,7 @@ enum Event_Type {
 #define SC_Lobby_Time 11				// 클라이언트 에게 로비 대기시간을 보내준다.
 #define SC_StartCar_Play 12			// 클라이언트 에게 시작 차량을 움직이라고 보내준다.
 #define SC_Survival_Count 13			// 클라이언트 에게 총 인원을 보내준다.
+#define SC_KillLog 14						// 클라이언트 에게 KillLog를 보내준다.
 
 
 // 클라이언트가 서버에게 보내는 패킷
@@ -56,7 +57,7 @@ enum Event_Type {
 #define CS_Player_Status 9					// 클라이언트가 서버에게 자신의 상태를 전달한다.
 
 // 자기장 시간
-#define DangerLine_init 60
+#define DangerLine_init 5
 #define DangerLine_Level4 60
 #define DangerLine_Level3 60
 #define DangerLine_Level2 60

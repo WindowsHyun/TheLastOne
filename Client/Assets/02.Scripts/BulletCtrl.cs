@@ -17,6 +17,8 @@ public class BulletCtrl : MonoBehaviour {
     // 총알이 활성화된 뒤 경과시간을 계산하기 위한 변수
     public float _elapsedTime = 0.0f;
 
+    public string playerNickName = "";
+
     void Start()
     {
         GetComponent<Rigidbody>().AddForce(transform.forward * speed);

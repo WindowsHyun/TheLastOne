@@ -33,6 +33,8 @@ namespace Game {
 
 		struct Game_HP_Set;
 
+		struct KillLog_info;
+
 		MANUALLY_ALIGNED_STRUCT(4) Vec3 FLATBUFFERS_FINAL_CLASS {
 		private:
 			float x_;
@@ -891,7 +893,8 @@ namespace Game {
 				VT_ID = 4,
 				VT_HP = 6,
 				VT_ARMOUR = 8,
-				VT_KIND = 10
+				VT_KIND = 10,
+				VT_SHOTNICK = 12
 			};
 			int32_t id() const {
 				return GetField<int32_t>(VT_ID, 0);
@@ -905,12 +908,17 @@ namespace Game {
 			int32_t kind() const {
 				return GetField<int32_t>(VT_KIND, 0);
 			}
+			const flatbuffers::String *shotNick() const {
+				return GetPointer<const flatbuffers::String *>(VT_SHOTNICK);
+			}
 			bool Verify(flatbuffers::Verifier &verifier) const {
 				return VerifyTableStart(verifier) &&
 					VerifyField<int32_t>(verifier, VT_ID) &&
 					VerifyField<int32_t>(verifier, VT_HP) &&
 					VerifyField<int32_t>(verifier, VT_ARMOUR) &&
 					VerifyField<int32_t>(verifier, VT_KIND) &&
+					VerifyOffset(verifier, VT_SHOTNICK) &&
+					verifier.Verify(shotNick()) &&
 					verifier.EndTable();
 			}
 		};
@@ -930,6 +938,9 @@ namespace Game {
 			void add_kind(int32_t kind) {
 				fbb_.AddElement<int32_t>(Game_HP_Set::VT_KIND, kind, 0);
 			}
+			void add_shotNick(flatbuffers::Offset<flatbuffers::String> shotNick) {
+				fbb_.AddOffset(Game_HP_Set::VT_SHOTNICK, shotNick);
+			}
 			explicit Game_HP_SetBuilder(flatbuffers::FlatBufferBuilder &_fbb)
 				: fbb_(_fbb) {
 				start_ = fbb_.StartTable();
@@ -947,13 +958,93 @@ namespace Game {
 			int32_t id = 0,
 			int32_t hp = 0,
 			int32_t armour = 0,
-			int32_t kind = 0) {
+			int32_t kind = 0,
+			flatbuffers::Offset<flatbuffers::String> shotNick = 0) {
 			Game_HP_SetBuilder builder_(_fbb);
+			builder_.add_shotNick(shotNick);
 			builder_.add_kind(kind);
 			builder_.add_armour(armour);
 			builder_.add_hp(hp);
 			builder_.add_id(id);
 			return builder_.Finish();
+		}
+
+		inline flatbuffers::Offset<Game_HP_Set> CreateGame_HP_SetDirect(
+			flatbuffers::FlatBufferBuilder &_fbb,
+			int32_t id = 0,
+			int32_t hp = 0,
+			int32_t armour = 0,
+			int32_t kind = 0,
+			const char *shotNick = nullptr) {
+			return Game::TheLastOne::CreateGame_HP_Set(
+				_fbb,
+				id,
+				hp,
+				armour,
+				kind,
+				shotNick ? _fbb.CreateString(shotNick) : 0);
+		}
+
+		struct KillLog_info FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+			enum {
+				VT_LEFTNICK = 4,
+				VT_RIGHTNICK = 6
+			};
+			const flatbuffers::String *LeftNick() const {
+				return GetPointer<const flatbuffers::String *>(VT_LEFTNICK);
+			}
+			const flatbuffers::String *RightNick() const {
+				return GetPointer<const flatbuffers::String *>(VT_RIGHTNICK);
+			}
+			bool Verify(flatbuffers::Verifier &verifier) const {
+				return VerifyTableStart(verifier) &&
+					VerifyOffset(verifier, VT_LEFTNICK) &&
+					verifier.Verify(LeftNick()) &&
+					VerifyOffset(verifier, VT_RIGHTNICK) &&
+					verifier.Verify(RightNick()) &&
+					verifier.EndTable();
+			}
+		};
+
+		struct KillLog_infoBuilder {
+			flatbuffers::FlatBufferBuilder &fbb_;
+			flatbuffers::uoffset_t start_;
+			void add_LeftNick(flatbuffers::Offset<flatbuffers::String> LeftNick) {
+				fbb_.AddOffset(KillLog_info::VT_LEFTNICK, LeftNick);
+			}
+			void add_RightNick(flatbuffers::Offset<flatbuffers::String> RightNick) {
+				fbb_.AddOffset(KillLog_info::VT_RIGHTNICK, RightNick);
+			}
+			explicit KillLog_infoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+				: fbb_(_fbb) {
+				start_ = fbb_.StartTable();
+			}
+			KillLog_infoBuilder &operator=(const KillLog_infoBuilder &);
+			flatbuffers::Offset<KillLog_info> Finish() {
+				const auto end = fbb_.EndTable(start_);
+				auto o = flatbuffers::Offset<KillLog_info>(end);
+				return o;
+			}
+		};
+
+		inline flatbuffers::Offset<KillLog_info> CreateKillLog_info(
+			flatbuffers::FlatBufferBuilder &_fbb,
+			flatbuffers::Offset<flatbuffers::String> LeftNick = 0,
+			flatbuffers::Offset<flatbuffers::String> RightNick = 0) {
+			KillLog_infoBuilder builder_(_fbb);
+			builder_.add_RightNick(RightNick);
+			builder_.add_LeftNick(LeftNick);
+			return builder_.Finish();
+		}
+
+		inline flatbuffers::Offset<KillLog_info> CreateKillLog_infoDirect(
+			flatbuffers::FlatBufferBuilder &_fbb,
+			const char *LeftNick = nullptr,
+			const char *RightNick = nullptr) {
+			return Game::TheLastOne::CreateKillLog_info(
+				_fbb,
+				LeftNick ? _fbb.CreateString(LeftNick) : 0,
+				RightNick ? _fbb.CreateString(RightNick) : 0);
 		}
 
 		/* 왜인지 모르겠지만 Get이 없어서 샘플에서 가져왔다..! */

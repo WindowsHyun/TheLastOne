@@ -21,6 +21,7 @@ namespace TheLastOne.GameClass
         public int SC_Lobby_Time;               // 클라이언트 에게 로비 대기시간을 보내준다.
         public int SC_StartCar_Play;            // 클라이언트 에게 시작 차량을 움직이라고 보내준다.
         public int SC_Survival_Count;			// 클라이언트 에게 총 인원을 보내준다.
+        public int SC_KillLog;                      // 클라이언트 에게 KillLog를 보내준다.
 
         public int CS_Info;              // 클라이언트가 서버에게 자신의 위치정보를 보내준다.
         public int CS_Shot_info;       // 클라이언트가 서버에게 Shot 정보를 보내준다.
@@ -61,6 +62,7 @@ namespace TheLastOne.GameClass
             SC_Lobby_Time = 11;
             SC_StartCar_Play = 12;
             SC_Survival_Count = 13;
+            SC_KillLog = 14;
             //----------------------------------
             // 클라이언트에서 서버로
             CS_Info = 1;

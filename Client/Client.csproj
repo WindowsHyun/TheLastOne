@@ -283,6 +283,7 @@
     <Compile Include="Assets\07.Network\Game_Timer.cs" />
     <Compile Include="Assets\07.Network\GameDangerLine.cs" />
     <Compile Include="Assets\07.Network\Gameitem.cs" />
+    <Compile Include="Assets\07.Network\KillLog_info.cs" />
     <Compile Include="Assets\07.Network\navmesh_export.cs" />
     <Compile Include="Assets\07.Network\NetworkCtrl.cs" />
     <Compile Include="Assets\07.Network\Vec3.cs" />

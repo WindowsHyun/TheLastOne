@@ -32,6 +32,7 @@ public class OtherPlayerCtrl : MonoBehaviour
     // 캐릭터 체력
     public int hp = 100;
     public int armour = 0;
+    private string nickName = "";
 
     public int otherPlayer_id = -1;
 
@@ -91,7 +92,7 @@ public class OtherPlayerCtrl : MonoBehaviour
     public CapsuleCollider collider_script;
 
     // OtherPlayer 코스튬 종류
-    public GameObject[] otherPlayerCostume = new GameObject[15];
+    public GameObject[] otherPlayerCostume = new GameObject[18];
     public bool CostumeChange = false;
     public int CostumeNumber = 0;
 
@@ -142,12 +143,13 @@ public class OtherPlayerCtrl : MonoBehaviour
         weapon_state = value;
     }
 
-    public void Fire(Vector3 player)
+    public void Fire(Vector3 player, string name)
     {
         // 자신의 캐릭터 위치를 넣어준다.
         player_Pos = player;
         // 동적으로 총알을 생성할 수 있게 true로 변경
         createBullet_b = true;
+        nickName = name;
     }
 
     public float DistanceToPoint(Vector3 a, Vector3 b)
@@ -197,7 +199,7 @@ public class OtherPlayerCtrl : MonoBehaviour
             {
                 // Costume를 변경 한다.
 
-                for (int i = 0; i < 15; ++i)
+                for (int i = 0; i < 18; ++i)
                 {
                     if (i == CostumeNumber)
                     {
@@ -233,7 +235,8 @@ public class OtherPlayerCtrl : MonoBehaviour
 
             if (createBullet_b == true)
             {
-                Instantiate(bullet, firePos.position, firePos.rotation);
+                GameObject bt =  Instantiate(bullet, firePos.position, firePos.rotation);
+                bt.GetComponent<BulletCtrl>().playerNickName = nickName;
 
                 // 사운드 발생 함수 ( 거리에 따른 소리를 다르게 하기 위하여 함수로 만듬)
                 source.PlayOneShot(soundCollection[weapon_state], SoundsByStreet(DistanceToPoint(player_Pos, tr.position)));
@@ -268,12 +271,12 @@ public class OtherPlayerCtrl : MonoBehaviour
             if (armour <= 0)
             {
                 hp -= coll.gameObject.GetComponent<BulletCtrl>().damage;
-                networkCtrl.Player_HP(otherPlayer_id, hp, armour);
+                networkCtrl.Player_HP(otherPlayer_id, hp, armour, "");
             }
             else
             {
                 armour -= coll.gameObject.GetComponent<BulletCtrl>().damage;
-                networkCtrl.Player_HP(otherPlayer_id, hp, armour);
+                networkCtrl.Player_HP(otherPlayer_id, hp, armour, "");
             }
 
             if (hp <= 0)

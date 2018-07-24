@@ -85,6 +85,15 @@ namespace TheLastOne.Game.Network
         Vector3 Player_Position;
         Vector3 Player_Rotation;
         Vector3 Car_Rotation;
+        //------------------------------------------
+        // 킬로그 관련
+        public GameObject killLog;
+        public Text LeftkillLog;
+        private static string leftkillText;
+        public Text RightkillLog;
+        private static string rightkillText;
+        private static bool killLogOn = false;
+        private static int killCount = 0;
 
         private byte[] Sendbyte = new byte[10000];
 
@@ -272,6 +281,23 @@ namespace TheLastOne.Game.Network
                     }
 
                 }
+
+                if (killLogOn == true)
+                {
+                    if (killLog.activeInHierarchy == false)
+                        killLog.SetActive(true);
+                    LeftkillLog.text = leftkillText;
+                    RightkillLog.text = rightkillText;
+                    killLogOn = false;
+                } else if ( killLog.activeInHierarchy == true) {
+                    ++killCount;
+                }
+                if (killCount >= 300)
+                {
+                    killLog.SetActive(false);
+                    killCount = 0;
+                }
+
                 yield return null;
             } while (true);
             //yield return null;
@@ -434,7 +460,7 @@ namespace TheLastOne.Game.Network
                     Enum get_int_enum = Player_Script.playerState;
 
                     // 플레이어 데이터 보내주기
-                    Sendbyte = sF.makeClient_PacketInfo(Player_Position, Convert.ToInt32(get_int_enum), Player_Script.h, Player_Script.v, Player_Rotation, Player_Script.now_Weapon, Player_Script.CarNum, Player_Script.dangerLineIn, Car_Rotation, Player_Script.ridingCar.KMh);
+                    Sendbyte = sF.makeClient_PacketInfo(Player_Position, Convert.ToInt32(get_int_enum), Player_Script.h, Player_Script.v, Player_Rotation, Player_Script.now_Weapon, Player_Script.CarNum, Player_Script.dangerLineIn, Car_Rotation, Player_Script.ridingCar.KMh, SingletonCtrl.Instance_S.PlayerID);
                     Send_Packet(Sendbyte);
 
                     //좀비 데이터 보내주기
@@ -641,7 +667,7 @@ namespace TheLastOne.Game.Network
                 {
                     Game_ClientClass iter = client_data[Get_ServerData.Id];
                     Game_ClientClass iter2 = client_data[Client_imei];
-                    iter.script.Fire(iter2.get_pos());      // 자신의 위치를 보내는 것은 총 소리를 판별 하기 위하여.
+                    iter.script.Fire(iter2.get_pos(), iter.get_name());      // 자신의 위치를 보내는 것은 총 소리를 판별 하기 위하여.
                 }
             }
             else if (type == recv_protocol.SC_DangerLine)
@@ -733,6 +759,17 @@ namespace TheLastOne.Game.Network
                 var Get_ServerData = Client_Packet.GetRootAsClient_Packet(revc_buf);
                 SingletonCtrl.Instance_S.SurvivalPlayer = Int32.Parse(Get_ServerData.Id.ToString());
             }
+            else if (type == recv_protocol.SC_KillLog)
+            {
+                byte[] t_buf = new byte[size + 1];
+                System.Buffer.BlockCopy(recvPacket, 8, t_buf, 0, size); // 사이즈를 제외한 실제 패킷값을 복사한다.
+                ByteBuffer revc_buf = new ByteBuffer(t_buf); // ByteBuffer로 byte[]로 복사한다.
+                var Get_ServerData = KillLog_info.GetRootAsKillLog_info(revc_buf);
+                leftkillText =Get_ServerData.LeftNick;
+                rightkillText = Get_ServerData.RightNick;
+                if (Get_ServerData.RightNick != "" || Get_ServerData.LeftNick != "" )
+                killLogOn = true;
+            }
 
         }
 
@@ -757,7 +794,7 @@ namespace TheLastOne.Game.Network
             {
                 try
                 {
-                    //Debug.Log(packet.Length);
+                    Debug.Log(packet.Length);
                     m_Socket.Send(packet, packet.Length, 0);
                 }
                 catch (SocketException err)
@@ -791,7 +828,7 @@ namespace TheLastOne.Game.Network
             if (id != -1)
             {
                 // 좀비 id 가 -1인 경우는 오프라인 Zombie뿐이다.
-                Sendbyte = sF.makeHP_PacketInfo(id, hp, 0, recv_protocol.Kind_Zombie);
+                Sendbyte = sF.makeHP_PacketInfo(id, hp, 0, recv_protocol.Kind_Zombie, "");
                 Send_Packet(Sendbyte);
             }
         }
@@ -801,7 +838,7 @@ namespace TheLastOne.Game.Network
             if (id != -1)
             {
                 // 차량 id 가 -1인 경우는 오프라인 이다.
-                Sendbyte = sF.makeHP_PacketInfo(id, hp, 0, recv_protocol.Kind_Car);
+                Sendbyte = sF.makeHP_PacketInfo(id, hp, 0, recv_protocol.Kind_Car, "");
                 Send_Packet(Sendbyte);
             }
         }
@@ -816,10 +853,10 @@ namespace TheLastOne.Game.Network
             }
         }
 
-        public void Player_HP(int id, int hp, int armour)
+        public void Player_HP(int id, int hp, int armour, string nickname)
         {
             if (id == -1) id = Client_imei; // -1의 경우 좀비에게 맞을경우 이다.
-            Sendbyte = sF.makeHP_PacketInfo(id, hp, armour, recv_protocol.Kind_Player);
+            Sendbyte = sF.makeHP_PacketInfo(id, hp, armour, recv_protocol.Kind_Player, nickname);
             Send_Packet(Sendbyte);
         }
 
