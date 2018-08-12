@@ -9,7 +9,7 @@
 
 class Game_Room {
 private:
-	int mapType;
+	int mapType = 0;
 	std::unordered_map< int, Game_Client> g_clients;
 	std::unordered_map< int, Game_Item> g_item;
 	std::unordered_map< int, Game_Zombie> g_zombie;

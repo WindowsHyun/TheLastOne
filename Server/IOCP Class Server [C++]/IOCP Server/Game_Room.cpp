@@ -87,7 +87,13 @@ void Game_Room::room_init()
 	this->playGame = false;
 
 	// 게임 아이템 정보 g_item에 넣어주기.
-	load_item_txt("./Game_Item_Collection.txt", &g_item);
+	std::cout << "맵 정보 : " << get_mapType() << std::endl;
+	if (this->mapType == 1) {
+		load_item_txt("./Item_Forest_Collection.txt", &g_item);
+	}
+	else if (this->mapType == 2) {
+		load_item_txt("./item_Desert_collection.txt", &g_item);
+	}
 
 	// 좀비 캐릭터 생성하기
 	init_Zombie(Create_Zombie, &g_zombie);
@@ -101,12 +107,20 @@ int Game_Room::get_mapType()
 void Game_Room::set_mapType(int mapType)
 {
 	this->mapType = mapType;
+	std::cout << "맵 정보 : " << get_mapType() << std::endl;
+	if (this->mapType == 1) {
+		load_item_txt("./Item_Forest_Collection.txt", &g_item);
+	}
+	else if (this->mapType == 2) {
+		load_item_txt("./item_Desert_collection.txt", &g_item);
+	}
 }
 
 Game_Room::Game_Room()
 {
 	// 게임 아이템 정보 g_item에 넣어주기.
-	load_item_txt("./Game_Item_Collection.txt", &g_item);
+	
+	
 
 	// 좀비 캐릭터 생성하기
 	init_Zombie(Create_Zombie, &g_zombie);

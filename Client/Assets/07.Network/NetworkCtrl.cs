@@ -794,7 +794,7 @@ namespace TheLastOne.Game.Network
             {
                 try
                 {
-                    Debug.Log(packet.Length);
+                    //Debug.Log(packet.Length);
                     m_Socket.Send(packet, packet.Length, 0);
                 }
                 catch (SocketException err)

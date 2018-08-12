@@ -57,7 +57,7 @@ enum Event_Type {
 #define CS_Player_Status 9					// 클라이언트가 서버에게 자신의 상태를 전달한다.
 
 // 자기장 시간
-#define DangerLine_init 5
+#define DangerLine_init 500000
 #define DangerLine_Level4 60
 #define DangerLine_Level3 60
 #define DangerLine_Level2 60
