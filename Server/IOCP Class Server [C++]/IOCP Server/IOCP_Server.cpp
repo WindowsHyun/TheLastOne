@@ -951,7 +951,7 @@ void IOCP_Server::Send_SurvivalCount(const int room_id, const int client)
 	}
 	//count++;
 	flatbuffers::FlatBufferBuilder builder;
-	auto Client_id = count + 1;	// 임시로 올려놓자.
+	auto Client_id = count;	// 임시로 올려놓자.
 	auto orc = CreateClient_Packet(builder, Client_id);
 	builder.Finish(orc); // Serialize the root of the object.
 

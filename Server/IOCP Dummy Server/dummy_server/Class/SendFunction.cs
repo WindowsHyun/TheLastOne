@@ -17,11 +17,13 @@ namespace TheLastOne.SendFunction
             //var offset = fbb.CreateString("WindowsHyun"); // String 문자열이 있을경우 미리 생성해라.
             FlatBufferBuilder fbb = new FlatBufferBuilder(1);
             fbb.Clear(); // 클리어를 안해주고 시작하면 계속 누적해서 데이터가 들어간다.
+            var fbbNickName = fbb.CreateString("AI_Bot" + r.Next(1, 1000).ToString()); // String 문자열이 있을경우 미리 생성해라.
             Client_info.StartClient_info(fbb);
             Client_info.AddAnimator(fbb, Player_Animator);  // 0 살아 있음, 1 죽음
             Client_info.AddHorizontal(fbb, horizontal);
             Client_info.AddVertical(fbb, vertical);
             Client_info.AddInCar(fbb, -1);
+            Client_info.AddName(fbb, fbbNickName);
             Client_info.AddCarrotation(fbb, Vec3.CreateVec3(fbb, 0, 0, 0));
             Client_info.AddCarkmh(fbb, 0);
             Client_info.AddPosition(fbb, Vec3.CreateVec3(fbb, Player.x, Player.y, Player.z));

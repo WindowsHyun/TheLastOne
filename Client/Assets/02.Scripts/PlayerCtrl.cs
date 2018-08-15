@@ -442,37 +442,64 @@ public class PlayerCtrl : PlayerVehicleCtrl
             if (Input.GetKeyDown(KeyCode.Alpha3)) // 낡은 공장 단지
             {
                 navagent.enabled = false;
-                tr.transform.position = new Vector3(526.118f, 50.04224f, 2705.361f);
+                if (SingletonCtrl.Instance_S.NowMapNumber == 2)
+                    tr.transform.position = new Vector3(875.8784f, 30.07964f, 2529.244f);
+                else
+                    tr.transform.position = new Vector3(526.118f, 50.04224f, 2705.361f);
                 navagent.enabled = true;
             }
             else if (Input.GetKeyDown(KeyCode.Alpha4)) // 학교
             {
                 navagent.enabled = false;
-                tr.transform.position = new Vector3(1407.026f, 50.0f, 2190.113f);
+                if (SingletonCtrl.Instance_S.NowMapNumber == 2)
+                    tr.transform.position = new Vector3(653.0f, 30.05061f, 1855.0f);
+                else
+                    tr.transform.position = new Vector3(1407.026f, 50.0f, 2190.113f);
                 navagent.enabled = true;
             }
             else if (Input.GetKeyDown(KeyCode.Alpha5)) // 언덕위 집
             {
                 navagent.enabled = false;
-                tr.transform.position = new Vector3(718.0281f, 50.0f, 1235.498f);
+                if (SingletonCtrl.Instance_S.NowMapNumber == 2)
+                    tr.transform.position = new Vector3(654.1024f, 30.05061f, 968.7f);
+                else
+                    tr.transform.position = new Vector3(718.0281f, 50.0f, 1235.498f);
                 navagent.enabled = true;
             }
             else if (Input.GetKeyDown(KeyCode.Alpha6)) // 컨테이너 단지
             {
                 navagent.enabled = false;
-                tr.transform.position = new Vector3(349.1992f, 60.06981f, 376.0149f);
+                if (SingletonCtrl.Instance_S.NowMapNumber == 2)
+                    tr.transform.position = new Vector3(1001.0f, 30.07964f, 988.0f);
+                else
+                    tr.transform.position = new Vector3(349.1992f, 60.06981f, 376.0149f);
                 navagent.enabled = true;
             }
             else if (Input.GetKeyDown(KeyCode.Alpha7)) // 호수 옆 집
             {
                 navagent.enabled = false;
-                tr.transform.position = new Vector3(1545.017f, 59.95751f, 904.9451f);
+                if (SingletonCtrl.Instance_S.NowMapNumber == 2)
+                    tr.transform.position = new Vector3(1572.333f, 30.07964f, 923.0f);
+                else
+                    tr.transform.position = new Vector3(1545.017f, 59.95751f, 904.9451f);
                 navagent.enabled = true;
             }
             else if (Input.GetKeyDown(KeyCode.Alpha8)) // 센터
             {
                 navagent.enabled = false;
-                tr.transform.position = new Vector3(1008.397f, 30.06981f, 1553.832f);
+                if (SingletonCtrl.Instance_S.NowMapNumber == 2)
+                    tr.transform.position = new Vector3(1390.741f, 30.08651f, 2121.12f);
+                else
+                    tr.transform.position = new Vector3(1008.397f, 30.06981f, 1553.832f);
+                navagent.enabled = true;
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha9)) // 센터
+            {
+                navagent.enabled = false;
+                if (SingletonCtrl.Instance_S.NowMapNumber == 2)
+                    tr.transform.position = new Vector3(1647.643f, 64.04927f, 2341.669f);
+                else
+                    tr.transform.position = new Vector3(1008.397f, 30.06981f, 1553.832f);
                 navagent.enabled = true;
             }
 
