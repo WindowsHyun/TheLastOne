@@ -1,0 +1,252 @@
+fileFormatVersion: 2
+guid: 27ef05e7a3983504f8c17b8e5c1c00e3
+ModelImporter:
+  serializedVersion: 22
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: Cube
+    100004: Cube_000
+    100006: Cube_001
+    100008: Cube_002
+    100010: Cube_003
+    100012: Cube_004
+    100014: Cube_005
+    100016: Cube_006
+    100018: Cube_007
+    100020: Cube_008
+    100022: Cube_009
+    100024: Cube_010
+    100026: Cube_011
+    100028: Cube_012
+    100030: Cube_013
+    100032: Cube_014
+    100034: Cube_015
+    100036: Cube_016
+    100038: Cube_017
+    100040: Cube_018
+    100042: Cube_019
+    100044: Plane
+    100046: Plane_001
+    400000: //RootNode
+    400002: Cube
+    400004: Cube_000
+    400006: Cube_001
+    400008: Cube_002
+    400010: Cube_003
+    400012: Cube_004
+    400014: Cube_005
+    400016: Cube_006
+    400018: Cube_007
+    400020: Cube_008
+    400022: Cube_009
+    400024: Cube_010
+    400026: Cube_011
+    400028: Cube_012
+    400030: Cube_013
+    400032: Cube_014
+    400034: Cube_015
+    400036: Cube_016
+    400038: Cube_017
+    400040: Cube_018
+    400042: Cube_019
+    400044: Plane
+    400046: Plane_001
+    2300000: Cube
+    2300002: Cube_000
+    2300004: Cube_001
+    2300006: Cube_002
+    2300008: Cube_003
+    2300010: Cube_004
+    2300012: Cube_005
+    2300014: Cube_006
+    2300016: Cube_007
+    2300018: Cube_008
+    2300020: Cube_009
+    2300022: Cube_010
+    2300024: Cube_011
+    2300026: Cube_012
+    2300028: Cube_013
+    2300030: Cube_014
+    2300032: Cube_015
+    2300034: Cube_016
+    2300036: Cube_017
+    2300038: Cube_018
+    2300040: Cube_019
+    2300042: Plane
+    2300044: Plane_001
+    3300000: Cube
+    3300002: Cube_000
+    3300004: Cube_001
+    3300006: Cube_002
+    3300008: Cube_003
+    3300010: Cube_004
+    3300012: Cube_005
+    3300014: Cube_006
+    3300016: Cube_007
+    3300018: Cube_008
+    3300020: Cube_009
+    3300022: Cube_010
+    3300024: Cube_011
+    3300026: Cube_012
+    3300028: Cube_013
+    3300030: Cube_014
+    3300032: Cube_015
+    3300034: Cube_016
+    3300036: Cube_017
+    3300038: Cube_018
+    3300040: Cube_019
+    3300042: Plane
+    3300044: Plane_001
+    4300000: Cube_019
+    4300002: Plane_001
+    4300004: Plane
+    4300006: Cube_018
+    4300008: Cube_017
+    4300010: Cube_016
+    4300012: Cube_014
+    4300014: Cube_010
+    4300016: Cube_015
+    4300018: Cube_013
+    4300020: Cube_012
+    4300022: Cube_011
+    4300024: Cube_009
+    4300026: Cube_008
+    4300028: Cube_007
+    4300030: Cube_006
+    4300032: Cube_005
+    4300034: Cube_004
+    4300036: Cube_003
+    4300038: Cube_002
+    4300040: Cube
+    4300042: Cube_000
+    4300044: Cube_001
+    6400000: Cube
+    6400002: Cube_000
+    6400004: Cube_001
+    6400006: Cube_002
+    6400008: Cube_003
+    6400010: Cube_004
+    6400012: Cube_005
+    6400014: Cube_006
+    6400016: Cube_007
+    6400018: Cube_008
+    6400020: Cube_009
+    6400022: Cube_010
+    6400024: Cube_011
+    6400026: Cube_012
+    6400028: Cube_013
+    6400030: Cube_014
+    6400032: Cube_015
+    6400034: Cube_016
+    6400036: Cube_017
+    6400038: Cube_018
+    6400040: Cube_019
+    6400042: Plane
+    6400044: Plane_001
+    7400000: Default Take
+    9500000: //RootNode
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material_002__AT_Walls_png
+    second: {fileID: 2100000, guid: e02fc36ffc8d9e942a14e26459b5b92a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material_003__AT_Walls_png
+    second: {fileID: 2100000, guid: e02fc36ffc8d9e942a14e26459b5b92a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material_004__AT_Walls_png
+    second: {fileID: 2100000, guid: e02fc36ffc8d9e942a14e26459b5b92a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material_005__AT_Walls_png
+    second: {fileID: 2100000, guid: e02fc36ffc8d9e942a14e26459b5b92a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material_006__Tile_Marble_Floor_2_png
+    second: {fileID: 2100000, guid: 2cb23f86d9ba3bc418a36f3a6868ebfb, type: 2}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 0
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 3
+    meshCompression: 0
+    addColliders: 1
+    importVisibility: 0
+    importBlendShapes: 1
+    importCameras: 0
+    importLights: 0
+    swapUVChannels: 0
+    generateSecondaryUV: 1
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 4
+    normalCalculationMode: 0
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
