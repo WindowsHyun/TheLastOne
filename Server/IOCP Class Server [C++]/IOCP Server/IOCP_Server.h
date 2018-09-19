@@ -19,6 +19,7 @@
 #include <windows.h>
 #include <string>
 #include <cmath>
+#include <mutex>
 
 
 #include "Protocol.h"
@@ -69,6 +70,7 @@ private:
 
 public:
 	HANDLE getHandle() { return g_hiocp; }
+	std::mutex mtx;
 	IOCP_Server();
 	~IOCP_Server();
 };

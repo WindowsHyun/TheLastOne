@@ -462,7 +462,9 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const int packe
 	{
 		auto client_Check_info = GetClient_packetView(get_packet);
 		auto iter = GameRoom[room_id].get_room().get_item_iter(client_Check_info->id());
+		mtx.lock();
 		iter->second.set_eat(true);
+		mtx.unlock();
 	}
 	break;
 	case CS_Zombie_info:
@@ -481,18 +483,24 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const int packe
 				// 좀비 위치가 정상적이지 않을경우 동기화 하지 않는다.
 				continue;
 			}
+
 			xyz packet_position{ packet_zombie->Get(i)->position()->x() , packet_zombie->Get(i)->position()->y() , packet_zombie->Get(i)->position()->z() };
 			iter->second.set_zombie_position(packet_position);
 			xyz packet_rotation{ packet_zombie->Get(i)->rotation()->x() , packet_zombie->Get(i)->rotation()->y() , packet_zombie->Get(i)->rotation()->z() };
 			iter->second.set_zombie_rotation(packet_rotation);
+
 			if (iter->second.get_target() == -1 && packet_zombie->Get(i)->targetPlayer() != -1) {
 				// 타겟이 없었는데 클라이언트에서 타겟을 넣어줬다.
+				mtx.lock();
 				iter->second.set_target(packet_zombie->Get(i)->targetPlayer());
+				mtx.unlock();
 				//std::cout << "타겟 설정 : " << iter->second.get_target() << std::endl;
 			}
 			else if (iter->second.get_target() != -1 && packet_zombie->Get(i)->targetPlayer() == -1) {
 				// 타겟이 있었는데 클라이언트에서 타겟을 초기화 해줬다.
+				mtx.lock();
 				iter->second.set_target(packet_zombie->Get(i)->targetPlayer());
+				mtx.unlock();
 				//std::cout << "타겟 초기화 : " << iter->second.get_target() << std::endl;
 			}
 
@@ -505,8 +513,10 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const int packe
 		auto client_Check_info = getGame_HP_SetView(get_packet);
 		if (client_Check_info->kind() == Kind_Player) {
 			auto iter = GameRoom[room_id].get_room().get_client_iter(client_Check_info->id());
+			mtx.lock();
 			iter->second.set_hp(client_Check_info->hp());
 			iter->second.set_armour(client_Check_info->armour());
+			mtx.unlock();
 			if (iter->second.get_hp() <= 0) {
 				// 체력이 0일경우 죽을을 허용한다.
 				Send_KillLog(room_id, client_Check_info->shotNick()->str(), iter->second.nickName);
@@ -515,11 +525,15 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const int packe
 		}
 		else if (client_Check_info->kind() == Kind_Zombie) {
 			auto iter = GameRoom[room_id].get_room().get_zombie_iter(client_Check_info->id());
+			mtx.lock();
 			iter->second.set_hp(client_Check_info->hp());
+			mtx.unlock();
 		}
 		else if (client_Check_info->kind() == Kind_Car) {
 			auto iter = GameRoom[room_id].get_room().get_item_iter(client_Check_info->id());
+			mtx.lock();
 			iter->second.set_hp(client_Check_info->hp());
+			mtx.unlock();
 			if (iter->second.get_hp() <= 0) {
 				// 차량 체력이 0일경우 폭파를 허용한다.
 				iter->second.set_exp(true);
@@ -531,20 +545,26 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const int packe
 	{
 		auto client_Check_info = GetClient_packetView(get_packet);
 		auto iter = GameRoom[room_id].get_room().get_item_iter(client_Check_info->id());
+		mtx.lock();
 		iter->second.set_riding(true);
+		mtx.unlock();
 	}
 	break;
 	case CS_Car_Rode:
 	{
 		auto client_Check_info = GetClient_packetView(get_packet);
 		auto iter = GameRoom[room_id].get_room().get_item_iter(client_Check_info->id());
+		mtx.lock();
 		iter->second.set_riding(false);
+		mtx.unlock();
 	}
 	break;
 	case CS_Player_Status:
 	{
 		auto client_Check_info = getClient_Status(get_packet);
+		mtx.lock();
 		client->second.set_playerStatus(client_Check_info->status());
+		mtx.unlock();
 		if (client_Check_info->mapType() != -1) {
 			// mapType가 -1이 아닐경우 : 플레이어가 레디를 하여 방을 찾는 상황이다.
 			GameRoomEnter(ci, client_Check_info->mapType(), client->second.get_Socket());
@@ -909,24 +929,29 @@ searchRoom:
 #if (DebugMod == TRUE )
 			std::cout << "Connect to Room : " << iter.get_id() << std::endl;
 #endif
+			mtx.lock();
 			// 접속된 클라이언트 데이터를 넣어 준다.
 			GameRoom[room_id].get_room().get_client().insert(std::pair< int, Game_Client>(client, { sock, client, (char *)"TheLastOne", room_id }));
 			//Room을 옮겨준 이후 Ready 상태로 변경해 준다.
 			GameRoom[room_id].get_room().get_client_iter(client)->second.set_playerStatus(ReadyStatus);
-
+			mtx.unlock();
 
 			//---------------------------------------------------------------------------------------
 			// 새로 입장한 Room에 Recv를 설정 해준다.
 			auto client_data = GameRoom[room_id].get_room().get_client_iter((int)client);
+			mtx.lock();
 			client_data->second.recv_over.room_id = room_id;
 			client_data->second.recv_over.target_id = (int)client;
+			mtx.unlock();
 
 			DWORD recv_flag = 0;
 			WSARecv(client_data->second.get_Socket(), &client_data->second.recv_over.wsabuf, 1, NULL, &recv_flag, &client_data->second.recv_over.over, NULL);
 			//---------------------------------------------------------------------------------------
 			// 기존 Overlapped 대기방이 변경이 되었다고 수정을 한다.
+			mtx.lock();
 			GameRoom[0].get_room().get_client().find(client)->second.set_room_id(room_id);
 			GameRoom[0].get_room().get_client_iter((int)client)->second.recv_over.room_change = true;
+			mtx.unlock();
 			// 대기방 번호를 리턴한다.
 			return room_id;
 			break;
@@ -980,7 +1005,9 @@ void IOCP_Server::create_GameRoom(const int mapType)
 	}
 	else {
 		std::cout << "Create to Room : " << createroom_id << " (" << mapType << ")" << std::endl;
+		mtx.lock();
 		GameRoom.emplace_back(Room_Manager(createroom_id, mapType));
+		mtx.unlock();
 		// 대기방이 아닐 경우에만 타이머를 추가해준다.
 		if (mapType != -1) {
 			// 클라이언트 종료시 삭제 처리를 위한 각 방에대한 타이머 이벤트 추가.
@@ -1017,7 +1044,9 @@ void IOCP_Server::Attack_DangerLine_Damge(const int room_id)
 			// 자기장 밖에 있을 경우.
 			auto client_iter = GameRoom[room_id].get_room().get_client_iter(iter.first);
 			int my_hp = client_iter->second.get_hp();
+			mtx.lock();
 			client_iter->second.set_hp(my_hp - GameRoom[room_id].get_room().get_dangerLine().get_demage());
+			mtx.unlock();
 			if (client_iter->second.get_hp() <= 0) {
 				client_iter->second.set_hp(0);
 			}
