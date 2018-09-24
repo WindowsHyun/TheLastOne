@@ -185,7 +185,9 @@ void IOCP_Server::Worker_Thread()
 			Send_All_Time(over->room_id, SC_Server_Time, T_DangerLine, (int)ci, -1, true);
 			if (ci <= 0) {
 				// 초기 대기시간이 만료 되었을 경우
+				mtx.lock();
 				GameRoom[over->room_id].get_room().get_dangerLine().set_level(GameRoom[over->room_id].get_room().get_dangerLine().get_level() - 1);
+				mtx.unlock();
 				Send_DangerLine_info(over->room_id, GameRoom[over->room_id].get_room().get_dangerLine().get_demage(), GameRoom[over->room_id].get_room().get_dangerLine().get_pos(), GameRoom[over->room_id].get_room().get_dangerLine().get_scale());
 				if (GameRoom[over->room_id].get_room().get_dangerLine().get_level() != -1) {
 					Timer_Event t = { over->room_id, (int)GameRoom[over->room_id].get_room().get_dangerLine().get_scale_x() , high_resolution_clock::now() + 100ms, E_MoveDangerLine };
@@ -203,7 +205,9 @@ void IOCP_Server::Worker_Thread()
 			}
 		}
 		else if (OP_MoveDangerLine == over->event_type) {
+			mtx.lock();
 			GameRoom[over->room_id].get_room().get_dangerLine().set_scale(10);
+			mtx.unlock();
 			Send_DangerLine_info(over->room_id, GameRoom[over->room_id].get_room().get_dangerLine().get_demage(), GameRoom[over->room_id].get_room().get_dangerLine().get_pos(), GameRoom[over->room_id].get_room().get_dangerLine().get_scale());
 
 			if (GameRoom[over->room_id].get_room().get_dangerLine().get_now_scale_x() <= ci) {
@@ -232,7 +236,9 @@ void IOCP_Server::Worker_Thread()
 			// 룸에 대기인원이 몇명인지 확인을 한다.
 			if (GameRoom[over->room_id].get_room().check_ReadyClients() >= Minimum_Players && GameRoom[over->room_id].get_status() == LobbyStatus) {
 				// 레디한 인원이 최소 인원 보다 많아졌을 경우.
+				mtx.lock();
 				GameRoom[over->room_id].set_status(ReadyStatus);
+				mtx.unlock();
 				// 게임 레디 단계로 넘어간다.
 				Timer_Event t = { over->room_id, GamePlayWait, high_resolution_clock::now() + 1s, E_LobbyReday };
 				Timer.setTimerEvent(t);
@@ -242,8 +248,10 @@ void IOCP_Server::Worker_Thread()
 			else if (GameRoom[over->room_id].get_room().get_client().size() <= 0 && GameRoom[over->room_id].get_room().get_playGame() == true) {
 				// 룸 안에 클라이언트가 한명도 없을경우 방을 다시 대기 모드로 변경한다.
 				std::cout << "Room (" << over->room_id << ") init..!" << std::endl;
+				mtx.lock();
 				GameRoom[over->room_id].get_room().room_init();
 				GameRoom[over->room_id].set_status(LobbyStatus);
+				mtx.unlock();
 				Timer_Event t = { over->room_id, 1, high_resolution_clock::now() + 1s, E_LobbyWait };
 				Timer.setTimerEvent(t);
 			}
@@ -257,8 +265,10 @@ void IOCP_Server::Worker_Thread()
 			Send_All_Time(over->room_id, SC_Lobby_Time, T_LobbyReday, (int)ci, noPlayer, true);
 			if (ci <= 0) {
 				// 카운트 다운이 모두 끝난 경우.
+				mtx.lock();
 				GameRoom[over->room_id].get_room().set_playGame(true);
 				GameRoom[over->room_id].set_status(inGameStatus);
+				mtx.unlock();
 				std::cout << "Room : " << over->room_id << " Game Start..!" << std::endl;
 				// 자기장 밖의 경우 데미지를 잃게 타이머 시작을 한다.
 				Timer_Event t = { over->room_id, 1, high_resolution_clock::now() + 1s, E_DangerLineDamage };
@@ -349,8 +359,10 @@ void IOCP_Server::Remove_Client(const int room_id)
 				Send_Client_ID(client_iter->second.get_room_id(), client_iter->second.get_client_id(), SC_REMOVE_PLAYER, true);
 				if (client_iter->second.get_hp() >= -100 && client_iter->second.get_hp() <= 100)
 					closesocket(client_iter->second.get_Socket());
+				mtx.lock();
 				remove_client_id.push(client_iter->second.get_client_id());	// 종료된 클라이언트 번호를 스택에 넣어준다.
 				client_iter = GameRoom[room_id].get_room().get_client().erase(client_iter++);		// Map 에서 해당 클라이언트를 삭제한다.
+				mtx.unlock();
 			}
 			else {
 				++client_iter;
