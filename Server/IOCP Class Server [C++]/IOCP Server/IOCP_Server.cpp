@@ -386,8 +386,10 @@ void IOCP_Server::Shutdown_Server()
 void IOCP_Server::DisconnectClient(const int room_id, const int ci)
 {
 	// Disconnect시 Remove_Client에서 지울 수 있게 값을 변경 해준다.
+	mtx.lock();
 	GameRoom[room_id].get_room().get_client().find(ci)->second.set_client_Connect(false);
 	GameRoom[room_id].get_room().get_client().find(ci)->second.set_client_Remove(true);
+	mtx.unlock();
 }
 
 void IOCP_Server::ProcessPacket(const int room_id, const int ci, const int packet_size, const int packet_i, const char *packet)
@@ -497,9 +499,12 @@ void IOCP_Server::ProcessPacket(const int room_id, const int ci, const int packe
 			}
 
 			xyz packet_position{ packet_zombie->Get(i)->position()->x() , packet_zombie->Get(i)->position()->y() , packet_zombie->Get(i)->position()->z() };
-			iter->second.set_zombie_position(packet_position);
 			xyz packet_rotation{ packet_zombie->Get(i)->rotation()->x() , packet_zombie->Get(i)->rotation()->y() , packet_zombie->Get(i)->rotation()->z() };
+
+			mtx.lock();
+			iter->second.set_zombie_position(packet_position);
 			iter->second.set_zombie_rotation(packet_rotation);
+			mtx.unlock();
 
 			if (iter->second.get_target() == -1 && packet_zombie->Get(i)->targetPlayer() != -1) {
 				// 타겟이 없었는데 클라이언트에서 타겟을 넣어줬다.

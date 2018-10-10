@@ -777,6 +777,9 @@ namespace TheLastOne.Game.Network
         {
             debugString = "";
             Application.runInBackground = true; // 백그라운드에서도 Network는 작동해야한다.
+            client_data.Clear();
+            zombie_data.Clear();
+            item_Collection.Clear();
             m_Socket = SingletonCtrl.Instance_S.PlayerSocket;
             StartCoroutine(SocketCheck());
         }

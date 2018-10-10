@@ -627,7 +627,10 @@ public class PlayerCtrl : PlayerVehicleCtrl
         Client_imei = networkCtrl.get_imei();
 
         // 인벤토리의 자식 컴포넌트의 스크립트 할당
+        Debug.Log("SlotCtrl 초기화!");
+        slotctrl = null;
         slotctrl = inventory.GetComponentsInChildren<SlotCtrl>();
+        weaponSlotCtrl = null;
         weaponSlotCtrl = inventory.GetComponentsInChildren<WeaponSlotCtrl>();
 
         StartCoroutine(StartKeyInput());

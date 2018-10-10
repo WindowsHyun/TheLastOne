@@ -63,7 +63,8 @@ public class SingletonCtrl : MonoBehaviour
             if (nowModeNumber == -1)
             {
                 m_Socket.Close();
-                networkCtrl.NetworkInit();
+                networkCtrl = null;
+                networkCtrl = new NetworkCtrl();
                 nowModeNumber = 0;
                 survivalPlayer = 0;
                 playerStatus = 1;
