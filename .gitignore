@@ -4,11 +4,12 @@
 *.idb
 *.tlog
 
-# À¯´ÏÆ¼ Ä³½Ã Æú´õ Á¦¿Ü
+# ìœ ë‹ˆí‹° ìºì‹œ í´ë” ì œì™¸
 metadata/
 PlayerDataCache/
 ShaderCache/
+Client/Library/
 
-# VS ÇÊ¿ä ¾ø´Â Æú´õ Á¦¿Ü
+# VS í•„ìš” ì—†ëŠ” í´ë” ì œì™¸
 .vs/
 Debug/
