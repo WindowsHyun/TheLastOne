@@ -73,6 +73,13 @@
     + 3D Max를 이용해 캐릭터 및 좀비의 여러 애니메이션 자체 제작
     + 포토샵을 이용한 UI 자체 제작
 
+----------
+TheLastOne 웹사이트
+----------
++ [http://game.thisisserver.com](http://game.thisisserver.com/)
++ ID : test , PW : 1234
++ ID : qwe, PW : 1234
+
 ---------
 인게임 화면
 ---------

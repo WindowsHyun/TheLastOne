@@ -323,7 +323,7 @@ public class SingletonCtrl : MonoBehaviour
     public bool webServer_Point(int point, string content, string parameter)
     {
         string tmp;
-        tmp = parsing.httpWebPost("http://editer.iptime.org/set_point.php", "TheLastOne/WindowsHyun0616", "point=" + point  + "&content=" + content + "&parameter=" + parameter, true);
+        tmp = parsing.httpWebPost("http://game.thisisserver.com/set_point.php", "TheLastOne/WindowsHyun0616", "point=" + point  + "&content=" + content + "&parameter=" + parameter, true);
         if (tmp.IndexOf("Error") == -1)
         {
             return true;
@@ -339,7 +339,7 @@ public class SingletonCtrl : MonoBehaviour
     {
         string tmp;
         string Content;
-        tmp = parsing.httpWebPost("http://editer.iptime.org/recv_costum.php", "TheLastOne/WindowsHyun0616", "", true);
+        tmp = parsing.httpWebPost("http://game.thisisserver.com/recv_costum.php", "TheLastOne/WindowsHyun0616", "", true);
         if (tmp.IndexOf("Error") == -1)
         {
             Content = parsing.splitParsing(tmp, "Success : ", "\\|");
@@ -360,7 +360,7 @@ public class SingletonCtrl : MonoBehaviour
     {
         // 현재 장착된 Costum을 서버에 보내준다.
         string tmp;
-        tmp = parsing.httpWebPost("http://editer.iptime.org/set_costum.php", "TheLastOne/WindowsHyun0616", "costum=" + costum_num, true);
+        tmp = parsing.httpWebPost("http://game.thisisserver.com/set_costum.php", "TheLastOne/WindowsHyun0616", "costum=" + costum_num, true);
         if (tmp.IndexOf("Error") == -1)
         {
             return true;
@@ -374,7 +374,7 @@ public class SingletonCtrl : MonoBehaviour
 
     public bool webServer_getPlayerinfo()
     {
-        string tmp = parsing.httpWebPost("http://editer.iptime.org/get_info.php", "", "", true);
+        string tmp = parsing.httpWebPost("http://game.thisisserver.com/get_info.php", "", "", true);
 
         playerID = parsing.splitParsing(tmp, "Nick : ", "\\|");
         playerMoney = Int32.Parse(parsing.splitParsing(tmp, "Point : ", "\\|"));
@@ -399,7 +399,7 @@ public class SingletonCtrl : MonoBehaviour
     public bool loginWebServer(string id, string pw)
     {
         string tmp;
-        tmp = parsing.httpWebPost("http://editer.iptime.org/bbs/login_check.php", "", "url=&mb_id=" + id + "&mb_password=" + pw, false);
+        tmp = parsing.httpWebPost("http://game.thisisserver.com/bbs/login_check.php", "", "url=&mb_id=" + id + "&mb_password=" + pw, false);
         if (tmp.IndexOf("비밀번호가 틀립니다") == -1)
         {
             // 정상적으로 로그인 완료!
